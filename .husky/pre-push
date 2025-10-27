@@ -1,6 +1,16 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Add common pnpm paths to PATH
+export PATH="$HOME/.local/share/pnpm:$HOME/Library/pnpm:/usr/local/bin:$PATH"
+
+# Try to find pnpm
+if ! command -v pnpm >/dev/null 2>&1; then
+    echo "⚠️  pnpm not found in PATH"
+    echo "Skipping pre-push checks (install pnpm or use --no-verify)"
+    exit 0
+fi
+
 echo "🔍 Running pre-push checks..."
 echo ""
 
