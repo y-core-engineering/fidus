@@ -122,11 +122,19 @@ The UX/UI design must cover:
    - LLM Model Selection (Ollama local vs. Cloud LLM choice)
    - Shared Resources (Family calendar, shared shopping lists)
 
-7. Responsive Design
-   - Desktop (primary interface)
-   - Mobile Web (responsive breakpoints)
-   - Mobile Apps (iOS, Android considerations)
-   - CLI (command-line interface design)
+7. Responsive Design & Progressive Web App (PWA)
+   - Desktop (primary interface - 1024px+)
+   - Tablet (768px - 1023px)
+   - Mobile Web (320px - 767px, responsive breakpoints)
+   - PWA (Progressive Web App - CRITICAL!)
+     - Offline capability (Service Workers for core functionality)
+     - Install to home screen (manifest.json, app icons)
+     - Native-like experience (full-screen, splash screen)
+     - Push notifications (proactive suggestions)
+     - Background sync (when connection restored)
+     - App shell architecture (instant loading)
+   - Native Mobile Apps (iOS, Android - optional for Cloud/Enterprise)
+   - CLI (command-line interface design for power users)
 
 8. Privacy & Trust UX
    - Privacy indicators (local vs. cloud processing)
@@ -184,15 +192,19 @@ The UX/UI design must cover:
       - Local-only UI elements
       - Hardware requirement warnings
       - No cloud sync options
+      - PWA install encouraged (no app store needed)
+      - Offline-first experience
     - Cloud Edition (Managed):
       - Cloud sync indicators
-      - Mobile app access
+      - PWA with online/offline hybrid mode
+      - Optional native mobile apps (iOS, Android)
       - Subscription management UI
     - Enterprise Edition (Hybrid):
       - SSO integration UI
       - Admin dashboards
       - Multi-tenant management
       - Air-gapped mode indicators
+      - Custom PWA deployment on intranet
 
 CRITICAL CONSTRAINTS
 
@@ -219,8 +231,9 @@ MUST NOT:
 - Hidden permission usage (always show Service/Data/LLM permissions)
 
 Design Requirements:
-- Load Time: Perceived < 1 second (use optimistic UI, skeletons)
+- Load Time: Perceived < 1 second (use optimistic UI, skeletons, app shell)
 - Mobile-First: Responsive down to 320px width
+- PWA-Ready: Offline capability, install to home screen, native-like experience
 - Accessibility: WCAG 2.1 AA compliant
 - Privacy: Visual indicators for local vs. cloud processing
 - Trust: Always show why and how Fidus does things
@@ -275,7 +288,8 @@ Step 6: Review Preparation
   - Brand identity consistently applied (colors, typography, tone)?
   - Privacy & trust UX complete (Privacy Proxy, encryption, permissions)?
   - Accessibility considered (WCAG 2.1 AA)?
-  - Responsive design addressed (desktop, mobile, CLI)?
+  - Responsive design addressed (desktop, tablet, mobile)?
+  - PWA requirements covered (offline, install, push notifications)?
   - Multi-tenancy UX complete (Personal/Family/Team/Company)?
   - Ubiquitous language used consistently in all UI text?
   - Onboarding flow designed and documented?
@@ -426,9 +440,10 @@ Example structure (but you decide!):
 - Core interaction patterns
 - Design system and components
 - Key screens and flows (multiple documents if needed)
-- Responsive design considerations
+- Responsive design & PWA
 - Privacy and trust UX
 - AI/LLM-specific UX
+- Multi-tenancy UX
 - Accessibility guidelines
 - Appendices (design decisions, open questions, checklist)
 
@@ -661,6 +676,39 @@ Must show how AI affects UX:
 4. Fallback UI:
    - If LLM fails: "I couldn't understand that. Try rephrasing?"
    - Offers predefined options: "Did you mean: [Schedule meeting] [Check budget] [Plan trip]?"
+
+PWA-SPECIFIC UX EXAMPLES TO INCLUDE
+
+Must show how PWA capabilities manifest in UX:
+
+1. Install Prompt:
+   - After 2-3 positive interactions: "Add Fidus to your home screen for quick access"
+   - Dismissible, doesn't repeat if declined
+   - Shows benefits: "Works offline, faster loading, desktop notifications"
+
+2. Offline Indicator:
+   - Top banner (non-intrusive): "Offline mode - some features limited"
+   - Cached data available (calendar, recent transactions)
+   - Queue for sync: "2 actions will sync when online"
+
+3. Background Sync:
+   - Success notification: "Synced 2 calendar updates while you were away"
+   - Conflict resolution: "Your calendar changed. Choose version: [Yours] [Server]"
+
+4. Push Notifications (Proactive Suggestions):
+   - Rich notifications with actions: "Budget alert: Food 90% → [View] [Dismiss]"
+   - Notification settings: Granular control per Supervisor
+   - Respects system Do Not Disturb
+
+5. App Shell Loading:
+   - Instant skeleton UI (<100ms)
+   - Progressive content load
+   - Perceived performance: "Fidus loads instantly"
+
+6. Update Available:
+   - Non-blocking: "New version available. [Update now] [Later]"
+   - Auto-update on next visit (with user consent)
+   - Changelog preview: "What's new: Calendar sync improvements"
 
 START
 
