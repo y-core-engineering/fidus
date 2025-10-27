@@ -15,46 +15,38 @@ The Proactivity Domain is a **Core Domain** responsible for detecting opportunit
 
 ### Proactivity Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    DATA INPUTS                          │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────────────┐      ┌──────────────────────┐   │
-│  │   Data Signals   │      │   Domain Events      │   │
-│  │   (Pull-based)   │      │   (Push-based)       │   │
-│  └────────┬─────────┘      └──────────┬───────────┘   │
-│           │                            │               │
-│           └────────────┬───────────────┘               │
-│                        │                               │
-└────────────────────────┼───────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│              OPPORTUNITY DETECTION ENGINE               │
-│  • Signal Collection (dynamic registry)                 │
-│  • Event Processing (Redis Pub/Sub)                    │
-│  • LLM-based Relevance Evaluation                      │
-│  • Confidence Scoring                                   │
-│  • Deduplication & Throttling                          │
-└────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│                OPPORTUNITY AGGREGATES                   │
-│  • Opportunity (identified potential action)            │
-│  • Suggestion (concrete recommendation)                 │
-│  • ProactiveSession (group of related opportunities)    │
-└────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│            NOTIFICATION DELIVERY ENGINE                 │
-│  • Smart Timing (Do Not Disturb, context-aware)        │
-│  • Priority Ordering                                    │
-│  • Deduplication                                        │
-│  • Multi-Channel Delivery (push, email, in-app)        │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph DataInputs["DATA INPUTS"]
+        Signals[Data Signals<br/>Pull-based]
+        Events[Domain Events<br/>Push-based]
+    end
+
+    subgraph Detection["OPPORTUNITY DETECTION ENGINE"]
+        Collection[Signal Collection<br/>dynamic registry]
+        Processing[Event Processing<br/>Redis Pub/Sub]
+        Evaluation[LLM-based Relevance<br/>Evaluation]
+        Scoring[Confidence Scoring]
+        Dedup[Deduplication & Throttling]
+    end
+
+    subgraph Aggregates["OPPORTUNITY AGGREGATES"]
+        Opp[Opportunity<br/>identified potential action]
+        Sugg[Suggestion<br/>concrete recommendation]
+        Session[ProactiveSession<br/>group of related opportunities]
+    end
+
+    subgraph Delivery["NOTIFICATION DELIVERY ENGINE"]
+        Timing[Smart Timing<br/>Do Not Disturb, context-aware]
+        Priority[Priority Ordering]
+        Dedup2[Deduplication]
+        MultiChannel[Multi-Channel Delivery<br/>push, email, in-app]
+    end
+
+    Signals --> Detection
+    Events --> Detection
+    Detection --> Aggregates
+    Aggregates --> Delivery
 ```
 
 ---

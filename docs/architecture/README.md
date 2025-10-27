@@ -27,38 +27,38 @@ Fidus is a privacy-first AI personal assistant built on a modular, event-driven 
 
 Fidus follows a **multi-agent architecture** where specialized agents (Supervisors) handle specific domains of user life. The system is built on three foundational layers:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    User Interface Layer                      │
-│              (Web, Mobile, Voice, Chat)                      │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  Orchestration Layer                         │
-│         ┌──────────────────────────────────────┐            │
-│         │    Orchestration Supervisor          │            │
-│         │  (Intent Detection & Routing)        │            │
-│         └──────────────────────────────────────┘            │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                    Domain Layer                              │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐            │
-│  │  Calendar  │  │  Finance   │  │   Travel   │            │
-│  │ Supervisor │  │ Supervisor │  │ Supervisor │            │
-│  └────────────┘  └────────────┘  └────────────┘            │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐            │
-│  │  Health    │  │    Home    │  │  Shopping  │            │
-│  │ Supervisor │  │ Supervisor │  │ Supervisor │            │
-│  └────────────┘  └────────────┘  └────────────┘            │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│               Infrastructure Layer                           │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
-│  │PostgreSQL│ │   Redis  │ │  Neo4j   │ │   LLM    │      │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph UI["User Interface Layer"]
+        Web[Web]
+        Mobile[Mobile]
+        Voice[Voice]
+        Chat[Chat]
+    end
+
+    subgraph Orchestration["Orchestration Layer"]
+        OrcSup[Orchestration Supervisor<br/>Intent Detection & Routing]
+    end
+
+    subgraph Domain["Domain Layer"]
+        Calendar[Calendar<br/>Supervisor]
+        Finance[Finance<br/>Supervisor]
+        Travel[Travel<br/>Supervisor]
+        Health[Health<br/>Supervisor]
+        Home[Home<br/>Supervisor]
+        Shopping[Shopping<br/>Supervisor]
+    end
+
+    subgraph Infra["Infrastructure Layer"]
+        PostgreSQL[(PostgreSQL)]
+        Redis[(Redis)]
+        Neo4j[(Neo4j)]
+        LLM[LLM]
+    end
+
+    UI --> Orchestration
+    Orchestration --> Domain
+    Domain --> Infra
 ```
 
 ### Key Architectural Principles
@@ -183,8 +183,11 @@ graph.set_entry_point("analyze_request")
 ### 2. Event-Driven Architecture
 
 **Event Flow:**
-```
-Domain Event → Redis Pub/Sub → Subscribers → Side Effects
+```mermaid
+flowchart LR
+    A[Domain Event] --> B[Redis Pub/Sub]
+    B --> C[Subscribers]
+    C --> D[Side Effects]
 ```
 
 **Event Structure:**
@@ -306,9 +309,13 @@ Shared, immutable value objects ensure consistency:
 - Response synthesis
 
 **State Machine:**
-```
-User Request → Detect Intent → Route to Supervisor(s) →
-Execute → Synthesize Response → Return to User
+```mermaid
+flowchart LR
+    A[User Request] --> B[Detect Intent]
+    B --> C[Route to Supervisor]
+    C --> D[Execute]
+    D --> E[Synthesize Response]
+    E --> F[Return to User]
 ```
 
 #### 2. Domain Supervisors
@@ -332,9 +339,12 @@ Each domain has a dedicated Supervisor:
 **Responsibility:** Detect opportunities and generate suggestions
 
 **Flow:**
-```
-Proactive Trigger → Validate → Check Preferences →
-Create Suggestion → Notify User
+```mermaid
+flowchart LR
+    A[Proactive Trigger] --> B[Validate]
+    B --> C[Check Preferences]
+    C --> D[Create Suggestion]
+    D --> E[Notify User]
 ```
 
 **Example Opportunities:**
@@ -345,9 +355,12 @@ Create Suggestion → Notify User
 #### 4. Plugin System
 
 **MCP Server Integration:**
-```
-Plugin Connection → OAuth Flow → MCP Server →
-Expose Tools → Supervisors Use Tools
+```mermaid
+flowchart LR
+    A[Plugin Connection] --> B[OAuth Flow]
+    B --> C[MCP Server]
+    C --> D[Expose Tools]
+    D --> E[Supervisors Use Tools]
 ```
 
 **Supported Integrations:**
@@ -363,61 +376,56 @@ Expose Tools → Supervisors Use Tools
 
 ### Request Flow Example: "Schedule a meeting"
 
-```
-1. User: "Schedule a meeting with John tomorrow at 2pm"
-   ↓
-2. Orchestration Supervisor
-   - Detects intent: CREATE_APPOINTMENT
-   - Routes to: CalendarSupervisor
-   ↓
-3. Calendar Supervisor
-   - Checks availability (2pm tomorrow)
-   - Detects no conflicts
-   - Creates Appointment aggregate
-   - Emits: AppointmentCreated event
-   ↓
-4. Event Handling
-   - Proactivity Supervisor subscribes
-   - Checks for travel time needed
-   - No trigger generated (same location)
-   ↓
-5. Response
-   - Calendar Supervisor returns confirmation
-   - Orchestration synthesizes response
-   - User receives: "Meeting scheduled for tomorrow at 2pm with John"
+```mermaid
+sequenceDiagram
+    actor User
+    participant Orch as Orchestration<br/>Supervisor
+    participant Cal as Calendar<br/>Supervisor
+    participant Proact as Proactivity<br/>Supervisor
+
+    User->>Orch: "Schedule a meeting with John<br/>tomorrow at 2pm"
+    Orch->>Orch: Detect intent:<br/>CREATE_APPOINTMENT
+    Orch->>Cal: Route to CalendarSupervisor
+    Cal->>Cal: Check availability (2pm tomorrow)
+    Cal->>Cal: Detect no conflicts
+    Cal->>Cal: Create Appointment aggregate
+    Cal-->>Proact: Emit: AppointmentCreated event
+    Proact->>Proact: Check for travel time needed
+    Proact->>Proact: No trigger (same location)
+    Cal->>Orch: Return confirmation
+    Orch->>Orch: Synthesize response
+    Orch->>User: "Meeting scheduled for<br/>tomorrow at 2pm with John"
 ```
 
 ### Multi-Domain Flow Example: "Book a flight to Paris"
 
-```
-1. User: "Book a flight to Paris next Friday"
-   ↓
-2. Orchestration Supervisor
-   - Detects intents: SEARCH_FLIGHT, CREATE_TRIP
-   - Routes to: TravelSupervisor
-   ↓
-3. Travel Supervisor
-   - Searches flights (via MCP: amadeus.search_flights)
-   - Creates Trip aggregate
-   - Presents options to user
-   ↓
-4. User selects flight
-   ↓
-5. Travel Supervisor
-   - Creates Booking aggregate
-   - Emits: BookingConfirmed event
-   ↓
-6. Calendar Supervisor (subscribes to BookingConfirmed)
-   - Creates calendar event for flight
-   - Emits: AppointmentCreated event
-   ↓
-7. Finance Supervisor (subscribes to BookingConfirmed)
-   - Records transaction
-   - Checks budget
-   ↓
-8. Proactivity Supervisor
-   - Receives: DEPARTURE_SOON trigger (24h before)
-   - Creates suggestion: "Check in for your flight"
+```mermaid
+sequenceDiagram
+    actor User
+    participant Orch as Orchestration<br/>Supervisor
+    participant Travel as Travel<br/>Supervisor
+    participant MCP as MCP Server<br/>(Amadeus)
+    participant Cal as Calendar<br/>Supervisor
+    participant Fin as Finance<br/>Supervisor
+    participant Proact as Proactivity<br/>Supervisor
+
+    User->>Orch: "Book a flight to Paris next Friday"
+    Orch->>Orch: Detect intents:<br/>SEARCH_FLIGHT, CREATE_TRIP
+    Orch->>Travel: Route to TravelSupervisor
+    Travel->>MCP: amadeus.search_flights
+    MCP-->>Travel: Flight options
+    Travel->>Travel: Create Trip aggregate
+    Travel->>User: Present flight options
+    User->>Travel: Select flight
+    Travel->>Travel: Create Booking aggregate
+    Travel-->>Cal: Emit: BookingConfirmed event
+    Travel-->>Fin: Emit: BookingConfirmed event
+    Cal->>Cal: Create calendar event for flight
+    Cal-->>Proact: Emit: AppointmentCreated event
+    Fin->>Fin: Record transaction
+    Fin->>Fin: Check budget
+    Note over Proact: 24h before departure
+    Proact->>User: Suggestion: "Check in for your flight"
 ```
 
 ---

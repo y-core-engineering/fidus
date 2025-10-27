@@ -24,84 +24,45 @@ We use the following DDD patterns to describe context relationships:
 
 ## High-Level Context Map
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          FIDUS SYSTEM                                   │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph FidusSystem["FIDUS SYSTEM"]
+        Orch["Orchestration Context (CORE)<br/>[OHS + PL]"]
 
-                    ┌──────────────────────────┐
-                    │  Orchestration Context   │ (CORE)
-                    │     [OHS + PL]           │
-                    └───────────┬──────────────┘
-                                │
-                    Commands    │    Events (PL)
-                    (Sync)      │    (Async)
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        │                       │                       │
-        ▼                       ▼                       ▼
-┌───────────────┐      ┌────────────────┐     ┌────────────────┐
-│  Calendar     │      │   Finance      │     │    Travel      │
-│  Context      │      │   Context      │     │    Context     │
-│   [C/S]       │      │   [C/S]        │     │   [C/S]        │
-└───────┬───────┘      └────────┬───────┘     └────────┬───────┘
-        │                       │                       │
-        │      Domain Events (PL) - Published Language  │
-        │                       │                       │
-        └───────────────────────┼───────────────────────┘
-                                │
-                                ▼
-                    ┌───────────────────────┐
-                    │  Proactivity Context  │ (CORE)
-                    │      [CF]             │
-                    │  (Subscribes to all)  │
-                    └───────────────────────┘
+        subgraph DomainLayer["Domain Layer"]
+            Calendar["Calendar Context<br/>[C/S]"]
+            Finance["Finance Context<br/>[C/S]"]
+            Travel["Travel Context<br/>[C/S]"]
+        end
 
-┌─────────────────────────────────────────────────────────────────────────┐
-│                       SUPPORTING CONTEXTS                               │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────┐   │
-│  │  Identity &      │  │   Profile        │  │    Plugin         │   │
-│  │  Access Context  │  │   Context        │  │    Context        │   │
-│  │    [OHS]         │  │   [OHS]          │  │    [OHS]          │   │
-│  └────────┬─────────┘  └────────┬─────────┘  └─────────┬─────────┘   │
-│           │                     │                       │             │
-│           │     Used by all Domain Contexts            │             │
-│           │     (Customer/Supplier)                     │             │
-│           └─────────────────────┼───────────────────────┘             │
-│                                 │                                     │
-│                    ┌────────────▼───────────┐                         │
-│                    │  Audit & Compliance    │                         │
-│                    │      Context           │                         │
-│                    │      [CF]              │                         │
-│                    │  (Subscribes to all)   │                         │
-│                    └────────────────────────┘                         │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+        Proact["Proactivity Context (CORE)<br/>[CF]<br/>(Subscribes to all)"]
 
-┌─────────────────────────────────────────────────────────────────────────┐
-│                       EXTERNAL SYSTEMS                                  │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                │
-│  │   Google     │  │   Outlook    │  │   Stripe     │                │
-│  │   Calendar   │  │   Calendar   │  │   Payment    │                │
-│  │   [ACL]      │  │   [ACL]      │  │   [ACL]      │                │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘                │
-│         │                 │                  │                         │
-│         └─────────────────┼──────────────────┘                         │
-│                           │                                            │
-│                  Via MCP Protocol                                      │
-│                           │                                            │
-│         ┌─────────────────┼──────────────────┐                         │
-│         ▼                 ▼                  ▼                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                │
-│  │  Calendar    │  │  Calendar    │  │   Finance    │                │
-│  │  Context     │  │  Context     │  │   Context    │                │
-│  └──────────────┘  └──────────────┘  └──────────────┘                │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+        subgraph SupportingContexts["SUPPORTING CONTEXTS"]
+            Identity["Identity & Access<br/>Context [OHS]"]
+            Profile["Profile Context<br/>[OHS]"]
+            Plugin["Plugin Context<br/>[OHS]"]
+            Audit["Audit & Compliance<br/>Context [CF]<br/>(Subscribes to all)"]
+        end
+
+        Orch -->|Commands (Sync)| DomainLayer
+        DomainLayer -->|Events (PL) (Async)| Proact
+
+        Identity -.->|Used by all<br/>Customer/Supplier| DomainLayer
+        Profile -.->|Used by all<br/>Customer/Supplier| DomainLayer
+        Plugin -.->|Used by all<br/>Customer/Supplier| DomainLayer
+
+        DomainLayer -.->|Events| Audit
+    end
+
+    subgraph ExternalSystems["EXTERNAL SYSTEMS"]
+        Google["Google Calendar<br/>[ACL]"]
+        Outlook["Outlook Calendar<br/>[ACL]"]
+        Stripe["Stripe Payment<br/>[ACL]"]
+
+        Google -->|Via MCP Protocol| Calendar
+        Outlook -->|Via MCP Protocol| Calendar
+        Stripe -->|Via MCP Protocol| Finance
+    end
 ```
 
 ---
@@ -466,72 +427,53 @@ class GoogleCalendarACL {
 
 **Scenario:** User books a flight for a business trip
 
-```
-1. User Request
-   ↓
-   User: "Book me a flight to Berlin for next Monday"
-   ↓
+```mermaid
+sequenceDiagram
+    actor User
+    participant Orch as Orchestration<br/>Context
+    participant Travel as Travel Context<br/>(Supervisor)
+    participant MCP as MCP Tool
+    participant Bus as Event Bus<br/>(Redis Pub/Sub)
+    participant Cal as Calendar<br/>Context
+    participant Fin as Finance<br/>Context
+    participant Proact as Proactivity<br/>Context
+    participant Audit as Audit<br/>Context
 
-2. Orchestration Context
-   ↓
-   - Detects Intent: TRAVEL_BOOK_FLIGHT
-   - Routes to: Travel Context
-   ↓
+    User->>Orch: "Book me a flight to Berlin<br/>for next Monday"
+    Orch->>Orch: Detect Intent:<br/>TRAVEL_BOOK_FLIGHT
+    Orch->>Travel: Route to Travel Context
 
-3. Travel Context (Supervisor)
-   ↓
-   - Calls MCP Tool: findFlights(destination: "Berlin", date: "2025-11-03")
-   - User confirms flight
-   - Creates Trip Aggregate
-   - Emits Event: TripBooked
-   - Emits Event: FlightBooked
-   ↓
+    Travel->>MCP: findFlights(destination: "Berlin",<br/>date: "2025-11-03")
+    MCP-->>Travel: Flight options
+    Travel->>User: Present options
+    User->>Travel: Confirm flight
+    Travel->>Travel: Create Trip Aggregate
+    Travel->>Bus: Emit: TripBooked
+    Travel->>Bus: Emit: FlightBooked
 
-4. Event Broadcasting (Published Language)
-   ↓
-   Events published to message bus (Redis Pub/Sub)
-   ↓
+    Bus-->>Cal: TripBooked event
+    Cal->>Cal: Block time in calendar
+    Cal->>Bus: Emit: AppointmentCreated
 
-5. Event Subscribers
+    Bus-->>Fin: FlightBooked event
+    Fin->>Fin: Record transaction
+    Fin->>Fin: Check budget
+    Fin->>Bus: Emit: TransactionRecorded
 
-   A) Calendar Context (subscribes to TripBooked)
-      ↓
-      - Blocks time in calendar for trip duration
-      - Emits Event: AppointmentCreated (type: "Travel Block")
-      ↓
+    Bus-->>Proact: TripBooked event
+    Proact->>Proact: Detect Signal: MISSING_ACCOMMODATION
+    Proact->>Proact: Evaluate relevance (0.85)
+    Proact->>Proact: Create Opportunity
+    Proact->>Bus: Emit: OpportunityIdentified
 
-   B) Finance Context (subscribes to FlightBooked)
-      ↓
-      - Records transaction (flight cost)
-      - Checks budget
-      - Emits Event: TransactionRecorded
-      ↓
+    Bus-->>Audit: ALL events
+    Audit->>Audit: Log events for compliance
+    Audit->>Audit: Create AIDecisionLog
 
-   C) Proactivity Context (subscribes to TripBooked)
-      ↓
-      - Detects Signal: MISSING_ACCOMMODATION
-      - Evaluates relevance (confidence: 0.85)
-      - Creates Opportunity: "Book hotel in Berlin"
-      - Emits Event: OpportunityIdentified
-      ↓
-
-   D) Audit Context (subscribes to ALL events)
-      ↓
-      - Logs all events for compliance
-      - Creates AIDecisionLog for flight booking
-      ↓
-
-6. Proactivity → Orchestration
-   ↓
-   - Sends Suggestion to User: "I noticed you booked a flight to Berlin.
-     Should I help you find a hotel?"
-   ↓
-
-7. User Response
-   ↓
-   User: "Yes, find me a hotel near Alexanderplatz"
-   ↓
-   (Process repeats with Travel Context)
+    Proact->>Orch: Send Suggestion
+    Orch->>User: "I noticed you booked a flight to Berlin.<br/>Should I help you find a hotel?"
+    User->>Orch: "Yes, find me a hotel near Alexanderplatz"
+    Note over Orch,Travel: Process repeats with Travel Context
 ```
 
 ---

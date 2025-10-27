@@ -167,46 +167,59 @@ Read all documents in order:
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     CORE DOMAIN                             │
-├─────────────────────────────────────────────────────────────┤
-│  - Orchestration Context (Central Coordinator)              │
-│  - Proactivity Context (Signals & Suggestions)              │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph Core["CORE DOMAIN"]
+        Orch[Orchestration Context<br/>Central Coordinator]
+        Proact[Proactivity Context<br/>Signals & Suggestions]
+    end
 
-┌─────────────────────────────────────────────────────────────┐
-│                  SUPPORTING DOMAINS                         │
-├─────────────────────────────────────────────────────────────┤
-│  - Identity & Access (Users, Tenants, Permissions)          │
-│  - Profile (User Profiles, Preferences)                     │
-│  - Plugin (Plugin Registry, Lifecycle)                      │
-│  - Audit & Compliance (EU AI Act Logging)                   │
-└─────────────────────────────────────────────────────────────┘
+    subgraph Supporting["SUPPORTING DOMAINS"]
+        Identity[Identity & Access<br/>Users, Tenants, Permissions]
+        Profile[Profile<br/>User Profiles, Preferences]
+        Plugin[Plugin<br/>Plugin Registry, Lifecycle]
+        Audit[Audit & Compliance<br/>EU AI Act Logging]
+    end
 
-┌─────────────────────────────────────────────────────────────┐
-│              DOMAIN CONTEXTS (Supervisors)                  │
-├─────────────────────────────────────────────────────────────┤
-│  - Calendar    - Finance      - Travel                      │
-│  - Communication - Health     - Home                        │
-│  - Shopping    - Learning                                   │
-└─────────────────────────────────────────────────────────────┘
+    subgraph Domains["DOMAIN CONTEXTS (Supervisors)"]
+        Calendar[Calendar]
+        Finance[Finance]
+        Travel[Travel]
+        Comm[Communication]
+        Health[Health]
+        Home[Home]
+        Shopping[Shopping]
+        Learning[Learning]
+    end
+
+    Orch --> Domains
+    Domains -.-> Proact
+    Supporting -.-> Domains
 ```
 
 ## Communication Between Contexts
 
 ### Synchronous (Commands)
-- Orchestrator → Supervisors: HTTP/RPC calls
-- All Contexts → Identity: Permission checks
-- All Contexts → Profile: Context retrieval
+
+```mermaid
+graph LR
+    Orch[Orchestrator] -->|HTTP/RPC| Sup[Supervisors]
+    Contexts[All Contexts] -->|Permission checks| Identity[Identity]
+    Contexts -->|Context retrieval| Profile[Profile]
+```
 
 ### Asynchronous (Events)
-- Supervisors → Proactivity: Domain Events
-- Supervisors → Audit: Domain Events
-- Supervisors ↔ Supervisors: Domain Events
 
-**Event Bus:** Redis Pub/Sub
-**Event Store:** PostgreSQL (append-only)
+```mermaid
+graph TB
+    Sup[Supervisors] -->|Domain Events| Proact[Proactivity]
+    Sup -->|Domain Events| Audit[Audit]
+    Sup1[Supervisor A] <-->|Domain Events| Sup2[Supervisor B]
+
+    Note[Event Bus: Redis Pub/Sub<br/>Event Store: PostgreSQL append-only]
+
+    style Note fill:#f9f,stroke:#333
+```
 
 ## Team Ownership
 

@@ -15,13 +15,12 @@ The Orchestration Domain is a **Core Domain** responsible for coordinating all u
 
 ### Orchestration Architecture
 
-```
-User Request → Intent Detection → Supervisor Selection → Execution → Response Synthesis
-     │              │                    │                  │              │
-     │              │                    │                  │              │
-     ▼              ▼                    ▼                  ▼              ▼
- Natural       LLM analyzes      Registry lookup     Tool calling    Aggregate
- Language      context + tools   for Supervisor      via LangGraph   responses
+```mermaid
+flowchart LR
+    A[User Request<br/>Natural Language] --> B[Intent Detection<br/>LLM analyzes<br/>context + tools]
+    B --> C[Supervisor Selection<br/>Registry lookup<br/>for Supervisor]
+    C --> D[Execution<br/>Tool calling<br/>via LangGraph]
+    D --> E[Response Synthesis<br/>Aggregate<br/>responses]
 ```
 
 ---

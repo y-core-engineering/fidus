@@ -22,84 +22,30 @@ This document defines the **Bounded Contexts** for Fidus using Domain-Driven Des
 
 Fidus is organized into the following Bounded Contexts:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CORE DOMAIN                              │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Orchestration Context (Core)                     │  │
-│  │  - Central Orchestrator                                  │  │
-│  │  - Intent Detection                                      │  │
-│  │  - Routing                                               │  │
-│  │  - Multi-Domain Coordination                             │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Proactivity Context (Core)                       │  │
-│  │  - Signal Detection                                      │  │
-│  │  - Opportunity Identification                            │  │
-│  │  - Proactive Suggestions                                 │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph Core["CORE DOMAIN"]
+        Orch["Orchestration Context (Core)<br/>━━━━━━━━━━━━━━━━━<br/>• Central Orchestrator<br/>• Intent Detection<br/>• Routing<br/>• Multi-Domain Coordination"]
+        Proact["Proactivity Context (Core)<br/>━━━━━━━━━━━━━━━━━<br/>• Signal Detection<br/>• Opportunity Identification<br/>• Proactive Suggestions"]
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│                     SUPPORTING DOMAINS                          │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Identity & Access Context                        │  │
-│  │  - User Management                                       │  │
-│  │  - Authentication                                        │  │
-│  │  - Authorization & Permissions                           │  │
-│  │  - Tenant Management                                     │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Profile Context                                  │  │
-│  │  - User Profiles                                         │  │
-│  │  - Preferences (Explicit & Inferred)                     │  │
-│  │  - User Context & History                                │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Plugin Context                                   │  │
-│  │  - Plugin Registry                                       │  │
-│  │  - Plugin Lifecycle Management                           │  │
-│  │  - Dependency Resolution                                 │  │
-│  │  - Permission Management                                 │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Audit & Compliance Context                       │  │
-│  │  - AI Decision Logging                                   │  │
-│  │  - EU AI Act Compliance                                  │  │
-│  │  - Audit Trail                                           │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+    subgraph Supporting["SUPPORTING DOMAINS"]
+        Identity["Identity & Access Context<br/>━━━━━━━━━━━━━━━━━<br/>• User Management<br/>• Authentication<br/>• Authorization & Permissions<br/>• Tenant Management"]
+        Profile["Profile Context<br/>━━━━━━━━━━━━━━━━━<br/>• User Profiles<br/>• Preferences (Explicit & Inferred)<br/>• User Context & History"]
+        Plugin["Plugin Context<br/>━━━━━━━━━━━━━━━━━<br/>• Plugin Registry<br/>• Plugin Lifecycle Management<br/>• Dependency Resolution<br/>• Permission Management"]
+        Audit["Audit & Compliance Context<br/>━━━━━━━━━━━━━━━━━<br/>• AI Decision Logging<br/>• EU AI Act Compliance<br/>• Audit Trail"]
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│                    DOMAIN CONTEXTS (Supervisors)                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐   │
-│  │    Calendar    │  │    Finance     │  │     Travel     │   │
-│  │    Context     │  │    Context     │  │    Context     │   │
-│  └────────────────┘  └────────────────┘  └────────────────┘   │
-│                                                                 │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐   │
-│  │ Communication  │  │     Health     │  │      Home      │   │
-│  │    Context     │  │    Context     │  │    Context     │   │
-│  └────────────────┘  └────────────────┘  └────────────────┘   │
-│                                                                 │
-│  ┌────────────────┐  ┌────────────────┐                        │
-│  │   Shopping     │  │    Learning    │                        │
-│  │    Context     │  │    Context     │                        │
-│  └────────────────┘  └────────────────┘                        │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+    subgraph Domains["DOMAIN CONTEXTS (Supervisors)"]
+        Calendar[Calendar<br/>Context]
+        Finance[Finance<br/>Context]
+        Travel[Travel<br/>Context]
+        Comm[Communication<br/>Context]
+        Health[Health<br/>Context]
+        Home[Home<br/>Context]
+        Shopping[Shopping<br/>Context]
+        Learning[Learning<br/>Context]
+    end
 ```
 
 ---
@@ -636,17 +582,15 @@ Each Domain Context has a Supervisor that handles domain-specific logic.
 
 ### Upstream/Downstream Relationships
 
-```
-Orchestration Context (UPSTREAM)
-    ↓ Commands
-    ↓
-Domain Contexts (DOWNSTREAM)
-    ↓ Events
-    ↓
-Proactivity Context (DOWNSTREAM)
-    ↓ Suggestions
-    ↓
-Orchestration Context (loops back)
+```mermaid
+flowchart TB
+    Orch[Orchestration Context<br/>UPSTREAM]
+    Domain[Domain Contexts<br/>DOWNSTREAM]
+    Proact[Proactivity Context<br/>DOWNSTREAM]
+
+    Orch -->|Commands| Domain
+    Domain -->|Events| Proact
+    Proact -->|Suggestions| Orch
 ```
 
 ### Anti-Corruption Layers (ACL)
@@ -704,11 +648,17 @@ Each Bounded Context has its own logical database schema, even if physically sto
 
 Each Domain Context can be deployed independently:
 
-```
-- calendar-supervisor-service
-- finance-supervisor-service
-- travel-supervisor-service
-- ...
+```mermaid
+graph LR
+    Cal[calendar-supervisor-service]
+    Fin[finance-supervisor-service]
+    Travel[travel-supervisor-service]
+    More[...]
+
+    style Cal fill:#e1f5ff
+    style Fin fill:#e1f5ff
+    style Travel fill:#e1f5ff
+    style More fill:#e1f5ff
 ```
 
 **Benefits:**

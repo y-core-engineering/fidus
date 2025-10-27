@@ -28,6 +28,12 @@ When working with Fidus, keep these principles in mind:
 3. **Type Safety** - Use TypeScript/Python type hints extensively
 4. **Test Coverage** - Maintain > 80% test coverage
 5. **Documentation** - Keep docs in sync with code
+6. **Language** - **All code, documentation, and comments must be in English**
+   - Code: Variable names, function names, class names in English
+   - Documentation: All .md files in English (except dedicated translations)
+   - Comments: Inline and block comments in English
+   - Commit messages: In English
+   - Exception: Brand identity documents may have German originals with English translations
 
 ## Essential Commands
 
