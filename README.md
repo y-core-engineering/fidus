@@ -88,7 +88,7 @@ Fidus doesn't just respond to commands - it **proactively helps** by:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/fidus.git
+git clone https://github.com/y-core-engineering/fidus.git
 cd fidus
 
 # Install dependencies (monorepo)
@@ -249,10 +249,10 @@ See [Architecture Documentation](docs/architecture/README.md) for details.
 
 ## 🤝 Contributing
 
-We welcome contributions! Fidus is open-source (AGPL-3.0) and built by the community.
+We welcome contributions! Fidus is fair-code licensed (Sustainable Use License) and built by the community.
 
 **Ways to contribute:**
-- 🐛 Report bugs and request features via [Issues](https://github.com/yourusername/fidus/issues)
+- 🐛 Report bugs and request features via [Issues](https://github.com/y-core-engineering/fidus/issues)
 - 💻 Submit pull requests for bug fixes or new features
 - 📖 Improve documentation
 - 🌐 Translate to other languages
@@ -446,7 +446,7 @@ Learn more about fair-code: https://faircode.io
 
 ## 🌐 Community
 
-- **GitHub Discussions:** [Ask questions, share ideas](https://github.com/yourusername/fidus/discussions)
+- **GitHub Discussions:** [Ask questions, share ideas](https://github.com/y-core-engineering/fidus/discussions)
 - **Discord:** [Join our community](https://discord.gg/fidus)
 - **Twitter:** [@FidusAI](https://twitter.com/FidusAI)
 - **Blog:** [blog.fidus.ai](https://blog.fidus.ai)
@@ -464,7 +464,7 @@ Fidus is built on the shoulders of giants:
 - [Redis](https://redis.io/) - Fast caching and pub/sub
 - [Neo4j](https://neo4j.com/) - Graph database
 
-Special thanks to all [contributors](https://github.com/yourusername/fidus/graphs/contributors)!
+Special thanks to all [contributors](https://github.com/y-core-engineering/fidus/graphs/contributors)!
 
 ---
 
@@ -472,8 +472,8 @@ Special thanks to all [contributors](https://github.com/yourusername/fidus/graph
 
 ### Community Edition
 - 📖 [Documentation](docs/)
-- 💬 [GitHub Discussions](https://github.com/yourusername/fidus/discussions)
-- 🐛 [Report Issues](https://github.com/yourusername/fidus/issues)
+- 💬 [GitHub Discussions](https://github.com/y-core-engineering/fidus/discussions)
+- 🐛 [Report Issues](https://github.com/y-core-engineering/fidus/issues)
 
 ### Cloud Edition
 - 📧 Email: support@fidus.ai
@@ -485,6 +485,8 @@ Special thanks to all [contributors](https://github.com/yourusername/fidus/graph
 - 🎯 Custom SLA
 
 ---
+
+**Developed by Y-Core Consulting GmbH**
 
 **Built with ❤️ by the Fidus community**
 

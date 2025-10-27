@@ -2,7 +2,7 @@
 
 Version 1.0, January 2025
 
-Copyright (c) 2025 Fidus Contributors
+Copyright (c) 2025 Y-Core Consulting GmbH
 
 ## Preamble
 
@@ -89,6 +89,7 @@ If your use case requires capabilities beyond this license, commercial licenses 
 - **Fidus Enterprise License** - Includes additional features and support
 - **OEM/Redistribution License** - For bundling Fidus with commercial products
 
+Licensor: Y-Core Consulting GmbH
 Contact: enterprise@fidus.ai
 
 ## Enterprise Edition
@@ -109,7 +110,7 @@ See [LICENSE_ENTERPRISE.md](LICENSE_ENTERPRISE.md) for details.
 ### Source Code Availability
 
 The complete source code of Fidus Community Edition is available at:
-https://github.com/yourusername/fidus
+https://github.com/y-core-engineering/fidus
 
 ### Modifications
 
@@ -165,5 +166,7 @@ See also: [Licensing FAQ](docs/licensing/FAQ.md)
 ---
 
 **Fidus Community Edition** - Privacy-first AI personal assistant
+
+Developed by Y-Core Consulting GmbH
 
 Built with ❤️ by the Fidus community
