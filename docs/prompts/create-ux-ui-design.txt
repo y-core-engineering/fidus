@@ -1,0 +1,677 @@
+ROLE AND CONTEXT
+
+You are an expert UX/UI Designer with expertise in:
+- User Experience Design (UX)
+- User Interface Design (UI)
+- Design Systems and Component Libraries
+- Privacy-First User Experiences
+- Multi-Platform Design (Web, Mobile, Desktop)
+- AI/LLM-based Conversational Interfaces
+- Accessibility (WCAG 2.1 AA)
+- Responsive Design
+
+TASK
+
+Create a comprehensive UX/UI Design for the Fidus system based on the existing architecture, domain model, and solution architecture.
+
+CRITICAL: All output must be in ENGLISH. The entire Fidus documentation is in English.
+
+INPUT DOCUMENTS
+
+Required reading (in this order):
+
+1. Core Principles (CRITICAL - UX Implications):
+   - docs/architecture/00-core-principles.md
+   - These principles directly impact UX design choices (e.g., privacy-first, LLM-driven)
+
+2. Solution Architecture (CRITICAL - Technical Context):
+   - docs/solution-architecture/README.md
+   - docs/solution-architecture/01-executive-summary.md
+   - docs/solution-architecture/02-architecture-principles.md
+   - docs/solution-architecture/03-component-architecture.md
+   - docs/solution-architecture/05-data-flows.md
+
+3. System Architecture (Background):
+   - docs/architecture/README.md
+   - docs/architecture/01-overview.md
+   - docs/architecture/07-user-profiling.md (implicit learning!)
+
+4. Domain Model (User Mental Model):
+   - docs/domain-model/README.md
+   - docs/domain-model/01-ubiquitous-language.md (CRITICAL - use these terms in UI!)
+   - docs/domain-model/02-bounded-contexts.md
+   - All domain-specific documents (04-14) - understand what users need to accomplish
+
+5. Security & Privacy (UX Constraints):
+   - docs/solution-architecture/07-security-compliance.md
+   - docs/architecture/09-security-architecture.md
+   - Critical for transparent permission UI
+
+6. Multi-Tenancy & Deployment (UX Variations):
+   - docs/architecture/01-overview.md (section 6: Multi-User & Multi-Tenancy)
+   - docs/architecture/01-overview.md (section 5: Deployment Models)
+   - Community vs. Cloud vs. Enterprise UX differences
+
+7. Brand Identity (Visual Language):
+   - docs/branding/fidus-brand-identity-en.md
+   - Logo, color palette, typography, tone of voice
+   - Visual design language and brand personality
+   - CRITICAL: All UX/UI must align with brand identity
+
+UX/UI DESIGN TO CREATE
+
+Content Requirements:
+
+The UX/UI design must cover:
+
+1. Design Philosophy & Principles
+   - How privacy-first affects UX (transparency, control, local-first)
+   - How LLM-driven logic affects UI (conversational, adaptive, smart defaults)
+   - How proactivity is presented (non-intrusive, contextual, dismissible)
+   - Accessibility principles (WCAG 2.1 AA minimum)
+   - Design language (must align with brand identity: modern, clean, trustworthy)
+   - Brand personality in UX (from fidus-brand-identity-en.md)
+
+2. User Personas & Journeys
+   - Primary personas (individual users, families, power users)
+   - Key user journeys mapped to Bounded Contexts
+   - Pain points and how Fidus solves them
+   - User goals and success metrics
+
+3. Information Architecture
+   - Navigation structure (main menu, contextual navigation)
+   - Content hierarchy
+   - How 14 Bounded Contexts (Supervisors) are organized in UI
+   - Search and discovery patterns
+   - Settings and configuration structure
+   - Tenant/workspace switching (for Family/Team/Company tiers)
+
+4. Core Interaction Patterns
+   - Conversational UI (chat interface, voice commands)
+   - Natural language input (how users express intent)
+   - CRITICAL: Situational/Contextual UI (dynamic interfaces based on conversation)
+     - Chat triggers domain-specific UIs (e.g., "check my calendar" opens calendar widget)
+     - Rich UI cards embedded in chat (interactive forms, data visualizations)
+     - Adaptive interfaces that appear/disappear based on context
+     - Example: Budget discussion shows inline budget chart, meeting planning shows calendar picker
+   - Proactive notifications (timing, presentation, dismissal)
+   - Multi-step workflows (e.g., calendar scheduling, trip planning)
+   - Implicit learning feedback (how system learns from user behavior)
+   - Permission requests (transparent, granular, just-in-time)
+
+5. Component Library & Design System
+   - Typography scale (must align with brand identity!)
+   - Color palette (primary, secondary, semantic - from brand identity)
+   - Spacing system
+   - Component catalog (buttons, cards, forms, modals, etc.)
+   - Icon set (brand-consistent)
+   - Animation principles (purposeful, not decorative)
+   - Logo usage guidelines
+   - Tone of voice in UI text (friendly, trustworthy, professional)
+
+6. Key Screens & Flows (Wireframes/Mockups)
+   - Dashboard (proactive insights, quick actions)
+   - Chat Interface (main interaction point)
+   - Calendar View (appointments, scheduling)
+   - Finance Overview (budgets, transactions)
+   - Travel Planning (trips, bookings)
+   - Settings (privacy controls, preferences, integrations)
+   - Onboarding Flow (first-time user experience - CRITICAL!)
+   - Permission Management (Service/Data/LLM permissions granular control)
+   - Plugin Marketplace (community extensions discovery/installation)
+   - LLM Model Selection (Ollama local vs. Cloud LLM choice)
+   - Shared Resources (Family calendar, shared shopping lists)
+
+7. Responsive Design
+   - Desktop (primary interface)
+   - Mobile Web (responsive breakpoints)
+   - Mobile Apps (iOS, Android considerations)
+   - CLI (command-line interface design)
+
+8. Privacy & Trust UX
+   - Privacy indicators (local vs. cloud processing)
+   - Data usage transparency (what data, why, when)
+   - Permission UI (Service/Data/LLM permissions - granular, clear, revocable)
+   - Audit log access (user sees what system did - EU AI Act compliance)
+   - Onboarding trust-building (explaining privacy model)
+   - Privacy Proxy visualization (show when PII is filtered before cloud LLM)
+   - Encryption indicators (show when data is encrypted at rest)
+   - Community vs. Cloud vs. Enterprise privacy differences
+
+9. AI/LLM-Specific UX
+   - "Thinking" indicators (when LLM is processing)
+   - Confidence visualization (how certain is the AI?)
+   - Explanation UI (why did Fidus suggest this? - EU AI Act transparency)
+   - Fallback UI (when AI fails, graceful degradation to rule-based routing)
+   - Model selection (Ollama local vs. Cloud LLM - user choice)
+   - LLM-driven vs. rule-based indication (show when system switches to fallback mode)
+
+10. Proactivity UX
+    - Notification types (urgent, time-sensitive, optimization, insight)
+    - Presentation modes (push, pull, digest)
+    - Dismissal and snooze patterns
+    - Feedback mechanisms (was this helpful?)
+    - Do Not Disturb modes
+
+11. Multi-User / Family / Team / Company UX (Multi-Tenancy)
+    - Tenant/workspace switching (Individual -> Family -> Team -> Company)
+    - Shared resources UI (Family calendar, shared shopping lists, team budgets)
+    - Privacy boundaries (what's shared, what's private)
+    - Access control visualization (who can see/edit what)
+    - Permission hierarchies (owner/admin/member/viewer roles)
+    - Shared resource notifications (who added/changed what)
+    - Onboarding new family/team members
+
+12. Accessibility
+    - Keyboard navigation
+    - Screen reader support
+    - Color contrast (WCAG AA)
+    - Font sizes and readability
+    - Alternative text for images/icons
+    - Focus indicators
+
+13. Terminology & Ubiquitous Language in UI (CRITICAL!)
+    - Use terms from docs/domain-model/01-ubiquitous-language.md consistently
+    - "Supervisor" (not "Agent" or "Bot") for domain assistants
+    - "Bounded Context" awareness (users understand different domains)
+    - "Signals" and "Proactive Suggestions" (not "Notifications")
+    - "Appointment" (not "Event" - avoid ambiguity)
+    - "Permission" categories: Service, Data, LLM
+    - Anti-patterns to avoid (e.g., "Chatbot", "Task", "Request")
+
+14. Deployment Edition Differences
+    - Community Edition (Self-Hosted):
+      - Local-only UI elements
+      - Hardware requirement warnings
+      - No cloud sync options
+    - Cloud Edition (Managed):
+      - Cloud sync indicators
+      - Mobile app access
+      - Subscription management UI
+    - Enterprise Edition (Hybrid):
+      - SSO integration UI
+      - Admin dashboards
+      - Multi-tenant management
+      - Air-gapped mode indicators
+
+CRITICAL CONSTRAINTS
+
+UX Principles (NON-NEGOTIABLE):
+
+MUST reflect:
+- Privacy by Design (users MUST see what's happening with their data)
+- LLM-Driven Logic (UI adapts to AI decisions, not hard-coded flows)
+- Proactivity (non-intrusive, user retains control)
+- Implicit Learning (system learns without explicit user training)
+- Multi-Tenancy (family/team/company contexts clear and switchable)
+- Ubiquitous Language (use terms from domain model consistently)
+- Bounded Context awareness (14 supervisors, each with clear purpose)
+- MCP-based extensibility (plugin marketplace, community extensions)
+- Graceful degradation (clear UI when LLM fails, fallback to rules)
+
+MUST NOT:
+- Dark patterns (manipulation, deception)
+- Hidden data collection (always transparent)
+- Forced cloud usage (local must be default for Community Edition)
+- Overwhelming proactivity (respect user attention, >50% acceptance rate target)
+- Inaccessible interfaces (WCAG AA minimum)
+- Inconsistent terminology (always use ubiquitous language)
+- Hidden permission usage (always show Service/Data/LLM permissions)
+
+Design Requirements:
+- Load Time: Perceived < 1 second (use optimistic UI, skeletons)
+- Mobile-First: Responsive down to 320px width
+- Accessibility: WCAG 2.1 AA compliant
+- Privacy: Visual indicators for local vs. cloud processing
+- Trust: Always show why and how Fidus does things
+
+APPROACH
+
+Step 1: Understand the System (CRITICAL!)
+- Read ALL specified documents completely
+- Understand the 13 Core Principles and their UX implications
+- Read and internalize the brand identity (visual language, tone, personality)
+- Map Bounded Contexts to user mental models
+- Identify key user workflows
+
+Step 2: Research & Benchmarking
+- Review similar systems (personal AI assistants, productivity tools)
+- Note what works and what doesn't
+- Identify UX patterns for LLM-based interfaces
+- Consider privacy-focused apps (Signal, ProtonMail)
+
+Step 3: Clarification & Questions
+- DO NOT HALLUCINATE!
+- For uncertainties: ASK
+- Ask specifically:
+  - "How should users switch between local and cloud LLM?"
+  - "What level of detail should permission requests show (Service/Data/LLM)?"
+  - "How intrusive can proactive notifications be?"
+  - "Should chat be the primary interface or one of many?"
+  - "How do users switch between Personal/Family/Team/Company tenants?"
+  - "How is the Privacy Proxy (PII filtering) visualized to users?"
+  - "What happens when LLM fails? How is fallback mode shown?"
+  - "How do users discover and install plugins from marketplace?"
+  - "How are Supervisors (Bounded Contexts) presented in UI?"
+  - "Should onboarding be mandatory or skippable?"
+
+Step 4: Structure the UX/UI Design
+- IMPORTANT: Decide how to split the design into multiple self-contained documents
+- Each document should cover a specific aspect of the design
+- Create a logical structure (e.g., principles, personas, IA, patterns, screens, components)
+- Create a README.md for navigation
+
+Step 5: Create UX/UI Design
+- Write structured according to your chosen document structure
+- Use wireframes/mockups (describe in detail or use ASCII art placeholders)
+- Include Mermaid diagrams for user flows
+- Show design rationale for EVERY decision
+- Include multiple design alternatives where relevant
+
+Step 6: Review Preparation
+- Create a checklist:
+  - All 13 Core Principles reflected in UX?
+  - All 14 Bounded Contexts (Supervisors) have UI representations?
+  - Brand identity consistently applied (colors, typography, tone)?
+  - Privacy & trust UX complete (Privacy Proxy, encryption, permissions)?
+  - Accessibility considered (WCAG 2.1 AA)?
+  - Responsive design addressed (desktop, mobile, CLI)?
+  - Multi-tenancy UX complete (Personal/Family/Team/Company)?
+  - Ubiquitous language used consistently in all UI text?
+  - Onboarding flow designed and documented?
+  - Plugin marketplace and MCP extensibility shown?
+  - Graceful degradation (LLM fallback) designed?
+  - Deployment edition differences addressed (Community/Cloud/Enterprise)?
+  - Situational/Contextual UI examples provided?
+
+OUTPUT FORMAT
+
+Target Directory:
+docs/ux-ui-design/
+
+File Structure:
+- You MUST create multiple self-contained markdown files
+- Each file should cover a logical portion of the UX/UI design
+- Create a README.md that provides navigation and overview
+- Use descriptive filenames (e.g., 01-design-principles.md, 02-personas.md, etc.)
+- Number files if there is a logical reading order
+
+File Format:
+- Markdown (.md)
+- Mermaid for user flows and diagrams
+- ASCII art or detailed descriptions for wireframes (NOT implementation code!)
+- ENGLISH language for ALL content
+
+Document Header Template:
+==============================================
+[Document Title]
+
+Version: 1.0
+Date: [Date]
+Status: Draft (Awaiting Human Review)
+Part of: Fidus UX/UI Design
+Author: AI-Generated
+
+[Content...]
+==============================================
+
+README.md Structure:
+Must contain:
+- Overview of the UX/UI design
+- List of all documents with brief descriptions
+- Recommended reading order
+- Quick links to key screens/flows
+- Design system summary
+- Status and version information
+
+Each Document Must Include:
+- Clear scope and purpose
+- Design rationale (why this choice?)
+- References to architecture/domain docs
+- User research insights (if applicable)
+- Accessibility notes
+- Open design questions (if any)
+
+IMPORTANT NOTES
+
+What you MUST NOT do:
+- NO implementation (no code, no CSS, no HTML - this is DESIGN only)
+- NO hallucination (base designs on documented requirements)
+- NO arbitrary design decisions without rationale
+- NO unclear assumptions (when in doubt: ask!)
+- NO inaccessible designs (always consider WCAG)
+- NO German language (everything in English!)
+
+What you MUST do:
+- Read all documents thoroughly
+- Base designs on Core Principles and domain model
+- Ask when uncertain
+- Provide design alternatives with trade-offs
+- Consider accessibility in EVERY design
+- Show how privacy-first manifests in UI
+- Explain why AI-driven UX differs from traditional UX
+- Structure content into logical, self-contained documents
+- Create clear navigation (README.md)
+
+REVIEWER NOTES
+
+This UX/UI design will be reviewed by a human designer/architect. Therefore:
+
+1. Rationale: EVERY design decision must be justified
+2. Alternatives: Show multiple design options with pros/cons
+3. Accessibility: Always mention WCAG compliance
+4. Privacy: Explicitly show privacy/trust UX elements
+5. User Flows: Use Mermaid to visualize journeys
+6. Modular Structure: Each document independently reviewable
+
+EXAMPLE OF GOOD DESIGN DECISION
+
+Design Decision: Notification Presentation
+
+Chosen: Slide-in drawer (bottom-right corner)
+
+Alternatives:
+- Toast notifications (too intrusive, hard to dismiss)
+- Email-style inbox (requires user to check, defeats proactivity)
+- Modal dialogs (blocking, annoying)
+
+Rationale:
+- Non-blocking (user can continue working)
+- Dismissible (user in control)
+- Stackable (multiple notifications possible)
+- Respects Do Not Disturb mode
+- Matches Core Principle 3 (Event-Driven Proactivity, non-intrusive)
+
+Accessibility:
+- Keyboard accessible (Tab + Enter to open/dismiss)
+- Screen reader announces new notifications
+- Focus management (returns to previous focus after dismissal)
+- Color-coded by urgency (visual + semantic)
+
+Privacy:
+- No preview of sensitive data (until user opens)
+- Clear source indication (which Supervisor sent this?)
+
+User Research:
+- Similar pattern used in Slack, Microsoft Teams (familiar)
+- User testing showed 85% preference over modals
+
+Open Question:
+- Should notifications auto-dismiss after X seconds? (might miss important info)
+
+DOCUMENT STRUCTURE GUIDELINES
+
+When deciding how to split the UX/UI design:
+
+Consider splitting by:
+- Design phase (principles, research, IA, patterns, components)
+- User journey (onboarding, daily use, power user features)
+- Platform (web, mobile, CLI)
+- Feature domain (chat, calendar, finance, etc.)
+- Design concern (accessibility, privacy UX, responsive design)
+
+Each document should:
+- Have a clear, single focus
+- Be readable independently (but may reference other docs)
+- Include relevant wireframes/mockups (described in detail)
+- Show design rationale
+- Reference source architecture/domain documents
+- Be approximately 500-2000 lines (adjust as needed)
+
+Example structure (but you decide!):
+- README.md (navigation and overview)
+- Design philosophy and principles
+- User personas and journeys
+- Information architecture
+- Core interaction patterns
+- Design system and components
+- Key screens and flows (multiple documents if needed)
+- Responsive design considerations
+- Privacy and trust UX
+- AI/LLM-specific UX
+- Accessibility guidelines
+- Appendices (design decisions, open questions, checklist)
+
+WIREFRAME/MOCKUP GUIDELINES
+
+CRITICAL: ALL diagrams, wireframes, and visual representations MUST use Mermaid format!
+
+According to docs/CLAUDE.md: "Use Mermaid diagrams - All architecture, flows, and relationships must be visualized using Mermaid in markdown files."
+
+Mermaid Diagram Types for UX/UI:
+
+1. User Flows: Use flowchart or graph
+Example:
+```mermaid
+flowchart TD
+    Start[User opens app] --> Auth{Authenticated?}
+    Auth -->|No| Login[Show login screen]
+    Auth -->|Yes| Dashboard[Show dashboard]
+    Login --> Auth
+    Dashboard --> Action{User action}
+    Action -->|Chat| Chat[Open chat interface]
+    Action -->|Calendar| Cal[Open calendar view]
+    Action -->|Settings| Settings[Open settings]
+```
+
+2. Screen Layouts: Use graph with subgraphs
+Example:
+```mermaid
+graph TB
+    subgraph DashboardScreen["Dashboard Screen"]
+        subgraph TopBar["Top Bar"]
+            Logo[Fidus Logo]
+            Search[Search Input]
+            Profile[Profile Avatar]
+            Notifications[Bell Icon]
+            Settings[Gear Icon]
+        end
+
+        subgraph Sidebar["Sidebar (240px)"]
+            NavCal[Calendar]
+            NavFin[Finance]
+            NavTravel[Travel]
+            NavMore[More...]
+        end
+
+        subgraph MainContent["Main Content Area"]
+            Greeting[Good morning, User!]
+
+            subgraph ProactiveCard["Proactive Insights"]
+                Insight1[Budget alert: Food 90%]
+                Insight2[Meeting conflict tomorrow]
+                Insight3[Travel reminder: Paris]
+            end
+
+            subgraph QuickActions["Quick Actions Grid"]
+                Action1[New Event]
+                Action2[Check Budget]
+                Action3[Plan Trip]
+                Action4[Send Message]
+            end
+
+            subgraph RecentActivity["Recent Activity"]
+                Activity1[2h ago: Email reply]
+                Activity2[3h ago: Calendar update]
+            end
+        end
+
+        ChatWidget[Chat Widget - Minimized]
+    end
+```
+
+3. Component States: Use stateDiagram
+Example:
+```mermaid
+stateDiagram-v2
+    [*] --> Idle: Component loads
+    Idle --> Loading: User clicks button
+    Loading --> Success: Data received
+    Loading --> Error: Request failed
+    Success --> Idle: User navigates away
+    Error --> Idle: User dismisses error
+    Error --> Loading: User retries
+```
+
+4. Navigation Hierarchy: Use graph TD
+Example:
+```mermaid
+graph TD
+    App[Fidus App]
+
+    App --> Dashboard
+    App --> Chat
+    App --> Settings
+
+    Dashboard --> Calendar
+    Dashboard --> Finance
+    Dashboard --> Travel
+
+    Calendar --> DayView[Day View]
+    Calendar --> WeekView[Week View]
+    Calendar --> MonthView[Month View]
+
+    Settings --> Privacy
+    Settings --> Integrations
+    Settings --> Appearance
+```
+
+5. Interaction Sequences: Use sequenceDiagram
+Example:
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as UI Layer
+    participant Orch as Orchestrator
+    participant Cal as Calendar Supervisor
+
+    User->>UI: "Schedule meeting tomorrow at 2pm"
+    UI->>Orch: Parse intent
+    Orch->>Cal: Find free slots
+    Cal-->>Orch: Available slots
+    Orch->>UI: Show suggestions
+    UI->>User: "2pm or 3pm available?"
+    User->>UI: Select 2pm
+    UI->>Cal: Create appointment
+    Cal-->>UI: Confirmation
+    UI->>User: "Meeting scheduled!"
+```
+
+NO ASCII ART! NO text-only descriptions for visual layouts! ALWAYS use Mermaid!
+
+Detailed text descriptions are allowed ONLY for:
+- Design rationale and explanations
+- Color specifications (e.g., "Primary: #1976D2")
+- Typography details (e.g., "H1: 32px, Bold, Inter")
+- Spacing/sizing values (e.g., "Card padding: 16px")
+- Interaction micro-behaviors (e.g., "Button hover: lift 2px, shadow grows")
+
+SITUATIONAL/CONTEXTUAL UI EXAMPLES (CRITICAL!)
+
+Must show how chat triggers context-specific interfaces:
+
+Example 1: Budget Discussion
+User: "How much have I spent on food this month?"
+Fidus: "You've spent 450 EUR on food (90% of budget)."
+[Inline UI appears in chat]:
+```mermaid
+graph LR
+    subgraph BudgetCard["Budget Card - Food Category"]
+        Chart[Progress Bar: 90% filled]
+        Details[450 EUR / 500 EUR]
+        Actions[View Transactions | Adjust Budget]
+    end
+```
+
+Example 2: Calendar Scheduling
+User: "Schedule a meeting with John next week"
+Fidus: "When works best for you?"
+[Calendar picker appears in chat]:
+```mermaid
+graph TB
+    subgraph CalendarWidget["Week View - Inline"]
+        Mon[Monday: 2pm, 4pm available]
+        Tue[Tuesday: 10am, 3pm available]
+        Wed[Wednesday: Full]
+        SelectButton[Select Time Slot]
+    end
+```
+
+Example 3: Travel Planning
+User: "Plan my trip to Paris"
+Fidus: "I found your flight. Need a hotel?"
+[Travel card appears in chat]:
+```mermaid
+graph TB
+    subgraph TravelCard["Trip Card"]
+        Flight[Flight: 10 Nov, 2pm]
+        Hotel[Suggested Hotels: 3 options]
+        Actions[Book Hotel | Add to Calendar | Set Reminders]
+    end
+```
+
+These situational UIs must:
+- Appear contextually (triggered by conversation, not always visible)
+- Be dismissible (user can close and continue chat)
+- Be interactive (user can act directly in the widget)
+- Be domain-specific (Finance UI looks different from Calendar UI)
+- Transition smoothly (fade in/out, no jarring appearance)
+
+PRIVACY UX EXAMPLES TO INCLUDE
+
+Must show how privacy manifests in UI:
+
+1. Local vs. Cloud Indicator:
+   - Visual badge on LLM responses ("Processed locally" vs. "Processed via OpenAI")
+   - User can click to see details (why cloud was used, what data was sent)
+
+2. Permission Requests:
+   - Just-in-time (when Fidus needs access, not upfront)
+   - Clear purpose ("Fidus needs Google Calendar access to find free slots")
+   - Granular (not "access everything", but "read calendar events only")
+   - Revocable (easy to revoke in settings)
+
+3. Audit Log:
+   - User-accessible log of all Fidus actions
+   - Filters (by date, by domain, by action type)
+   - Export option (GDPR compliance)
+
+4. Data Transparency:
+   - Settings page shows what data Fidus has collected
+   - User can view, download, or delete any data
+
+AI/LLM UX EXAMPLES TO INCLUDE
+
+Must show how AI affects UX:
+
+1. Thinking Indicator:
+   - "Fidus is thinking..." (animated dots)
+   - "Analyzing your calendar..." (specific feedback)
+   - Estimated time if > 2 seconds
+
+2. Confidence Visualization:
+   - High confidence: "I'm certain this is the best slot"
+   - Medium confidence: "I think this works, but check..."
+   - Low confidence: "I'm not sure, here are 3 options..."
+
+3. Explanation UI:
+   - "Why did Fidus suggest this?" (expandable)
+   - Shows reasoning: "Based on your past preferences (evening meetings) and current calendar (free at 6pm)..."
+
+4. Fallback UI:
+   - If LLM fails: "I couldn't understand that. Try rephrasing?"
+   - Offers predefined options: "Did you mean: [Schedule meeting] [Check budget] [Plan trip]?"
+
+START
+
+Begin with:
+1. Read docs/architecture/00-core-principles.md (13 Core Principles)
+2. Read docs/branding/fidus-brand-identity-en.md (Brand Identity - CRITICAL!)
+3. Read docs/solution-architecture/README.md and key documents
+4. Understand the 14 Bounded Contexts from domain model
+5. Ask IMMEDIATELY if anything is unclear
+6. Decide how to structure the UX/UI design into multiple documents
+7. Create the UX/UI design in docs/ux-ui-design/ according to your structure
+8. Remember: EVERYTHING IN ENGLISH!
+9. Focus on DESIGN, not implementation!
+10. ALWAYS align with brand identity (colors, typography, tone)!

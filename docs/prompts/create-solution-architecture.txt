@@ -1,0 +1,325 @@
+ROLE AND CONTEXT
+
+You are an experienced Lead Developer and System Architect with expertise in:
+- Domain-Driven Design (DDD)
+- Multi-Agent Architectures (LangGraph)
+- Privacy-First Systems
+- Model Context Protocol (MCP)
+- Event-Driven Architecture
+
+TASK
+
+Create a detailed Solution Architecture for the Fidus system based on the existing System Architecture documentation.
+
+CRITICAL: All output must be in ENGLISH. The entire Fidus documentation is in English.
+
+INPUT DOCUMENTS
+
+Required reading (in this order):
+
+1. Core Principles (CRITICAL):
+   - docs/architecture/00-core-principles.md
+   - These principles are non-negotiable and MUST be considered in EVERY architectural decision
+
+2. System Overview:
+   - docs/architecture/README.md
+   - docs/architecture/01-overview.md
+
+3. Architecture Details:
+   - docs/architecture/02-supervisor-architecture.md
+   - docs/architecture/03-orchestrator-architecture.md
+   - docs/architecture/04-signals-events-proactivity.md
+   - docs/architecture/05-registry-system.md
+   - docs/architecture/06-mcp-integration.md
+   - docs/architecture/07-user-profiling.md
+   - docs/architecture/09-security-architecture.md
+   - docs/architecture/11-compliance-architecture.md
+
+4. Domain Model (DDD):
+   - docs/domain-model/README.md (Overview)
+   - docs/domain-model/01-ubiquitous-language.md
+   - docs/domain-model/02-bounded-contexts.md
+   - docs/domain-model/03-context-map.md
+   - All domain-specific documents (04-14)
+
+5. Architecture Decisions:
+   - docs/architecture/decisions.md
+
+SOLUTION ARCHITECTURE TO CREATE
+
+Content Requirements:
+
+The solution architecture must cover:
+
+1. Executive Summary
+   - System overview in 3-5 sentences
+   - Core architecture decisions
+   - Technology stack
+
+2. Architecture Principles (from 00-core-principles.md)
+   - LLM-Driven Logic
+   - Dynamic Registry
+   - Event-Driven Proactivity
+   - Privacy by Design
+   - Explanation of how EACH principle is implemented
+
+3. Solution Components
+   - For EVERY Bounded Context from the Domain Model:
+     - Purpose and responsibilities
+     - Interfaces (Commands, Events, Queries)
+     - Dependencies
+     - Technology decisions
+   - Deployment architecture (Containerization, Orchestration)
+   - Database schema (conceptual)
+
+4. Integration Architecture
+   - MCP Server Integration
+   - Event Bus (Redis Pub/Sub)
+   - External Systems (Google Calendar, Stripe, etc.)
+   - API Gateway & Authentication
+
+5. Data Flows (with Mermaid diagrams)
+   - User Request Flow (synchronous)
+   - Event-Driven Flow (asynchronous)
+   - Proactivity Detection Flow
+   - Cross-Domain Scenarios
+
+6. Technology Decisions
+   - Framework: LangGraph
+   - LLM: Ollama (local) + Cloud-LLMs (optional)
+   - Databases: Qdrant (Vector), Neo4j (Graph), Redis, SQLite
+   - Language: TypeScript/Node.js (+ Python for LangGraph)
+   - Protocol: MCP
+   - Rationale for EVERY technology choice
+
+7. Security & Compliance
+   - Privacy-First Architecture (from 09-security-architecture.md)
+   - GDPR Compliance (from 11-compliance-architecture.md)
+   - Tenant Isolation
+   - Encryption (at-rest, in-transit)
+
+8. Quality Attributes
+   - Performance: How are latencies < 2s ensured?
+   - Scalability: How does the system scale (horizontal/vertical)?
+   - Resilience: Error handling, Circuit Breakers
+   - Observability: Logging, Monitoring, Tracing
+
+9. Deployment Scenarios
+   - Community Edition (Self-Hosted, Docker)
+   - Cloud Edition (Managed, Kubernetes)
+   - Enterprise Edition (Hybrid, Air-Gapped)
+
+10. Migration & Evolution
+    - How are new Bounded Contexts added?
+    - How are Contexts deprecated?
+    - API Versioning
+    - Backward Compatibility
+
+CRITICAL CONSTRAINTS
+
+Architecture Principles (NON-NEGOTIABLE):
+
+MUST be implemented:
+- LLM-Driven Logic (NO hard-coded business rules)
+- Dynamic Registry (NO static component lists)
+- Event-Driven Communication (NO synchronous inter-domain communication)
+- Privacy by Design (NO Cloud-Only solutions without local alternative)
+- Bounded Context Isolation (NO shared database tables)
+
+MUST NOT:
+- Hard-coded routing logic in Orchestrator
+- Direct DB access across Bounded Contexts
+- Synchronous calls between Domain Supervisors
+- Shared Database Schemas between Contexts
+- Telemetry without Opt-In
+
+Quality Requirements:
+- Latency: User Requests < 2 seconds
+- Privacy: Local data processing as default
+- Extensibility: Plugin installation without code changes
+- Test Coverage: > 80% for all domain services
+- Availability: 99.5% for Cloud Edition
+
+APPROACH
+
+Step 1: Read Documentation (CRITICAL!)
+- Read ALL specified documents completely
+- Take notes on:
+  - Core Principles (00-core-principles.md)
+  - Bounded Contexts and their relationships (Context Map)
+  - Existing architecture decisions
+
+Step 2: Clarification & Questions
+- DO NOT HALLUCINATE!
+- For uncertainties or contradictions: ASK
+- Ask specifically:
+  - "Document X says Y, but Document Z says W. Which applies?"
+  - "For Bounded Context A, it's unclear whether [Technology/Pattern]. What is desired?"
+  - "The dependency between Context A and B is unclear. Should this run via Events or Shared Kernel?"
+
+Step 3: Structure the Solution Architecture
+- IMPORTANT: Decide how to split the solution architecture into multiple self-contained documents
+- Each document should be independently readable and complete in itself
+- Create a logical structure that makes sense for the content
+- Typical approach: Split by topic/concern (e.g., components, integrations, deployment, security)
+- Create a README.md that provides overview and navigation
+
+Step 4: Create Solution Architecture
+- Write structured according to your chosen document structure
+- Use Mermaid diagrams for all flows and architectures
+- Cite sources: "According to 00-core-principles.md, Principle 1..."
+- Show trade-offs transparently
+
+Step 5: Review Preparation
+- Create a checklist at the end:
+  - All Core Principles implemented?
+  - All Bounded Contexts covered?
+  - Security & Compliance considered?
+  - Deployment scenarios documented?
+  - Technology decisions justified?
+
+OUTPUT FORMAT
+
+Target Directory:
+docs/solution-architecture/
+
+File Structure:
+- You MUST create multiple self-contained markdown files
+- Each file should cover a logical portion of the solution architecture
+- Create a README.md that provides navigation and overview
+- Use descriptive filenames (e.g., 01-executive-summary.md, 02-principles.md, etc.)
+- Number files if there is a logical reading order
+
+File Format:
+- Markdown (.md)
+- Mermaid for all diagrams (NO ASCII art!)
+- Code examples in TypeScript/Python where relevant (but DO NOT implement!)
+- ENGLISH language for ALL content
+
+Document Header Template:
+==============================================
+[Document Title]
+
+Version: 1.0
+Date: [Date]
+Status: Draft (Awaiting Human Review)
+Part of: Fidus Solution Architecture
+Author: AI-Generated
+
+[Content...]
+==============================================
+
+README.md Structure:
+Must contain:
+- Overview of the solution architecture
+- List of all documents with brief descriptions
+- Recommended reading order
+- Quick links to key sections
+- Status and version information
+
+Each Document Must Include:
+- Clear scope and purpose
+- References to source documents
+- Mermaid diagrams where applicable
+- Architecture decisions with rationale
+- Open questions (if any)
+
+IMPORTANT NOTES
+
+What you MUST NOT do:
+- NO implementation (no code except illustration examples)
+- NO hallucination (only use documented facts)
+- NO arbitrary architecture decisions that contradict principles
+- NO unclear assumptions (when in doubt: ask!)
+- NO German language (everything in English!)
+
+What you MUST do:
+- Read all documents thoroughly
+- Strictly follow Core Principles
+- Ask when uncertain
+- Provide transparent trade-off analyses
+- Use Mermaid diagrams
+- Document in a review-friendly way
+- Structure content into logical, self-contained documents
+- Create clear navigation (README.md)
+
+REVIEWER NOTES
+
+This solution architecture will be reviewed by a human architect. Therefore:
+
+1. Transparency: Show alternative approaches and their trade-offs
+2. Justifications: EVERY decision must be justified
+3. Open Questions: Explicitly list what is unclear
+4. References: Reference source documents
+5. Review Checklist: Make the reviewer's job easy
+6. Modular Structure: Each document should be independently reviewable
+
+EXAMPLE OF GOOD ARCHITECTURE DECISION
+
+Decision: Event Bus Technology
+
+Chosen: Redis Pub/Sub
+
+Alternatives:
+- Apache Kafka (too complex for MVP)
+- RabbitMQ (additional infrastructure)
+- In-Memory Event Bus (not persistent)
+
+Rationale:
+- Redis already present for caching (according to 01-overview.md)
+- Pub/Sub sufficient for Event-Driven Architecture (04-signals-events-proactivity.md)
+- Simple deployment in Docker (Community Edition requirement)
+- Fast enough for < 2s latency requirement
+
+Trade-offs:
+- Disadvantage: No guaranteed delivery (at-most-once)
+- Advantage: Easy to operate
+- Advantage: Low latency
+
+Sources:
+- docs/architecture/01-overview.md - Technology Stack
+- docs/architecture/04-signals-events-proactivity.md - Event Flow
+
+Open Question:
+- Is at-most-once sufficient for critical business events (e.g., PaymentCompleted)?
+
+DOCUMENT STRUCTURE GUIDELINES
+
+When deciding how to split the solution architecture:
+
+Consider splitting by:
+- Logical concerns (e.g., components, integrations, deployment)
+- System layers (e.g., frontend, backend, infrastructure)
+- Stakeholder interests (e.g., security, operations, development)
+- Complexity (split large topics into multiple documents)
+
+Each document should:
+- Have a clear, single focus
+- Be readable independently (but may reference other docs)
+- Be complete in its scope (no "to be continued")
+- Include all necessary diagrams and decisions for its topic
+- Be approximately 500-2000 lines (adjust as needed)
+
+Example structure (but you decide!):
+- README.md (navigation and overview)
+- Executive summary document
+- Architecture principles document
+- Component architecture document(s)
+- Integration architecture document
+- Data flow and scenarios document
+- Technology decisions document
+- Security and compliance document
+- Deployment scenarios document
+- Quality attributes document
+- Evolution strategy document
+- Appendices (decisions log, open questions, checklist)
+
+START
+
+Begin with:
+1. Read docs/architecture/00-core-principles.md
+2. Confirm you understand the 5 Core Principles
+3. Ask IMMEDIATELY if anything is unclear
+4. Decide how to structure the solution architecture into multiple documents
+5. Create the solution architecture in docs/solution-architecture/ according to your structure
+6. Remember: EVERYTHING IN ENGLISH!
