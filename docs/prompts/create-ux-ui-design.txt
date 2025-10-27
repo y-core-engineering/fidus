@@ -52,6 +52,12 @@ Required reading (in this order):
    - docs/architecture/01-overview.md (section 5: Deployment Models)
    - Community vs. Cloud vs. Enterprise UX differences
 
+7. Brand Identity (Visual Language):
+   - docs/branding/fidus-brand-identity-en.md
+   - Logo, color palette, typography, tone of voice
+   - Visual design language and brand personality
+   - CRITICAL: All UX/UI must align with brand identity
+
 UX/UI DESIGN TO CREATE
 
 Content Requirements:
@@ -63,7 +69,8 @@ The UX/UI design must cover:
    - How LLM-driven logic affects UI (conversational, adaptive, smart defaults)
    - How proactivity is presented (non-intrusive, contextual, dismissible)
    - Accessibility principles (WCAG 2.1 AA minimum)
-   - Design language (modern, clean, trustworthy)
+   - Design language (must align with brand identity: modern, clean, trustworthy)
+   - Brand personality in UX (from fidus-brand-identity-en.md)
 
 2. User Personas & Journeys
    - Primary personas (individual users, families, power users)
@@ -93,12 +100,14 @@ The UX/UI design must cover:
    - Permission requests (transparent, granular, just-in-time)
 
 5. Component Library & Design System
-   - Typography scale
-   - Color palette (primary, secondary, semantic)
+   - Typography scale (must align with brand identity!)
+   - Color palette (primary, secondary, semantic - from brand identity)
    - Spacing system
    - Component catalog (buttons, cards, forms, modals, etc.)
-   - Icon set
+   - Icon set (brand-consistent)
    - Animation principles (purposeful, not decorative)
+   - Logo usage guidelines
+   - Tone of voice in UI text (friendly, trustworthy, professional)
 
 6. Key Screens & Flows (Wireframes/Mockups)
    - Dashboard (proactive insights, quick actions)
@@ -220,7 +229,8 @@ APPROACH
 
 Step 1: Understand the System (CRITICAL!)
 - Read ALL specified documents completely
-- Understand the 5 Core Principles and their UX implications
+- Understand the 13 Core Principles and their UX implications
+- Read and internalize the brand identity (visual language, tone, personality)
 - Map Bounded Contexts to user mental models
 - Identify key user workflows
 
@@ -262,6 +272,7 @@ Step 6: Review Preparation
 - Create a checklist:
   - All 13 Core Principles reflected in UX?
   - All 14 Bounded Contexts (Supervisors) have UI representations?
+  - Brand identity consistently applied (colors, typography, tone)?
   - Privacy & trust UX complete (Privacy Proxy, encryption, permissions)?
   - Accessibility considered (WCAG 2.1 AA)?
   - Responsive design addressed (desktop, mobile, CLI)?
@@ -654,11 +665,13 @@ Must show how AI affects UX:
 START
 
 Begin with:
-1. Read docs/architecture/00-core-principles.md
-2. Read docs/solution-architecture/README.md and key documents
-3. Understand the 14 Bounded Contexts from domain model
-4. Ask IMMEDIATELY if anything is unclear
-5. Decide how to structure the UX/UI design into multiple documents
-6. Create the UX/UI design in docs/ux-ui-design/ according to your structure
-7. Remember: EVERYTHING IN ENGLISH!
-8. Focus on DESIGN, not implementation!
+1. Read docs/architecture/00-core-principles.md (13 Core Principles)
+2. Read docs/branding/fidus-brand-identity-en.md (Brand Identity - CRITICAL!)
+3. Read docs/solution-architecture/README.md and key documents
+4. Understand the 14 Bounded Contexts from domain model
+5. Ask IMMEDIATELY if anything is unclear
+6. Decide how to structure the UX/UI design into multiple documents
+7. Create the UX/UI design in docs/ux-ui-design/ according to your structure
+8. Remember: EVERYTHING IN ENGLISH!
+9. Focus on DESIGN, not implementation!
+10. ALWAYS align with brand identity (colors, typography, tone)!
