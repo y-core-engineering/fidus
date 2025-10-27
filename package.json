@@ -3,6 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "description": "Privacy-first AI assistant with domain-driven architecture",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/y-core-engineering/fidus.git"
+  },
+  "author": "Y-Core Consulting GmbH",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/y-core-engineering/fidus/issues"
+  },
+  "homepage": "https://github.com/y-core-engineering/fidus#readme",
   "workspaces": [
     "packages/*"
   ],

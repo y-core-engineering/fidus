@@ -347,7 +347,7 @@ Your data is always yours.
 
 Fidus is developed by the community with contributions from individuals and organizations.
 
-Copyright is held by "Fidus Contributors" collectively.
+Copyright is held by Y-Core Consulting GmbH.
 
 ### Can the license change?
 

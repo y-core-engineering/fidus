@@ -4,6 +4,13 @@
   "description": "Fidus CLI - Command-line interface for Fidus AI Assistant",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/y-core-engineering/fidus.git",
+    "directory": "packages/cli"
+  },
+  "author": "Y-Core Consulting GmbH",
+  "license": "SEE LICENSE IN ../../LICENSE.md",
   "bin": {
     "fidus": "./dist/cli.js"
   },

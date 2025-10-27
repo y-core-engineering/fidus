@@ -2,7 +2,7 @@
 
 Version 1.0, January 2025
 
-Copyright (c) 2025 Fidus Contributors
+Copyright (c) 2025 Y-Core Consulting GmbH
 
 ## Enterprise Edition
 
@@ -320,7 +320,8 @@ This agreement is governed by the laws of [Jurisdiction], without regard to conf
 
 ---
 
-© 2025 Fidus Contributors. All rights reserved.
+© 2025 Y-Core Consulting GmbH. All rights reserved.
 
 Fidus Enterprise Edition is proprietary software.
+Developed by Y-Core Consulting GmbH.
 Community Edition is available under the Sustainable Use License.

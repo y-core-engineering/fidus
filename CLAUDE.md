@@ -920,7 +920,7 @@ git diff main...HEAD
 ## Questions?
 
 For questions about using Claude Code with Fidus:
-- **GitHub Discussions:** https://github.com/yourusername/fidus/discussions
+- **GitHub Discussions:** https://github.com/y-core-engineering/fidus/discussions
 - **Discord:** https://discord.gg/fidus
 - **Email:** dev@fidus.ai
 

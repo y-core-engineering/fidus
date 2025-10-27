@@ -44,7 +44,7 @@ All reports will be handled confidentially.
 ### 🐛 Reporting Bugs
 
 **Before submitting:**
-1. Check [existing issues](https://github.com/yourusername/fidus/issues)
+1. Check [existing issues](https://github.com/y-core-engineering/fidus/issues)
 2. Update to the latest version
 3. Check the [FAQ](docs/licensing/FAQ.md)
 
@@ -58,7 +58,7 @@ All reports will be handled confidentially.
 ### 💡 Suggesting Features
 
 **Before suggesting:**
-1. Check [existing feature requests](https://github.com/yourusername/fidus/issues?q=is%3Aissue+label%3Aenhancement)
+1. Check [existing feature requests](https://github.com/y-core-engineering/fidus/issues?q=is%3Aissue+label%3Aenhancement)
 2. Review the [roadmap](README.md#-roadmap)
 3. Consider if it fits Fidus's scope
 
@@ -110,7 +110,7 @@ git clone https://github.com/YOUR_USERNAME/fidus.git
 cd fidus
 
 # Add upstream remote
-git remote add upstream https://github.com/yourusername/fidus.git
+git remote add upstream https://github.com/y-core-engineering/fidus.git
 
 # Install dependencies
 pnpm install
@@ -192,7 +192,7 @@ fidus/
 
 ### 1. Choose an Issue
 
-- Browse [open issues](https://github.com/yourusername/fidus/issues)
+- Browse [open issues](https://github.com/y-core-engineering/fidus/issues)
 - Look for issues labeled `good first issue` or `help wanted`
 - Comment on the issue to claim it
 - Wait for maintainer approval before starting
@@ -589,7 +589,7 @@ Contributors are recognized:
 - **Technical:** dev@fidus.ai
 - **Security:** security@fidus.ai
 
-Or ask in [GitHub Discussions](https://github.com/yourusername/fidus/discussions)
+Or ask in [GitHub Discussions](https://github.com/y-core-engineering/fidus/discussions)
 
 ---
 
