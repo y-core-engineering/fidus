@@ -1,10 +1,13 @@
 # Fidus - Privacy-First AI Personal Assistant
 
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](LICENSE)
+[![License: Sustainable Use](https://img.shields.io/badge/License-Sustainable%20Use-blue.svg)](LICENSE.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
 [![LangGraph](https://img.shields.io/badge/LangGraph-Latest-green.svg)](https://github.com/langchain-ai/langgraph)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
 
-> **A privacy-first, open-source AI personal assistant that helps you manage your life across calendars, finances, travel, health, and more.**
+> **A privacy-first, fair-code AI personal assistant that helps you manage your life across calendars, finances, travel, health, and more.**
 
 Fidus is built on a modular, agentic architecture where specialized AI agents (called "Supervisors") handle different aspects of your life. Your data stays local, you maintain full control, and the assistant proactively helps you stay organized.
 
@@ -409,20 +412,35 @@ Fidus follows an **Open Core** business model:
 
 ## 📜 License
 
-Fidus Community Edition is licensed under **AGPL-3.0**.
+Fidus Community Edition is licensed under the **Sustainable Use License** (fair-code).
 
-This means:
-- ✅ You can use, modify, and distribute Fidus freely
-- ✅ You can use Fidus in commercial projects
-- ⚠️  If you modify and deploy Fidus as a service, you must open-source your changes
-- ⚠️  If you offer Fidus as a SaaS, users must have access to the source code
+**What is fair-code?**
+Fair-code is not open-source, but source-available with usage rights:
+- ✅ **Source Available** - All code is public and auditable
+- ✅ **Self-Hostable** - Deploy anywhere you want
+- ✅ **Extensible** - Build your own plugins and modifications
+- ✅ **Free for personal and internal business use** (any company size!)
+- ⚠️  **Commercial license required** for offering Fidus-as-a-Service
 
-See [LICENSE](LICENSE) for full details.
+**You CAN:**
+- Use Fidus internally in your company (unlimited employees)
+- Modify Fidus for your own needs
+- Self-host on your infrastructure
+- Build custom plugins for internal use
 
-**Why AGPL-3.0?**
-We chose AGPL-3.0 to ensure that improvements to Fidus benefit the entire community, even when deployed as a service. This aligns with our privacy-first mission - if you run a hosted version, users should be able to verify what you're doing with their data.
+**You CANNOT** (without commercial license):
+- Offer Fidus as a hosted service to customers
+- Resell Fidus or modified versions
+- White-label Fidus for commercial customers
 
-For commercial licensing without AGPL restrictions, contact us at enterprise@fidus.ai.
+See [LICENSE.md](LICENSE.md) for full details and [Licensing FAQ](docs/licensing/FAQ.md) for common questions.
+
+**Why Sustainable Use License?**
+We chose this license (like n8n) to ensure sustainable development while protecting against unfair commercial exploitation. This allows us to maintain Fidus long-term while keeping it free for individual and business internal use.
+
+For commercial licensing: enterprise@fidus.ai
+
+Learn more about fair-code: https://faircode.io
 
 ---
 
