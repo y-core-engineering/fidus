@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Add common pnpm paths to PATH
 export PATH="$HOME/.local/share/pnpm:$HOME/Library/pnpm:/usr/local/bin:$PATH"
 
