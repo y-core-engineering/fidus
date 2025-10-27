@@ -484,39 +484,39 @@ sequenceDiagram
 > which are copies of the communication structures of these organizations."
 > — Conway's Law
 
-**Our Team Structure matches our Context Map:**
+**Our Context Ownership Structure:**
 
-### Core Team
-- **Owns:** Orchestration Context, Proactivity Context
-- **Size:** 3-4 developers
-- **Focus:** Coordination, routing, proactivity
+As an open-source project with contributions from the community, context ownership is fluid and collaborative. Contributors can work on any context based on their interests and expertise.
 
-### Platform Team
-- **Owns:** Identity, Profile, Plugin, Audit Contexts
-- **Size:** 4-5 developers
-- **Focus:** Infrastructure, shared services
+### Core Contexts
+- **Orchestration Context** - Request routing and coordination
+- **Proactivity Context** - Opportunity detection and notifications
 
-### Domain Team A (Life Management)
-- **Owns:** Calendar Context, Finance Context
-- **Size:** 2-3 developers
-- **Focus:** Personal organization, money management
+### Platform Contexts
+- **Identity & Access** - Authentication and authorization
+- **Profile** - User preferences and implicit learning
+- **Plugin** - Extension system and marketplace
+- **Audit & Compliance** - Logging and GDPR compliance
 
-### Domain Team B (Travel & Communication)
-- **Owns:** Travel Context, Communication Context
-- **Size:** 2-3 developers
-- **Focus:** Travel planning, messaging
+### Domain Contexts - Life Management
+- **Calendar** - Appointments and scheduling
+- **Finance** - Budget tracking and transactions
 
-### Domain Team C (Lifestyle)
-- **Owns:** Health, Home, Shopping, Learning Contexts
-- **Size:** 2-3 developers
-- **Focus:** Health, smart home, shopping, education
+### Domain Contexts - Travel & Communication
+- **Travel** - Trip planning and coordination
+- **Communication** - Email and message management
 
-**Total Team Size:** ~16-20 developers
+### Domain Contexts - Lifestyle
+- **Health** - Wellness and medical tracking
+- **Home** - Smart home and maintenance
+- **Shopping** - Shopping lists and price tracking
+- **Learning** - Courses and study management
 
-**Communication Patterns:**
-- Core Team ↔ All Teams: Weekly sync
-- Domain Teams ↔ Domain Teams: Event-driven (async)
-- Platform Team → All Teams: On-demand support
+**Collaboration Model:**
+- All contexts are independently deployable
+- Communication happens via domain events (async)
+- Contributors can work across multiple contexts
+- AI-assisted development accelerates contribution velocity
 
 ---
 

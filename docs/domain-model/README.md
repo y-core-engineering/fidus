@@ -223,15 +223,15 @@ graph TB
 
 ## Team Ownership
 
-| Team | Contexts | Size |
-|------|----------|------|
-| **Core Team** | Orchestration, Proactivity | 3-4 devs |
-| **Platform Team** | Identity, Profile, Plugin, Audit | 4-5 devs |
-| **Domain Team A** | Calendar, Finance | 2-3 devs |
-| **Domain Team B** | Travel, Communication | 2-3 devs |
-| **Domain Team C** | Health, Home, Shopping, Learning | 2-3 devs |
+| Context Group | Contexts |
+|---------------|----------|
+| **Core** | Orchestration, Proactivity |
+| **Platform** | Identity, Profile, Plugin, Audit |
+| **Life Management** | Calendar, Finance |
+| **Travel & Communication** | Travel, Communication |
+| **Lifestyle** | Health, Home, Shopping, Learning |
 
-**Total:** ~16-20 developers
+**Note:** As an open-source project with AI-assisted development and community contributions, context development is collaborative and fluid.
 
 ## Evolution Strategy
 

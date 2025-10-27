@@ -33,37 +33,28 @@
 
 ### 2.1 Three Uses of MCP
 
-```
-┌─────────────────────────────────────────────────┐
-│              FIDUS SYSTEM                        │
-│                                                 │
-│  ┌──────────────────────────────────────────┐  │
-│  │  1. SUPERVISORS = MCP SERVERS            │  │
-│  │     (exposed externally)                 │  │
-│  │                                          │  │
-│  │  • calendar_supervisor                   │  │
-│  │  • health_supervisor                     │  │
-│  │  • finance_supervisor                    │  │
-│  └──────────────────────────────────────────┘  │
-│                                                 │
-│  ┌──────────────────────────────────────────┐  │
-│  │  2. SUPERVISORS USE MCP CLIENTS          │  │
-│  │     (call external MCP servers)          │  │
-│  │                                          │  │
-│  │  • Google Calendar MCP                   │  │
-│  │  • Notion MCP                            │  │
-│  │  • Slack MCP                             │  │
-│  └──────────────────────────────────────────┘  │
-│                                                 │
-│  ┌──────────────────────────────────────────┐  │
-│  │  3. COMMUNITY MCP SERVERS                │  │
-│  │     (via Marketplace)                    │  │
-│  │                                          │  │
-│  │  • User installs MCP server              │  │
-│  │  • Auto-discovery via MCP Registry       │  │
-│  │  • Becomes supervisor or tool            │  │
-│  └──────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph FIDUS["FIDUS SYSTEM"]
+        subgraph S1["1. SUPERVISORS = MCP SERVERS<br/>(exposed externally)"]
+            S1A["calendar_supervisor"]
+            S1B["health_supervisor"]
+            S1C["finance_supervisor"]
+        end
+
+        subgraph S2["2. SUPERVISORS USE MCP CLIENTS<br/>(call external MCP servers)"]
+            S2A["Google Calendar MCP"]
+            S2B["Notion MCP"]
+            S2C["Slack MCP"]
+        end
+
+        subgraph S3["3. COMMUNITY MCP SERVERS<br/>(via Marketplace)"]
+            S3A["User installs MCP server"]
+            S3B["Auto-discovery via MCP Registry"]
+            S3C["Becomes supervisor or tool"]
+            S3A --> S3B --> S3C
+        end
+    end
 ```
 
 ---
@@ -489,31 +480,27 @@ const client = await MCPClient.connect({
 
 ### 8.1 Community Marketplace
 
-```
-┌─────────────────────────────────────────────────┐
-│        FIDUS COMMUNITY MARKETPLACE              │
-│                                                 │
-│  ┌──────────────────────────────────────────┐  │
-│  │  MCP Server Packages                     │  │
-│  │  • npm registry                          │  │
-│  │  • GitHub releases                       │  │
-│  │  • Version management                    │  │
-│  └──────────────────────────────────────────┘  │
-│                                                 │
-│  ┌──────────────────────────────────────────┐  │
-│  │  Discovery & Search                      │  │
-│  │  • Category tags                         │  │
-│  │  • Rating system                         │  │
-│  │  • Usage stats                           │  │
-│  └──────────────────────────────────────────┘  │
-│                                                 │
-│  ┌──────────────────────────────────────────┐  │
-│  │  Security & Verification                 │  │
-│  │  • Code review                           │  │
-│  │  • Permission system                     │  │
-│  │  • Audit logs                            │  │
-│  └──────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph MARKET["FIDUS COMMUNITY MARKETPLACE"]
+        subgraph PKG["MCP Server Packages"]
+            P1["npm registry"]
+            P2["GitHub releases"]
+            P3["Version management"]
+        end
+
+        subgraph DISC["Discovery & Search"]
+            D1["Category tags"]
+            D2["Rating system"]
+            D3["Usage stats"]
+        end
+
+        subgraph SEC["Security & Verification"]
+            S1["Code review"]
+            S2["Permission system"]
+            S3["Audit logs"]
+        end
+    end
 ```
 
 ### 8.2 Installation Flow

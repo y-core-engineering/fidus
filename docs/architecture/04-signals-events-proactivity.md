@@ -62,21 +62,19 @@ await eventBus.publish({
 
 ### 2.1 Overview
 
-```
-┌────────────────────────────────────────────────┐
-│           TRIGGER LAYER                         │
-│                                                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
-│  │Time-Based│  │Event-Based│ │User-Custom│     │
-│  │ Triggers │  │ Triggers  │ │ Triggers  │     │
-│  └─────┬────┘  └─────┬─────┘  └─────┬────┘     │
-│        │             │              │          │
-│        └─────────────┼──────────────┘          │
-│                      │                         │
-└──────────────────────┼─────────────────────────┘
-                       │
-                       ▼
-              Proactivity Engine
+```mermaid
+graph TB
+    subgraph TRIGGER["TRIGGER LAYER"]
+        T1["Time-Based<br/>Triggers"]
+        T2["Event-Based<br/>Triggers"]
+        T3["User-Custom<br/>Triggers"]
+    end
+
+    T1 --> PE
+    T2 --> PE
+    T3 --> PE
+
+    PE["Proactivity Engine"]
 ```
 
 ### 2.2 Time-Based Triggers (Scheduler)
@@ -163,35 +161,34 @@ cron.schedule(schedule.trigger.schedule, async () => {
 
 #### Event Flow
 
-```
-External System (e.g. Google Calendar)
-           │
-           ▼ Webhook/Poll
-┌──────────────────────────────────┐
-│ Domain Supervisor                │
-│ - Receives event                 │
-│ - Emits to Event Bus             │
-└──────────┬───────────────────────┘
-           │
-           ▼
-┌──────────────────────────────────┐
-│ Event Bus (Redis Pub/Sub)        │
-│ - Global event routing           │
-└──────────┬───────────────────────┘
-           │
-           ▼
-┌──────────────────────────────────┐
-│ Proactivity Engine               │
-│ - Generic event handler          │
-│ - LLM decides: Relevant?         │
-└──────────┬───────────────────────┘
-           │
-           ▼ (if relevant)
-┌──────────────────────────────────┐
-│ Notification Agent               │
-│ - Smart timing                   │
-│ - Delivery to user               │
-└──────────────────────────────────┘
+```mermaid
+graph TB
+    EXT["External System<br/>(e.g. Google Calendar)"] -->|Webhook/Poll| SUP
+
+    subgraph SUP["Domain Supervisor"]
+        S1["Receives event"]
+        S2["Emits to Event Bus"]
+    end
+
+    SUP --> BUS
+
+    subgraph BUS["Event Bus (Redis Pub/Sub)"]
+        B1["Global event routing"]
+    end
+
+    BUS --> PE
+
+    subgraph PE["Proactivity Engine"]
+        P1["Generic event handler"]
+        P2["LLM decides: Relevant?"]
+    end
+
+    PE -->|if relevant| NA
+
+    subgraph NA["Notification Agent"]
+        N1["Smart timing"]
+        N2["Delivery to user"]
+    end
 ```
 
 #### LLM-Based Event Filtering
@@ -526,50 +523,33 @@ Format: Brief, actionable, prioritized.
 
 ### 5.1 Proactivity Flow (Complete)
 
-```
-┌─────────────────────────────────────────────────┐
-│              TRIGGER LAYER                       │
-│                                                 │
-│  Time-Based: Every 5 min                        │
-│  Event-Based: Real-time on events              │
-│  User-Custom: User-defined schedulers           │
-└──────────────────┬──────────────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────────────┐
-│        OPPORTUNITY DETECTION ENGINE              │
-│                                                 │
-│  1. Signal Collection (dynamic via Registry)    │
-│     - Collect required signals                  │
-│     - Collect optional signals (best effort)    │
-│                                                 │
-│  2. LLM Analysis (per domain)                   │
-│     - Parallel for all domains                  │
-│     - Prompt dynamically generated              │
-│                                                 │
-│  3. Opportunity Prioritization                  │
-│     - LLM ranks opportunities                   │
-│     - Consider user preferences                 │
-└──────────────────┬──────────────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────────────┐
-│         NOTIFICATION AGENT                       │
-│                                                 │
-│  1. Timing Optimization (LLM)                   │
-│     - Now or defer?                             │
-│     - Respect Do Not Disturb                    │
-│                                                 │
-│  2. Batching (Low Priority)                     │
-│     - 3+ notifications → Digest                 │
-│                                                 │
-│  3. Delivery                                    │
-│     - Push notification                         │
-│     - In-app message                            │
-└──────────────────┬──────────────────────────────┘
-                   │
-                   ▼
-                 USER
+```mermaid
+graph TB
+    subgraph TL["TRIGGER LAYER"]
+        T1["Time-Based: Every 5 min"]
+        T2["Event-Based: Real-time on events"]
+        T3["User-Custom: User-defined schedulers"]
+    end
+
+    TL --> ODE
+
+    subgraph ODE["OPPORTUNITY DETECTION ENGINE"]
+        O1["1. Signal Collection (dynamic via Registry)<br/>- Collect required signals<br/>- Collect optional signals (best effort)"]
+        O2["2. LLM Analysis (per domain)<br/>- Parallel for all domains<br/>- Prompt dynamically generated"]
+        O3["3. Opportunity Prioritization<br/>- LLM ranks opportunities<br/>- Consider user preferences"]
+        O1 --> O2 --> O3
+    end
+
+    ODE --> NA
+
+    subgraph NA["NOTIFICATION AGENT"]
+        N1["1. Timing Optimization (LLM)<br/>- Now or defer?<br/>- Respect Do Not Disturb"]
+        N2["2. Batching (Low Priority)<br/>- 3+ notifications → Digest"]
+        N3["3. Delivery<br/>- Push notification<br/>- In-app message"]
+        N1 --> N2 --> N3
+    end
+
+    NA --> USER["USER"]
 ```
 
 ### 5.2 Key Features

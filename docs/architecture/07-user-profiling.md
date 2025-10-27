@@ -24,32 +24,45 @@ User profiling is the foundation for personalized, context-aware agents. Fidus u
 
 UserProfiling is a **central shared infrastructure component** similar to registries.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│              FIDUS SYSTEM                                │
-│                                                          │
-│  ┌────────────────────────────────────────────────┐    │
-│  │         ORCHESTRATOR                            │    │
-│  └─────────────────┬──────────────────────────────┘    │
-│                    │                                     │
-│        ┌───────────┼───────────┬──────────┐            │
-│        ▼           ▼           ▼          ▼            │
-│  ┌──────────────────────────────────────────────┐      │
-│  │      DOMAIN SUPERVISORS                       │      │
-│  │  Calendar │ Health │ Finance │ Travel │ ...  │      │
-│  └──────────────────┬───────────────────────────┘      │
-│                     │                                    │
-│           All access ▼                                   │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │        SHARED INFRASTRUCTURE                     │   │
-│  ├──────────────┬──────────────┬──────────────────┤   │
-│  │ Registries   │ Memory Layer │ UserProfiling    │   │
-│  │ • Signal     │ • Vector DB  │ • Profile API    │   │
-│  │ • Event      │ • Graph DB   │ • Learning       │   │
-│  │ • MCP        │ • Cache      │ • Privacy        │   │
-│  │ • Supervisor │ • Document   │                  │   │
-│  └──────────────┴──────────────┴──────────────────┘   │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph FIDUS["FIDUS SYSTEM"]
+        ORCH["ORCHESTRATOR"]
+
+        ORCH --> SUP
+
+        subgraph SUP["DOMAIN SUPERVISORS"]
+            S1["Calendar"]
+            S2["Health"]
+            S3["Finance"]
+            S4["Travel"]
+            S5["..."]
+        end
+
+        SUP -->|All access| INFRA
+
+        subgraph INFRA["SHARED INFRASTRUCTURE"]
+            subgraph REG["Registries"]
+                R1["Signal"]
+                R2["Event"]
+                R3["MCP"]
+                R4["Supervisor"]
+            end
+
+            subgraph MEM["Memory Layer"]
+                M1["Vector DB"]
+                M2["Graph DB"]
+                M3["Cache"]
+                M4["Document"]
+            end
+
+            subgraph PROF["UserProfiling"]
+                P1["Profile API"]
+                P2["Learning"]
+                P3["Privacy"]
+            end
+        end
+    end
 ```
 
 ### 2.2 Access Patterns
@@ -455,58 +468,57 @@ class HealthSupervisor {
 
 #### 2.3.1 Community Edition (Monolith)
 
-```
-┌─────────────────────────────────────┐
-│ Fidus Backend (Single Process)     │
-│                                     │
-│ ┌─────────────────────────────────┐ │
-│ │ Orchestrator                    │ │
-│ │ ├─ Supervisors                  │ │
-│ │ └─ Proactivity Engine           │ │
-│ └─────────────────────────────────┘ │
-│                                     │
-│ ┌─────────────────────────────────┐ │
-│ │ Shared Services (In-Process)    │ │
-│ │ ├─ UserProfileService           │ │
-│ │ ├─ ImplicitLearningService      │ │
-│ │ └─ Registries                   │ │
-│ └─────────────────────────────────┘ │
-│                                     │
-│ ┌─────────────────────────────────┐ │
-│ │ Databases (Local)               │ │
-│ │ ├─ Neo4j (Graph)                │ │
-│ │ ├─ Qdrant (Vector)              │ │
-│ │ └─ Redis (Cache)                │ │
-│ └─────────────────────────────────┘ │
-└─────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph BACKEND["Fidus Backend (Single Process)"]
+        subgraph ORCH["Orchestrator"]
+            O1["Supervisors"]
+            O2["Proactivity Engine"]
+        end
+
+        subgraph SERVICES["Shared Services (In-Process)"]
+            S1["UserProfileService"]
+            S2["ImplicitLearningService"]
+            S3["Registries"]
+        end
+
+        subgraph DB["Databases (Local)"]
+            D1["Neo4j (Graph)"]
+            D2["Qdrant (Vector)"]
+            D3["Redis (Cache)"]
+        end
+
+        ORCH --> SERVICES
+        SERVICES --> DB
+    end
 ```
 
 **Access:** In-process via dependency injection
 
 #### 2.3.2 Cloud Edition (Distributed)
 
-```
-┌─────────────────────────────────────┐
-│ Orchestrator Service (Pods)         │
-│ ├─ Orchestrator                     │
-│ └─ Supervisors                      │
-└──────────────┬──────────────────────┘
-               │ gRPC/HTTP
-               ▼
-┌─────────────────────────────────────┐
-│ UserProfile Service (Pods)          │
-│ ├─ UserProfileService               │
-│ ├─ ImplicitLearningService          │
-│ └─ API Gateway                      │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│ Managed Databases                   │
-│ ├─ Neo4j Cluster                    │
-│ ├─ Qdrant Cluster                   │
-│ └─ Redis Cluster                    │
-└─────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph ORCH["Orchestrator Service (Pods)"]
+        O1["Orchestrator"]
+        O2["Supervisors"]
+    end
+
+    ORCH -->|gRPC/HTTP| UPS
+
+    subgraph UPS["UserProfile Service (Pods)"]
+        U1["UserProfileService"]
+        U2["ImplicitLearningService"]
+        U3["API Gateway"]
+    end
+
+    UPS --> MDB
+
+    subgraph MDB["Managed Databases"]
+        D1["Neo4j Cluster"]
+        D2["Qdrant Cluster"]
+        D3["Redis Cluster"]
+    end
 ```
 
 **Access:** Remote via gRPC or HTTP/REST
@@ -518,24 +530,23 @@ class HealthSupervisor {
 
 #### 2.3.3 Enterprise Edition (Hybrid)
 
-```
-┌─────────────────────────────────────┐
-│ Customer Private Cloud              │
-│                                     │
-│ ┌─────────────────────────────────┐ │
-│ │ Fidus Core (Air-Gapped)         │ │
-│ │ ├─ Orchestrator                 │ │
-│ │ ├─ Supervisors                  │ │
-│ │ └─ UserProfile Service          │ │
-│ └─────────────────────────────────┘ │
-│                                     │
-│ ┌─────────────────────────────────┐ │
-│ │ Customer Databases              │ │
-│ │ ├─ Existing Graph DB            │ │
-│ │ ├─ Existing Vector DB           │ │
-│ │ └─ Existing Cache               │ │
-│ └─────────────────────────────────┘ │
-└─────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph PRIV["Customer Private Cloud"]
+        subgraph CORE["Fidus Core (Air-Gapped)"]
+            C1["Orchestrator"]
+            C2["Supervisors"]
+            C3["UserProfile Service"]
+        end
+
+        subgraph CDB["Customer Databases"]
+            D1["Existing Graph DB"]
+            D2["Existing Vector DB"]
+            D3["Existing Cache"]
+        end
+
+        CORE --> CDB
+    end
 ```
 
 **Access:** In-process or remote (depending on customer requirements)
