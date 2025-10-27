@@ -863,23 +863,23 @@ gh pr create --web
 gh pr create --title "feat(domain): your change" --body "Description..."
 ```
 
-5. **Merge PR (after CI passes):**
-```bash
-# Merge via GitHub UI or CLI
-gh pr merge --squash
-
-# Delete feature branch
-git branch -d feature/your-feature-name
-git push origin --delete feature/your-feature-name
+5. **Wait for human approval:**
+```
+⚠️ IMPORTANT: Claude Code creates PRs but does NOT merge them!
+- PR must be reviewed and approved by a human
+- CI checks must pass
+- Human developer merges via GitHub UI
 ```
 
-6. **Update main branch:**
+6. **After human merges the PR, update local main branch:**
 ```bash
 git checkout main
 git pull
 ```
 
 **NEVER use `git push` directly when on main branch!** This violates the PR workflow.
+
+**NEVER merge PRs automatically!** Always wait for human approval.
 
 ### Creating Pull Requests
 

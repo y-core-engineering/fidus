@@ -13,28 +13,14 @@
 
 The **PluginManager** is the central instance that manages and coordinates all registries:
 
-```
-┌─────────────────────────────────────────────┐
-│           PluginManager                     │
-├─────────────────────────────────────────────┤
-│ Responsibilities:                           │
-│ - Plugin Discovery (File-based, NPM)        │
-│ - Dependency Resolution                     │
-│ - Plugin Lifecycle (initialize, shutdown)   │
-│ - Registry Coordination                     │
-└────────────────┬────────────────────────────┘
-                 │
-                 ├─── SupervisorRegistry
-                 │     └─ Manages Supervisors
-                 │
-                 ├─── SignalRegistry
-                 │     └─ Manages Signal Providers
-                 │
-                 ├─── EventRegistry
-                 │     └─ Manages Event Types
-                 │
-                 └─── ServiceRegistry
-                       └─ Manages Services (UserProfile, etc.)
+```mermaid
+graph TB
+    PM["PluginManager<br/>━━━━━━━━━━━━━━━━<br/>Responsibilities:<br/>- Plugin Discovery (File-based, NPM)<br/>- Dependency Resolution<br/>- Plugin Lifecycle (initialize, shutdown)<br/>- Registry Coordination"]
+
+    PM --> SR["SupervisorRegistry<br/>└─ Manages Supervisors"]
+    PM --> SigR["SignalRegistry<br/>└─ Manages Signal Providers"]
+    PM --> ER["EventRegistry<br/>└─ Manages Event Types"]
+    PM --> ServR["ServiceRegistry<br/>└─ Manages Services (UserProfile, etc.)"]
 ```
 
 ### 0.2 PluginManager Responsibilities
@@ -795,31 +781,33 @@ class CalendarSupervisor {
 
 ### 5.2 Update Flow
 
-```
-New supervisor registered
-           │
-           ▼
-┌──────────────────────────────────┐
-│ SupervisorRegistry               │
-│ - register(supervisor)           │
-│ - emit('supervisor_registered')  │
-└──────────┬───────────────────────┘
-           │
-           ▼
-┌──────────────────────────────────┐
-│ Orchestrator (Event Listener)    │
-│ - cachedSystemPrompt = null      │
-│ - promptVersion++                │
-└──────────┬───────────────────────┘
-           │
-           ▼
-┌──────────────────────────────────┐
-│ Next handleUserRequest()         │
-│ - generateSystemPrompt()         │
-│   → Query registry               │
-│   → New prompt generated         │
-│   → Cached                       │
-└──────────────────────────────────┘
+```mermaid
+graph TB
+    START["New supervisor registered"] --> SR
+
+    subgraph SR["SupervisorRegistry"]
+        S1["register(supervisor)"]
+        S2["emit('supervisor_registered')"]
+        S1 --> S2
+    end
+
+    SR --> ORCH
+
+    subgraph ORCH["Orchestrator (Event Listener)"]
+        O1["cachedSystemPrompt = null"]
+        O2["promptVersion++"]
+        O1 --> O2
+    end
+
+    ORCH --> NEXT
+
+    subgraph NEXT["Next handleUserRequest()"]
+        N1["generateSystemPrompt()"]
+        N2["→ Query registry"]
+        N3["→ New prompt generated"]
+        N4["→ Cached"]
+        N1 --> N2 --> N3 --> N4
+    end
 ```
 
 ### 5.3 Key Features

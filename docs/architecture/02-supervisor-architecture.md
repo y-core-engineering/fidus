@@ -11,16 +11,19 @@
 
 A **Supervisor** is a hybrid component in the Fidus system:
 
-```
-Supervisor =
-  ├── LangGraph State Machine (Multi-Step Reasoning)
-  ├── MCP Server Interface (Tools, Resources, Prompts)
-  ├── MCP Client (calls external MCP servers)
-  └── Fidus-Specific Extensions
-      ├── Signal Providers (for Proactivity Engine)
-      ├── Event Emitters (for Event Bus)
-      ├── Background Jobs (Monitoring)
-      └── Domain State Management
+```mermaid
+graph TB
+    SUP["Supervisor"]
+
+    SUP --> LG["LangGraph State Machine<br/>(Multi-Step Reasoning)"]
+    SUP --> MCP["MCP Server Interface<br/>(Tools, Resources, Prompts)"]
+    SUP --> CLIENT["MCP Client<br/>(calls external MCP servers)"]
+    SUP --> EXT["Fidus-Specific Extensions"]
+
+    EXT --> SP["Signal Providers<br/>(for Proactivity Engine)"]
+    EXT --> EE["Event Emitters<br/>(for Event Bus)"]
+    EXT --> BJ["Background Jobs<br/>(Monitoring)"]
+    EXT --> DSM["Domain State Management"]
 ```
 
 ### Supervisor ≠ MCP Server
@@ -322,21 +325,23 @@ class CalendarSupervisor {
 
 ### Sub-Agent Hierarchy
 
-```
-Orchestrator (LangGraph)
-    │
-    ├─ Calendar Supervisor (LangGraph)
-    │   ├─ Meeting Preparation Agent (LangGraph)
-    │   ├─ Conflict Resolution Agent (LangGraph)
-    │   └─ Smart Scheduling Agent (LangGraph)
-    │
-    ├─ Health Supervisor (LangGraph)
-    │   ├─ Workout Planning Agent (LangGraph)
-    │   └─ Nutrition Tracking Agent (LangGraph)
-    │
-    └─ Finance Supervisor (LangGraph)
-        ├─ Budget Analysis Agent (LangGraph)
-        └─ Investment Advisor Agent (LangGraph)
+```mermaid
+graph TB
+    ORCH["Orchestrator<br/>(LangGraph)"]
+
+    ORCH --> CAL["Calendar Supervisor<br/>(LangGraph)"]
+    ORCH --> HEALTH["Health Supervisor<br/>(LangGraph)"]
+    ORCH --> FIN["Finance Supervisor<br/>(LangGraph)"]
+
+    CAL --> MP["Meeting Preparation Agent<br/>(LangGraph)"]
+    CAL --> CR["Conflict Resolution Agent<br/>(LangGraph)"]
+    CAL --> SS["Smart Scheduling Agent<br/>(LangGraph)"]
+
+    HEALTH --> WP["Workout Planning Agent<br/>(LangGraph)"]
+    HEALTH --> NT["Nutrition Tracking Agent<br/>(LangGraph)"]
+
+    FIN --> BA["Budget Analysis Agent<br/>(LangGraph)"]
+    FIN --> IA["Investment Advisor Agent<br/>(LangGraph)"]
 ```
 
 **Each agent = its own LangGraph state machine!**
@@ -479,20 +484,19 @@ class HealthSupervisor {
 
 In the Fidus system, Supervisors are deployed as **plugins**:
 
-```
-┌─────────────────────────────────────────┐
-│         Supervisor Plugin               │
-├─────────────────────────────────────────┤
-│ - Implements Plugin Interface           │
-│ - Declares Dependencies                 │
-│ - Registers Services                    │
-│ - Lifecycle: initialize()               │
-└─────────────────────────────────────────┘
-         │
-         ├─ Registers with SupervisorRegistry
-         ├─ Registers Signals with SignalRegistry
-         ├─ Registers Events with EventRegistry
-         └─ Starts Background Jobs
+```mermaid
+graph TB
+    subgraph PLUGIN["Supervisor Plugin"]
+        P1["Implements Plugin Interface"]
+        P2["Declares Dependencies"]
+        P3["Registers Services"]
+        P4["Lifecycle: initialize()"]
+    end
+
+    PLUGIN --> SR["Registers with SupervisorRegistry"]
+    PLUGIN --> SigR["Registers Signals with SignalRegistry"]
+    PLUGIN --> ER["Registers Events with EventRegistry"]
+    PLUGIN --> BJ["Starts Background Jobs"]
 ```
 
 ### 6.2 Plugin Interface
@@ -590,18 +594,14 @@ class CalendarSupervisorPlugin implements Plugin {
 4. Supervisor is available to Orchestrator
 
 **Flow:**
-```
-PluginManager.discoverPlugins()
-  ↓
-Plugin file found: calendar-supervisor.plugin.ts
-  ↓
-Dependency check: ['user-profiling'] available?
-  ↓
-CalendarSupervisorPlugin.initialize()
-  ↓
-Service 'calendarSupervisor' registered with ServiceRegistry
-  ↓
-Orchestrator can use Supervisor
+```mermaid
+graph TB
+    PM["PluginManager.discoverPlugins()"]
+    PM --> PF["Plugin file found:<br/>calendar-supervisor.plugin.ts"]
+    PF --> DC["Dependency check:<br/>['user-profiling'] available?"]
+    DC --> INIT["CalendarSupervisorPlugin.initialize()"]
+    INIT --> REG["Service 'calendarSupervisor' registered<br/>with ServiceRegistry"]
+    REG --> ORCH["Orchestrator can use Supervisor"]
 ```
 
 ### 6.5 Advantages of Plugin Model
@@ -641,18 +641,28 @@ class CryptoTradingSupervisorPlugin implements Plugin {
 ```
 
 **Orchestrator recognizes automatically:**
-```
-User: "Buy 0.1 BTC if price drops below 40k"
+```mermaid
+graph TB
+    USER["User: 'Buy 0.1 BTC if price drops below 40k'"]
+    USER --> ASK
 
-Orchestrator asks PluginManager:
-  → Which Supervisors are available?
-  → Tools: [..., crypto-trading.place_order, ...]
+    subgraph ASK["Orchestrator asks PluginManager"]
+        A1["Which Supervisors are available?"]
+        A2["Tools: [..., crypto-trading.place_order, ...]"]
+        A1 --> A2
+    end
 
-LLM decides:
-  → Tool: crypto-trading.place_order
+    ASK --> LLM
 
-Orchestrator calls:
-  → CryptoTradingSupervisor.execute(...)
+    subgraph LLM["LLM decides"]
+        L1["Tool: crypto-trading.place_order"]
+    end
+
+    LLM --> CALL
+
+    subgraph CALL["Orchestrator calls"]
+        C1["CryptoTradingSupervisor.execute(...)"]
+    end
 ```
 
 ---
@@ -674,34 +684,54 @@ Orchestrator calls:
 
 ### Lifecycle of a Supervisor
 
-```
-1. Initialization
-   ├─ Compile LangGraph
-   ├─ Connect external MCP servers
-   ├─ Register signals (→ Signal Registry)
-   ├─ Register events (→ Event Registry)
-   ├─ Start background jobs
-   └─ Initialize sub-agents
+```mermaid
+graph TB
+    subgraph INIT["1. Initialization"]
+        I1["Compile LangGraph"]
+        I2["Connect external MCP servers"]
+        I3["Register signals → Signal Registry"]
+        I4["Register events → Event Registry"]
+        I5["Start background jobs"]
+        I6["Initialize sub-agents"]
+        I1 --> I2 --> I3 --> I4 --> I5 --> I6
+    end
 
-2. Runtime
-   ├─ execute() called by Orchestrator
-   │  └─ LangGraph state machine runs
-   │     ├─ Nodes: Reasoning steps
-   │     ├─ MCP calls (External + Sub-Agents)
-   │     └─ Return result
-   │
-   ├─ Background jobs run
-   │  └─ Publish events when needed
-   │
-   └─ Signal collectors
-      └─ Called by Proactivity Engine
+    INIT --> RUNTIME
 
-3. Updates
-   ├─ Register new sub-agents
-   │  └─ Regenerate prompt
-   ├─ Connect new external MCP servers
-   │  └─ Update tools
-   └─ Hot-reload without restart
+    subgraph RUNTIME["2. Runtime"]
+        direction TB
+        R1["execute() called by Orchestrator"]
+        R2["LangGraph state machine runs"]
+        R3["Nodes: Reasoning steps"]
+        R4["MCP calls (External + Sub-Agents)"]
+        R5["Return result"]
+
+        R6["Background jobs run"]
+        R7["Publish events when needed"]
+
+        R8["Signal collectors"]
+        R9["Called by Proactivity Engine"]
+
+        R1 --> R2
+        R2 --> R3 --> R4 --> R5
+        R6 --> R7
+        R8 --> R9
+    end
+
+    RUNTIME --> UPDATES
+
+    subgraph UPDATES["3. Updates"]
+        U1["Register new sub-agents"]
+        U2["Regenerate prompt"]
+        U3["Connect new external MCP servers"]
+        U4["Update tools"]
+        U5["Hot-reload without restart"]
+
+        U1 --> U2
+        U3 --> U4
+        U2 --> U5
+        U4 --> U5
+    end
 ```
 
 ---

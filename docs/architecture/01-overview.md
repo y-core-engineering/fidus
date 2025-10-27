@@ -217,59 +217,71 @@ JSON: {
 
 ### 3.1 High-Level Components
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    FIDUS SYSTEM                              │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │         USER INTERACTION LAYER                      │    │
-│  │  • Chat Interface (Web, Mobile, Desktop)           │    │
-│  │  • Voice Interface (Optional)                      │    │
-│  │  • Notification System                             │    │
-│  └─────────────────┬──────────────────────────────────┘    │
-│                    │                                         │
-│                    ▼                                         │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │      ORCHESTRATOR (Central Intelligence)           │    │
-│  │  • LLM-based Intent Detection                      │    │
-│  │  • Dynamic Supervisor Routing                      │    │
-│  │  • Multi-Agent Coordination                        │    │
-│  │  • Response Synthesis                              │    │
-│  └─────────────────┬──────────────────────────────────┘    │
-│                    │                                         │
-│        ┌───────────┼───────────┬───────────┐                │
-│        ▼           ▼           ▼           ▼                │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │      DOMAIN SUPERVISORS (LangGraph Agents)        │      │
-│  ├──────────┬──────────┬──────────┬──────────┬──────┤      │
-│  │Calendar  │ Health   │ Finance  │ Travel   │ Home │      │
-│  ├──────────┼──────────┼──────────┼──────────┼──────┤      │
-│  │Shopping  │ Comm     │ Learning │ Custom   │ ...  │      │
-│  └──────────┴──────────┴──────────┴──────────┴──────┘      │
-│        │           │           │           │                │
-│        └───────────┼───────────┴───────────┘                │
-│                    │                                         │
-│  ════════════════════════════════════════════════════       │
-│                    │                                         │
-│  ┌─────────────────▼─────────────────────────────────┐     │
-│  │    PROACTIVITY ENGINE (Background Service)        │     │
-│  │  • Opportunity Detection Engine                   │     │
-│  │  • Event Bus Listener                             │     │
-│  │  • Notification Agent                             │     │
-│  │  • Scheduler (Time-Based Triggers)                │     │
-│  └───────────────────────────────────────────────────┘     │
-│                    │                                         │
-│                    ▼                                         │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │        SHARED INFRASTRUCTURE                         │   │
-│  ├─────────────┬────────────┬────────────┬─────────────┤   │
-│  │ Registries  │ Memory     │ Profiling  │ External    │   │
-│  │ • Signal    │ • Vector   │ • User     │ • MCP       │   │
-│  │ • Event     │ • Graph    │   Profile  │   Servers   │   │
-│  │ • MCP       │ • Cache    │ • Implicit │ • Privacy   │   │
-│  │ • Supervisor│ • Document │   Learning │   Proxy     │   │
-│  └─────────────┴────────────┴────────────┴─────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph FIDUS_SYSTEM["FIDUS SYSTEM"]
+        subgraph UI["USER INTERACTION LAYER"]
+            UI1["Chat Interface<br/>(Web, Mobile, Desktop)"]
+            UI2["Voice Interface (Optional)"]
+            UI3["Notification System"]
+        end
+
+        subgraph ORCH["ORCHESTRATOR (Central Intelligence)"]
+            O1["LLM-based Intent Detection"]
+            O2["Dynamic Supervisor Routing"]
+            O3["Multi-Agent Coordination"]
+            O4["Response Synthesis"]
+        end
+
+        subgraph SUPERVISORS["DOMAIN SUPERVISORS (LangGraph Agents)"]
+            S1["Calendar"]
+            S2["Health"]
+            S3["Finance"]
+            S4["Travel"]
+            S5["Home"]
+            S6["Shopping"]
+            S7["Comm"]
+            S8["Learning"]
+            S9["Custom"]
+            S10["..."]
+        end
+
+        subgraph PROACT["PROACTIVITY ENGINE (Background Service)"]
+            P1["Opportunity Detection Engine"]
+            P2["Event Bus Listener"]
+            P3["Notification Agent"]
+            P4["Scheduler (Time-Based Triggers)"]
+        end
+
+        subgraph INFRA["SHARED INFRASTRUCTURE"]
+            subgraph REG["Registries"]
+                R1["Signal"]
+                R2["Event"]
+                R3["MCP"]
+                R4["Supervisor"]
+            end
+            subgraph MEM["Memory"]
+                M1["Vector"]
+                M2["Graph"]
+                M3["Cache"]
+                M4["Document"]
+            end
+            subgraph PROF["Profiling"]
+                PR1["User Profile"]
+                PR2["Implicit Learning"]
+            end
+            subgraph EXT["External"]
+                E1["MCP Servers"]
+                E2["Privacy Proxy"]
+            end
+        end
+
+        UI --> ORCH
+        ORCH --> SUPERVISORS
+        SUPERVISORS --> PROACT
+        PROACT --> INFRA
+        SUPERVISORS --> INFRA
+    end
 ```
 
 ### 3.2 Component Description
@@ -845,31 +857,27 @@ User: "Good morning! Your day:
 
 ### 5.1 Community Edition (Self-Hosted)
 
-```
-┌─────────────────────────────────┐
-│ User's Device (Local)           │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ Fidus Backend (Docker)      │ │
-│ │ • Orchestrator              │ │
-│ │ • Domain Supervisors        │ │
-│ │ • Proactivity Engine        │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ Ollama (Local LLM)          │ │
-│ │ • Llama 3.1 8B              │ │
-│ │ • Mistral 7B                │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ Databases (Local)           │ │
-│ │ • Qdrant (Vector)           │ │
-│ │ • Neo4j (Graph)             │ │
-│ │ • Redis (Cache/Events)      │ │
-│ │ • SQLite (User Data)        │ │
-│ └─────────────────────────────┘ │
-└─────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph LOCAL["User's Device (Local)"]
+        subgraph BACKEND["Fidus Backend (Docker)"]
+            B1["Orchestrator"]
+            B2["Domain Supervisors"]
+            B3["Proactivity Engine"]
+        end
+
+        subgraph OLLAMA["Ollama (Local LLM)"]
+            L1["Llama 3.1 8B"]
+            L2["Mistral 7B"]
+        end
+
+        subgraph DB["Databases (Local)"]
+            D1["Qdrant (Vector)"]
+            D2["Neo4j (Graph)"]
+            D3["Redis (Cache/Events)"]
+            D4["SQLite (User Data)"]
+        end
+    end
 ```
 
 **Characteristics:**
@@ -880,34 +888,33 @@ User: "Good morning! Your day:
 
 ### 5.2 Cloud Edition (Managed)
 
-```
-┌─────────────────────────────────┐
-│ Fidus Cloud (EU/US Regions)    │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ API Gateway                 │ │
-│ │ • Rate Limiting             │ │
-│ │ • Authentication            │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ Orchestrator Cluster        │ │
-│ │ • Auto-Scaling              │ │
-│ │ • Load Balancing            │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ Cloud LLM (GPT-4o, Claude)  │ │
-│ │ • Via Privacy Proxy         │ │
-│ │ • PII Filtering             │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ Managed Databases           │ │
-│ │ • Encrypted-at-Rest         │ │
-│ │ • End-to-End Encryption     │ │
-│ └─────────────────────────────┘ │
-└─────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph CLOUD["Fidus Cloud (EU/US Regions)"]
+        subgraph GW["API Gateway"]
+            G1["Rate Limiting"]
+            G2["Authentication"]
+        end
+
+        subgraph ORCH["Orchestrator Cluster"]
+            O1["Auto-Scaling"]
+            O2["Load Balancing"]
+        end
+
+        subgraph LLM["Cloud LLM (GPT-4o, Claude)"]
+            L1["Via Privacy Proxy"]
+            L2["PII Filtering"]
+        end
+
+        subgraph DB["Managed Databases"]
+            D1["Encrypted-at-Rest"]
+            D2["End-to-End Encryption"]
+        end
+
+        GW --> ORCH
+        ORCH --> LLM
+        ORCH --> DB
+    end
 ```
 
 **Characteristics:**
@@ -919,22 +926,31 @@ User: "Good morning! Your day:
 
 ### 5.3 Enterprise Edition (Hybrid)
 
-```
-┌─────────────────────────────────┐  ┌─────────────────────────────┐
-│ Customer's Private Cloud        │  │ Fidus Managed Services      │
-│                                 │  │                             │
-│ ┌─────────────────────────────┐ │  │ ┌─────────────────────────┐ │
-│ │ Fidus Core (Air-Gapped)     │ │  │ │ Marketplace API         │ │
-│ │ • All Components            │ │  │ │ • Agent Discovery       │ │
-│ │ • Custom LLM (Fine-Tuned)   │ │  │ │ • Version Management    │ │
-│ └─────────────────────────────┘ │  │ └─────────────────────────┘ │
-│                                 │  │                             │
-│ ┌─────────────────────────────┐ │  │ ┌─────────────────────────┐ │
-│ │ Customer Databases          │ │  │ │ Support & Monitoring    │ │
-│ │ • Bring-Your-Own            │ │  │ │ • Analytics (Opt-in)    │ │
-│ └─────────────────────────────┘ │  │ └─────────────────────────┘ │
-└─────────────────────────────────┘  └─────────────────────────────┘
-        ↕ VPN/Private Link (optional)
+```mermaid
+graph LR
+    subgraph PRIVATE["Customer's Private Cloud"]
+        subgraph CORE["Fidus Core (Air-Gapped)"]
+            C1["All Components"]
+            C2["Custom LLM (Fine-Tuned)"]
+        end
+
+        subgraph CDB["Customer Databases"]
+            D1["Bring-Your-Own"]
+        end
+    end
+
+    subgraph MANAGED["Fidus Managed Services"]
+        subgraph MARKET["Marketplace API"]
+            M1["Agent Discovery"]
+            M2["Version Management"]
+        end
+
+        subgraph SUPPORT["Support & Monitoring"]
+            S1["Analytics (Opt-in)"]
+        end
+    end
+
+    PRIVATE <-."VPN/Private Link (optional)".-> MANAGED
 ```
 
 **Characteristics:**
@@ -1474,39 +1490,36 @@ class CalendarSupervisor {
 
 #### 6.6.7 Summary: Multi-Tenancy Layers
 
-```
-┌───────────────────────────────────────────┐
-│ USER REQUEST                               │
-└────────────────┬──────────────────────────┘
-                 │ userId, tenantId
-                 ▼
-┌───────────────────────────────────────────┐
-│ ORCHESTRATOR                               │
-│ - Loads UserContext (incl. tenantId)      │
-│ - Calls Supervisor with context           │
-└────────────────┬──────────────────────────┘
-                 │ UserContext
-                 ▼
-┌───────────────────────────────────────────┐
-│ SUPERVISOR (Singleton)                     │
-│ - Extracts tenantId from context          │
-│ - Passes tenantId to services             │
-└────────────────┬──────────────────────────┘
-                 │ userId, tenantId
-                 ▼
-┌───────────────────────────────────────────┐
-│ SERVICE (Singleton, Tenant-aware Methods) │
-│ - Methods accept tenantId parameter       │
-│ - Adds tenantId to DB queries             │
-└────────────────┬──────────────────────────┘
-                 │ Query with tenantId
-                 ▼
-┌───────────────────────────────────────────┐
-│ DATABASE (Tenant-isolated)                 │
-│ - Strategy 1: Collection per tenant       │
-│ - Strategy 2: Shared + filter             │
-│ - Strategy 3: Database per tenant         │
-└───────────────────────────────────────────┘
+```mermaid
+graph TB
+    REQ["USER REQUEST"] -->|userId, tenantId| ORCH
+
+    subgraph ORCH["ORCHESTRATOR"]
+        O1["Loads UserContext<br/>(incl. tenantId)"]
+        O2["Calls Supervisor with context"]
+    end
+
+    ORCH -->|UserContext| SUP
+
+    subgraph SUP["SUPERVISOR (Singleton)"]
+        S1["Extracts tenantId from context"]
+        S2["Passes tenantId to services"]
+    end
+
+    SUP -->|userId, tenantId| SERV
+
+    subgraph SERV["SERVICE (Singleton, Tenant-aware Methods)"]
+        SV1["Methods accept tenantId parameter"]
+        SV2["Adds tenantId to DB queries"]
+    end
+
+    SERV -->|Query with tenantId| DB
+
+    subgraph DB["DATABASE (Tenant-isolated)"]
+        D1["Strategy 1: Collection per tenant"]
+        D2["Strategy 2: Shared + filter"]
+        D3["Strategy 3: Database per tenant"]
+    end
 ```
 
 **Key Principles:**

@@ -162,24 +162,16 @@
 3. ✅ Create API Specifications (~1500 lines, code-heavy)
 4. ✅ Cross-references between documents
 
-**Effort:** ~8-10 hours
-
 ### Phase 2: Privacy Architecture (Priority 1)
 1. ✅ Document privacy model (Local LLM + Cloud migration)
 2. ✅ Describe privacy level system (3 levels)
 3. ✅ Define LLM-Provider-Interface (abstracts local/cloud)
 4. ✅ Document migration path for users
 
-**Effort:** ~2-3 hours
-
 ### Phase 3: Clarifications (Priority 1)
 1. ✅ Create glossary (Mobile First / Docker First)
 2. ✅ Home Agent architecture diagram
 3. ✅ MCP integration patterns
-
-**Effort:** ~2 hours
-
-**Total Priority 1:** ~12-15 hours
 
 ---
 
