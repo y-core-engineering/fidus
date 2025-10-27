@@ -34,6 +34,12 @@ When working with Fidus, keep these principles in mind:
    - Comments: Inline and block comments in English
    - Commit messages: In English
    - Exception: Brand identity documents may have German originals with English translations
+7. **Pull Request Workflow** - **All changes to main branch must go through Pull Requests**
+   - NEVER push directly to main branch
+   - Always create a feature branch for your work
+   - Create a PR and merge it (even if you're working alone)
+   - This ensures code review history and CI checks run
+   - Exception: Emergency hotfixes (document reason in PR)
 
 ## Essential Commands
 
@@ -818,6 +824,62 @@ And help me debug the issue."
 ```
 
 ## GitHub & Pull Request Guidelines
+
+### Git Workflow
+
+**IMPORTANT: The main branch is protected. All changes MUST go through Pull Requests.**
+
+#### Standard Workflow
+
+1. **Create a feature branch:**
+```bash
+# For new features
+git checkout -b feature/your-feature-name
+
+# For bug fixes
+git checkout -b fix/bug-description
+
+# For documentation
+git checkout -b docs/what-you-document
+```
+
+2. **Make your changes and commit:**
+```bash
+git add .
+git commit -m "feat(domain): your change description"
+```
+
+3. **Push to remote:**
+```bash
+git push -u origin feature/your-feature-name
+```
+
+4. **Create Pull Request:**
+```bash
+# Create and view PR in browser
+gh pr create --web
+
+# Or create with CLI
+gh pr create --title "feat(domain): your change" --body "Description..."
+```
+
+5. **Merge PR (after CI passes):**
+```bash
+# Merge via GitHub UI or CLI
+gh pr merge --squash
+
+# Delete feature branch
+git branch -d feature/your-feature-name
+git push origin --delete feature/your-feature-name
+```
+
+6. **Update main branch:**
+```bash
+git checkout main
+git pull
+```
+
+**NEVER use `git push` directly when on main branch!** This violates the PR workflow.
 
 ### Creating Pull Requests
 
