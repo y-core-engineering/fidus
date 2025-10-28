@@ -77,9 +77,32 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: 'Feedback',
+    items: [
+      { title: 'Toast', href: '/components/toast' },
+      { title: 'Modal', href: '/components/modal' },
+      { title: 'Alert', href: '/components/alert' },
+      { title: 'Banner', href: '/components/banner' },
+      { title: 'Progress Bar', href: '/components/progress-bar' },
+    ],
+  },
+  {
+    title: 'Overlays',
+    items: [
+      { title: 'Dropdown', href: '/components/dropdown' },
+      { title: 'Popover', href: '/components/popover' },
+      { title: 'Tooltip', href: '/components/tooltip' },
+      { title: 'Drawer', href: '/components/drawer' },
+    ],
+  },
+  {
     title: 'Patterns',
     items: [
       { title: 'Form Validation', href: '/patterns/form-validation' },
+      { title: 'Error States', href: '/patterns/error-states' },
+      { title: 'Empty States', href: '/patterns/empty-states' },
+      { title: 'Loading States', href: '/patterns/loading-states' },
+      { title: 'Success Confirmation', href: '/patterns/success-confirmation' },
     ],
   },
 ];
