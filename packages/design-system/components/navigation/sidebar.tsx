@@ -21,12 +21,31 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: 'Components',
+    title: 'Layout',
+    items: [
+      { title: 'Container', href: '/components/container' },
+      { title: 'Grid', href: '/components/grid' },
+      { title: 'Stack', href: '/components/stack' },
+      { title: 'Divider', href: '/components/divider' },
+    ],
+  },
+  {
+    title: 'Actions',
     items: [
       { title: 'Button', href: '/components/button' },
       { title: 'Link', href: '/components/link' },
       { title: 'Icon Button', href: '/components/icon-button' },
       { title: 'Button Group', href: '/components/button-group' },
+    ],
+  },
+  {
+    title: 'Data Display',
+    items: [
+      { title: 'Table', href: '/components/table' },
+      { title: 'List', href: '/components/list' },
+      { title: 'Badge', href: '/components/badge' },
+      { title: 'Chip', href: '/components/chip' },
+      { title: 'Avatar', href: '/components/avatar' },
     ],
   },
 ];
