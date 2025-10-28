@@ -19,6 +19,16 @@ Fidus is a **monorepo** with multiple packages built using:
 - **Multi-Agent Architecture** - LangGraph-based supervisors
 - **Fair-Code License** - Sustainable Use License (see [LICENSE.md](LICENSE.md))
 
+### Project Context
+
+Fidus is currently a **two-person project** (Sebastian + Claude Code), with potential for open community involvement later. Keep this in mind when:
+- ❌ **DON'T** use team-oriented language ("the team will...", "frontend team", "backend team")
+- ❌ **DON'T** provide time estimates or sprint planning ("Week 1-2", "Phase 1 takes 3 weeks")
+- ❌ **DON'T** reference imaginary stakeholders ("discuss with team", "get approval from product owner")
+- ✅ **DO** focus on technical decisions and implementation details
+- ✅ **DO** provide options and trade-offs for Sebastian to decide
+- ✅ **DO** write code and documentation that's ready to use
+
 ### Key Principles
 
 When working with Fidus, keep these principles in mind:
