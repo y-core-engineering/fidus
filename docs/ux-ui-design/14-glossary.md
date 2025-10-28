@@ -46,6 +46,27 @@ Data in API responses describing **actions users can take** (buttons, links). In
 
 ---
 
+### Auto-Dismiss
+
+The behavior where a UI element **removes itself AFTER a user action is completed**, NOT based on a timeout.
+
+**Critical Distinction:**
+- ✅ **Action-Based Auto-Dismiss:** Card dismisses after user clicks a button (e.g., "Reschedule appointment" → card dismissed after successful reschedule)
+- ❌ **Time-Based Auto-Hide:** Card disappears after 30 seconds (NEVER used for Dashboard Opportunity Cards)
+
+**Fidus Rule:** Dashboard Opportunity Cards are **persistent** and **user-controlled**. They ONLY dismiss when:
+1. User explicitly dismisses (swipe or X button)
+2. User completes an action on the card (action-based auto-dismiss)
+3. Opportunity is no longer relevant (e.g., double-booking resolved → conflict card removed)
+
+**Exception:** OS-level notifications (toasts, push notifications) MAY auto-hide after a timeout per platform conventions. These are separate from Dashboard Opportunity Cards.
+
+**Usage:** "The card auto-dismisses after the user clicks 'Mark as Done' (action-based), NOT after sitting idle for 30 seconds (time-based)."
+
+**Related:** Opportunity Card, Dashboard, User-Controlled
+
+---
+
 ## B
 
 ### Bounded Context
@@ -92,11 +113,21 @@ A core principle of Fidus: the system **adapts UI and suggestions based on user 
 
 ## D
 
-### Dashboard
+### Dashboard / Opportunity Surface
 
-The **main screen** showing dynamic opportunity cards. Also called **Opportunity Surface** (design term) or **Home Screen** (user-facing term).
+The **main screen** showing dynamic opportunity cards.
 
-**Standard Term:** Use "Dashboard" in code and technical docs, "Opportunity Surface" in design docs.
+**Terminology Standard:**
+- **"Dashboard"** - Use in code, technical docs, and API endpoints (e.g., `/api/dashboard`)
+- **"Opportunity Surface"** - Use in UX/UI design docs to emphasize the AI-driven, dynamic nature
+- **"Home" or "Home Screen"** - Use in user-facing UI (top navigation, labels)
+
+**Example:**
+- Code: `DashboardPage.tsx`, `getDashboardOpportunities()`
+- Design docs: "The Opportunity Surface displays AI-selected opportunities"
+- User UI: "Home" navigation button
+
+**Rationale:** "Dashboard" is familiar to developers; "Opportunity Surface" communicates the unique AI-driven paradigm in design discussions; "Home" is intuitive for end users.
 
 **Usage:** "The Dashboard displays relevance-scored opportunity cards."
 
