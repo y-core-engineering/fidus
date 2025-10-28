@@ -17,13 +17,12 @@ export type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
   z.infer<typeof LinkPropsSchema>;
 
 const linkVariants = cva(
-  'transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',
+  'text-foreground underline hover:no-underline transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',
   {
     variants: {
       variant: {
-        inline: 'text-primary hover:underline inline',
-        standalone:
-          'text-primary hover:text-primary-hover font-medium flex items-center gap-1',
+        inline: 'inline',
+        standalone: 'font-medium flex items-center gap-1',
       },
     },
     defaultVariants: {

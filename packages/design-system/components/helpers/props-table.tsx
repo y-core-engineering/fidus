@@ -26,7 +26,7 @@ export function PropsTable({ props }: PropsTableProps) {
           {props.map((prop) => (
             <tr key={prop.name} className="border-b border-border last:border-0">
               <td className="px-4 py-3 align-top">
-                <code className="text-sm font-mono text-primary">
+                <code className="text-sm font-mono text-foreground font-semibold">
                   {prop.name}
                   {prop.required && <span className="text-error ml-1">*</span>}
                 </code>

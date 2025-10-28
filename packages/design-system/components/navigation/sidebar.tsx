@@ -13,13 +13,6 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   {
-    title: 'Getting Started',
-    items: [
-      { title: 'Overview', href: '/getting-started' },
-      { title: 'Installation', href: '/getting-started/installation' },
-    ],
-  },
-  {
     title: 'Foundations',
     items: [
       { title: 'Colors', href: '/foundations/colors' },
@@ -30,7 +23,6 @@ const navigation: NavItem[] = [
   {
     title: 'Components',
     items: [
-      { title: 'Actions', href: '/components#actions' },
       { title: 'Button', href: '/components/button' },
       { title: 'Link', href: '/components/link' },
       { title: 'Icon Button', href: '/components/icon-button' },
@@ -80,9 +72,9 @@ function NavItem({ item }: { item: NavItem }) {
   return (
     <Link
       href={item.href}
-      className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+      className={`block px-3 py-2 text-sm rounded-md transition-colors no-underline ${
         isActive
-          ? 'bg-primary/10 text-primary font-medium'
+          ? 'bg-primary text-black font-bold'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >

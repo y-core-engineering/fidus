@@ -29,7 +29,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
               <Menu className="h-5 w-5" />
             </IconButton>
           )}
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 no-underline">
             <div className="h-8 w-8 rounded-md bg-primary" />
             <span className="text-xl font-bold">Fidus Design System</span>
           </Link>

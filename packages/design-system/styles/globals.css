@@ -5,7 +5,8 @@
 @layer base {
   :root {
     /* Colors - Brand */
-    --color-primary: 45 100% 51%;        /* #FFD700 Gold */
+    --color-primary: 45 100% 51%;        /* #FFD700 Gold - for backgrounds */
+    --color-primary-foreground: 0 0% 0%; /* Black text on gold background */
     --color-primary-hover: 45 100% 45%;
     --color-primary-active: 45 100% 38%;
 
@@ -26,8 +27,8 @@
     /* Colors - Neutral */
     --color-background: 0 0% 100%;       /* #FFFFFF */
     --color-foreground: 0 0% 0%;         /* #000000 */
-    --color-muted: 0 0% 88%;             /* #E0E0E0 */
-    --color-muted-foreground: 0 0% 62%;  /* #9E9E9E */
+    --color-muted: 0 0% 96%;             /* #F5F5F5 - lighter background */
+    --color-muted-foreground: 0 0% 40%;  /* #666666 - darker for better contrast */
     --color-border: 0 0% 88%;            /* #E0E0E0 */
     --color-input-bg: 0 0% 100%;
 
@@ -145,6 +146,6 @@
   }
 
   a {
-    @apply text-primary hover:underline;
+    @apply text-foreground underline hover:no-underline;
   }
 }
