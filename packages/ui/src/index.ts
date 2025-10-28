@@ -35,5 +35,18 @@ export * from './components/date-picker';
 export * from './components/time-picker';
 export * from './components/file-upload';
 
+// Feedback Components
+export * from './components/toast';
+export * from './components/modal';
+export * from './components/alert';
+export * from './components/banner';
+export * from './components/progress-bar';
+
+// Overlay Components
+export * from './components/dropdown';
+export * from './components/popover';
+export * from './components/tooltip';
+export * from './components/drawer';
+
 // Utilities
 export { cn } from './lib/cn';
