@@ -108,8 +108,8 @@ graph TB
     CalLG -->|Calls Tools| GoogleMCP
     FinLG -->|Calls Tools| StripeMCP
 
-    style Core fill:#fff3e0
-    style Agents fill:#e8f5e9
+    style Core fill:#ffcc80
+    style Agents fill:#a5d6a7
     style External fill:#fce4ec
 ```
 
@@ -686,9 +686,9 @@ graph TB
     Cal -->|AppointmentCreated| RedisPubSub
     RedisPubSub -->|Fast Notification| Proact
 
-    style BullMQ fill:#fff3e0
-    style RedisPubSub fill:#e3f2fd
-    style EventStore fill:#e8f5e9
+    style BullMQ fill:#ffcc80
+    style RedisPubSub fill:#90caf9
+    style EventStore fill:#a5d6a7
 ```
 
 ### 4.3 Event Types
@@ -867,7 +867,7 @@ graph TB
     CalLG -->|8. Response| CalMCP
     CalMCP -->|9. Result| Orch
 
-    style CalendarAgent fill:#e8f5e9
+    style CalendarAgent fill:#a5d6a7
     style GoogleMCP fill:#fce4ec
 ```
 

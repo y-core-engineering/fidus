@@ -27,21 +27,21 @@ We use the following DDD patterns to describe context relationships:
 ```mermaid
 graph TB
     subgraph FidusSystem["FIDUS SYSTEM"]
-        Orch["Orchestration Context (CORE)<br/>[OHS + PL]"]
+        Orch["Orchestration Context (CORE)<br/>(OHS + PL)"]
 
         subgraph DomainLayer["Domain Layer"]
-            Calendar["Calendar Context<br/>[C/S]"]
-            Finance["Finance Context<br/>[C/S]"]
-            Travel["Travel Context<br/>[C/S]"]
+            Calendar["Calendar Context<br/>(C/S)"]
+            Finance["Finance Context<br/>(C/S)"]
+            Travel["Travel Context<br/>(C/S)"]
         end
 
-        Proact["Proactivity Context (CORE)<br/>[CF]<br/>(Subscribes to all)"]
+        Proact["Proactivity Context (CORE)<br/>(CF)<br/>(Subscribes to all)"]
 
         subgraph SupportingContexts["SUPPORTING CONTEXTS"]
-            Identity["Identity & Access<br/>Context [OHS]"]
-            Profile["Profile Context<br/>[OHS]"]
-            Plugin["Plugin Context<br/>[OHS]"]
-            Audit["Audit & Compliance<br/>Context [CF]<br/>(Subscribes to all)"]
+            Identity["Identity & Access<br/>Context (OHS)"]
+            Profile["Profile Context<br/>(OHS)"]
+            Plugin["Plugin Context<br/>(OHS)"]
+            Audit["Audit & Compliance<br/>Context (CF)<br/>(Subscribes to all)"]
         end
 
         Orch -->|Commands (Sync)| DomainLayer
@@ -55,9 +55,9 @@ graph TB
     end
 
     subgraph ExternalSystems["EXTERNAL SYSTEMS"]
-        Google["Google Calendar<br/>[ACL]"]
-        Outlook["Outlook Calendar<br/>[ACL]"]
-        Stripe["Stripe Payment<br/>[ACL]"]
+        Google["Google Calendar<br/>(ACL)"]
+        Outlook["Outlook Calendar<br/>(ACL)"]
+        Stripe["Stripe Payment<br/>(ACL)"]
 
         Google -->|Via MCP Protocol| Calendar
         Outlook -->|Via MCP Protocol| Calendar

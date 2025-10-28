@@ -12,6 +12,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  mermaid-check:
+    name: Validate Mermaid Diagrams
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check Mermaid diagrams
+        run: node scripts/check-mermaid.js docs/**/*.md
+
   lint-and-typecheck:
     name: Lint & Type Check
     runs-on: ubuntu-latest

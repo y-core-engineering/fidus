@@ -40,6 +40,184 @@ When working with Fidus, keep these principles in mind:
    - Create a PR and merge it (even if you're working alone)
    - This ensures code review history and CI checks run
    - Exception: Emergency hotfixes (document reason in PR)
+8. **AI-Driven UI Paradigm** - **Fidus UI is NOT traditional - it's context-adaptive**
+   - Read [docs/ux-ui-design/00-ai-driven-ui-paradigm.md](docs/ux-ui-design/00-ai-driven-ui-paradigm.md) BEFORE implementing UI
+   - NO fixed screens (Dashboard Screen, Calendar Screen) - use contextual rendering
+   - LLM decides UI form (chat vs form vs widget) at runtime based on context
+   - Dashboard is Opportunity Surface with dynamic cards (NOT static widgets)
+   - User controls dismissal (swipe/X button) - NO auto-hide timers
+   - Show EXAMPLES not RULES in documentation ("might show" not "always shows")
+
+## AI-Driven UI Paradigm (CRITICAL for Frontend Work!)
+
+**READ THIS BEFORE WORKING ON ANY UI/UX CODE:**
+
+Fidus uses an **AI-Driven UI Paradigm** that is fundamentally different from traditional application UI. Understanding this paradigm is **mandatory** before implementing any frontend features.
+
+### Core Concept
+
+The UI is **NOT predetermined**. Instead:
+- The **LLM analyzes user context** (time, location, history, intent)
+- The **LLM decides which UI form** to render (chat, form, widget, wizard)
+- The **same user query** can produce **different UIs** in different contexts
+
+### What This Means for Development
+
+**❌ WRONG Approach (Traditional UI):**
+```typescript
+// ❌ BAD: Hardcoded screen routing
+if (route === '/calendar') {
+  return <CalendarScreen />
+}
+
+// ❌ BAD: Fixed widget on dashboard
+<Dashboard>
+  <WeatherWidget /> {/* Always visible */}
+  <CalendarWidget /> {/* Always visible */}
+</Dashboard>
+
+// ❌ BAD: Predetermined form
+function createBudget() {
+  return <BudgetForm /> // Always shows form
+}
+```
+
+**✅ CORRECT Approach (AI-Driven UI):**
+```typescript
+// ✅ GOOD: LLM decides what to render
+async function renderResponse(userQuery: string, context: Context) {
+  const decision = await llm.decideUIForm(userQuery, context)
+
+  switch (decision.uiForm) {
+    case 'text':
+      return <ChatResponse text={decision.text} />
+    case 'widget':
+      return <DynamicWidget type={decision.widgetType} data={decision.data} />
+    case 'form':
+      return <DynamicForm fields={decision.formFields} />
+    case 'wizard':
+      return <MultiStepWizard steps={decision.steps} />
+  }
+}
+
+// ✅ GOOD: Dashboard renders opportunity cards dynamically
+function Dashboard() {
+  const opportunities = useOpportunities() // LLM decides relevance
+
+  return (
+    <OpportunitySurface>
+      {opportunities.map(opp => (
+        <OpportunityCard
+          key={opp.id}
+          onDismiss={() => dismissCard(opp.id)} // User controls
+        />
+      ))}
+    </OpportunitySurface>
+  )
+}
+
+// ✅ GOOD: LLM decides form vs wizard vs chat
+async function handleBudgetCreation(intent: string, userLevel: UserLevel) {
+  if (userLevel === 'expert' && hasAllParameters(intent)) {
+    return <QuickBudgetForm prefilled={extractParams(intent)} />
+  } else if (userLevel === 'beginner') {
+    return <BudgetCreationWizard />
+  } else {
+    return <ConversationalBudgetCreation />
+  }
+}
+```
+
+### Key Rules for Frontend Development
+
+1. **NO Fixed Screens**
+   - Don't create `CalendarScreen.tsx`, `FinanceScreen.tsx`
+   - Create `CalendarWidget.tsx`, `FinanceWidget.tsx` that can appear **anywhere**
+
+2. **Dashboard = Opportunity Surface**
+   - Dashboard doesn't have fixed widgets
+   - It renders `OpportunityCard` components dynamically
+   - Cards are decided by LLM based on relevance
+
+3. **User Controls Dismissal**
+   - Every card/widget has swipe gesture or X button
+   - **NEVER** use `setTimeout()` to auto-hide
+   - Cards stay until user explicitly dismisses
+
+4. **Context-Driven Rendering**
+   - Pass context to LLM: `{ time, location, userHistory, currentActivity }`
+   - LLM returns UI decision: `{ uiForm: 'widget', widgetType: 'calendar' }`
+   - Render based on LLM decision, not hardcoded logic
+
+5. **Examples, Not Rules**
+   - Don't hardcode "morning = weather widget"
+   - Let LLM decide if weather is relevant NOW
+   - Use language: "might show", "could render", "based on context"
+
+### Required Reading
+
+**MUST READ before UI work:**
+1. [docs/ux-ui-design/00-ai-driven-ui-paradigm.md](docs/ux-ui-design/00-ai-driven-ui-paradigm.md) - THE FOUNDATION
+2. [docs/ux-ui-design/04-interaction-patterns.md](docs/ux-ui-design/04-interaction-patterns.md) - 4 core patterns
+3. [docs/ux-ui-design/06-contextual-ui-patterns.md](docs/ux-ui-design/06-contextual-ui-patterns.md) - Domain examples
+
+**For specific features:**
+- Components: [docs/ux-ui-design/05-design-system-components.md](docs/ux-ui-design/05-design-system-components.md)
+- Responsive: [docs/ux-ui-design/07-responsive-pwa.md](docs/ux-ui-design/07-responsive-pwa.md)
+- Privacy UI: [docs/ux-ui-design/08-privacy-trust-ux.md](docs/ux-ui-design/08-privacy-trust-ux.md)
+- AI UX: [docs/ux-ui-design/09-ai-llm-ux.md](docs/ux-ui-design/09-ai-llm-ux.md)
+
+### Anti-Patterns to Avoid
+
+**❌ Don't do this:**
+- Fixed navigation bars with "Calendar", "Finance", "Travel" tabs
+- Static dashboard with permanent widgets
+- Route-based rendering (`/calendar` → `CalendarScreen`)
+- Auto-hiding notifications after X seconds
+- Predetermined "if user does X, show Y" logic
+- Hardcoded morning/evening layouts
+
+**✅ Do this instead:**
+- Minimal navigation (only Dashboard access + Settings)
+- Dynamic opportunity cards that LLM decides to show
+- Context-based rendering (LLM chooses UI form)
+- User-dismissed cards (swipe/X button)
+- LLM-driven "based on context, render Y" logic
+- Time-aware opportunity scoring (LLM decides relevance)
+
+### Testing UI Components
+
+When testing, test **context variations**:
+
+```typescript
+describe('BudgetCreation', () => {
+  it('should render form for expert user with complete intent', async () => {
+    const context = { userLevel: 'expert', intent: 'Create food budget 500 EUR monthly' }
+    const ui = await renderBudgetUI(context)
+    expect(ui).toBeInstanceOf(QuickBudgetForm)
+  })
+
+  it('should render wizard for beginner user', async () => {
+    const context = { userLevel: 'beginner', intent: 'Budget' }
+    const ui = await renderBudgetUI(context)
+    expect(ui).toBeInstanceOf(BudgetWizard)
+  })
+
+  it('should render chat for ambiguous intent', async () => {
+    const context = { userLevel: 'intermediate', intent: 'Money stuff' }
+    const ui = await renderBudgetUI(context)
+    expect(ui).toBeInstanceOf(ConversationalFlow)
+  })
+})
+```
+
+### Questions About This Paradigm?
+
+- Read: [docs/ux-ui-design/00-ai-driven-ui-paradigm.md](docs/ux-ui-design/00-ai-driven-ui-paradigm.md)
+- Ask in: [GitHub Discussions - Design category](https://github.com/y-core-engineering/fidus/discussions)
+- Discord: #design channel
+
+---
 
 ## Essential Commands
 
@@ -452,7 +630,25 @@ class BudgetExceededError(Exception):
 ### Documentation
 
 **Use Mermaid Diagrams:**
-When you need to visualize architecture, flows, or relationships, use Mermaid diagrams in markdown files:
+When you need to visualize architecture, flows, or relationships, use Mermaid diagrams in markdown files.
+
+**IMPORTANT: Check Mermaid Diagrams Before Committing:**
+- ✅ **Always run the Mermaid checker** before committing documentation changes
+- ✅ **Quote labels with special chars** - Use `["Text | or (parens)"]` for PIPE or parentheses
+- ✅ **Avoid PIPE in unquoted labels** - Better: `[Text or alternatives]` or `[Text, list, items]`
+- ✅ **No nested brackets** in node labels - use `•` or `→` for buttons/actions
+- ✅ **Explicit text colors** on dark backgrounds for contrast
+
+```bash
+# Check all Mermaid diagrams
+node scripts/check-mermaid.js docs/**/*.md
+
+# This check runs automatically in:
+# 1. Pre-push hook (local)
+# 2. GitHub Actions CI (on every PR)
+```
+
+**Mermaid Best Practices:**
 
 ```markdown
 ## Calendar Workflow
@@ -466,6 +662,26 @@ graph TD
     D -->|Conflict Found| F[Suggest Alternatives]
     E --> G[Emit AppointmentCreated Event]
     F --> H[Return to User]
+
+    %% ✅ GOOD: Actions separated with 'or' or ','
+    Actions[View Details or Adjust Budget]
+    Filters[Date, Merchant, Amount]
+
+    %% ❌ BAD: Don't use PIPE in unquoted node labels
+    %% BadActions[View Details | Adjust Budget]  ← Parse error!
+
+    %% ✅ ALTERNATIVE: Quote labels with special characters
+    QuotedActions["View Details | Adjust Budget"]
+    Privacy["Privacy: High (Compliance)"]
+
+    %% ✅ GOOD: Use bullets for button lists
+    Card[Budget Alert<br/>• Set Alarm • Dismiss]
+
+    %% ❌ BAD: Nested brackets
+    %% BadCard[Alert<br/>[Button1] [Button2]]  ← Parse error!
+
+    %% ✅ GOOD: Explicit text color on dark backgrounds
+    style E fill:#000000,color:#ffffff
 ```
 ```
 

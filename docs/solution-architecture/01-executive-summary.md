@@ -585,10 +585,10 @@ graph TB
     agents --> data
     agents --> ext
 
-    style ul fill:#e3f2fd
-    style core fill:#fff3e0
-    style agents fill:#e8f5e9
-    style support fill:#f3e5f5
+    style ul fill:#90caf9
+    style core fill:#ffcc80
+    style agents fill:#a5d6a7
+    style support fill:#ce93d8
     style ext fill:#fce4ec
 ```
 

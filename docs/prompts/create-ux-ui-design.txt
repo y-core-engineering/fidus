@@ -16,6 +16,68 @@ Create a comprehensive UX/UI Design for the Fidus system based on the existing a
 
 CRITICAL: All output must be in ENGLISH. The entire Fidus documentation is in English.
 
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL PARADIGM SHIFT: AI-DRIVEN UI (READ THIS FIRST!)
+═══════════════════════════════════════════════════════════════════════════════
+
+Fidus uses an **AI-DRIVEN UI PARADIGM** that is fundamentally different from traditional application UI design.
+
+**WRONG APPROACH (Traditional UI):**
+❌ Fixed screens (Dashboard Screen, Calendar Screen, Finance Screen)
+❌ Static navigation (Sidebar with menu items)
+❌ Hardcoded UI flows ("User clicks X → System shows Y")
+❌ Predetermined layouts ("Morning always shows weather widget")
+❌ User navigates to features
+
+**CORRECT APPROACH (AI-Driven UI):**
+✅ **Context-Driven UI Rendering** - LLM analyzes situation and decides optimal UI
+✅ **Dashboard as Opportunity Surface** - Dynamic cards based on relevance, NOT static widgets
+✅ **Situational Adaptation** - Same query can render differently based on context
+✅ **User-Controlled Dismissal** - User swipes/clicks X to dismiss (NO auto-hide timers)
+✅ **Nothing Predetermined** - Design shows EXAMPLES not RULES
+✅ **LLM Chooses UI Form** - Chat vs. Form vs. Widget decided at runtime by LLM
+
+CORE PRINCIPLES:
+
+1. **LLM as UI Decision Engine**
+   - LLM decides whether to show chat response, form, widget, or wizard
+   - Same user query can produce different UI based on context
+   - Example: "Create budget" → form for power user, wizard for beginner
+   - NO hardcoded "if X then show Y" in design
+
+2. **Dashboard = Opportunity Surface**
+   - Dashboard shows DYNAMIC opportunity cards (NOT static widgets)
+   - Content changes based on: time, location, user history, supervisor signals
+   - User can open dashboard anytime (swipe down or button)
+   - Example: Morning might show weather + meetings, evening might show day summary
+   - But we don't HARDCODE "morning = weather" - LLM decides relevance
+
+3. **User Controls Visibility**
+   - Cards dismissed by user action: swipe gesture or X button
+   - NO automatic hiding after timeout
+   - Cards remain visible until user explicitly dismisses
+   - Dashboard always accessible (not hidden by system)
+
+4. **Examples, Not Rules**
+   - Design document shows: "In situation X, system MIGHT show Y"
+   - NOT: "When X happens, system ALWAYS shows Y"
+   - Emphasize flexibility and LLM decision-making
+   - Use language like: "could show", "might render", "based on context"
+
+5. **Form vs. Chat: LLM Decides**
+   - Don't predetermine "Budget creation uses form"
+   - LLM analyzes: Is structured input more efficient than chat?
+   - Factors: User expertise, number of parameters, ambiguity
+   - Example: Simple query → chat, complex multi-param → form
+
+BEFORE YOU START DESIGNING:
+1. Read: docs/ux-ui-design/00-ai-driven-ui-paradigm.md (if exists - THE FOUNDATION)
+2. Internalize: UI is a FUNCTION of CONTEXT, decided by LLM at runtime
+3. Avoid: Any design that implies fixed screens or predetermined flows
+4. Emphasize: Flexibility, adaptation, contextual rendering
+
+═══════════════════════════════════════════════════════════════════════════════
+
 INPUT DOCUMENTS
 
 Required reading (in this order):
@@ -78,11 +140,14 @@ The UX/UI design must cover:
    - Pain points and how Fidus solves them
    - User goals and success metrics
 
-3. Information Architecture
-   - Navigation structure (main menu, contextual navigation)
-   - Content hierarchy
-   - How 14 Bounded Contexts (Supervisors) are organized in UI
-   - Search and discovery patterns
+3. Information Architecture (CONTEXTUAL, NOT FIXED)
+   - Contextual layers (NOT fixed hierarchy)
+     * Layer 1: Opportunity Surface (dashboard - always accessible)
+     * Layer 2: Conversational Interface (chat/voice - primary)
+     * Layer 3: Situational UI (forms/widgets appear when LLM decides)
+     * Layer 4: Settings (rarely accessed)
+   - How 14 Bounded Contexts appear situationally in UI
+   - Dashboard access patterns (swipe down, button)
    - Settings and configuration structure
    - Tenant/workspace switching (for Family/Team/Company tiers)
 
@@ -109,18 +174,26 @@ The UX/UI design must cover:
    - Logo usage guidelines
    - Tone of voice in UI text (friendly, trustworthy, professional)
 
-6. Key Screens & Flows (Wireframes/Mockups)
-   - Dashboard (proactive insights, quick actions)
-   - Chat Interface (main interaction point)
-   - Calendar View (appointments, scheduling)
-   - Finance Overview (budgets, transactions)
-   - Travel Planning (trips, bookings)
+6. Contextual UI Patterns (NOT Fixed Screens!)
+   CRITICAL: These are EXAMPLES of situational rendering, NOT hardcoded screens!
+   - Dashboard as Opportunity Surface (shows relevant cards based on context)
+   - Chat/Voice Interface (primary interaction)
+   - Situational widgets for each domain (Calendar, Finance, Travel, etc.)
+     * Show: "In context X, LLM might render Y"
+     * NOT: "Calendar Screen looks like this"
+   - Dynamic forms (when LLM decides structured input is better)
+   - Multi-step wizards (for complex flows)
    - Settings (privacy controls, preferences, integrations)
    - Onboarding Flow (first-time user experience - CRITICAL!)
    - Permission Management (Service/Data/LLM permissions granular control)
    - Plugin Marketplace (community extensions discovery/installation)
    - LLM Model Selection (Ollama local vs. Cloud LLM choice)
    - Shared Resources (Family calendar, shared shopping lists)
+
+   For each domain, show:
+   - Example context → LLM decision → UI rendered
+   - Alternative contexts → different UI
+   - Emphasize: FLEXIBILITY and ADAPTATION
 
 7. Responsive Design & Progressive Web App (PWA)
    - Desktop (primary interface - 1024px+)
@@ -155,11 +228,12 @@ The UX/UI design must cover:
    - LLM-driven vs. rule-based indication (show when system switches to fallback mode)
 
 10. Proactivity UX
-    - Notification types (urgent, time-sensitive, optimization, insight)
-    - Presentation modes (push, pull, digest)
-    - Dismissal and snooze patterns
+    - Opportunity Cards on Dashboard (NOT notifications)
+    - Card types: Urgent, Time-Sensitive, Optimization, Insight
+    - User dismissal: Swipe gesture or X button (NO auto-hide)
+    - Dashboard always accessible (swipe down/button)
     - Feedback mechanisms (was this helpful?)
-    - Do Not Disturb modes
+    - Do Not Disturb modes (affects card relevance scoring)
 
 11. Multi-User / Family / Team / Company UX (Multi-Tenancy)
     - Tenant/workspace switching (Individual -> Family -> Team -> Company)

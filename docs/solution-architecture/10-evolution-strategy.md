@@ -317,7 +317,7 @@ flowchart TD
     Plugins --> PL3[Plugin Sandboxing]
     Plugins --> PL4[Plugin Monetization]
 
-    Enterprise --> E1[SSO (SAML/OIDC)]
+    Enterprise --> E1["SSO (SAML/OIDC)"]
     Enterprise --> E2[Team Management]
     Enterprise --> E3[Audit Logs]
     Enterprise --> E4[Custom Branding]

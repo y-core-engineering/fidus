@@ -1597,7 +1597,7 @@ sequenceDiagram
 
     Orchestrator->>LLM: Analyze request and determine strategy<br/>{<br/>  request: "...",<br/>  available_agents: ["finance", "travel", "calendar"]<br/>}
 
-    LLM-->>Orchestrator: {<br/>  strategy: "CONDITIONAL",<br/>  flow: [<br/>    {agent: "finance", action: "check_budget"},<br/>    {<br/>      condition: "budget_available >= 200",<br/>      then: [<br/>        {agent: "travel", action: "book_hotel"},<br/>        {agent: "calendar", action: "create_appointment"}<br/>      ],<br/>      else: [<br/>        {action: "notify_user", message: "Insufficient budget"}<br/>      ]<br/>    }<br/>  ]<br/>}
+    LLM-->>Orchestrator: strategy: CONDITIONAL<br/>flow: check_budget first<br/>if budget >= 200: book + add calendar<br/>else: notify user
 
     rect rgb(200, 220, 255)
         Note over Orchestrator,Finance Agent: Condition Check
@@ -2479,7 +2479,7 @@ sequenceDiagram
 
     Anonymizer-->>Privacy Proxy: Anonymized prompt:<br/>"Remind me about my appointment<br/>with [PERSON_1] tomorrow"
 
-    Privacy Proxy->>OpenAI: POST /v1/chat/completions<br/>{<br/>  model: "gpt-4",<br/>  messages: [{<br/>    role: "user",<br/>    content: "Remind me about my<br/>    appointment with [PERSON_1]<br/>    tomorrow"<br/>  }]<br/>}
+    Privacy Proxy->>OpenAI: POST /v1/chat/completions<br/>{<br/>  model: "gpt-4",<br/>  messages: (array)<br/>    role: "user",<br/>    content: "Remind me about my<br/>    appointment with (PERSON_1)<br/>    tomorrow"<br/>}
 
     OpenAI-->>Privacy Proxy: {<br/>  completion: "I'll remind you<br/>  about your appointment with<br/>  [PERSON_1] on November 4th"<br/>}
 

@@ -22,10 +22,16 @@ echo "→ Running typecheck..."
 pnpm typecheck
 TYPECHECK_EXIT=$?
 
+# Check Mermaid diagrams
+echo ""
+echo "→ Checking Mermaid diagrams..."
+node scripts/check-mermaid.js docs/**/*.md
+MERMAID_EXIT=$?
+
 echo ""
 
 # Check if there were any errors
-if [ $LINT_EXIT -ne 0 ] || [ $TYPECHECK_EXIT -ne 0 ]; then
+if [ $LINT_EXIT -ne 0 ] || [ $TYPECHECK_EXIT -ne 0 ] || [ $MERMAID_EXIT -ne 0 ]; then
     echo "⚠️  Some checks failed!"
     echo ""
     echo "You can:"
