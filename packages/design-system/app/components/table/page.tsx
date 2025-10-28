@@ -6,6 +6,7 @@ import {
   TableHead,
   TableCell,
   TableCaption,
+  Badge,
 } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
