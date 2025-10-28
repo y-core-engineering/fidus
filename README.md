@@ -76,42 +76,23 @@ Fidus doesn't just respond to commands - it **proactively helps** by:
 
 ## 🚀 Quick Start
 
-### Prerequisites
+Fidus offers **multiple deployment options** to suit different needs:
 
-- **Node.js** 20+ and pnpm 8+
-- **Python** 3.11+
-- **PostgreSQL** 15+
-- **Redis** 7+
-- (Optional) **Neo4j** 5+ for relationship graphs
+### Option 1: All-in-Docker (Quickest Start)
 
-### Installation
+**Best for:** Testing, quick evaluation, or production use
 
 ```bash
 # Clone the repository
 git clone https://github.com/y-core-engineering/fidus.git
 cd fidus
 
-# Install dependencies (monorepo)
-pnpm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
-
-# Start development servers (all packages)
-pnpm dev
-```
-
-This will start:
-- **API** - http://localhost:8000 (FastAPI backend)
-- **Web** - http://localhost:3000 (Next.js frontend)
-- **CLI** - Available via `pnpm --filter @fidus/cli start`
-
-### Docker Deployment
-
-```bash
-# Build and start all services
+# Start all services (Web, API, Databases, Ollama)
 docker-compose up -d
+
+# Access Fidus
+# Web UI: http://localhost:3000
+# API Docs: http://localhost:8000/docs
 
 # Check status
 docker-compose ps
@@ -120,50 +101,224 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-### Package-Specific Setup
+**Advantages:**
+- ✅ Single command deployment
+- ✅ All services isolated and managed
+- ✅ Easy backup and restore
 
-#### API Package (Backend)
+### Option 2: Hybrid with Native LLM (Best Performance)
+
+**Best for:** Production deployments requiring optimal LLM performance
+
+**Prerequisites:**
+- Docker & Docker Compose
+- Ollama (installed natively on host)
 
 ```bash
+# 1. Install Ollama natively
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.1:8b
+
+# 2. Clone repository
+git clone https://github.com/y-core-engineering/fidus.git
+cd fidus
+
+# 3. Start services (without Ollama in Docker)
+docker-compose -f docker-compose.hybrid.yml up -d
+
+# Access Fidus
+# Web UI: http://localhost:3000
+# API Docs: http://localhost:8000/docs
+```
+
+**Advantages:**
+- ✅ **10-20% faster LLM performance**
+- ✅ **Direct GPU access** (no Docker GPU passthrough)
+- ✅ **Lower memory overhead**
+- ✅ Production-ready
+
+### Option 3: LM Studio (GUI-Based LLM)
+
+**Best for:** Development, users who prefer visual model management
+
+**Prerequisites:**
+- Docker & Docker Compose
+- [LM Studio](https://lmstudio.ai/) (Desktop app)
+
+```bash
+# 1. Install LM Studio from https://lmstudio.ai/
+# 2. Download a model (e.g., llama-2-7b-chat)
+# 3. Start Local Server in LM Studio (Port 1234)
+
+# 4. Clone repository
+git clone https://github.com/y-core-engineering/fidus.git
+cd fidus
+
+# 5. Start services with LM Studio config
+docker-compose -f docker-compose.hybrid.yml --env-file .env.lmstudio up -d
+```
+
+**Advantages:**
+- ✅ **Graphical user interface** for model management
+- ✅ **Visual model browser** with easy downloads
+- ✅ **Built-in chat UI** for testing
+- ✅ **Real-time performance monitoring**
+- ✅ Multi-platform (Windows, macOS, Linux)
+
+### Option 4: Development Setup with Local LLM (For Contributors)
+
+**Best for:** Active development on Fidus codebase with privacy-first approach
+
+**Prerequisites:**
+- Node.js 20+ & pnpm 8+
+- Python 3.11+ & Poetry
+- Docker & Docker Compose (for databases only)
+- Ollama or LM Studio (native on host)
+
+```bash
+# 1. Clone repository
+git clone https://github.com/y-core-engineering/fidus.git
+cd fidus
+
+# 2. Start dependencies in Docker (databases only)
+docker-compose -f docker-compose.dev-deps.yml up -d
+
+# 3. Start Ollama natively
+ollama serve
+ollama pull llama3.1:8b
+
+# 4. Backend Setup (runs natively on host)
 cd packages/api
-
-# Install Python dependencies
 poetry install
-
-# Run database migrations
 poetry run alembic upgrade head
-
-# Start API server
 poetry run uvicorn fidus.main:app --reload
-```
 
-#### Web Package (Frontend)
-
-```bash
+# 5. Frontend Setup (runs natively on host)
 cd packages/web
-
-# Install dependencies
 pnpm install
-
-# Start dev server
 pnpm dev
+
+# Access Fidus
+# Web UI: http://localhost:3000
+# API Docs: http://localhost:8000/docs
 ```
 
-#### CLI Package
+**Advantages:**
+- ✅ **Instant hot-reload** - No Docker rebuilds
+- ✅ **Full IDE debugging** - Breakpoints in VS Code/PyCharm
+- ✅ **Native performance** - No Docker overhead
+- ✅ **100% Privacy** - All data stays local
+- ✅ **No API costs** - Free local LLM
+- ✅ **Fast test iteration** - TDD-friendly
+
+**Detailed setup:** See [Development Setup Guide](docs/solution-architecture/09-deployment-scenarios.md#installation-steps-variante-4-development-setup)
+
+### Option 5: Development Setup with Cloud LLM (For GPU-free Developers)
+
+**Best for:** Active development without GPU, using ChatGPT/Claude via LiteLLM
+
+**Prerequisites:**
+- Node.js 20+ & pnpm 8+
+- Python 3.11+ & Poetry
+- Docker & Docker Compose
+- OpenAI API Key or Anthropic API Key
 
 ```bash
-cd packages/cli
+# 1. Get API Keys
+# OpenAI: https://platform.openai.com/api-keys
+# Anthropic: https://console.anthropic.com/
 
-# Build CLI
-pnpm build
+# 2. Clone repository
+git clone https://github.com/y-core-engineering/fidus.git
+cd fidus
 
-# Run CLI
-pnpm start
-# or
-npx fidus chat
+# 3. Start dependencies + LiteLLM in Docker
+docker-compose -f docker-compose.dev-cloud.yml --env-file .env.dev.cloud up -d
+
+# 4. Backend Setup (runs natively on host)
+cd packages/api
+poetry install
+export $(cat ../../.env.dev.cloud | xargs)
+poetry run uvicorn fidus.main:app --reload
+
+# 5. Frontend Setup (runs natively on host)
+cd packages/web
+pnpm install
+pnpm dev
+
+# Access Fidus
+# Web UI: http://localhost:3000
+# LiteLLM Dashboard: http://localhost:4001 (Cost Tracking!)
 ```
 
-### First Steps
+**Advantages:**
+- ✅ **No GPU needed** - Cloud LLMs run remotely
+- ✅ **Best LLM quality** - GPT-4o, Claude 3.5 Sonnet
+- ✅ **Multi-provider support** - Instant switch between models
+- ✅ **Cost tracking** - Budget control via LiteLLM Dashboard
+- ✅ **Response caching** - 50-80% cost savings
+- ✅ **Fallback chains** - Automatic fallback on provider failure
+- ✅ **Hot-reload development** - Full dev comfort
+
+**Costs:** $5-40/month depending on usage (with caching: -50-80%)
+
+**Detailed setup:** See [Cloud LLM Development Guide](docs/solution-architecture/09-deployment-scenarios.md#installation-steps-variante-5-development-mit-cloud-llm)
+
+---
+
+### Option 6: LiteLLM Gateway (Production Multi-Provider)
+
+**Best for:** Production with multiple LLM providers, cost tracking, and fallbacks
+
+```bash
+# 1. Install Ollama natively
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.1:8b
+
+# 2. Clone repository
+git clone https://github.com/y-core-engineering/fidus.git
+cd fidus
+
+# 3. Start with LiteLLM Gateway
+docker-compose -f docker-compose.litellm.yml up -d
+
+# Access Fidus & Dashboard
+# Web UI: http://localhost:3000
+# LiteLLM Dashboard: http://localhost:4001
+```
+
+**Advantages:**
+- ✅ Unified API for all providers (Ollama, OpenAI, Claude, etc.)
+- ✅ Automatic load balancing & fallbacks
+- ✅ Cost tracking & budget management
+- ✅ Response caching (saves tokens)
+- ✅ Admin dashboard with monitoring
+
+---
+
+### Comparison Table
+
+| Deployment Option | Setup | Performance | GPU | Costs | Use Case |
+|-------------------|-------|-------------|-----|-------|----------|
+| **All-in-Docker** | ⭐⭐ Easy | ⚡⚡ Good | Optional | Free | Quick Start, Testing |
+| **Hybrid (Ollama Native)** | ⭐⭐⭐ Medium | ⚡⚡⚡ Excellent | Recommended | Free | Production |
+| **LM Studio** | ⭐ Very Easy | ⚡⚡ Good | Recommended | Free | Development, GUI Users |
+| **Dev (Local LLM)** | ⭐⭐⭐ Medium | ⚡⚡⚡ Excellent | Recommended | Free | Active Dev (Privacy) |
+| **Dev (Cloud LLM)** | ⭐⭐ Easy | ⚡⚡⚡ Excellent | ❌ Not needed | $5-40/mo | Active Dev (Quality) |
+| **LiteLLM Gateway** | ⭐⭐⭐ Medium | ⚡⚡⚡ Excellent | Recommended | Free | Enterprise, Multi-Provider |
+
+**Recommended:**
+- **First-time users:** All-in-Docker
+- **Production deployment:** Hybrid (Ollama Native) or LiteLLM Gateway
+- **Development with GPU:** Dev (Local LLM)
+- **Development without GPU:** Dev (Cloud LLM)
+- **GUI preference:** LM Studio
+
+For detailed deployment instructions, see [Deployment Scenarios Documentation](docs/solution-architecture/09-deployment-scenarios.md).
+
+---
+
+### First Steps After Installation
 
 1. **Create an account:**
    ```bash
