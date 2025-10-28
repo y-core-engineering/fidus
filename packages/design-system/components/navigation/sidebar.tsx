@@ -70,6 +70,10 @@ const navigation: NavItem[] = [
       { title: 'Checkbox', href: '/components/checkbox' },
       { title: 'Radio Button', href: '/components/radio-button' },
       { title: 'Toggle Switch', href: '/components/toggle-switch' },
+      { title: 'Select', href: '/components/select' },
+      { title: 'Date Picker', href: '/components/date-picker' },
+      { title: 'Time Picker', href: '/components/time-picker' },
+      { title: 'File Upload', href: '/components/file-upload' },
     ],
   },
   {
