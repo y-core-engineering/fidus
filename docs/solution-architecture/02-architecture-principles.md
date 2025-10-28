@@ -32,11 +32,11 @@ graph TB
     P4 --> Impl4[Local LLM first<br/>Privacy Proxy]
     P5 --> Impl5[Separate DBs<br/>Event-only communication]
 
-    style P1 fill:#ffebee
-    style P2 fill:#e8f5e9
-    style P3 fill:#e3f2fd
-    style P4 fill:#fff3e0
-    style P5 fill:#f3e5f5
+    style P1 fill:#ef9a9a
+    style P2 fill:#a5d6a7
+    style P3 fill:#90caf9
+    style P4 fill:#ffcc80
+    style P5 fill:#ce93d8
 ```
 
 ---
@@ -84,9 +84,9 @@ graph TB
     Domain --> Events
     Domain --> Signals
 
-    style Agent fill:#fff3e0
-    style MCP fill:#e3f2fd
-    style Domain fill:#e8f5e9
+    style Agent fill:#ffcc80
+    style MCP fill:#90caf9
+    style Domain fill:#a5d6a7
 ```
 
 **Components:**
@@ -819,8 +819,8 @@ graph TB
     LLMInterface -->|Opt-in| Proxy
     Proxy --> Cloud
 
-    style LocalPath fill:#e8f5e9
-    style CloudPath fill:#fff3e0
+    style LocalPath fill:#a5d6a7
+    style CloudPath fill:#ffcc80
 ```
 
 **LLM Provider Interface (abstraction):**
@@ -1035,9 +1035,9 @@ graph TB
     CalSup -.->|Events only| TravelSup
     FinSup -.->|Events only| TravelSup
 
-    style CalDB fill:#e3f2fd
-    style FinDB fill:#e8f5e9
-    style TravelDB fill:#fff3e0
+    style CalDB fill:#90caf9
+    style FinDB fill:#a5d6a7
+    style TravelDB fill:#ffcc80
 ```
 
 **Database Schema Separation:**
@@ -1220,9 +1220,9 @@ graph TB
     P3 & P5 --> Benefit2[Scalability:<br/>Independent deployment<br/>and scaling]
     P4 --> Benefit3[Privacy:<br/>Local-first processing]
 
-    style Benefit1 fill:#e8f5e9
-    style Benefit2 fill:#e3f2fd
-    style Benefit3 fill:#fff3e0
+    style Benefit1 fill:#a5d6a7
+    style Benefit2 fill:#90caf9
+    style Benefit3 fill:#ffcc80
 ```
 
 **Key Insights:**

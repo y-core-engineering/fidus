@@ -255,7 +255,7 @@ graph TB
     style Fidus fill:#e1f5ff
     style Supervisors fill:#fff3e1
     style Support fill:#f0f0f0
-    style External fill:#e8f5e9
+    style External fill:#a5d6a7
 ```
 
 ---

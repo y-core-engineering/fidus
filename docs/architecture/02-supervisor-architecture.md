@@ -598,7 +598,7 @@ class CalendarSupervisorPlugin implements Plugin {
 graph TB
     PM["PluginManager.discoverPlugins()"]
     PM --> PF["Plugin file found:<br/>calendar-supervisor.plugin.ts"]
-    PF --> DC["Dependency check:<br/>['user-profiling'] available?"]
+    PF --> DC["Dependency check:<br/>('user-profiling') available?"]
     DC --> INIT["CalendarSupervisorPlugin.initialize()"]
     INIT --> REG["Service 'calendarSupervisor' registered<br/>with ServiceRegistry"]
     REG --> ORCH["Orchestrator can use Supervisor"]
@@ -648,7 +648,7 @@ graph TB
 
     subgraph ASK["Orchestrator asks PluginManager"]
         A1["Which Supervisors are available?"]
-        A2["Tools: [..., crypto-trading.place_order, ...]"]
+        A2["Tools: (..., crypto-trading.place_order, ...)"]
         A1 --> A2
     end
 
