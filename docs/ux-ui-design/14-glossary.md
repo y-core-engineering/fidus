@@ -69,6 +69,44 @@ The behavior where a UI element **removes itself AFTER a user action is complete
 
 ## B
 
+### Breakpoints (Responsive)
+
+Standard **responsive design breakpoints** used across all Fidus UI components.
+
+**Standard Breakpoints:**
+- **Mobile:** < 640px (`sm` in Tailwind)
+- **Tablet:** 640px - 1024px (`md` to `lg` in Tailwind)
+- **Desktop:** ≥ 1024px (`lg+` in Tailwind)
+
+**Form-Specific Breakpoints:**
+- **Mobile:** Single column, full-width inputs
+- **Tablet:** Single column, max-width 600px
+- **Desktop:** Two columns for short fields, single column for long fields
+
+**Usage:** "The form switches to two-column layout at the desktop breakpoint (1024px)."
+
+**Related:** Responsive Design, Mobile-First
+
+---
+
+### Button Labels
+
+**Capitalization Standard:** Use **Title Case** for button labels (capitalize first letter of each major word).
+
+**Examples:**
+- ✅ "View Details", "Reschedule Meeting", "Mark as Done"
+- ❌ "view details", "Reschedule meeting", "Mark As Done"
+
+**Exceptions:**
+- Short prepositions (of, in, at, by) stay lowercase: "Sign in", "Log out", "Opt in"
+- Articles (a, an, the) stay lowercase: "Add to Calendar"
+
+**Usage:** Button labels should be action-oriented and use Title Case.
+
+**Related:** Design System, Buttons
+
+---
+
 ### Bounded Context
 
 A **DDD term** for a distinct area of the domain with clear boundaries. In Fidus, each domain (Calendar, Finance, Travel, etc.) is a bounded context.
@@ -81,11 +119,36 @@ A **DDD term** for a distinct area of the domain with clear boundaries. In Fidus
 
 ## C
 
-### Chat Mode
+### Color System
+
+Fidus uses a **CSS variable-based color system** defined in the design system.
+
+**Single Source of Truth:** All color values are defined ONLY in [05-design-system-components.md](05-design-system-components.md#colors). Other documents reference these via CSS variable names.
+
+**Standard Color Variables:**
+- `--color-primary` - Brand blue (#2563EB)
+- `--color-secondary` - Accent purple (#7C3AED)
+- `--color-success` - Green (#10B981)
+- `--color-warning` - Yellow (#F59E0B)
+- `--color-error` - Red (#DC2626)
+- `--color-bg-primary` - Background white (#FFFFFF)
+- `--color-text-primary` - Text dark (#1F2937)
+
+**Usage:** Use CSS variable names in code, NOT hex values. Example: `color: var(--color-primary)` instead of `color: #2563EB`.
+
+**Rationale:** Single source prevents drift and maintenance issues.
+
+**Related:** Design System, CSS Variables
+
+---
+
+### Chat Mode / Conversational UI
 
 One of four **UI modes** in the AI-Driven UI. Used for **simple informational responses** where the user asks a question and receives a text answer with optional suggestions.
 
-**Usage:** "The user asked 'What's on my calendar today?' so the system responded in Chat mode."
+**Standard Term:** Use "Chat Mode" in technical docs and code. "Conversational UI" may be used in design discussions to emphasize the interactive nature.
+
+**Usage:** "The user asked 'What's on my calendar today?' so the system responded in Chat Mode."
 
 **Related:** UI Mode, Form Mode, Wizard Mode, Widget Mode
 
@@ -249,7 +312,12 @@ The process of **analyzing user input** to determine what the user wants to do a
 
 **Large Language Model** — the AI model that powers Fidus's natural language understanding and decision-making. Can be Local (Llama 3.1) or Cloud (OpenAI GPT-4).
 
-**Usage:** "Fidus can run with a local LLM for maximum privacy or cloud LLM for more power."
+**Standard Model Names:**
+- **Local:** "Llama 3.1 8B" or "Ollama" (never "Llama3", "LLama", or "Lama")
+- **Cloud OpenAI:** "GPT-4" or "GPT-3.5" (never "ChatGPT", "OpenAI API")
+- **Cloud Anthropic:** "Claude 3.5 Sonnet" (never "Claude-3", "Anthropic API")
+
+**Usage:** "Fidus can run with a local LLM (Llama 3.1 8B) for maximum privacy or cloud LLM (GPT-4) for more power."
 
 **Related:** Local AI, Cloud AI
 
@@ -417,6 +485,21 @@ A **LangGraph state machine** that manages logic for a domain or the orchestrati
 
 ---
 
+### Swipe Gestures
+
+**Standard swipe directions** for touch interactions:
+
+- **Swipe Right** (→): Dismiss/Archive (e.g., dismiss opportunity card)
+- **Swipe Left** (←): Delete/Remove (destructive action)
+- **Swipe Down** (↓): Refresh/Pull-to-refresh
+- **Swipe Up** (↑): Show more details/Expand
+
+**Usage:** "Swipe right on a card to dismiss it."
+
+**Related:** Touch Interactions, Mobile UX
+
+---
+
 ## T
 
 ### Tenant
@@ -433,9 +516,11 @@ A **data isolation boundary**. Users can have multiple tenants (Personal, Work, 
 
 A **UI component** (usually in header) allowing users to switch between tenants.
 
-**Icon:** 👤 (single user) with dropdown arrow 👤▾
+**Icon Convention:**
+- **Closed State:** 👤 (profile icon alone in header)
+- **Open/Active State:** 👤▾ (with dropdown arrow when clicked)
 
-**Usage:** "Click the tenant switcher to change from Personal to Work."
+**Usage:** "Click the tenant switcher (👤) to change from Personal to Work."
 
 **Related:** Tenant, Multi-Tenancy
 
