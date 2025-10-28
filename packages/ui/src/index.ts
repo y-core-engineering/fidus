@@ -22,5 +22,12 @@ export * from './components/opportunity-card';
 export * from './components/detail-card';
 export * from './components/empty-card';
 
+// Form Components
+export * from './components/text-input';
+export * from './components/text-area';
+export * from './components/checkbox';
+export * from './components/radio-button';
+export * from './components/toggle-switch';
+
 // Utilities
 export { cn } from './lib/cn';
