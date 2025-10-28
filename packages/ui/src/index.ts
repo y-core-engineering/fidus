@@ -17,5 +17,10 @@ export * from './components/badge';
 export * from './components/chip';
 export * from './components/avatar';
 
+// Card Components
+export * from './components/opportunity-card';
+export * from './components/detail-card';
+export * from './components/empty-card';
+
 // Utilities
 export { cn } from './lib/cn';

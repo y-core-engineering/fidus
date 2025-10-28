@@ -18,6 +18,12 @@ const navigation: NavItem[] = [
       { title: 'Colors', href: '/foundations/colors' },
       { title: 'Typography', href: '/foundations/typography' },
       { title: 'Spacing', href: '/foundations/spacing' },
+      { title: 'AI-Driven UI', href: '/foundations/ai-driven-ui' },
+      { title: 'Privacy & UX', href: '/foundations/privacy-ux' },
+      { title: 'Icons', href: '/foundations/icons' },
+      { title: 'Motion', href: '/foundations/motion' },
+      { title: 'Accessibility', href: '/foundations/accessibility' },
+      { title: 'Responsive Design', href: '/foundations/responsive-design' },
     ],
   },
   {
@@ -46,6 +52,14 @@ const navigation: NavItem[] = [
       { title: 'Badge', href: '/components/badge' },
       { title: 'Chip', href: '/components/chip' },
       { title: 'Avatar', href: '/components/avatar' },
+    ],
+  },
+  {
+    title: 'Cards',
+    items: [
+      { title: 'Opportunity Card', href: '/components/opportunity-card' },
+      { title: 'Detail Card', href: '/components/detail-card' },
+      { title: 'Empty Card', href: '/components/empty-card' },
     ],
   },
 ];
