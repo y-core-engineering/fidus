@@ -969,9 +969,13 @@ graph LR
 
 **Behavior:**
 - Slides in from bottom-right with smooth animation (300ms)
-- Auto-dismiss after 30 seconds if not interacted with
-- Clicking dismisses notification
+- **Important:** This is an OS-level notification (toast), NOT an Opportunity Card
+- Follows OS notification defaults (typically auto-dismiss after 5-10 seconds on most platforms)
+- User can dismiss immediately by clicking anywhere on the toast
 - Multiple notifications stack vertically
+- Clicking action button (e.g., "Review") opens relevant view and dismisses toast
+
+**Note:** Desktop toasts are ephemeral notifications. For persistent information, see [Opportunity Cards](#pattern-1-opportunistic-surfacing) on the Dashboard, which NEVER auto-dismiss.
 
 #### Pattern 2: Push Notification (Mobile)
 

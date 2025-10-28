@@ -354,32 +354,49 @@ graph LR
 
 ### Principle Statement
 
-**Users dismiss cards explicitly (swipe or X button). Cards NEVER auto-hide after a timeout. Dashboard is always accessible.**
+**Users dismiss Opportunity Cards explicitly (swipe or X button). Dashboard cards NEVER auto-hide after a timeout. Dashboard is always accessible.**
 
-### Anti-Pattern: Auto-Hide
+### Important Distinction: Dashboard Cards vs OS Notifications
+
+Fidus uses two types of notifications with different dismissal behavior:
+
+| Type | Location | Auto-Dismiss? | Why? |
+|------|----------|---------------|------|
+| **Opportunity Cards** | Dashboard (Opportunity Surface) | ❌ NEVER | User must explicitly swipe/click X. Cards persist until user decides to dismiss. |
+| **OS Notifications** | Desktop toast / Mobile push | ✅ YES (per OS defaults) | Ephemeral alerts that follow platform conventions (typically 5-10 seconds). Not part of the Opportunity Surface. |
+
+**Rule:** Dashboard Opportunity Cards are **persistent** and **user-controlled**. OS-level notifications (toasts/push) follow **platform defaults** and may auto-dismiss.
+
+**Example:**
+- Budget exceeded → Shows as Opportunity Card on Dashboard (stays until user dismisses)
+- Budget exceeded → Also sends OS notification toast (auto-dismisses per OS defaults)
+- User can click toast to jump to Dashboard card, which persists
+
+### Anti-Pattern: Auto-Hide Dashboard Cards
 
 ```mermaid
 sequenceDiagram
     participant System
-    participant Card
+    participant DashboardCard as Dashboard Card
     participant User
 
-    System->>Card: Display notification
-    Note over Card: User distracted, didn't see
-    Card->>Card: Wait 30 seconds
-    Card->>System: Auto-dismiss
+    System->>DashboardCard: Display Opportunity Card
+    Note over DashboardCard: User distracted, didn't see
+    DashboardCard->>DashboardCard: Wait 30 seconds
+    DashboardCard->>System: Auto-dismiss
     Note over User: ❌ User missed important info!
 
     rect rgba(255, 0, 0, 0.1)
-    Note over System,User: WRONG - System decides visibility
+    Note over System,User: WRONG - System decides visibility for Dashboard Cards
     end
 ```
 
-**Problems:**
-- User might be temporarily distracted
-- Important info disappears before user reads
+**Problems with auto-dismissing Dashboard Cards:**
+- User might be temporarily distracted (in meeting, on call, etc.)
+- Important info disappears before user reads it
 - System assumes "no action = not important"
-- User has no control
+- User has no control over what stays visible
+- Violates accessibility guidelines (WCAG 2.2.1 - Timing Adjustable)
 
 ---
 
@@ -679,7 +696,7 @@ graph TD
 | **Navigation** | Static sidebar/tabs | Dynamic opportunity surface |
 | **Flows** | Predetermined (Step 1 → Step 2 → Step 3) | LLM decides (form vs. wizard vs. chat) |
 | **Content** | Hardcoded ("show weather if morning") | LLM analyzes ("show if relevant") |
-| **Dismissal** | Auto-hide after 30 seconds | User swipes/clicks X |
+| **Dismissal** | OS notifications auto-hide after timeout | Dashboard cards: User swipes/clicks X (never auto-hide) |
 | **Dashboard** | Static widgets | Opportunity surface (changes all day) |
 | **Design Artifacts** | Wireframes for every screen | Examples + principles + component library |
 | **Developer Work** | Implement exact screens | Build context-adaptive system |
