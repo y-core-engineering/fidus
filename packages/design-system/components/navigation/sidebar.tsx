@@ -62,6 +62,22 @@ const navigation: NavItem[] = [
       { title: 'Empty Card', href: '/components/empty-card' },
     ],
   },
+  {
+    title: 'Forms',
+    items: [
+      { title: 'Text Input', href: '/components/text-input' },
+      { title: 'Text Area', href: '/components/text-area' },
+      { title: 'Checkbox', href: '/components/checkbox' },
+      { title: 'Radio Button', href: '/components/radio-button' },
+      { title: 'Toggle Switch', href: '/components/toggle-switch' },
+    ],
+  },
+  {
+    title: 'Patterns',
+    items: [
+      { title: 'Form Validation', href: '/patterns/form-validation' },
+    ],
+  },
 ];
 
 function NavSection({ item }: { item: NavItem }) {
