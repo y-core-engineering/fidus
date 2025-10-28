@@ -250,332 +250,361 @@ Each slice delivers a **complete, usable feature** from infrastructure to UI:
 - ✅ Tests
 - ✅ Deployable
 
-**Benefits:**
-- Each slice delivers immediate value
-- Can deploy after each slice
-- Early feedback on architecture
-- No "big bang" integration
+**Target:** Complete implementation of all 34 components + patterns from [18-design-system-website.md](18-design-system-website.md)
 
 ---
 
-### Slice 0: Foundation & First Component (Button)
+### Slice 0: Foundation & Action Components
 
-**Goal:** Set up infrastructure and deliver first complete component.
+**Goal:** Set up infrastructure and deliver first component category (Actions).
 
 **What You Get:**
 - Working monorepo structure
-- Design tokens system
-- Navigation layout
-- Button component (complete)
-- Button documentation page
-- Deployable design system website
+- Design tokens system (colors, typography, spacing, shadows, motion)
+- Navigation shell (header, sidebar, routing)
+- **4 Action components:** Button, Link, Icon Button, Button Group
+- Complete documentation for all 4
 
-**Tasks:**
+**Components:**
 
-1. **Infrastructure Setup**
-   ```bash
-   mkdir -p packages/design-system packages/ui
-   cd packages/design-system
-   pnpm create next-app@latest . --typescript --tailwind --app --no-src-dir
-   ```
+1. **Button** - Primary, Secondary, Tertiary, Destructive variants
+2. **Link** - Inline, standalone, with icons
+3. **Icon Button** - Small, medium, large sizes
+4. **Button Group** - Horizontal/vertical grouping
 
-2. **Design Tokens**
-   - `styles/globals.css` with CSS variables (colors, spacing, typography)
-   - `tailwind.config.ts` configured to use tokens
-   - Dark mode support
-
-3. **Navigation Shell**
-   - Header (logo, search placeholder, theme toggle)
-   - Sidebar (collapsible, mobile-responsive)
-   - Basic routing structure
-
-4. **Button Component** (`@fidus/ui`)
-   - Implementation (`button.tsx`)
-   - Zod schema (`ButtonPropsSchema`)
-   - Unit tests (`button.test.tsx`)
-   - Export from package
-
-5. **Button Documentation**
-   - `/components/button` page
-   - ComponentPreview helper
-   - Props table
-   - All variants showcased
-   - Accessibility notes
+**Foundation Setup:**
+- `packages/design-system` (Next.js 14 App Router)
+- `packages/ui` (Component library)
+- Design tokens (`globals.css` + `tailwind.config.ts`)
+- Navigation shell (Header, Sidebar with collapsible sections)
+- ComponentPreview helper
+- PropsTable helper
+- `/foundations/colors`, `/foundations/typography`, `/foundations/spacing` pages
 
 **Deliverable:**
-- Live design system at `design.fidus.ai` (or localhost)
-- One complete, documented, tested component
-- Foundation for all future work
+- Deployable design system at `design.fidus.ai`
+- 4 production-ready action components
+- Interactive token documentation
 
 ---
 
-### Slice 1: Design Tokens Documentation + Badge Component
+### Slice 1: Layout & Data Display Components
 
-**Goal:** Document the design system foundation and add Badge component.
+**Goal:** Core structural and display components.
 
 **What You Get:**
-- Interactive color palette page
-- Typography showcase page
-- Spacing scale page
-- Badge component (complete with docs)
+- **4 Layout components:** Container, Grid, Stack, Divider
+- **5 Data Display components:** Table, List, Badge, Chip, Avatar
+- Complete documentation
 
-**Tasks:**
+**Components:**
 
-1. **Foundation Pages**
-   - `/foundations/colors` - Interactive color palette with copy-to-clipboard
-   - `/foundations/typography` - Font sizes, weights, line heights showcase
-   - `/foundations/spacing` - Spacing scale visualization
+**Layout:**
+1. **Container** - Max-width containers, responsive padding
+2. **Grid** - CSS Grid wrapper, responsive columns
+3. **Stack** - Vertical/horizontal spacing
+4. **Divider** - Horizontal/vertical separators
 
-2. **Badge Component** (`@fidus/ui`)
-   - Implementation with urgency variants (urgent, medium, low)
-   - Domain variants (calendar, finance, travel, etc.)
-   - Zod schema + tests
-   - Export from package
-
-3. **Badge Documentation**
-   - `/components/badge` page
-   - All variants (urgency + domain)
-   - Usage examples
-   - Props table
+**Data Display:**
+5. **Table** - Sortable, filterable, paginated
+6. **List** - Ordered, unordered, nested
+7. **Badge** - Urgency (urgent, medium, low), domain variants
+8. **Chip** - Dismissible tags, filter chips
+9. **Avatar** - User avatars, initials, images
 
 **Deliverable:**
-- Design tokens documented and interactive
-- Badge component ready for use in Fidus
-- 2 production-ready components
+- 9 additional components (total: 13)
+- Layout system ready
+- Data display patterns established
 
 ---
 
-### Slice 2: AI-Driven UI Concept + Card Components
+### Slice 2: Card System & Privacy UX
 
-**Goal:** Explain Fidus's unique paradigm and implement card components.
+**Goal:** Fidus-specific card components and privacy documentation.
 
 **What You Get:**
-- AI-Driven UI philosophy page (critical for understanding Fidus)
-- Card component (base)
-- OpportunityCard component (Fidus-specific)
-- Both documented
+- **3 Card components:** OpportunityCard, Detail Card, Empty Card
+- Privacy & Trust UX documentation
+- AI-Driven UI Paradigm documentation
 
-**Tasks:**
+**Components:**
 
-1. **AI-Driven UI Documentation**
-   - `/foundations/ai-driven-ui` page
-   - Explain LLM-based UI decisions
-   - Visual examples (NOT vs CORRECT patterns)
-   - UIDecisionLayer concept introduction
+1. **OpportunityCard** - Urgency indicators, actions, swipe gestures, optimistic updates
+2. **Detail Card** - Expandable details, header/body/footer slots
+3. **Empty Card** - Empty state patterns, illustrations
 
-2. **Card Component** (`@fidus/ui`)
-   - Base card with header/body/footer slots
-   - Hover states, borders, shadows
-   - Zod schema + tests
-
-3. **OpportunityCard Component** (`@fidus/ui`)
-   - Full implementation (urgency indicators, actions, swipe gestures)
-   - Integration with UIDecisionLayer pattern
-   - Optimistic updates pattern
-   - Comprehensive tests
-
-4. **Card Documentation**
-   - `/components/card` page
-   - `/components/opportunity-card` page
-   - Interactive previews
-   - Usage in AI-driven context
+**Foundation Pages:**
+- `/foundations/ai-driven-ui` - LLM-based UI decisions, examples
+- `/foundations/privacy-ux` - Privacy-first principles, Privacy Badge patterns
+- `/foundations/icons` - Icon library documentation (Lucide React)
+- `/foundations/motion` - Animation principles, timing functions
+- `/foundations/accessibility` - WCAG 2.1 AA guidelines
+- `/foundations/responsive-design` - Breakpoints, mobile-first
 
 **Deliverable:**
+- 3 Fidus-specific cards (total: 16 components)
 - Core Fidus philosophy documented
-- OpportunityCard ready for Dashboard implementation
-- 4 production-ready components
+- All foundation pages complete
 
 ---
 
-### Slice 3: Form Foundations + Input Component
+### Slice 3: Form Components (Part 1: Basic Inputs)
 
-**Goal:** Build form infrastructure and first form component.
+**Goal:** Basic form input components.
 
 **What You Get:**
+- **5 Form components:** Text Input, Text Area, Checkbox, Radio Button, Toggle Switch
+- Form validation patterns
+
+**Components:**
+
+1. **Text Input** - Text, email, password, number, search types
+2. **Text Area** - Resizable, character count, validation
+3. **Checkbox** - Single, group, indeterminate state
+4. **Radio Button** - Group, inline/stacked layout
+5. **Toggle Switch** - Boolean toggle, with labels
+
+**Pattern Documentation:**
+- `/patterns/form-validation` - Real-time, async, cross-field validation
+
+**Deliverable:**
+- 5 form components (total: 21 components)
 - Form validation patterns documented
-- Input component with all states
-- Error handling patterns
-- Privacy UX documentation
-
-**Tasks:**
-
-1. **Privacy UX Documentation**
-   - `/foundations/privacy-ux` page
-   - Privacy-first principles for Fidus
-   - Privacy Badge patterns
-   - Data processing transparency
-
-2. **Input Component** (`@fidus/ui`)
-   - Text, email, password, number types
-   - Validation states (error, success, loading)
-   - Label, helper text, error messages
-   - Accessible (ARIA labels, keyboard navigation)
-   - Zod integration for validation
-
-3. **Form Patterns Documentation**
-   - `/patterns/forms` page
-   - Real-time validation
-   - Error handling
-   - Accessibility best practices
-
-4. **Input Documentation**
-   - `/components/input` page
-   - All input types showcased
-   - Validation examples
-   - Accessibility checklist
-
-**Deliverable:**
-- Form infrastructure ready
-- Input component for all Fidus forms
-- Privacy principles documented
-- 5 production-ready components
 
 ---
 
-### Slice 4: Interactive Playground
+### Slice 4: Form Components (Part 2: Complex Inputs)
 
-**Goal:** Add interactive component playground for exploration.
+**Goal:** Advanced form input components.
 
 **What You Get:**
-- Live component playground
-- Real-time prop editing
-- Code generation
-- Responsive preview
+- **4 Form components:** Select, Date Picker, Time Picker, File Upload
+- Complete form system
 
-**Tasks:**
+**Components:**
 
-1. **Playground Infrastructure**
-   - `/playground` page
-   - Component selector dropdown
-   - Preview area with device frames
-   - Props editor panel
-   - Code viewer with syntax highlighting
-
-2. **Playground Features**
-   - Component registry integration
-   - Real-time prop updates (Zustand state)
-   - Zod validation for prop editing
-   - Code generation (copy to clipboard)
-   - Theme toggle (light/dark)
-   - Responsive preview (mobile/tablet/desktop)
-
-3. **Playground Integration**
-   - Connect all existing components
-   - Generate prop forms from Zod schemas
-   - Show TypeScript types in code output
+1. **Select** - Single/multi-select, searchable, grouped options
+2. **Date Picker** - Calendar picker, date range, shortcuts
+3. **Time Picker** - 12/24 hour format, minute intervals
+4. **File Upload** - Drag & drop, preview, validation, progress
 
 **Deliverable:**
-- Interactive playground for all components
-- Easy component exploration
-- Code examples for developers
+- 4 advanced form components (total: 25 components)
+- Complete form system ready for Fidus
 
 ---
 
-### Slice 5: UIDecisionLayer Demo + Architecture Docs
+### Slice 5: Feedback & Overlay Components
 
-**Goal:** Demonstrate AI-driven UI architecture with live demo.
+**Goal:** User feedback and overlay components.
+
+**What You Get:**
+- **5 Feedback components:** Toast, Modal, Alert, Banner, Progress Bar
+- **4 Overlay components:** Dropdown, Popover, Tooltip, Drawer
+
+**Feedback Components:**
+
+1. **Toast** - Success, Error, Warning, Info variants, action buttons
+2. **Modal** - Confirmation, form, fullscreen modals
+3. **Alert** - Inline alerts, dismissible
+4. **Banner** - Page-level announcements
+5. **Progress Bar** - Linear, circular, determinate/indeterminate
+
+**Overlay Components:**
+
+6. **Dropdown** - Menu, select dropdown
+7. **Popover** - Contextual information, positioning
+8. **Tooltip** - Hover tooltips, keyboard accessible
+9. **Drawer** - Side drawer, bottom sheet (mobile)
+
+**Pattern Documentation:**
+- `/patterns/error-states` - 6 error categories, recovery patterns
+- `/patterns/empty-states` - 5 empty state patterns
+- `/patterns/loading-states` - 5 loading patterns, timing rules
+- `/patterns/success-confirmation` - 4 success patterns, undo support
+
+**Deliverable:**
+- 9 components (total: 34 components) ✅ **All components complete!**
+- Error, empty, loading, success patterns documented
+
+---
+
+### Slice 6: Navigation & Getting Started
+
+**Goal:** Navigation components and onboarding documentation.
+
+**What You Get:**
+- **5 Navigation components:** Header, Sidebar, Tabs, Breadcrumbs, Pagination
+- Getting Started guides
+- Onboarding pattern documentation
+
+**Navigation Components:**
+
+1. **Header** - Logo, search, user menu, theme toggle
+2. **Sidebar** - Collapsible sections, nested navigation
+3. **Tabs** - Horizontal/vertical tabs, controlled/uncontrolled
+4. **Breadcrumbs** - Path navigation, truncation
+5. **Pagination** - Page numbers, prev/next, page size
+
+**Getting Started Pages:**
+- `/getting-started/overview`
+- `/getting-started/for-designers` - Figma setup, design principles
+- `/getting-started/for-developers` - Installation, first component
+- `/getting-started/design-philosophy` - AI-Driven UI, Privacy-First
+- `/getting-started/contributing`
+
+**Pattern Documentation:**
+- `/patterns/onboarding` - 8-step wizard, privacy-first flow
+- `/patterns/multi-tenancy` - Tenant switcher, management
+
+**Deliverable:**
+- Navigation system complete
+- Getting Started guides ready
+- Onboarding patterns documented
+
+---
+
+### Slice 7: Architecture & Advanced Patterns
+
+**Goal:** Document Fidus architecture and remaining patterns.
 
 **What You Get:**
 - Interactive UIDecisionLayer demo
 - Architecture documentation
-- Component Registry documentation
-- Mock LLM simulation
+- Opportunity Surface pattern
+- Search pattern
 
-**Tasks:**
+**Architecture Pages:**
+- `/architecture/ui-decision-layer` - Interactive demo, mock LLM
+- `/architecture/component-registry` - Backend-Frontend bridge
+- `/architecture/api-response-schema` - UI metadata structure
+- `/architecture/opportunity-surface-service` - Dashboard management
+- `/architecture/frontend-architecture` - State management, real-time
 
-1. **UIDecisionLayer Demo**
-   - `/architecture/ui-decision-layer` page
-   - Interactive demo with mock LLM
-   - Show same query → different UIs based on context
-   - Visualize decision flow
-   - Real component rendering
-
-2. **Architecture Documentation**
-   - `/architecture/component-registry` page
-   - Explain how UIDecisionLayer works
-   - Code examples from production
-   - Integration guide for Fidus web app
-
-3. **Mock LLM Simulator**
-   - Simple UI context simulator (time, location, device)
-   - Show different UI decisions
-   - Explain reasoning
+**Pattern Documentation:**
+- `/patterns/opportunity-surface` - Dynamic dashboard, ranking, filters
+- `/patterns/search-filtering` - AI-powered, traditional search
+- `/patterns/settings` - 9 settings categories, privacy report
 
 **Deliverable:**
 - Core Fidus architecture demonstrated
-- Clear guide for main app development
-- Proof of concept for AI-driven UI
+- All patterns documented
+- Clear integration guide for main Fidus app
 
 ---
 
-### Slice 6: Search + Pattern Library
+### Slice 8: Interactive Playground
 
-**Goal:** Add search functionality and document UX patterns.
+**Goal:** Build interactive component playground.
+
+**What You Get:**
+- Live component playground
+- Real-time prop editing for all 34 components
+- Code generation
+- Responsive preview
+
+**Features:**
+
+1. **Component Explorer**
+   - Component selector (all 34 components)
+   - Category filtering (Actions, Forms, Feedback, etc.)
+   - Search components
+
+2. **Live Preview**
+   - Device frames (mobile, tablet, desktop)
+   - Theme toggle (light/dark)
+   - Props editor (auto-generated from Zod schemas)
+   - Real-time updates
+
+3. **Code Generation**
+   - Copy React code
+   - Copy TypeScript types
+   - Copy Zod schemas
+   - Export to CodeSandbox
+
+**Deliverable:**
+- Interactive playground at `/playground`
+- All 34 components explorable
+- Code examples for developers
+
+---
+
+### Slice 9: Tokens, Content Guidelines & Resources
+
+**Goal:** Complete design system with tokens, guidelines, and resources.
+
+**What You Get:**
+- All token pages
+- Content guidelines
+- Resource pages
+
+**Token Pages:**
+- `/tokens/color-tokens` - Semantic colors, CSS variables
+- `/tokens/spacing-tokens` - Spacing scale, usage examples
+- `/tokens/typography-tokens` - Type scale, line heights
+- `/tokens/shadow-tokens` - Elevation system, shadow values
+- `/tokens/motion-tokens` - Timing functions, easing
+
+**Content Guidelines:**
+- `/content/voice-tone` - Friendly, privacy-conscious, empowering
+- `/content/grammar-mechanics` - Title Case, punctuation
+- `/content/glossary` - 40+ standardized terms (from 14-glossary.md)
+- `/content/writing-for-privacy` - Privacy-safe messaging
+
+**Resources:**
+- `/resources/figma-library` - Download, setup guide
+- `/resources/code-playground` - Link to interactive playground
+- `/resources/downloads` - Icons, logos, assets
+- `/resources/changelog` - Version history
+- `/resources/contributing` - Contribution guide
+- `/resources/github` - Repository link
+- `/resources/support` - Discord, GitHub Discussions
+
+**Deliverable:**
+- Complete token documentation
+- Content guidelines ready
+- Resource hub established
+
+---
+
+### Slice 10: Search, Deployment & CI/CD
+
+**Goal:** Add global search and deploy to production.
 
 **What You Get:**
 - Global search (Cmd+K)
-- Pattern documentation (onboarding, error states, settings)
-- Complete design system
-
-**Tasks:**
-
-1. **Search Implementation**
-   - Global search with keyboard shortcut (Cmd+K)
-   - Flexsearch index (components, patterns, pages)
-   - Search UI with results preview
-   - Keyboard navigation
-
-2. **Pattern Documentation**
-   - `/patterns/onboarding` - 8-step onboarding flow
-   - `/patterns/error-states` - All 6 error categories
-   - `/patterns/settings` - 9 settings categories
-   - `/patterns/search` - Search interface patterns
-
-3. **Pattern Showcase**
-   - Interactive examples for each pattern
-   - Code snippets
-   - Do's and Don'ts
-
-**Deliverable:**
-- Searchable design system
-- Complete pattern library
-- Ready for main Fidus app development
-
----
-
-### Slice 7: Deployment + CI/CD
-
-**Goal:** Deploy to production and set up automation.
-
-**What You Get:**
 - Live design system at `design.fidus.ai`
-- Automated deployments
 - CI/CD pipeline
 
-**Tasks:**
+**Features:**
 
-1. **Vercel Deployment**
-   - Connect GitHub repository
-   - Configure build (root: `packages/design-system`)
-   - Set up custom domain
-   - Configure environment variables
+1. **Global Search**
+   - Flexsearch index (all components, patterns, pages)
+   - Keyboard shortcut (Cmd+K / Ctrl+K)
+   - Search UI with results preview
+   - Keyboard navigation (arrow keys, enter)
+   - Recent searches
 
-2. **CI/CD Pipeline**
+2. **Deployment**
+   - Vercel deployment
+   - Custom domain (`design.fidus.ai`)
+   - Environment variables
+   - Static site generation
+
+3. **CI/CD Pipeline**
    - GitHub Actions workflow
    - Run tests on PRs
-   - Type checking
-   - Linting
+   - Type checking (TypeScript)
+   - Linting (ESLint)
+   - Build verification
    - Auto-deploy on merge to main
-
-3. **Documentation**
-   - Contributing guide (`CONTRIBUTING.md`)
-   - Component creation guide
-   - Deployment instructions
 
 **Deliverable:**
 - Production design system website
+- Searchable documentation
 - Automated quality checks
-- Developer onboarding docs
+- Complete Fidus Design System ✅
 
 ---
 
@@ -1531,24 +1560,33 @@ By building the design system website with production technologies:
    - Design system already proven
    - All patterns validated in isolation
 
-### Implementation Slices (Vertical)
+### Implementation Slices (Vertical) - Complete Coverage
 
-| Slice | Deliverable | Value |
-|-------|-------------|-------|
-| **Slice 0** | Foundation + Button component | Deployable design system with first component |
-| **Slice 1** | Design tokens docs + Badge | Interactive token documentation |
-| **Slice 2** | AI-Driven UI docs + Cards | Core Fidus philosophy + OpportunityCard |
-| **Slice 3** | Privacy UX + Input component | Form infrastructure ready |
-| **Slice 4** | Interactive Playground | Component exploration tool |
-| **Slice 5** | UIDecisionLayer demo | AI-driven architecture proven |
-| **Slice 6** | Search + Pattern library | Complete, searchable design system |
-| **Slice 7** | Deployment + CI/CD | Production-ready automation |
+| Slice | Components | Additional Content | Total Components |
+|-------|------------|-------------------|------------------|
+| **Slice 0** | Button, Link, Icon Button, Button Group | Foundation setup, Navigation shell, Design tokens (colors, typography, spacing) | 4 |
+| **Slice 1** | Container, Grid, Stack, Divider, Table, List, Badge, Chip, Avatar | Layout & data display patterns | 13 |
+| **Slice 2** | OpportunityCard, Detail Card, Empty Card | AI-Driven UI, Privacy UX, Icons, Motion, Accessibility, Responsive design | 16 |
+| **Slice 3** | Text Input, Text Area, Checkbox, Radio, Toggle Switch | Form validation patterns | 21 |
+| **Slice 4** | Select, Date Picker, Time Picker, File Upload | Complete form system | 25 |
+| **Slice 5** | Toast, Modal, Alert, Banner, Progress Bar, Dropdown, Popover, Tooltip, Drawer | Error, empty, loading, success patterns | **34 ✅** |
+| **Slice 6** | Header, Sidebar, Tabs, Breadcrumbs, Pagination | Getting Started guides, Onboarding, Multi-tenancy patterns | 39 |
+| **Slice 7** | - | Architecture docs (UIDecisionLayer, Component Registry), Opportunity Surface, Search, Settings patterns | 39 |
+| **Slice 8** | - | Interactive Playground (all 34+ components explorable) | 39 |
+| **Slice 9** | - | All token pages, Content guidelines, Resources | 39 |
+| **Slice 10** | - | Global search, Production deployment, CI/CD | 39 |
 
-**Key Difference from Horizontal Slicing:**
+**Progress Tracking:**
+- ✅ **Slice 5:** All 34 core components from 18-design-system-website.md complete
+- ✅ **Slice 6:** +5 navigation components (Header, Sidebar, Tabs, Breadcrumbs, Pagination)
+- ✅ **Slice 7-10:** Complete documentation, patterns, tooling, deployment
+
+**Key Benefits:**
 - Each slice is **independently deployable and valuable**
-- No waiting for "all components" or "all docs" to complete
+- No waiting for "all components" to complete
 - Early validation of architecture decisions
 - Incremental value delivery
+- After Slice 5: All 34 components ready for Fidus main app
 
 ---
 
