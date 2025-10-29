@@ -125,6 +125,19 @@ const navigation: NavItem[] = [
       { title: 'Success Confirmation', href: '/patterns/success-confirmation' },
       { title: 'Onboarding', href: '/patterns/onboarding' },
       { title: 'Multi-Tenancy', href: '/patterns/multi-tenancy' },
+      { title: 'Opportunity Surface', href: '/patterns/opportunity-surface' },
+      { title: 'Search & Filtering', href: '/patterns/search-filtering' },
+      { title: 'Settings', href: '/patterns/settings' },
+    ],
+  },
+  {
+    title: 'Architecture',
+    items: [
+      { title: 'UI Decision Layer', href: '/architecture/ui-decision-layer' },
+      { title: 'Component Registry', href: '/architecture/component-registry' },
+      { title: 'API Response Schema', href: '/architecture/api-response-schema' },
+      { title: 'Opportunity Surface Service', href: '/architecture/opportunity-surface-service' },
+      { title: 'Frontend Architecture', href: '/architecture/frontend-architecture' },
     ],
   },
 ];
