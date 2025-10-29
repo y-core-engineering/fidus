@@ -628,8 +628,9 @@ export function TeamMemberList({
         </div>
       </section>
 
-      <section className="border-t pt-8">
-        <h2 className="text-2xl font-semibold mb-4">Further Reading</h2>
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
         <ul className="space-y-2">
           <li>
             <Link href="/foundations/privacy-ux" className="text-blue-600 hover:underline">
@@ -645,6 +646,36 @@ export function TeamMemberList({
             <Link href="/getting-started/design-philosophy" className="text-blue-600 hover:underline">
               Design Philosophy
             </Link>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/multi-tenant-ux/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Multi-Tenant UX
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/on-focus.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              WCAG 2.1: Context Changes
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/02-Fingerprint_Web_Server"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              OWASP: Multi-Tenancy Security
+            </a>
           </li>
         </ul>
       </section>

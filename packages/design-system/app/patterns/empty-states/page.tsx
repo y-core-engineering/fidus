@@ -607,6 +607,49 @@ export default function EmptyStatesPage() {
           </ul>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/empty-state-interface-design/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nielsen Norman Group: Empty State Design Patterns
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://uxdesign.cc/empty-state-designing-the-void-77e4297e3fc6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              UX Collective: Designing the Void - Empty State Best Practices
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/empty-card"
+              className="text-primary hover:underline"
+            >
+              EmptyCard Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/button"
+              className="text-primary hover:underline"
+            >
+              Button Component Documentation
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

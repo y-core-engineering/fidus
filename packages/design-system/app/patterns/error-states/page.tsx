@@ -526,6 +526,65 @@ export default function ErrorStatesPage() {
           </div>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/error-message-guidelines/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nielsen Norman Group: Error Message Guidelines
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/error-identification.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              WCAG 2.1: Error Identification
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/alert"
+              className="text-primary hover:underline"
+            >
+              Alert Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/banner"
+              className="text-primary hover:underline"
+            >
+              Banner Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/modal"
+              className="text-primary hover:underline"
+            >
+              Modal Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/toast"
+              className="text-primary hover:underline"
+            >
+              Toast Component Documentation
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

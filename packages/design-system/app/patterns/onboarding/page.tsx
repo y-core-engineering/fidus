@@ -468,8 +468,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         </div>
       </section>
 
-      <section className="border-t pt-8">
-        <h2 className="text-2xl font-semibold mb-4">Further Reading</h2>
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
         <ul className="space-y-2">
           <li>
             <Link href="/foundations/privacy-ux" className="text-blue-600 hover:underline">
@@ -485,6 +486,36 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             <Link href="/getting-started/design-philosophy" className="text-blue-600 hover:underline">
               Design Philosophy
             </Link>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/onboarding-tutorials/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Onboarding Tutorials
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/error-identification.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              WCAG 2.1: Error Identification
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/progress-indicators/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Progress Indicators
+            </a>
           </li>
         </ul>
       </section>

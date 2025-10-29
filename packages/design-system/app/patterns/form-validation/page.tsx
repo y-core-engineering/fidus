@@ -451,6 +451,67 @@ const validatePasswordMatch = (pass: string, confirm: string) => {
           </ul>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/errors-forms-design-guidelines/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nielsen Norman Group: Website Forms Usability - Error Messages
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/error-suggestion.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              WCAG 2.1: Error Suggestion Guidelines
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.smashingmagazine.com/2022/09/inline-validation-web-forms-ux/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Smashing Magazine: Inline Validation in Web Forms
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/text-input"
+              className="text-primary hover:underline"
+            >
+              TextInput Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/checkbox"
+              className="text-primary hover:underline"
+            >
+              Checkbox Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/select"
+              className="text-primary hover:underline"
+            >
+              Select Component Documentation
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

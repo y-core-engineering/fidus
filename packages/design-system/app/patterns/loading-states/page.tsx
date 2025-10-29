@@ -666,6 +666,49 @@ const handleLike = async () => {
           </div>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/progress-indicators/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nielsen Norman Group: Progress Indicators Make a Slow System Less Insufferable
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.lukew.com/ff/entry.asp?1797"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Luke Wroblewski: Mobile Design Details - Avoid the Spinner
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/progress-bar"
+              className="text-primary hover:underline"
+            >
+              ProgressBar Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/button"
+              className="text-primary hover:underline"
+            >
+              Button Component Documentation (Loading States)
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

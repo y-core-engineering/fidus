@@ -322,6 +322,57 @@ export default function SuccessConfirmationPage() {
           </ul>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/confirmation-dialog/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nielsen Norman Group: Confirmation Dialog Design Best Practices
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/feedback-forms/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nielsen Norman Group: Feedback and Confirmation Patterns
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/toast"
+              className="text-primary hover:underline"
+            >
+              Toast Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/alert"
+              className="text-primary hover:underline"
+            >
+              Alert Component Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="/components/modal"
+              className="text-primary hover:underline"
+            >
+              Modal Component Documentation
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

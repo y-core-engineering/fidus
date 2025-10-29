@@ -662,6 +662,63 @@ function useTransactionSearch(query: string, filters: Filters) {
           </div>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <Link href="/components/input" className="text-blue-600 hover:underline">
+              TextInput Component
+            </Link>
+          </li>
+          <li>
+            <Link href="/components/chip" className="text-blue-600 hover:underline">
+              Chip Component
+            </Link>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/search-visible-and-simple/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Search Visibility
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/filters-vs-facets/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Filters vs Facets
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              WCAG 2.1: Status Messages
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/ai-search/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: AI-Powered Search
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

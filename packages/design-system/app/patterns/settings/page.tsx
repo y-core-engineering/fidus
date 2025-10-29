@@ -801,6 +801,68 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <Link href="/components/toggle-switch" className="text-blue-600 hover:underline">
+              ToggleSwitch Component
+            </Link>
+          </li>
+          <li>
+            <Link href="/components/select" className="text-blue-600 hover:underline">
+              Select Component
+            </Link>
+          </li>
+          <li>
+            <Link href="/foundations/privacy-ux" className="text-blue-600 hover:underline">
+              Privacy UX Guidelines
+            </Link>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/settings-design/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Settings Design
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/privacy-ux/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Privacy UX
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/error-prevention-legal-financial-data.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              WCAG 2.1: Error Prevention
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://gdpr.eu/right-to-be-forgotten/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              GDPR: Right to Erasure
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }

@@ -635,6 +635,68 @@ function useOpportunityUpdates() {
           </div>
         </div>
       </section>
+
+      {/* Resources */}
+      <section className="space-y-4">
+        <h2 className="mb-4 text-2xl font-semibold">Resources</h2>
+        <ul className="space-y-2">
+          <li>
+            <Link href="/components/card" className="text-blue-600 hover:underline">
+              Card Component
+            </Link>
+          </li>
+          <li>
+            <Link href="/components/badge" className="text-blue-600 hover:underline">
+              Badge Component
+            </Link>
+          </li>
+          <li>
+            <Link href="/foundations/ai-driven-ui" className="text-blue-600 hover:underline">
+              AI-Driven UI Paradigm
+            </Link>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/notification-design/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Notification Design
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/ai-transparency/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: AI Transparency
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              WCAG 2.1: Status Messages
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.nngroup.com/articles/contextual-content/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Nielsen Norman Group: Contextual Content
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }
