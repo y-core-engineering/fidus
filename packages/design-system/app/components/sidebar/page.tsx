@@ -5,8 +5,12 @@ import {
   SidebarRoot,
   SidebarSection,
   SidebarItem,
+  Button,
+  Link,
+  Stack,
 } from '@fidus/ui';
-import { Button } from '@fidus/ui';
+import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';
 import {
   Home,
@@ -97,435 +101,553 @@ export default function SidebarPage() {
     },
   ];
 
+  const sidebarProps = [
+    {
+      name: 'sections',
+      type: 'SidebarSection[]',
+      description: 'Array of sections with grouped items',
+    },
+    {
+      name: 'items',
+      type: 'SidebarItem[]',
+      description: 'Array of items (alternative to sections)',
+    },
+    {
+      name: 'collapsed',
+      type: 'boolean',
+      default: 'false',
+      description: 'Whether sidebar is collapsed (shows icons only)',
+    },
+    {
+      name: 'onCollapse',
+      type: '(collapsed: boolean) => void',
+      description: 'Callback when collapse state changes',
+    },
+    {
+      name: 'position',
+      type: "'left' | 'right'",
+      default: "'left'",
+      description: 'Sidebar position',
+    },
+    {
+      name: 'width',
+      type: "'sm' | 'md' | 'lg'",
+      default: "'md'",
+      description: 'Width of expanded sidebar',
+    },
+    {
+      name: 'className',
+      type: 'string',
+      description: 'Additional CSS classes',
+    },
+  ];
+
+  const sidebarItemProps = [
+    {
+      name: 'id',
+      type: 'string',
+      required: true,
+      description: 'Unique identifier for the item',
+    },
+    {
+      name: 'label',
+      type: 'string',
+      required: true,
+      description: 'Display text for the item',
+    },
+    {
+      name: 'href',
+      type: 'string',
+      description: 'Link destination (omit for parent items)',
+    },
+    {
+      name: 'icon',
+      type: 'ReactNode',
+      description: 'Icon to display before label',
+    },
+    {
+      name: 'active',
+      type: 'boolean',
+      description: 'Whether this is the current page',
+    },
+    {
+      name: 'children',
+      type: 'SidebarItem[]',
+      description: 'Nested child items',
+    },
+  ];
+
+  const sidebarSectionProps = [
+    {
+      name: 'id',
+      type: 'string',
+      required: true,
+      description: 'Unique identifier for the section',
+    },
+    {
+      name: 'title',
+      type: 'string',
+      description: 'Section header title',
+    },
+    {
+      name: 'items',
+      type: 'SidebarItem[]',
+      required: true,
+      description: 'Items in this section',
+    },
+    {
+      name: 'collapsible',
+      type: 'boolean',
+      description: 'Whether section can be collapsed',
+    },
+    {
+      name: 'defaultCollapsed',
+      type: 'boolean',
+      description: 'Whether section starts collapsed',
+    },
+  ];
+
   return (
-    <div className="mx-auto max-w-6xl space-y-12 px-4 py-8">
-      <div>
-        <h1 className="mb-2 text-4xl font-bold">Sidebar</h1>
-        <p className="text-lg text-muted-foreground">
-          Navigation sidebar component with support for nested items, collapsible sections, icons, and collapsed state. Ideal for application layouts.
-        </p>
-      </div>
+    <div className="prose prose-neutral dark:prose-invert max-w-none">
+      <h1>Sidebar</h1>
+      <p className="lead">
+        Navigation sidebar component with support for nested items, collapsible sections, icons, and collapsed state. Ideal for application layouts.
+      </p>
 
-      {/* Import Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Import</h2>
-          <div className="rounded-lg border border-border bg-muted p-4">
-            <pre className="text-sm">
-              <code>{`import { Sidebar, SidebarRoot, SidebarSection, SidebarItem } from '@fidus/ui';
-
-// Simple usage with items array
-<Sidebar items={items} />
-
-// With sections for organization
-<Sidebar sections={sections} />
-
-// Composable API for full control
-<SidebarRoot>
-  <SidebarSection section={section} renderItem={renderItem} />
-</SidebarRoot>`}</code>
-            </pre>
+      <h2>Basic Sidebar</h2>
+      <ComponentPreview
+        code={`<Sidebar items={[
+  { id: 'home', label: 'Home', href: '/', icon: <Home />, active: true },
+  { id: 'users', label: 'Users', href: '/users', icon: <Users /> },
+  { id: 'documents', label: 'Documents', href: '/documents', icon: <FileText /> },
+  { id: 'settings', label: 'Settings', href: '/settings', icon: <Settings /> },
+]} />`}
+      >
+        <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '400px' }}>
+          <Sidebar items={basicItems} />
+          <div className="flex-1 p-lg">
+            <h3 className="text-lg font-semibold">Main Content Area</h3>
+            <p className="mt-sm text-sm text-muted-foreground">
+              Content appears here alongside the sidebar navigation.
+            </p>
           </div>
         </div>
-      </section>
+      </ComponentPreview>
 
-      {/* Basic Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Basic Sidebar</h2>
+      <h2>With Sections</h2>
+      <ComponentPreview
+        code={`<Sidebar sections={[
+  {
+    id: 'main',
+    title: 'Main Menu',
+    items: [
+      { id: 'home', label: 'Home', href: '/', icon: <Home />, active: true },
+      { id: 'calendar', label: 'Calendar', href: '/calendar', icon: <Calendar /> },
+    ],
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics',
+    collapsible: true,
+    items: [
+      { id: 'reports', label: 'Reports', href: '/reports', icon: <BarChart /> },
+    ],
+  },
+]} />`}
+      >
+        <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '500px' }}>
+          <Sidebar sections={sections} />
+          <div className="flex-1 p-lg">
+            <h3 className="text-lg font-semibold">Organized Navigation</h3>
+            <p className="mt-sm text-sm text-muted-foreground">
+              Sections group related navigation items. Some sections are collapsible and can start collapsed.
+            </p>
+          </div>
+        </div>
+      </ComponentPreview>
+
+      <h2>Nested Navigation</h2>
+      <ComponentPreview
+        code={`<Sidebar items={[
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: <Home />,
+    active: true,
+    children: [
+      { id: 'overview', label: 'Overview', href: '/dashboard/overview' },
+      { id: 'analytics', label: 'Analytics', href: '/dashboard/analytics' },
+    ],
+  },
+  {
+    id: 'products',
+    label: 'Products',
+    icon: <Package />,
+    children: [
+      { id: 'all-products', label: 'All Products', href: '/products' },
+      { id: 'add-product', label: 'Add Product', href: '/products/add' },
+    ],
+  },
+]} />`}
+      >
+        <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '500px' }}>
+          <Sidebar items={nestedItems} />
+          <div className="flex-1 p-lg">
+            <h3 className="text-lg font-semibold">Hierarchical Navigation</h3>
+            <p className="mt-sm text-sm text-muted-foreground">
+              Click parent items to expand/collapse nested children. Great for complex navigation structures.
+            </p>
+          </div>
+        </div>
+      </ComponentPreview>
+
+      <h2>Collapsed State</h2>
+      <ComponentPreview
+        code={`const [collapsed, setCollapsed] = useState(false);
+
+<Button onClick={() => setCollapsed(!collapsed)}>
+  {collapsed ? 'Expand' : 'Collapse'} Sidebar
+</Button>
+
+<Sidebar items={items} collapsed={collapsed} />`}
+      >
+        <div className="space-y-md">
+          <Stack direction="horizontal" spacing="md" align="center">
+            <Button onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? 'Expand' : 'Collapse'} Sidebar
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {collapsed ? 'Collapsed (w-16)' : 'Expanded (w-70)'}
+            </span>
+          </Stack>
           <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '400px' }}>
-            <Sidebar items={basicItems} />
-            <div className="flex-1 p-6">
-              <h3 className="text-lg font-semibold">Main Content Area</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Content appears here alongside the sidebar navigation.
+            <Sidebar items={basicItems} collapsed={collapsed} />
+            <div className="flex-1 p-lg">
+              <h3 className="text-lg font-semibold">Responsive Sidebar</h3>
+              <p className="mt-sm text-sm text-muted-foreground">
+                Collapsed sidebar shows only icons. Hover over icons to see tooltips with labels.
               </p>
             </div>
           </div>
         </div>
-      </section>
+      </ComponentPreview>
 
-      {/* With Sections */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">With Sections</h2>
-          <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '500px' }}>
-            <Sidebar sections={sections} />
-            <div className="flex-1 p-6">
-              <h3 className="text-lg font-semibold">Organized Navigation</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Sections group related navigation items. Some sections are collapsible and can start collapsed.
-              </p>
+      <h2>Width Variants</h2>
+      <ComponentPreview
+        code={`<Sidebar items={items} width="sm" />  // w-60
+<Sidebar items={items} width="md" />  // w-70 (default)
+<Sidebar items={items} width="lg" />  // w-80`}
+      >
+        <div className="space-y-lg">
+          <div>
+            <h3 className="mb-sm text-sm font-semibold text-muted-foreground">Small (w-60)</h3>
+            <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '300px' }}>
+              <Sidebar items={basicItems} width="sm" />
+              <div className="flex-1 p-md text-sm text-muted-foreground">Content area</div>
+            </div>
+          </div>
+          <div>
+            <h3 className="mb-sm text-sm font-semibold text-muted-foreground">Medium (w-70, Default)</h3>
+            <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '300px' }}>
+              <Sidebar items={basicItems} width="md" />
+              <div className="flex-1 p-md text-sm text-muted-foreground">Content area</div>
+            </div>
+          </div>
+          <div>
+            <h3 className="mb-sm text-sm font-semibold text-muted-foreground">Large (w-80)</h3>
+            <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '300px' }}>
+              <Sidebar items={basicItems} width="lg" />
+              <div className="flex-1 p-md text-sm text-muted-foreground">Content area</div>
             </div>
           </div>
         </div>
-      </section>
+      </ComponentPreview>
 
-      {/* Nested Items */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Nested Navigation</h2>
-          <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '500px' }}>
-            <Sidebar items={nestedItems} />
-            <div className="flex-1 p-6">
-              <h3 className="text-lg font-semibold">Hierarchical Navigation</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Click parent items to expand/collapse nested children. Great for complex navigation structures.
-              </p>
-            </div>
+      <h2>Right Position</h2>
+      <ComponentPreview
+        code={`<Sidebar items={items} position="right" />`}
+      >
+        <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '400px' }}>
+          <div className="flex-1 p-lg">
+            <h3 className="text-lg font-semibold">Main Content</h3>
+            <p className="mt-sm text-sm text-muted-foreground">
+              Sidebar can be positioned on the right side. Border appears on the left instead of right.
+            </p>
           </div>
+          <Sidebar items={basicItems} position="right" />
         </div>
-      </section>
+      </ComponentPreview>
 
-      {/* Collapsed State */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Collapsed State</h2>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Button onClick={() => setCollapsed(!collapsed)}>
-                {collapsed ? 'Expand' : 'Collapse'} Sidebar
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                {collapsed ? 'Collapsed (w-16)' : 'Expanded (w-70)'}
-              </span>
-            </div>
-            <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '400px' }}>
-              <Sidebar items={basicItems} collapsed={collapsed} />
-              <div className="flex-1 p-6">
-                <h3 className="text-lg font-semibold">Responsive Sidebar</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Collapsed sidebar shows only icons. Hover over icons to see tooltips with labels.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <h2>Props</h2>
+      <h3 className="text-lg font-semibold mb-md">Sidebar</h3>
+      <PropsTable props={sidebarProps} />
 
-      {/* Width Variants */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Width Variants</h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Small (w-60)</h3>
-              <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '300px' }}>
-                <Sidebar items={basicItems} width="sm" />
-                <div className="flex-1 p-4 text-sm text-muted-foreground">Content area</div>
-              </div>
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Medium (w-70, Default)</h3>
-              <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '300px' }}>
-                <Sidebar items={basicItems} width="md" />
-                <div className="flex-1 p-4 text-sm text-muted-foreground">Content area</div>
-              </div>
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Large (w-80)</h3>
-              <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '300px' }}>
-                <Sidebar items={basicItems} width="lg" />
-                <div className="flex-1 p-4 text-sm text-muted-foreground">Content area</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <h3 className="text-lg font-semibold mb-md mt-lg">SidebarItem Type</h3>
+      <PropsTable props={sidebarItemProps} />
 
-      {/* Position Right */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Right Position</h2>
-          <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '400px' }}>
-            <div className="flex-1 p-6">
-              <h3 className="text-lg font-semibold">Main Content</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Sidebar can be positioned on the right side. Border appears on the left instead of right.
-              </p>
-            </div>
-            <Sidebar items={basicItems} position="right" />
-          </div>
-        </div>
-      </section>
+      <h3 className="text-lg font-semibold mb-md mt-lg">SidebarSection Type</h3>
+      <PropsTable props={sidebarSectionProps} />
 
-      {/* E-commerce Example */}
-      <section className="space-y-4">
+      <h2>Usage Guidelines</h2>
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">E-commerce Dashboard Example</h2>
-          <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '600px' }}>
-            <Sidebar
-              sections={[
-                {
-                  id: 'overview',
-                  title: 'Overview',
-                  items: [
-                    { id: 'dashboard', label: 'Dashboard', href: '/', icon: <Home className="h-4 w-4" />, active: true },
-                    { id: 'analytics', label: 'Analytics', href: '/analytics', icon: <BarChart className="h-4 w-4" /> },
-                  ],
-                },
-                {
-                  id: 'sales',
-                  title: 'Sales',
-                  collapsible: true,
-                  items: [
-                    { id: 'orders', label: 'Orders', href: '/orders', icon: <ShoppingCart className="h-4 w-4" /> },
-                    { id: 'products', label: 'Products', href: '/products', icon: <Package className="h-4 w-4" /> },
-                    { id: 'customers', label: 'Customers', href: '/customers', icon: <Users className="h-4 w-4" /> },
-                  ],
-                },
-                {
-                  id: 'operations',
-                  title: 'Operations',
-                  collapsible: true,
-                  items: [
-                    { id: 'inventory', label: 'Inventory', href: '/inventory', icon: <Package className="h-4 w-4" /> },
-                    { id: 'shipping', label: 'Shipping', href: '/shipping', icon: <Truck className="h-4 w-4" /> },
-                    { id: 'pricing', label: 'Pricing', href: '/pricing', icon: <Tag className="h-4 w-4" /> },
-                  ],
-                },
-                {
-                  id: 'finance',
-                  title: 'Finance',
-                  collapsible: true,
-                  defaultCollapsed: true,
-                  items: [
-                    { id: 'revenue', label: 'Revenue', href: '/revenue', icon: <DollarSign className="h-4 w-4" /> },
-                    { id: 'expenses', label: 'Expenses', href: '/expenses', icon: <DollarSign className="h-4 w-4" /> },
-                  ],
-                },
-              ]}
-            />
-            <div className="flex-1 p-6">
-              <h3 className="text-lg font-semibold">Dashboard</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Complex e-commerce navigation with multiple collapsible sections and various menu items.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Props Table - Sidebar */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Props - Sidebar (Convenience Wrapper)</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-2 text-left font-semibold">Prop</th>
-                  <th className="p-2 text-left font-semibold">Type</th>
-                  <th className="p-2 text-left font-semibold">Default</th>
-                  <th className="p-2 text-left font-semibold">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">sections</td>
-                  <td className="p-2 font-mono text-xs">SidebarSection[]</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Array of sections with grouped items</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">items</td>
-                  <td className="p-2 font-mono text-xs">SidebarItem[]</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Array of items (alternative to sections)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">collapsed</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">false</td>
-                  <td className="p-2">Whether sidebar is collapsed (shows icons only)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">onCollapse</td>
-                  <td className="p-2 font-mono text-xs">(collapsed: boolean) =&gt; void</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Callback when collapse state changes</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">position</td>
-                  <td className="p-2 font-mono text-xs">'left' | 'right'</td>
-                  <td className="p-2 font-mono text-xs">'left'</td>
-                  <td className="p-2">Sidebar position</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">width</td>
-                  <td className="p-2 font-mono text-xs">'sm' | 'md' | 'lg'</td>
-                  <td className="p-2 font-mono text-xs">'md'</td>
-                  <td className="p-2">Width of expanded sidebar</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">className</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Additional CSS classes</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* SidebarItem Type */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">SidebarItem Type</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-2 text-left font-semibold">Property</th>
-                  <th className="p-2 text-left font-semibold">Type</th>
-                  <th className="p-2 text-left font-semibold">Required</th>
-                  <th className="p-2 text-left font-semibold">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">id</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 font-mono text-xs">Yes</td>
-                  <td className="p-2">Unique identifier for the item</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">label</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 font-mono text-xs">Yes</td>
-                  <td className="p-2">Display text for the item</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">href</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Link destination (omit for parent items)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">icon</td>
-                  <td className="p-2 font-mono text-xs">ReactNode</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Icon to display before label</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">active</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Whether this is the current page</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">children</td>
-                  <td className="p-2 font-mono text-xs">SidebarItem[]</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Nested child items</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* SidebarSection Type */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">SidebarSection Type</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-2 text-left font-semibold">Property</th>
-                  <th className="p-2 text-left font-semibold">Type</th>
-                  <th className="p-2 text-left font-semibold">Required</th>
-                  <th className="p-2 text-left font-semibold">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">id</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 font-mono text-xs">Yes</td>
-                  <td className="p-2">Unique identifier for the section</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">title</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Section header title</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">items</td>
-                  <td className="p-2 font-mono text-xs">SidebarItem[]</td>
-                  <td className="p-2 font-mono text-xs">Yes</td>
-                  <td className="p-2">Items in this section</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">collapsible</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Whether section can be collapsed</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">defaultCollapsed</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">No</td>
-                  <td className="p-2">Whether section starts collapsed</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Accessibility */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Accessibility</h2>
-          <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-            <li>ARIA role: navigation with aria-label</li>
-            <li>Semantic HTML: Uses aside and nav elements</li>
-            <li>Current page: Marked with aria-current="page"</li>
-            <li>Keyboard accessible: Tab and arrow key navigation</li>
-            <li>Focus indicators: Visible focus rings on all interactive elements</li>
-            <li>Collapsed state: Icons include title attribute for tooltips</li>
-            <li>Collapsible sections: Proper button semantics and expand/collapse icons</li>
-            <li>Nested navigation: Proper hierarchy and indentation</li>
+          <h3 className="text-lg font-semibold mb-md">When to use</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For primary navigation in web applications</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When you have multiple navigation items that need persistent visibility</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For hierarchical navigation with parent/child relationships</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>In dashboard layouts where navigation needs to be always accessible</span>
+            </li>
           </ul>
         </div>
-      </section>
 
-      {/* Usage Notes */}
-      <section className="space-y-4">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Usage Notes</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-muted p-6">
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Layout Integration</h3>
-              <p className="text-sm text-muted-foreground">
-                Use Sidebar with a flex layout. The sidebar is a fixed-width aside element, and your main content should be flex-1.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Nested Navigation</h3>
-              <p className="text-sm text-muted-foreground">
-                Items with children are expandable. Clicking them toggles the nested items. Nested items have increased left padding for visual hierarchy.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Collapsed State</h3>
-              <p className="text-sm text-muted-foreground">
-                In collapsed state (width: 64px), only icons are visible. Labels are hidden but available as tooltips via title attribute.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Section Organization</h3>
-              <p className="text-sm text-muted-foreground">
-                Use sections to group related navigation items. Sections can be collapsible for better space management in complex navigation structures.
-              </p>
-            </div>
+          <h3 className="text-lg font-semibold mb-md">Best practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use icons consistently across all navigation items</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Keep navigation item labels short and descriptive</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Group related items into sections for better organization</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Mark the current page with the active state</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Limit nesting to 2 levels to maintain simplicity</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use collapsed state on smaller screens to save space</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>ARIA role: navigation with aria-label</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Semantic HTML: Uses aside and nav elements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Current page: Marked with aria-current="page"</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Keyboard accessible: Tab and arrow key navigation</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Focus indicators: Visible focus rings on all interactive elements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Collapsed state: Icons include title attribute for tooltips</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="mt-2xl">Do's and Don'ts</h2>
+
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        {/* Do's */}
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Group related navigation items into sections</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use icons to help users quickly identify menu items</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Highlight the current page with the active state</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Keep navigation labels concise and clear</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Provide a collapsed state for responsive layouts</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-success/10 rounded-md">
+            <ComponentPreview
+              code={`<Sidebar sections={[
+  {
+    id: 'main',
+    title: 'Main',
+    items: [
+      { id: 'home', label: 'Home', href: '/', icon: <Home />, active: true },
+      { id: 'users', label: 'Users', href: '/users', icon: <Users /> },
+    ],
+  },
+]} />`}
+            >
+              <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '200px' }}>
+                <Sidebar
+                  sections={[
+                    {
+                      id: 'main',
+                      title: 'Main',
+                      items: [
+                        { id: 'home', label: 'Home', href: '/', icon: <Home className="h-4 w-4" />, active: true },
+                        { id: 'users', label: 'Users', href: '/users', icon: <Users className="h-4 w-4" /> },
+                      ],
+                    },
+                  ]}
+                />
+                <div className="flex-1 p-md text-sm text-muted-foreground">Content</div>
+              </div>
+            </ComponentPreview>
           </div>
         </div>
-      </section>
+
+        {/* Don'ts */}
+        <div className="border-2 border-error bg-error/10 rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don't
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use long navigation labels that get truncated</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't nest navigation more than 2 levels deep</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't mix items with icons and items without icons</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't forget to mark the current page as active</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use sidebar for temporary or contextual navigation</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-error/20 rounded-md">
+            <ComponentPreview
+              code={`<Sidebar items={[
+  { id: 'long', label: 'Very Long Navigation Item Label That Gets Cut Off', href: '/' },
+  { id: 'home', label: 'Home', icon: <Home /> }, // Mixed: one has icon, one doesn't
+]} />`}
+            >
+              <div className="flex rounded-lg border border-border bg-card overflow-hidden" style={{ height: '200px' }}>
+                <Sidebar
+                  items={[
+                    { id: 'long', label: 'Very Long Navigation Item Label That Gets Cut Off', href: '/' },
+                    { id: 'home', label: 'Home', href: '/home', icon: <Home className="h-4 w-4" /> },
+                  ]}
+                />
+                <div className="flex-1 p-md text-sm text-muted-foreground">Content</div>
+              </div>
+            </ComponentPreview>
+          </div>
+        </div>
+      </div>
+
+      <h2>Related Components</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/components/tabs"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Tabs</h3>
+          <p className="text-sm text-muted-foreground">For secondary navigation within a page</p>
+        </Link>
+        <Link
+          href="/components/breadcrumb"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Breadcrumb</h3>
+          <p className="text-sm text-muted-foreground">Show current location in hierarchy</p>
+        </Link>
+        <Link
+          href="/components/link"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Link</h3>
+          <p className="text-sm text-muted-foreground">For standalone navigation links</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/ui/src/components/sidebar/sidebar.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/"
+              external
+              showIcon
+            >
+              ARIA: Disclosure (Collapsible Sections) Pattern
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/tutorials/menus/"
+              external
+              showIcon
+            >
+              W3C: Menu Structure Tutorial
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

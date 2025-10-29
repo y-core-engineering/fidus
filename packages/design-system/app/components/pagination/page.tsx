@@ -1,6 +1,8 @@
 'use client';
 
-import { Pagination } from '@fidus/ui';
+import { Pagination, Link, Stack } from '@fidus/ui';
+import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';
 
 export default function PaginationPage() {
@@ -10,362 +12,506 @@ export default function PaginationPage() {
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const props = [
+    {
+      name: 'currentPage',
+      type: 'number',
+      required: true,
+      description: 'Current active page (min: 1)',
+    },
+    {
+      name: 'totalPages',
+      type: 'number',
+      required: true,
+      description: 'Total number of pages (min: 1)',
+    },
+    {
+      name: 'onPageChange',
+      type: '(page: number) => void',
+      required: true,
+      description: 'Callback when page changes',
+    },
+    {
+      name: 'showFirstLast',
+      type: 'boolean',
+      default: 'true',
+      description: 'Whether to show first/last page buttons',
+    },
+    {
+      name: 'size',
+      type: "'sm' | 'md' | 'lg'",
+      default: "'md'",
+      description: 'Size of pagination controls',
+    },
+    {
+      name: 'variant',
+      type: "'default' | 'outlined'",
+      default: "'default'",
+      description: 'Visual style of pagination',
+    },
+    {
+      name: 'pageSize',
+      type: 'number',
+      description: 'Current page size (enables page size selector)',
+    },
+    {
+      name: 'pageSizeOptions',
+      type: 'number[]',
+      default: '[10, 20, 50, 100]',
+      description: 'Available page size options',
+    },
+    {
+      name: 'onPageSizeChange',
+      type: '(size: number) => void',
+      description: 'Callback when page size changes',
+    },
+    {
+      name: 'className',
+      type: 'string',
+      description: 'Additional CSS classes',
+    },
+  ];
+
   return (
-    <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
-      <div>
-        <h1 className="mb-2 text-4xl font-bold">Pagination</h1>
-        <p className="text-lg text-muted-foreground">
-          Navigation component for splitting content across multiple pages, with support for page size selection and keyboard navigation.
-        </p>
-      </div>
+    <div className="prose prose-neutral dark:prose-invert max-w-none">
+      <h1>Pagination</h1>
+      <p className="lead">
+        Navigation component for splitting content across multiple pages, with support for page size selection and keyboard navigation.
+      </p>
 
-      {/* Import Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Import</h2>
-          <div className="rounded-lg border border-border bg-muted p-4">
-            <pre className="text-sm">
-              <code>{`import { Pagination } from '@fidus/ui';
-
-const [currentPage, setCurrentPage] = useState(1);
+      <h2>Basic Usage</h2>
+      <ComponentPreview
+        code={`const [currentPage, setCurrentPage] = useState(1);
 
 <Pagination
   currentPage={currentPage}
   totalPages={10}
   onPageChange={setCurrentPage}
-/>`}</code>
-            </pre>
+/>`}
+      >
+        <div className="space-y-md">
+          <div className="text-center text-sm text-muted-foreground">
+            Current page: {basicPage} of 10
           </div>
+          <Pagination
+            currentPage={basicPage}
+            totalPages={10}
+            onPageChange={setBasicPage}
+          />
         </div>
-      </section>
+      </ComponentPreview>
 
-      {/* Basic Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Basic Pagination</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-card p-6">
-            <div className="text-center text-sm text-muted-foreground">
-              Current page: {basicPage} of 10
-            </div>
+      <h2>Variants</h2>
+      <ComponentPreview code={`<Pagination variant="default" currentPage={1} totalPages={10} onPageChange={setPage} />`}>
+        <Stack direction="vertical" spacing="lg">
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Default</h3>
             <Pagination
               currentPage={basicPage}
               totalPages={10}
               onPageChange={setBasicPage}
+              variant="default"
             />
           </div>
-        </div>
-      </section>
-
-      {/* Variants */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Variants</h2>
-          <div className="space-y-8 rounded-lg border border-border bg-card p-6">
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Default</h3>
-              <Pagination
-                currentPage={basicPage}
-                totalPages={10}
-                onPageChange={setBasicPage}
-                variant="default"
-              />
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Outlined</h3>
-              <Pagination
-                currentPage={outlinedPage}
-                totalPages={10}
-                onPageChange={setOutlinedPage}
-                variant="outlined"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sizes */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Sizes</h2>
-          <div className="space-y-8 rounded-lg border border-border bg-card p-6">
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Small</h3>
-              <Pagination
-                currentPage={basicPage}
-                totalPages={10}
-                onPageChange={setBasicPage}
-                size="sm"
-              />
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Medium (Default)</h3>
-              <Pagination
-                currentPage={basicPage}
-                totalPages={10}
-                onPageChange={setBasicPage}
-                size="md"
-              />
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Large</h3>
-              <Pagination
-                currentPage={basicPage}
-                totalPages={10}
-                onPageChange={setBasicPage}
-                size="lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Without First/Last */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Without First/Last Buttons</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-card p-6">
-            <div className="text-center text-sm text-muted-foreground">
-              Current page: {withoutFirstLastPage} of 20
-            </div>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Outlined</h3>
             <Pagination
-              currentPage={withoutFirstLastPage}
-              totalPages={20}
-              onPageChange={setWithoutFirstLastPage}
-              showFirstLast={false}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* With Page Size Selector */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">With Page Size Selector</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-card p-6">
-            <div className="text-center text-sm text-muted-foreground">
-              Showing page {currentPage} of 15 with {pageSize} items per page
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={15}
-              onPageChange={setCurrentPage}
-              pageSize={pageSize}
-              pageSizeOptions={[10, 20, 50, 100]}
-              onPageSizeChange={(newSize) => {
-                setPageSize(newSize);
-                setCurrentPage(1); // Reset to first page when page size changes
-              }}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Different Page Counts */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Different Total Pages</h2>
-          <div className="space-y-8 rounded-lg border border-border bg-card p-6">
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Few pages (5 total)</h3>
-              <p className="mb-2 text-xs text-muted-foreground">Shows all page numbers when total is 7 or less</p>
-              <Pagination
-                currentPage={1}
-                totalPages={5}
-                onPageChange={(page) => console.log('Page:', page)}
-              />
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Many pages (50 total, page 1)</h3>
-              <p className="mb-2 text-xs text-muted-foreground">Shows ellipsis when needed</p>
-              <Pagination
-                currentPage={1}
-                totalPages={50}
-                onPageChange={(page) => console.log('Page:', page)}
-              />
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Many pages (50 total, page 25)</h3>
-              <p className="mb-2 text-xs text-muted-foreground">Shows current page in middle with ellipsis on both sides</p>
-              <Pagination
-                currentPage={25}
-                totalPages={50}
-                onPageChange={(page) => console.log('Page:', page)}
-              />
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Many pages (50 total, page 48)</h3>
-              <p className="mb-2 text-xs text-muted-foreground">Shows last pages when near the end</p>
-              <Pagination
-                currentPage={48}
-                totalPages={50}
-                onPageChange={(page) => console.log('Page:', page)}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Combined Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Complete Example</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-card p-6">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Page {currentPage} of 15 ({pageSize} items per page)
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Showing items {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, 300)} of 300 total
-              </p>
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={15}
-              onPageChange={setCurrentPage}
-              pageSize={pageSize}
-              pageSizeOptions={[10, 20, 50, 100]}
-              onPageSizeChange={(newSize) => {
-                setPageSize(newSize);
-                setCurrentPage(1);
-              }}
+              currentPage={outlinedPage}
+              totalPages={10}
+              onPageChange={setOutlinedPage}
               variant="outlined"
+            />
+          </div>
+        </Stack>
+      </ComponentPreview>
+
+      <h2>Sizes</h2>
+      <ComponentPreview
+        code={`<Stack direction="vertical" spacing="lg">
+  <Pagination size="sm" currentPage={1} totalPages={10} onPageChange={setPage} />
+  <Pagination size="md" currentPage={1} totalPages={10} onPageChange={setPage} />
+  <Pagination size="lg" currentPage={1} totalPages={10} onPageChange={setPage} />
+</Stack>`}
+      >
+        <Stack direction="vertical" spacing="lg">
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Small</h3>
+            <Pagination
+              currentPage={basicPage}
+              totalPages={10}
+              onPageChange={setBasicPage}
+              size="sm"
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Medium (Default)</h3>
+            <Pagination
+              currentPage={basicPage}
+              totalPages={10}
+              onPageChange={setBasicPage}
               size="md"
             />
           </div>
-        </div>
-      </section>
-
-      {/* Props Table */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Props</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-2 text-left font-semibold">Prop</th>
-                  <th className="p-2 text-left font-semibold">Type</th>
-                  <th className="p-2 text-left font-semibold">Default</th>
-                  <th className="p-2 text-left font-semibold">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">currentPage</td>
-                  <td className="p-2 font-mono text-xs">number</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Current active page (required, min: 1)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">totalPages</td>
-                  <td className="p-2 font-mono text-xs">number</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Total number of pages (required, min: 1)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">onPageChange</td>
-                  <td className="p-2 font-mono text-xs">(page: number) =&gt; void</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Callback when page changes (required)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">showFirstLast</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">true</td>
-                  <td className="p-2">Whether to show first/last page buttons</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">size</td>
-                  <td className="p-2 font-mono text-xs">'sm' | 'md' | 'lg'</td>
-                  <td className="p-2 font-mono text-xs">'md'</td>
-                  <td className="p-2">Size of pagination controls</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">variant</td>
-                  <td className="p-2 font-mono text-xs">'default' | 'outlined'</td>
-                  <td className="p-2 font-mono text-xs">'default'</td>
-                  <td className="p-2">Visual style of pagination</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">pageSize</td>
-                  <td className="p-2 font-mono text-xs">number</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Current page size (enables page size selector)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">pageSizeOptions</td>
-                  <td className="p-2 font-mono text-xs">number[]</td>
-                  <td className="p-2 font-mono text-xs">[10, 20, 50, 100]</td>
-                  <td className="p-2">Available page size options</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">onPageSizeChange</td>
-                  <td className="p-2 font-mono text-xs">(size: number) =&gt; void</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Callback when page size changes</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">className</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Additional CSS classes</td>
-                </tr>
-              </tbody>
-            </table>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Large</h3>
+            <Pagination
+              currentPage={basicPage}
+              totalPages={10}
+              onPageChange={setBasicPage}
+              size="lg"
+            />
           </div>
-        </div>
-      </section>
+        </Stack>
+      </ComponentPreview>
 
-      {/* Accessibility */}
-      <section className="space-y-4">
+      <h2>Without First/Last Buttons</h2>
+      <ComponentPreview
+        code={`<Pagination
+  currentPage={5}
+  totalPages={20}
+  onPageChange={setPage}
+  showFirstLast={false}
+/>`}
+      >
+        <div className="space-y-md">
+          <div className="text-center text-sm text-muted-foreground">
+            Current page: {withoutFirstLastPage} of 20
+          </div>
+          <Pagination
+            currentPage={withoutFirstLastPage}
+            totalPages={20}
+            onPageChange={setWithoutFirstLastPage}
+            showFirstLast={false}
+          />
+        </div>
+      </ComponentPreview>
+
+      <h2>With Page Size Selector</h2>
+      <ComponentPreview
+        code={`<Pagination
+  currentPage={currentPage}
+  totalPages={15}
+  onPageChange={setCurrentPage}
+  pageSize={pageSize}
+  pageSizeOptions={[10, 20, 50, 100]}
+  onPageSizeChange={(newSize) => {
+    setPageSize(newSize);
+    setCurrentPage(1);
+  }}
+/>`}
+      >
+        <div className="space-y-md">
+          <div className="text-center text-sm text-muted-foreground">
+            Showing page {currentPage} of 15 with {pageSize} items per page
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={15}
+            onPageChange={setCurrentPage}
+            pageSize={pageSize}
+            pageSizeOptions={[10, 20, 50, 100]}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+      </ComponentPreview>
+
+      <h2>Page Range Examples</h2>
+      <ComponentPreview
+        code={`// Shows all pages when total is 7 or less
+<Pagination currentPage={1} totalPages={5} onPageChange={setPage} />
+
+// Shows ellipsis for many pages
+<Pagination currentPage={25} totalPages={50} onPageChange={setPage} />`}
+      >
+        <Stack direction="vertical" spacing="lg">
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Few pages (5 total)</h3>
+            <p className="text-xs text-muted-foreground mb-sm">Shows all page numbers when total is 7 or less</p>
+            <Pagination
+              currentPage={1}
+              totalPages={5}
+              onPageChange={(page) => console.log('Page:', page)}
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Many pages (50 total, page 1)</h3>
+            <p className="text-xs text-muted-foreground mb-sm">Shows ellipsis when needed</p>
+            <Pagination
+              currentPage={1}
+              totalPages={50}
+              onPageChange={(page) => console.log('Page:', page)}
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Many pages (50 total, page 25)</h3>
+            <p className="text-xs text-muted-foreground mb-sm">Shows current page in middle with ellipsis on both sides</p>
+            <Pagination
+              currentPage={25}
+              totalPages={50}
+              onPageChange={(page) => console.log('Page:', page)}
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-sm">Many pages (50 total, page 48)</h3>
+            <p className="text-xs text-muted-foreground mb-sm">Shows last pages when near the end</p>
+            <Pagination
+              currentPage={48}
+              totalPages={50}
+              onPageChange={(page) => console.log('Page:', page)}
+            />
+          </div>
+        </Stack>
+      </ComponentPreview>
+
+      <h2>Props</h2>
+      <PropsTable props={props} />
+
+      <h2>Usage Guidelines</h2>
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Accessibility</h2>
-          <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-            <li>ARIA role: navigation with aria-label="pagination"</li>
-            <li>Current page: Marked with aria-current="page"</li>
-            <li>Keyboard accessible: Tab to navigate, Enter/Space to activate</li>
-            <li>Disabled states: Properly disabled when on first/last page</li>
-            <li>Clear labels: aria-label on all navigation buttons</li>
-            <li>Page size selector: Properly labeled with associated label element</li>
-            <li>Focus indicators: Visible focus rings on all interactive elements</li>
-            <li>Screen reader friendly: Descriptive labels for all controls</li>
+          <h3 className="text-lg font-semibold mb-md">When to use</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For large datasets that need to be split across multiple pages</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For tables with many rows that would be overwhelming on one page</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When users need to navigate between pages of content systematically</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For search results or list views with many items</span>
+            </li>
           </ul>
         </div>
-      </section>
 
-      {/* Usage Notes */}
-      <section className="space-y-4">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Usage Notes</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-muted p-6">
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Ellipsis Logic</h3>
-              <p className="text-sm text-muted-foreground">
-                When there are more than 7 pages, the component intelligently shows ellipsis:
-              </p>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                <li>Near start: [1, 2, 3, 4, ..., Last]</li>
-                <li>In middle: [1, ..., Current-1, Current, Current+1, ..., Last]</li>
-                <li>Near end: [1, ..., Last-3, Last-2, Last-1, Last]</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Page Size Changes</h3>
-              <p className="text-sm text-muted-foreground">
-                When page size changes, you typically want to reset to page 1 to avoid showing an empty page.
-                Remember to recalculate totalPages based on your total item count and new page size.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Responsive Design</h3>
-              <p className="text-sm text-muted-foreground">
-                The component uses flexbox with flex-col on mobile and flex-row on desktop (sm breakpoint).
-                Page size selector stacks below pagination on mobile for better usability.
-              </p>
-            </div>
+          <h3 className="text-lg font-semibold mb-md">Best practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Show total page count to help users understand the data size</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Reset to page 1 when page size changes to avoid empty pages</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Display item range (e.g., "Showing 21-40 of 100") for context</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use appropriate page size defaults (10-50 items) based on content type</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Consider infinite scroll for mobile or casual browsing experiences</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Disable navigation buttons when on first/last page to prevent confusion</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Navigation role with aria-label="pagination" for screen readers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Current page marked with aria-current="page"</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Keyboard accessible with Tab navigation and Enter/Space activation</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Clear aria-labels on all navigation buttons (First, Previous, Next, Last)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Visible focus indicators on all interactive elements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Page size selector properly labeled with associated label element</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="mt-2xl">Do's and Don'ts</h2>
+
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        {/* Do's */}
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Show item range and total count for context</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Reset to page 1 when changing page size</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use ellipsis (...) for large page ranges</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Provide reasonable page size options (10, 20, 50, 100)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Disable navigation when on first/last page</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-success/10 rounded-md">
+            <ComponentPreview
+              code={`<div className="space-y-md">
+  <div className="text-sm text-muted-foreground">
+    Showing 21-40 of 100 items
+  </div>
+  <Pagination
+    currentPage={2}
+    totalPages={5}
+    onPageChange={setPage}
+  />
+</div>`}
+            >
+              <div className="space-y-md">
+                <div className="text-sm text-muted-foreground">
+                  Showing 21-40 of 100 items
+                </div>
+                <Pagination
+                  currentPage={2}
+                  totalPages={5}
+                  onPageChange={(page) => console.log('Page:', page)}
+                />
+              </div>
+            </ComponentPreview>
           </div>
         </div>
-      </section>
+
+        {/* Don'ts */}
+        <div className="border-2 border-error bg-error/10 rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don't
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't show pagination without context (no item counts)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use pagination for small datasets (less than 20 items)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't show all page numbers when there are 50+ pages</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't forget to recalculate total pages when page size changes</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't enable navigation buttons when they have no action</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-error/20 rounded-md">
+            <ComponentPreview
+              code={`// No context - user doesn't know what they're paginating
+<Pagination
+  currentPage={2}
+  totalPages={5}
+  onPageChange={setPage}
+/>`}
+            >
+              <Pagination
+                currentPage={2}
+                totalPages={5}
+                onPageChange={(page) => console.log('Page:', page)}
+              />
+            </ComponentPreview>
+          </div>
+        </div>
+      </div>
+
+      <h2>Related Components</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/components/table"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Table</h3>
+          <p className="text-sm text-muted-foreground">Display tabular data with pagination</p>
+        </Link>
+        <Link
+          href="/components/select"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Select</h3>
+          <p className="text-sm text-muted-foreground">Used for page size selection</p>
+        </Link>
+        <Link
+          href="/components/button"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Button</h3>
+          <p className="text-sm text-muted-foreground">Navigation buttons in pagination</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/ui/src/components/pagination/pagination.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/ARIA/apg/patterns/link/"
+              external
+              showIcon
+            >
+              ARIA: Link Pattern
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

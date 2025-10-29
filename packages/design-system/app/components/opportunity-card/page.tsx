@@ -1,6 +1,6 @@
 'use client';
 
-import { OpportunityCard, Badge, Stack } from '@fidus/ui';
+import { OpportunityCard, Badge, Stack, Link } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { AlertCircle, DollarSign, Calendar, Plane } from 'lucide-react';
@@ -101,8 +101,10 @@ export default function OpportunityCardPage() {
   }}
   context="Month-end approaching, spending high"
 >
-  <p className="mb-2"><strong>Food: 475 EUR / 500 EUR</strong></p>
-  <p className="text-sm text-muted-foreground">3 days remaining in month</p>
+  <Stack spacing="sm">
+    <p><strong>Food: 475 EUR / 500 EUR</strong></p>
+    <p className="text-sm text-muted-foreground">3 days remaining in month</p>
+  </Stack>
 </OpportunityCard>`}
       >
         <OpportunityCard
@@ -121,8 +123,10 @@ export default function OpportunityCardPage() {
           }}
           context="Month-end approaching, spending high"
         >
-          <p className="mb-2"><strong>Food: 475 EUR / 500 EUR</strong></p>
-          <p className="text-sm text-muted-foreground">3 days remaining in month</p>
+          <Stack spacing="sm">
+            <p><strong>Food: 475 EUR / 500 EUR</strong></p>
+            <p className="text-sm text-muted-foreground">3 days remaining in month</p>
+          </Stack>
         </OpportunityCard>
       </ComponentPreview>
 
@@ -215,11 +219,13 @@ export default function OpportunityCardPage() {
   }}
   context="Both on Nov 4, overlap 30 minutes"
 >
-  <p className="mb-3">Double booking detected:</p>
-  <ul className="text-sm space-y-1">
-    <li>• Team Meeting: 2:00 PM - 3:00 PM</li>
-    <li>• Client Call: 2:30 PM - 3:30 PM</li>
-  </ul>
+  <Stack spacing="md">
+    <p>Double booking detected:</p>
+    <ul className="text-sm space-y-xs">
+      <li>• Team Meeting: 2:00 PM - 3:00 PM</li>
+      <li>• Client Call: 2:30 PM - 3:30 PM</li>
+    </ul>
+  </Stack>
 </OpportunityCard>`}
       >
         <OpportunityCard
@@ -238,11 +244,13 @@ export default function OpportunityCardPage() {
           }}
           context="Both on Nov 4, overlap 30 minutes"
         >
-          <p className="mb-3">Double booking detected:</p>
-          <ul className="text-sm space-y-1">
-            <li>• Team Meeting: 2:00 PM - 3:00 PM</li>
-            <li>• Client Call: 2:30 PM - 3:30 PM</li>
-          </ul>
+          <Stack spacing="md">
+            <p>Double booking detected:</p>
+            <ul className="text-sm space-y-xs">
+              <li>• Team Meeting: 2:00 PM - 3:00 PM</li>
+              <li>• Client Call: 2:30 PM - 3:30 PM</li>
+            </ul>
+          </Stack>
         </OpportunityCard>
       </ComponentPreview>
 
@@ -264,13 +272,17 @@ export default function OpportunityCardPage() {
   }}
   context="Less than 24 hours until departure"
 >
-  <p className="mb-3"><strong>Flight to Paris tomorrow</strong></p>
-  <p className="text-sm mb-2">Departure: Nov 10, 2:00 PM</p>
-  <p className="text-sm text-muted-foreground mb-3">Berlin (BER) → Paris (CDG)</p>
-  <div className="flex gap-2 text-sm">
-    <Badge variant="success">✓ Check-in complete</Badge>
-    <Badge variant="warning">⚠️ No hotel booking</Badge>
-  </div>
+  <Stack spacing="md">
+    <p><strong>Flight to Paris tomorrow</strong></p>
+    <Stack spacing="sm">
+      <p className="text-sm">Departure: Nov 10, 2:00 PM</p>
+      <p className="text-sm text-muted-foreground">Berlin (BER) → Paris (CDG)</p>
+    </Stack>
+    <Stack direction="horizontal" spacing="sm" className="text-sm">
+      <Badge variant="success">✓ Check-in complete</Badge>
+      <Badge variant="warning">⚠️ No hotel booking</Badge>
+    </Stack>
+  </Stack>
 </OpportunityCard>`}
       >
         <OpportunityCard
@@ -289,13 +301,17 @@ export default function OpportunityCardPage() {
           }}
           context="Less than 24 hours until departure"
         >
-          <p className="mb-3"><strong>Flight to Paris tomorrow</strong></p>
-          <p className="text-sm mb-2">Departure: Nov 10, 2:00 PM</p>
-          <p className="text-sm text-muted-foreground mb-3">Berlin (BER) → Paris (CDG)</p>
-          <div className="flex gap-2 text-sm">
-            <Badge variant="success">✓ Check-in complete</Badge>
-            <Badge variant="warning">⚠️ No hotel booking</Badge>
-          </div>
+          <Stack spacing="md">
+            <p><strong>Flight to Paris tomorrow</strong></p>
+            <Stack spacing="sm">
+              <p className="text-sm">Departure: Nov 10, 2:00 PM</p>
+              <p className="text-sm text-muted-foreground">Berlin (BER) → Paris (CDG)</p>
+            </Stack>
+            <Stack direction="horizontal" spacing="sm" className="text-sm">
+              <Badge variant="success">✓ Check-in complete</Badge>
+              <Badge variant="warning">⚠️ No hotel booking</Badge>
+            </Stack>
+          </Stack>
         </OpportunityCard>
       </ComponentPreview>
 
@@ -308,10 +324,10 @@ export default function OpportunityCardPage() {
   privacyBadge="🔒 Local"
   visual={
     <div className="w-full">
-      <div className="flex justify-between text-sm mb-2">
+      <Stack direction="horizontal" justify="between" className="text-sm mb-sm">
         <span>Food Budget</span>
         <span className="font-semibold">95%</span>
-      </div>
+      </Stack>
       <div className="w-full bg-muted rounded-full h-2">
         <div className="bg-warning h-2 rounded-full" style={{ width: '95%' }} />
       </div>
@@ -329,10 +345,10 @@ export default function OpportunityCardPage() {
           privacyBadge="🔒 Local"
           visual={
             <div className="w-full">
-              <div className="flex justify-between text-sm mb-2">
+              <Stack direction="horizontal" justify="between" className="text-sm mb-sm">
                 <span>Food Budget</span>
                 <span className="font-semibold">95%</span>
-              </div>
+              </Stack>
               <div className="w-full bg-muted rounded-full h-2">
                 <div className="bg-warning h-2 rounded-full" style={{ width: '95%' }} />
               </div>
@@ -348,54 +364,262 @@ export default function OpportunityCardPage() {
       <PropsTable props={props} />
 
       <h2>Usage Guidelines</h2>
+      <div className="not-prose space-y-lg my-lg">
+        <div>
+          <h3 className="text-lg font-semibold mb-md">When to use</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Proactive Opportunities:</strong> Surface AI-detected opportunities that
+                require user attention
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Dashboard Widgets:</strong> Display actionable insights on the main dashboard
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Urgent Notifications:</strong> Alert users to time-sensitive issues like
+                conflicts or deadlines
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Contextual Actions:</strong> Provide quick actions related to the opportunity
+              </span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>When to Use</h3>
-      <ul>
-        <li>
-          <strong>Proactive Opportunities:</strong> Surface AI-detected opportunities that require
-          user attention
-        </li>
-        <li>
-          <strong>Dashboard Widgets:</strong> Display actionable insights on the main dashboard
-        </li>
-        <li>
-          <strong>Urgent Notifications:</strong> Alert users to time-sensitive issues like conflicts
-          or deadlines
-        </li>
-        <li>
-          <strong>Contextual Actions:</strong> Provide quick actions related to the opportunity
-        </li>
-      </ul>
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Best practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Set Appropriate Urgency:</strong> Use "urgent" sparingly for truly critical
+                issues
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Provide Context:</strong> Always explain "why now" to help users understand
+                timing
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Include Privacy Badge:</strong> Show data source transparency (Local, Cloud,
+                etc.)
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Actionable Content:</strong> Provide clear primary and secondary actions
+              </span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>Dismissible:</strong> Always provide a close button for user control</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>
+                <strong>Mobile Support:</strong> Cards support swipe gestures for dismissal on mobile
+              </span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>Best Practices</h3>
-      <ul>
-        <li>
-          <strong>Set Appropriate Urgency:</strong> Use "urgent" sparingly for truly critical issues
-        </li>
-        <li>
-          <strong>Provide Context:</strong> Always explain "why now" to help users understand timing
-        </li>
-        <li>
-          <strong>Include Privacy Badge:</strong> Show data source transparency (Local, Cloud, etc.)
-        </li>
-        <li>
-          <strong>Actionable Content:</strong> Provide clear primary and secondary actions
-        </li>
-        <li>
-          <strong>Dismissible:</strong> Always provide a close button for user control
-        </li>
-        <li>
-          <strong>Mobile Support:</strong> Cards support swipe gestures for dismissal on mobile
-        </li>
-      </ul>
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Close button has proper aria-label for screen readers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Urgency levels use both color and visual hierarchy</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Touch targets meet minimum 44x44px size requirements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Swipe gestures have minimum threshold for intentional dismissal</span>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-      <h3>Accessibility</h3>
-      <ul>
-        <li>Close button has proper aria-label for screen readers</li>
-        <li>Urgency levels use both color and visual hierarchy</li>
-        <li>Touch targets meet minimum 44x44px size requirements</li>
-        <li>Swipe gestures have minimum threshold for intentional dismissal</li>
-      </ul>
+      <h2 className="mt-2xl">Do's and Don'ts</h2>
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        {/* Do's */}
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use appropriate urgency levels based on actual time sensitivity</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Provide clear context explaining why the opportunity is surfaced now</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Include both primary and secondary actions when multiple paths exist</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Show privacy badges to indicate data source transparency</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-success/10 rounded-md">
+            <ComponentPreview
+              code={`<OpportunityCard
+  title="Budget Alert"
+  icon={<DollarSign className="h-5 w-5" />}
+  urgency="important"
+  privacyBadge="🔒 Local"
+  onClose={() => {}}
+  context="Month-end approaching, spending high"
+  primaryAction={{ label: 'View', onClick: () => {} }}
+>
+  Food: 475 EUR / 500 EUR
+</OpportunityCard>`}
+            >
+              <OpportunityCard
+                title="Budget Alert"
+                icon={<DollarSign className="h-5 w-5" />}
+                urgency="important"
+                privacyBadge="🔒 Local"
+                onClose={() => {}}
+                context="Month-end approaching, spending high"
+                primaryAction={{ label: 'View', onClick: () => {} }}
+              >
+                Food: 475 EUR / 500 EUR
+              </OpportunityCard>
+            </ComponentPreview>
+          </div>
+        </div>
+
+        {/* Don'ts */}
+        <div className="border-2 border-error bg-error/10 rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don't
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Mark everything as urgent - reserve for truly critical issues</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Omit the close button - users must be able to dismiss cards</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Use vague or generic context - be specific about timing</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Create cards without actionable next steps</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-error/20 rounded-md">
+            <ComponentPreview
+              code={`<OpportunityCard
+  title="Budget Alert"
+  urgency="urgent"
+  // ❌ No close button
+  // ❌ No context
+  // ❌ No actions
+  // ❌ No privacy badge
+>
+  Your budget needs attention
+</OpportunityCard>`}
+            >
+              <OpportunityCard title="Budget Alert" urgency="urgent">
+                Your budget needs attention
+              </OpportunityCard>
+            </ComponentPreview>
+          </div>
+        </div>
+      </div>
+
+      <h2>Related Components</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/components/card"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Card
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Basic container for grouping related content
+          </p>
+        </Link>
+
+        <Link
+          href="/components/badge"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Badge
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Small status indicators used in opportunity cards
+          </p>
+        </Link>
+
+        <Link
+          href="/components/button"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Button
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Action buttons for primary and secondary actions
+          </p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/ui/src/components/opportunity-card/opportunity-card.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
