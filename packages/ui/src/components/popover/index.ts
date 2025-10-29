@@ -6,7 +6,7 @@ export {
   PopoverAnchor,
   PopoverClose,
   PopoverPortal,
-  popoverPropsSchema,
+  PopoverPropsSchema,
 } from './popover';
 export type {
   PopoverProps,

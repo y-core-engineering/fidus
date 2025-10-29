@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Drawer props validation
-export const drawerPropsSchema = z.object({
+export const DrawerPropsSchema = z.object({
   side: z.enum(['left', 'right', 'bottom']).default('right'),
   title: z.string(),
   description: z.string().optional(),
@@ -19,7 +19,7 @@ export const drawerPropsSchema = z.object({
   onOpenChange: z.function().optional(),
 });
 
-export type DrawerProps = z.infer<typeof drawerPropsSchema>;
+export type DrawerProps = z.infer<typeof DrawerPropsSchema>;
 
 // CVA Variants for Drawer
 const drawerOverlayVariants = cva(

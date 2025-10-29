@@ -13,7 +13,7 @@ export const breadcrumbItemSchema = z.object({
   icon: z.any().optional(),
 });
 
-export const breadcrumbsPropsSchema = z.object({
+export const BreadcrumbsPropsSchema = z.object({
   items: z.array(breadcrumbItemSchema).min(1),
   separator: z.enum(['slash', 'chevron', 'dot']).default('chevron'),
   size: z.enum(['sm', 'md', 'lg']).default('md'),
@@ -22,7 +22,7 @@ export const breadcrumbsPropsSchema = z.object({
 });
 
 export type BreadcrumbItem = z.infer<typeof breadcrumbItemSchema>;
-export type BreadcrumbsProps = z.infer<typeof breadcrumbsPropsSchema>;
+export type BreadcrumbsProps = z.infer<typeof BreadcrumbsPropsSchema>;
 
 const breadcrumbsVariants = cva('flex items-center flex-wrap', {
   variants: {

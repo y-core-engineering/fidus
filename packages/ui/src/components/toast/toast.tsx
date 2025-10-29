@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Toast props validation
-export const toastPropsSchema = z.object({
+export const ToastPropsSchema = z.object({
   variant: z.enum(['success', 'error', 'warning', 'info']).default('info'),
   position: z
     .enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center'])
@@ -21,7 +21,7 @@ export const toastPropsSchema = z.object({
   onAction: z.function().optional(),
 });
 
-export type ToastProps = z.infer<typeof toastPropsSchema>;
+export type ToastProps = z.infer<typeof ToastPropsSchema>;
 
 // CVA Variants for Toast
 const toastVariants = cva(

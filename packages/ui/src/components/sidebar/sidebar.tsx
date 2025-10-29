@@ -26,7 +26,7 @@ export const sidebarSectionSchema = z.object({
   defaultCollapsed: z.boolean().optional(),
 });
 
-export const sidebarPropsSchema = z.object({
+export const SidebarPropsSchema = z.object({
   sections: z.array(sidebarSectionSchema).optional(),
   items: z.array(sidebarItemSchema).optional(),
   collapsed: z.boolean().optional().default(false),
@@ -38,7 +38,7 @@ export const sidebarPropsSchema = z.object({
 
 export type SidebarItem = z.infer<typeof sidebarItemSchema>;
 export type SidebarSection = z.infer<typeof sidebarSectionSchema>;
-export type SidebarProps = z.infer<typeof sidebarPropsSchema> & {
+export type SidebarProps = z.infer<typeof SidebarPropsSchema> & {
   children?: React.ReactNode;
 };
 

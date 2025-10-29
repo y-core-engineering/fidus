@@ -20,7 +20,7 @@ export const headerItemSchema = z.object({
   icon: z.any().optional(),
 });
 
-export const headerPropsSchema = z.object({
+export const HeaderPropsSchema = z.object({
   logo: headerLogoSchema.optional(),
   items: z.array(headerItemSchema).optional().default([]),
   actions: z.any().optional(),
@@ -33,7 +33,7 @@ export const headerPropsSchema = z.object({
 
 export type HeaderLogo = z.infer<typeof headerLogoSchema>;
 export type HeaderItem = z.infer<typeof headerItemSchema>;
-export type HeaderProps = z.infer<typeof headerPropsSchema>;
+export type HeaderProps = z.infer<typeof HeaderPropsSchema>;
 
 const headerVariants = cva(
   'w-full border-b transition-colors duration-200',

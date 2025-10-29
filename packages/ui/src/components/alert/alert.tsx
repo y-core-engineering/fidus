@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Alert props validation
-export const alertPropsSchema = z.object({
+export const AlertPropsSchema = z.object({
   variant: z.enum(['success', 'error', 'warning', 'info']).default('info'),
   dismissible: z.boolean().default(false),
   title: z.string().optional(),
@@ -16,7 +16,7 @@ export const alertPropsSchema = z.object({
   onDismiss: z.function().optional(),
 });
 
-export type AlertProps = z.infer<typeof alertPropsSchema>;
+export type AlertProps = z.infer<typeof AlertPropsSchema>;
 
 // CVA Variants for Alert
 const alertVariants = cva(

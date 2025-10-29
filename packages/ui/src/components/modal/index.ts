@@ -8,7 +8,7 @@ export {
   ModalDescription,
   ModalBody,
   ModalFooter,
-  modalPropsSchema,
+  ModalPropsSchema,
 } from './modal';
 export type {
   ModalProps,

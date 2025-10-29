@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Popover props validation
-export const popoverPropsSchema = z.object({
+export const PopoverPropsSchema = z.object({
   trigger: z.any(),
   children: z.any(),
   side: z.enum(['top', 'bottom', 'left', 'right']).default('bottom'),
@@ -17,7 +17,7 @@ export const popoverPropsSchema = z.object({
   showArrow: z.boolean().default(true),
 });
 
-export type PopoverProps = z.infer<typeof popoverPropsSchema>;
+export type PopoverProps = z.infer<typeof PopoverPropsSchema>;
 
 // CVA Variants for Popover
 const popoverContentVariants = cva(

@@ -5,7 +5,7 @@ export {
   TooltipTrigger,
   TooltipContent,
   TooltipPortal,
-  tooltipPropsSchema,
+  TooltipPropsSchema,
 } from './tooltip';
 export type {
   TooltipProps,

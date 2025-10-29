@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Banner props validation
-export const bannerPropsSchema = z.object({
+export const BannerPropsSchema = z.object({
   variant: z.enum(['info', 'warning', 'error']).default('info'),
   message: z.string(),
   actionLabel: z.string().optional(),
@@ -17,7 +17,7 @@ export const bannerPropsSchema = z.object({
   onDismiss: z.function().optional(),
 });
 
-export type BannerProps = z.infer<typeof bannerPropsSchema>;
+export type BannerProps = z.infer<typeof BannerPropsSchema>;
 
 // CVA Variants for Banner
 const bannerVariants = cva(

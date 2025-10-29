@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Modal props validation
-export const modalPropsSchema = z.object({
+export const ModalPropsSchema = z.object({
   variant: z.enum(['confirmation', 'form', 'fullscreen']).default('form'),
   size: z.enum(['sm', 'md', 'lg', 'xl', 'fullscreen']).default('md'),
   dismissible: z.boolean().default(true),
@@ -19,7 +19,7 @@ export const modalPropsSchema = z.object({
   children: z.any(),
 });
 
-export type ModalProps = z.infer<typeof modalPropsSchema>;
+export type ModalProps = z.infer<typeof ModalPropsSchema>;
 
 // CVA Variants for Modal
 const modalOverlayVariants = cva(

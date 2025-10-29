@@ -140,6 +140,12 @@ const navigation: NavItem[] = [
       { title: 'Frontend Architecture', href: '/architecture/frontend-architecture' },
     ],
   },
+  {
+    title: 'Tools',
+    items: [
+      { title: 'Playground', href: '/playground' },
+    ],
+  },
 ];
 
 function NavSection({ item }: { item: NavItem }) {

@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Tooltip props validation
-export const tooltipPropsSchema = z.object({
+export const TooltipPropsSchema = z.object({
   content: z.string(),
   children: z.any(),
   side: z.enum(['top', 'bottom', 'left', 'right']).default('top'),
@@ -18,7 +18,7 @@ export const tooltipPropsSchema = z.object({
   showArrow: z.boolean().default(true),
 });
 
-export type TooltipProps = z.infer<typeof tooltipPropsSchema>;
+export type TooltipProps = z.infer<typeof TooltipPropsSchema>;
 
 // CVA Variants for Tooltip
 const tooltipContentVariants = cva(

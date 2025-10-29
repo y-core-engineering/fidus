@@ -1,4 +1,4 @@
-export { ProgressBar, CircularProgress, progressBarPropsSchema } from './progress-bar';
+export { ProgressBar, CircularProgress, ProgressBarPropsSchema } from './progress-bar';
 export type {
   ProgressBarProps,
   ProgressBarComponentProps,

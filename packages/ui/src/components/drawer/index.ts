@@ -11,7 +11,7 @@ export {
   DrawerFooter,
   DrawerClose,
   DrawerPortal,
-  drawerPropsSchema,
+  DrawerPropsSchema,
 } from './drawer';
 export type {
   DrawerProps,

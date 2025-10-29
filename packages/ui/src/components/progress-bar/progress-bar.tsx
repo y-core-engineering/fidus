@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for ProgressBar props validation
-export const progressBarPropsSchema = z.object({
+export const ProgressBarPropsSchema = z.object({
   value: z.number().min(0).max(100).optional(),
   variant: z.enum(['primary', 'success', 'warning', 'error']).default('primary'),
   size: z.enum(['sm', 'md', 'lg']).default('md'),
@@ -17,7 +17,7 @@ export const progressBarPropsSchema = z.object({
   indeterminate: z.boolean().default(false),
 });
 
-export type ProgressBarProps = z.infer<typeof progressBarPropsSchema>;
+export type ProgressBarProps = z.infer<typeof ProgressBarPropsSchema>;
 
 // CVA Variants for ProgressBar
 const progressBarRootVariants = cva('relative overflow-hidden rounded-full bg-gray-200', {

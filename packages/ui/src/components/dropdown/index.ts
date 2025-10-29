@@ -14,7 +14,7 @@ export {
   DropdownSubTrigger,
   DropdownSubContent,
   DropdownRadioGroup,
-  dropdownPropsSchema,
+  DropdownPropsSchema,
 } from './dropdown';
 export type {
   DropdownProps,

@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { cn } from '../../lib/cn';
 
 // Zod Schema for Dropdown props validation
-export const dropdownPropsSchema = z.object({
+export const DropdownPropsSchema = z.object({
   trigger: z.any(),
   items: z.array(
     z.union([
@@ -37,7 +37,7 @@ export const dropdownPropsSchema = z.object({
   ),
 });
 
-export type DropdownProps = z.infer<typeof dropdownPropsSchema>;
+export type DropdownProps = z.infer<typeof DropdownPropsSchema>;
 
 // CVA Variants for Dropdown
 const dropdownContentVariants = cva(

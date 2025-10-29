@@ -7,7 +7,7 @@ import { cn } from '../../lib/cn';
 import { z } from 'zod';
 
 // Zod schema for props validation
-export const tabsPropsSchema = z.object({
+export const TabsPropsSchema = z.object({
   value: z.string().optional(),
   defaultValue: z.string().optional(),
   onValueChange: z.function().args(z.string()).returns(z.void()).optional(),

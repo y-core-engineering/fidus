@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from 'lucide-react';
 
 // Zod schema for props validation
-export const paginationPropsSchema = z.object({
+export const PaginationPropsSchema = z.object({
   currentPage: z.number().min(1),
   totalPages: z.number().min(1),
   onPageChange: z.function().args(z.number()).returns(z.void()),
@@ -20,7 +20,7 @@ export const paginationPropsSchema = z.object({
   className: z.string().optional(),
 });
 
-export type PaginationProps = z.infer<typeof paginationPropsSchema>;
+export type PaginationProps = z.infer<typeof PaginationPropsSchema>;
 
 const paginationVariants = cva('flex items-center gap-1', {
   variants: {
