@@ -5,8 +5,8 @@ import { z } from 'zod';
 
 // Zod schema for props validation
 export const IconButtonPropsSchema = z.object({
-  variant: z.enum(['primary', 'secondary', 'tertiary', 'destructive']).default('primary'),
-  size: z.enum(['sm', 'md', 'lg']).default('md'),
+  variant: z.enum(['primary', 'secondary', 'tertiary', 'destructive']).optional().default('primary'),
+  size: z.enum(['sm', 'md', 'lg']).optional().default('md'),
   disabled: z.boolean().optional(),
   className: z.string().optional(),
   type: z.enum(['button', 'submit', 'reset']).optional(),
@@ -19,7 +19,10 @@ export type IconButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   'type'
 > &
-  z.infer<typeof IconButtonPropsSchema>;
+  Omit<z.infer<typeof IconButtonPropsSchema>, 'variant' | 'size'> & {
+    variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive';
+    size?: 'sm' | 'md' | 'lg';
+  };
 
 const iconButtonVariants = cva(
   'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed',

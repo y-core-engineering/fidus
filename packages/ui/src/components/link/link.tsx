@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 // Zod schema for props validation
 export const LinkPropsSchema = z.object({
-  variant: z.enum(['inline', 'standalone']).default('inline'),
+  variant: z.enum(['inline', 'standalone']).optional().default('inline'),
   showIcon: z.boolean().optional(),
   external: z.boolean().optional(),
   className: z.string().optional(),
@@ -14,7 +14,9 @@ export const LinkPropsSchema = z.object({
 });
 
 export type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
-  z.infer<typeof LinkPropsSchema>;
+  Omit<z.infer<typeof LinkPropsSchema>, 'variant'> & {
+    variant?: 'inline' | 'standalone';
+  };
 
 const linkVariants = cva(
   'text-foreground underline hover:no-underline transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',

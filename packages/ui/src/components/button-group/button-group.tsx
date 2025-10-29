@@ -5,13 +5,15 @@ import { z } from 'zod';
 
 // Zod schema for props validation
 export const ButtonGroupPropsSchema = z.object({
-  orientation: z.enum(['horizontal', 'vertical']).default('horizontal'),
+  orientation: z.enum(['horizontal', 'vertical']).optional().default('horizontal'),
   className: z.string().optional(),
   children: z.any(),
 });
 
 export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> &
-  z.infer<typeof ButtonGroupPropsSchema>;
+  Omit<z.infer<typeof ButtonGroupPropsSchema>, 'orientation'> & {
+    orientation?: 'horizontal' | 'vertical';
+  };
 
 const buttonGroupVariants = cva('inline-flex', {
   variants: {
