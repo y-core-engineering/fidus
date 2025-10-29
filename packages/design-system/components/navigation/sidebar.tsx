@@ -141,6 +141,37 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: 'Tokens',
+    items: [
+      { title: 'Color Tokens', href: '/tokens/color-tokens' },
+      { title: 'Spacing Tokens', href: '/tokens/spacing-tokens' },
+      { title: 'Typography Tokens', href: '/tokens/typography-tokens' },
+      { title: 'Shadow Tokens', href: '/tokens/shadow-tokens' },
+      { title: 'Motion Tokens', href: '/tokens/motion-tokens' },
+    ],
+  },
+  {
+    title: 'Content',
+    items: [
+      { title: 'Voice & Tone', href: '/content/voice-tone' },
+      { title: 'Grammar & Mechanics', href: '/content/grammar-mechanics' },
+      { title: 'Glossary', href: '/content/glossary' },
+      { title: 'Writing for Privacy', href: '/content/writing-for-privacy' },
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { title: 'Figma Library', href: '/resources/figma-library' },
+      { title: 'Code Playground', href: '/resources/code-playground' },
+      { title: 'Downloads', href: '/resources/downloads' },
+      { title: 'Changelog', href: '/resources/changelog' },
+      { title: 'Contributing', href: '/resources/contributing' },
+      { title: 'GitHub', href: '/resources/github' },
+      { title: 'Support', href: '/resources/support' },
+    ],
+  },
+  {
     title: 'Tools',
     items: [
       { title: 'Playground', href: '/playground' },
