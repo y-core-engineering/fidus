@@ -31,8 +31,8 @@ export const SidebarPropsSchema = z.object({
   items: z.array(sidebarItemSchema).optional(),
   collapsed: z.boolean().optional().default(false),
   onCollapse: z.function().args(z.boolean()).returns(z.void()).optional(),
-  position: z.enum(['left', 'right']).default('left'),
-  width: z.enum(['sm', 'md', 'lg']).default('md'),
+  position: z.enum(['left', 'right']).optional().default('left'),
+  width: z.enum(['sm', 'md', 'lg']).optional().default('md'),
   className: z.string().optional(),
 });
 
