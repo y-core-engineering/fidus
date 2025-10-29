@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, Link, IconButton, ButtonGroup } from '@fidus/ui';
 import { Search, Settings } from 'lucide-react';
 
