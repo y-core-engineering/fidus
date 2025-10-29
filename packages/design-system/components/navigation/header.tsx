@@ -6,7 +6,13 @@ import { Search, Moon, Sun, Menu } from 'lucide-react';
 import { IconButton } from '@fidus/ui';
 import { useState } from 'react';
 
-export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
+export function Header({
+  onMenuClick,
+  onSearchClick,
+}: {
+  onMenuClick?: () => void;
+  onSearchClick?: () => void;
+}) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   const toggleTheme = () => {
@@ -47,6 +53,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             variant="tertiary"
             size="md"
             aria-label="Search"
+            onClick={onSearchClick}
             className="hidden sm:flex"
           >
             <Search className="h-5 w-5" />
