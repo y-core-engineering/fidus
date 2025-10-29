@@ -13,8 +13,15 @@ import {
   type SearchResult,
 } from '@/lib/search';
 
-export function SearchDialog() {
-  const [isOpen, setIsOpen] = useState(false);
+export function SearchDialog({
+  isOpen: externalIsOpen,
+  onClose: externalOnClose,
+  onOpen: externalOnOpen,
+}: {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onOpen?: () => void;
+} = {}) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<SearchResult['category'] | 'All'>('All');
@@ -22,6 +29,8 @@ export function SearchDialog() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isOpen = externalIsOpen ?? false;
 
   // Load recent searches on mount
   useEffect(() => {
@@ -33,13 +42,17 @@ export function SearchDialog() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setIsOpen((open) => !open);
+        if (isOpen && externalOnClose) {
+          externalOnClose();
+        } else if (!isOpen && externalOnOpen) {
+          externalOnOpen();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isOpen, externalOnClose, externalOnOpen]);
 
   // Focus input when dialog opens
   useEffect(() => {
@@ -65,7 +78,7 @@ export function SearchDialog() {
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsOpen(false);
+        externalOnClose?.();
         setQuery('');
         setResults([]);
       } else if (e.key === 'ArrowDown') {
@@ -79,7 +92,7 @@ export function SearchDialog() {
         handleSelect(results[selectedIndex]);
       }
     },
-    [results, selectedIndex]
+    [results, selectedIndex, externalOnClose]
   );
 
   // Handle result selection
@@ -87,12 +100,12 @@ export function SearchDialog() {
     (result: SearchResult) => {
       saveRecentSearch(query);
       setRecentSearches(getRecentSearches());
-      setIsOpen(false);
+      externalOnClose?.();
       setQuery('');
       setResults([]);
       router.push(result.href);
     },
-    [query, router]
+    [query, router, externalOnClose]
   );
 
   // Handle recent search selection
@@ -131,7 +144,7 @@ export function SearchDialog() {
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
-        onClick={() => setIsOpen(false)}
+        onClick={() => externalOnClose?.()}
       />
 
       {/* Dialog */}
@@ -149,7 +162,7 @@ export function SearchDialog() {
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => externalOnClose?.()}
             className="text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" />
