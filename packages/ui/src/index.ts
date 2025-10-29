@@ -48,5 +48,12 @@ export * from './components/popover';
 export * from './components/tooltip';
 export * from './components/drawer';
 
+// Navigation Components
+export * from './components/tabs';
+export * from './components/breadcrumbs';
+export * from './components/pagination';
+export * from './components/header';
+export * from './components/sidebar';
+
 // Utilities
 export { cn } from './lib/cn';
