@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@fidus/ui';
 
 export default function PrivacyUXPage() {

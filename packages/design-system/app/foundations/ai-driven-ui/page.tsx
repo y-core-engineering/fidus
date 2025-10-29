@@ -1,3 +1,5 @@
+'use client';
+
 export default function AIDrivenUIPage() {
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">

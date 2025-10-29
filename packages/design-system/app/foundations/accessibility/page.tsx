@@ -1,3 +1,5 @@
+'use client';
+
 export default function AccessibilityPage() {
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">

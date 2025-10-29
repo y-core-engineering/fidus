@@ -1,3 +1,5 @@
+'use client';
+
 export default function ColorsPage() {
   const ColorSwatch = ({
     name,
