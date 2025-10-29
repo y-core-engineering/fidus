@@ -19,19 +19,24 @@ const navigation: NavItem[] = [
       { title: 'For Designers', href: '/getting-started/for-designers' },
       { title: 'For Developers', href: '/getting-started/for-developers' },
       { title: 'Design Philosophy', href: '/getting-started/design-philosophy' },
-      { title: 'Contributing', href: '/getting-started/contributing' },
+    ],
+  },
+  {
+    title: 'Design Tokens',
+    items: [
+      { title: 'Colors', href: '/tokens/color-tokens' },
+      { title: 'Typography', href: '/tokens/typography-tokens' },
+      { title: 'Spacing', href: '/tokens/spacing-tokens' },
+      { title: 'Shadows', href: '/tokens/shadow-tokens' },
+      { title: 'Motion', href: '/tokens/motion-tokens' },
     ],
   },
   {
     title: 'Foundations',
     items: [
-      { title: 'Colors', href: '/foundations/colors' },
-      { title: 'Typography', href: '/foundations/typography' },
-      { title: 'Spacing', href: '/foundations/spacing' },
       { title: 'AI-Driven UI', href: '/foundations/ai-driven-ui' },
       { title: 'Privacy & UX', href: '/foundations/privacy-ux' },
       { title: 'Icons', href: '/foundations/icons' },
-      { title: 'Motion', href: '/foundations/motion' },
       { title: 'Accessibility', href: '/foundations/accessibility' },
       { title: 'Responsive Design', href: '/foundations/responsive-design' },
     ],
@@ -141,9 +146,19 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: 'Tools',
+    title: 'Content',
+    items: [
+      { title: 'Glossary', href: '/content/glossary' },
+      { title: 'Writing for Privacy', href: '/content/writing-for-privacy' },
+    ],
+  },
+  {
+    title: 'Resources',
     items: [
       { title: 'Playground', href: '/playground' },
+      { title: 'Contributing', href: '/resources/contributing' },
+      { title: 'GitHub', href: '/resources/github' },
+      { title: 'Support', href: '/resources/support' },
     ],
   },
 ];
