@@ -1,6 +1,8 @@
 'use client';
 
-import { ToggleSwitch } from '@fidus/ui';
+import { ToggleSwitch, Link, Stack } from '@fidus/ui';
+import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';
 
 export default function ToggleSwitchPage() {
@@ -8,255 +10,475 @@ export default function ToggleSwitchPage() {
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
+  const props = [
+    {
+      name: 'label',
+      type: 'string',
+      required: true,
+      description: 'Toggle switch label text',
+    },
+    {
+      name: 'checked',
+      type: 'boolean',
+      description: 'Controlled checked state',
+    },
+    {
+      name: 'defaultChecked',
+      type: 'boolean',
+      default: 'false',
+      description: 'Uncontrolled default checked state',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Whether toggle is disabled',
+    },
+    {
+      name: 'error',
+      type: 'string',
+      description: 'Error message to display',
+    },
+    {
+      name: 'helperText',
+      type: 'string',
+      description: 'Helper text below toggle',
+    },
+    {
+      name: 'size',
+      type: "'sm' | 'md' | 'lg'",
+      default: "'md'",
+      description: 'Size of the toggle switch',
+    },
+    {
+      name: 'labelPosition',
+      type: "'left' | 'right'",
+      default: "'right'",
+      description: 'Position of label relative to toggle',
+    },
+    {
+      name: 'onChange',
+      type: '(e: ChangeEvent) => void',
+      description: 'Change event handler',
+    },
+  ];
+
   return (
-    <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
-      <div>
-        <h1 className="mb-2 text-4xl font-bold">Toggle Switch</h1>
-        <p className="text-lg text-muted-foreground">
-          A toggle switch component for binary on/off states, with support for multiple sizes and label positions.
-        </p>
-      </div>
+    <div className="prose prose-neutral dark:prose-invert max-w-none">
+      <h1>Toggle Switch</h1>
+      <p className="lead">
+        A toggle switch component for binary on/off states, with support for multiple sizes and label positions.
+      </p>
 
-      {/* Basic Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Basic Toggle Switch</h2>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Enable feature"
-              checked={enabled}
-              onChange={(e) => setEnabled(e.target.checked)}
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Basic Example</h2>
+      <ComponentPreview code={`<ToggleSwitch
+  label="Enable feature"
+  checked={enabled}
+  onChange={(e) => setEnabled(e.target.checked)}
+/>`}>
+        <ToggleSwitch
+          label="Enable feature"
+          checked={enabled}
+          onChange={(e) => setEnabled(e.target.checked)}
+        />
+      </ComponentPreview>
 
-      {/* Checked by Default */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Checked by Default</h2>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Email notifications"
-              defaultChecked
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Checked by Default</h2>
+      <ComponentPreview code={`<ToggleSwitch
+  label="Email notifications"
+  defaultChecked
+/>`}>
+        <ToggleSwitch
+          label="Email notifications"
+          defaultChecked
+        />
+      </ComponentPreview>
 
-      {/* Sizes */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Sizes</h2>
-          <div className="space-y-6 rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Small size"
-              size="sm"
-              checked={notifications}
-              onChange={(e) => setNotifications(e.target.checked)}
-            />
-            <ToggleSwitch
-              label="Medium size (default)"
-              size="md"
-              checked={notifications}
-              onChange={(e) => setNotifications(e.target.checked)}
-            />
-            <ToggleSwitch
-              label="Large size"
-              size="lg"
-              checked={notifications}
-              onChange={(e) => setNotifications(e.target.checked)}
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Sizes</h2>
+      <ComponentPreview code={`<Stack direction="vertical" spacing="lg">
+  <ToggleSwitch
+    label="Small size"
+    size="sm"
+    checked={notifications}
+    onChange={(e) => setNotifications(e.target.checked)}
+  />
+  <ToggleSwitch
+    label="Medium size (default)"
+    size="md"
+    checked={notifications}
+    onChange={(e) => setNotifications(e.target.checked)}
+  />
+  <ToggleSwitch
+    label="Large size"
+    size="lg"
+    checked={notifications}
+    onChange={(e) => setNotifications(e.target.checked)}
+  />
+</Stack>`}>
+        <Stack direction="vertical" spacing="lg">
+          <ToggleSwitch
+            label="Small size"
+            size="sm"
+            checked={notifications}
+            onChange={(e) => setNotifications(e.target.checked)}
+          />
+          <ToggleSwitch
+            label="Medium size (default)"
+            size="md"
+            checked={notifications}
+            onChange={(e) => setNotifications(e.target.checked)}
+          />
+          <ToggleSwitch
+            label="Large size"
+            size="lg"
+            checked={notifications}
+            onChange={(e) => setNotifications(e.target.checked)}
+          />
+        </Stack>
+      </ComponentPreview>
 
-      {/* Label Position */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Label Position</h2>
-          <div className="space-y-6 rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Label on left"
-              labelPosition="left"
-              checked={darkMode}
-              onChange={(e) => setDarkMode(e.target.checked)}
-            />
-            <ToggleSwitch
-              label="Label on right (default)"
-              labelPosition="right"
-              checked={darkMode}
-              onChange={(e) => setDarkMode(e.target.checked)}
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Label Position</h2>
+      <ComponentPreview code={`<Stack direction="vertical" spacing="lg">
+  <ToggleSwitch
+    label="Label on left"
+    labelPosition="left"
+    checked={darkMode}
+    onChange={(e) => setDarkMode(e.target.checked)}
+  />
+  <ToggleSwitch
+    label="Label on right (default)"
+    labelPosition="right"
+    checked={darkMode}
+    onChange={(e) => setDarkMode(e.target.checked)}
+  />
+</Stack>`}>
+        <Stack direction="vertical" spacing="lg">
+          <ToggleSwitch
+            label="Label on left"
+            labelPosition="left"
+            checked={darkMode}
+            onChange={(e) => setDarkMode(e.target.checked)}
+          />
+          <ToggleSwitch
+            label="Label on right (default)"
+            labelPosition="right"
+            checked={darkMode}
+            onChange={(e) => setDarkMode(e.target.checked)}
+          />
+        </Stack>
+      </ComponentPreview>
 
-      {/* With Helper Text */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">With Helper Text</h2>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Dark mode"
-              helperText="Switch to dark theme for better nighttime viewing"
-              checked={darkMode}
-              onChange={(e) => setDarkMode(e.target.checked)}
-            />
-          </div>
-        </div>
-      </section>
+      <h2>With Helper Text</h2>
+      <ComponentPreview code={`<ToggleSwitch
+  label="Dark mode"
+  helperText="Switch to dark theme for better nighttime viewing"
+  checked={darkMode}
+  onChange={(e) => setDarkMode(e.target.checked)}
+/>`}>
+        <ToggleSwitch
+          label="Dark mode"
+          helperText="Switch to dark theme for better nighttime viewing"
+          checked={darkMode}
+          onChange={(e) => setDarkMode(e.target.checked)}
+        />
+      </ComponentPreview>
 
-      {/* Error State */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Error State</h2>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Two-factor authentication"
-              error="You must enable 2FA to continue"
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Error State</h2>
+      <ComponentPreview code={`<ToggleSwitch
+  label="Two-factor authentication"
+  error="You must enable 2FA to continue"
+/>`}>
+        <ToggleSwitch
+          label="Two-factor authentication"
+          error="You must enable 2FA to continue"
+        />
+      </ComponentPreview>
 
-      {/* Disabled */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Disabled</h2>
-          <div className="space-y-6 rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Disabled off"
-              disabled
-            />
-            <ToggleSwitch
-              label="Disabled on"
-              disabled
-              checked
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Disabled</h2>
+      <ComponentPreview code={`<Stack direction="vertical" spacing="lg">
+  <ToggleSwitch
+    label="Disabled off"
+    disabled
+  />
+  <ToggleSwitch
+    label="Disabled on"
+    disabled
+    checked
+  />
+</Stack>`}>
+        <Stack direction="vertical" spacing="lg">
+          <ToggleSwitch
+            label="Disabled off"
+            disabled
+          />
+          <ToggleSwitch
+            label="Disabled on"
+            disabled
+            checked
+          />
+        </Stack>
+      </ComponentPreview>
 
-      {/* Combined Examples */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Combined Examples</h2>
-          <div className="space-y-6 rounded-lg border border-border bg-card p-6">
-            <ToggleSwitch
-              label="Auto-save"
-              size="sm"
-              labelPosition="left"
-              helperText="Automatically save your work every 5 minutes"
-            />
-            <ToggleSwitch
-              label="Push notifications"
-              size="md"
-              labelPosition="right"
-              helperText="Receive notifications on your device"
-              defaultChecked
-            />
-            <ToggleSwitch
-              label="High contrast mode"
-              size="lg"
-              labelPosition="left"
-              helperText="Increase contrast for better readability"
-            />
-          </div>
-        </div>
-      </section>
+      <h2>Combined Examples</h2>
+      <ComponentPreview code={`<Stack direction="vertical" spacing="lg">
+  <ToggleSwitch
+    label="Auto-save"
+    size="sm"
+    labelPosition="left"
+    helperText="Automatically save your work every 5 minutes"
+  />
+  <ToggleSwitch
+    label="Push notifications"
+    size="md"
+    labelPosition="right"
+    helperText="Receive notifications on your device"
+    defaultChecked
+  />
+  <ToggleSwitch
+    label="High contrast mode"
+    size="lg"
+    labelPosition="left"
+    helperText="Increase contrast for better readability"
+  />
+</Stack>`}>
+        <Stack direction="vertical" spacing="lg">
+          <ToggleSwitch
+            label="Auto-save"
+            size="sm"
+            labelPosition="left"
+            helperText="Automatically save your work every 5 minutes"
+          />
+          <ToggleSwitch
+            label="Push notifications"
+            size="md"
+            labelPosition="right"
+            helperText="Receive notifications on your device"
+            defaultChecked
+          />
+          <ToggleSwitch
+            label="High contrast mode"
+            size="lg"
+            labelPosition="left"
+            helperText="Increase contrast for better readability"
+          />
+        </Stack>
+      </ComponentPreview>
 
-      {/* Props Table */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Props</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-2 text-left font-semibold">Prop</th>
-                  <th className="p-2 text-left font-semibold">Type</th>
-                  <th className="p-2 text-left font-semibold">Default</th>
-                  <th className="p-2 text-left font-semibold">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">label</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Toggle switch label text (required)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">checked</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Controlled checked state</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">defaultChecked</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">false</td>
-                  <td className="p-2">Uncontrolled default checked state</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">disabled</td>
-                  <td className="p-2 font-mono text-xs">boolean</td>
-                  <td className="p-2 font-mono text-xs">false</td>
-                  <td className="p-2">Whether toggle is disabled</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">error</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Error message to display</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">helperText</td>
-                  <td className="p-2 font-mono text-xs">string</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Helper text below toggle</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">size</td>
-                  <td className="p-2 font-mono text-xs">'sm' | 'md' | 'lg'</td>
-                  <td className="p-2 font-mono text-xs">'md'</td>
-                  <td className="p-2">Size of the toggle switch</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">labelPosition</td>
-                  <td className="p-2 font-mono text-xs">'left' | 'right'</td>
-                  <td className="p-2 font-mono text-xs">'right'</td>
-                  <td className="p-2">Position of label relative to toggle</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-2 font-mono">onChange</td>
-                  <td className="p-2 font-mono text-xs">(e: ChangeEvent) =&gt; void</td>
-                  <td className="p-2 text-muted-foreground">-</td>
-                  <td className="p-2">Change event handler</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      <h2>Props</h2>
+      <PropsTable props={props} />
 
-      {/* Accessibility */}
-      <section className="space-y-4">
+      <h2>Usage Guidelines</h2>
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Accessibility</h2>
-          <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-            <li>Keyboard accessible (Tab for focus, Space or Enter to toggle)</li>
-            <li>ARIA attributes: role="switch", aria-checked, aria-invalid, aria-describedby</li>
-            <li>Error messages announced with aria-live</li>
-            <li>Focus indicators visible (2px ring)</li>
-            <li>Label properly associated with switch</li>
-            <li>Disabled state indicated with aria-disabled</li>
-            <li>State changes announced to screen readers</li>
-            <li>Visual feedback for on/off states with color and position</li>
+          <h3 className="text-lg font-semibold mb-md">When to use</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For settings that take effect immediately (no save button needed)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For binary on/off or enabled/disabled states</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>In settings panels and preferences menus</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When the change is applied immediately and is reversible</span>
+            </li>
           </ul>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Best practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use clear labels that describe what the toggle controls</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Provide helper text to explain what happens when toggled</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use consistent label positioning throughout your interface</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Show the current state visually with color and position</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use error states to indicate when a toggle is required but not enabled</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Keyboard accessible with Tab for focus, Space or Enter to toggle</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Uses role="switch" and aria-checked for screen readers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Error messages announced with aria-live and aria-invalid</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Visual focus indicators with 2px ring for keyboard navigation</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Label properly associated with switch via aria-describedby</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Disabled state indicated with aria-disabled attribute</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="mt-2xl">Do's and Don'ts</h2>
+
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        {/* Do's */}
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use for settings that take effect immediately</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Provide clear labels that describe the current state</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Add helper text to explain the effect of toggling</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use for reversible actions only</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-success/10 rounded-md">
+            <ComponentPreview code={`<ToggleSwitch
+  label="Email notifications"
+  helperText="Receive updates about your account"
+  defaultChecked
+/>`}>
+              <ToggleSwitch
+                label="Email notifications"
+                helperText="Receive updates about your account"
+                defaultChecked
+              />
+            </ComponentPreview>
+          </div>
+        </div>
+
+        {/* Don'ts */}
+        <div className="border-2 border-error bg-error/10 rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don't
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use for actions that require confirmation (use Checkbox)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use for irreversible or destructive actions</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use vague labels like "Setting 1" or "Option A"</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use when changes require a save action</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-error/20 rounded-md">
+            <ComponentPreview code={`<ToggleSwitch
+  label="Delete all data"
+/>`}>
+              <ToggleSwitch
+                label="Delete all data"
+              />
+            </ComponentPreview>
+          </div>
+        </div>
+      </div>
+
+      <h2>Related Components</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/components/checkbox"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Checkbox</h3>
+          <p className="text-sm text-muted-foreground">For selecting multiple options or confirming actions</p>
+        </Link>
+        <Link
+          href="/components/radio"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Radio</h3>
+          <p className="text-sm text-muted-foreground">For selecting one option from multiple choices</p>
+        </Link>
+        <Link
+          href="/components/select"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">Select</h3>
+          <p className="text-sm text-muted-foreground">For choosing from a dropdown list of options</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/ui/src/components/toggle-switch/toggle-switch.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/ARIA/apg/patterns/switch/"
+              external
+              showIcon
+            >
+              ARIA: Switch Pattern
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
