@@ -49,6 +49,20 @@ Fidus is **not** just a tool - Fidus is your **faithful companion**.
 
 ## Visual Identity
 
+### Logo & Avatar
+The Fidus logo features a **brain icon** on a **yellow background**:
+- Brain symbolizes intelligence and thinking
+- Yellow (#EAB308) represents alertness and clarity
+- Black strokes provide contrast and directness
+- The logo is used as:
+  - Website favicon
+  - Chat avatar (Fidus's identity in conversations)
+  - Brand identifier across all touchpoints
+
+**Files:**
+- `docs/branding/favicon.svg` - Favicon for websites
+- `docs/branding/fidus-logo.svg` - Full logo for general use
+
 ### Colors
 The landing page already uses a **Brutalist Theme** with:
 - **Yellow/Black** - Clear, direct communication

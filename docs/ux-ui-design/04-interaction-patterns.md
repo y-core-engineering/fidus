@@ -969,9 +969,13 @@ graph LR
 
 **Behavior:**
 - Slides in from bottom-right with smooth animation (300ms)
-- Auto-dismiss after 30 seconds if not interacted with
-- Clicking dismisses notification
+- **Important:** This is an OS-level notification (toast), NOT an Opportunity Card
+- Follows OS notification defaults (typically auto-dismiss after 5-10 seconds on most platforms)
+- User can dismiss immediately by clicking anywhere on the toast
 - Multiple notifications stack vertically
+- Clicking action button (e.g., "Review") opens relevant view and dismisses toast
+
+**Note:** Desktop toasts are ephemeral notifications. For persistent information, see [Opportunity Cards](#pattern-1-opportunistic-surfacing) on the Dashboard, which NEVER auto-dismiss.
 
 #### Pattern 2: Push Notification (Mobile)
 
@@ -1656,9 +1660,1221 @@ graph TB
 
 ---
 
-## 8. Error Handling & Recovery
+## 8. Form Validation Patterns
 
-### 8.1 Error Philosophy
+### 8.1 Validation Philosophy
+
+**Core Principle:** Validate early, validate often, but never block the user unnecessarily.
+
+**Fidus Approach:**
+- **Real-time validation** for instant feedback
+- **Inline error messages** near the problematic field
+- **Progressive validation** (validate as user types, not just on submit)
+- **Helpful suggestions** instead of just "error"
+- **Preserve user input** even when invalid
+
+### 8.2 Validation Types
+
+#### Client-Side Validation (Immediate)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Empty: Field empty
+    Empty --> Typing: User types
+    Typing --> Validating: Check format
+    Validating --> Valid: Passes rules
+    Validating --> Invalid: Fails rules
+    Invalid --> Typing: User corrects
+    Valid --> Submit: User submits
+    Invalid --> Submit: User submits
+    Submit --> ServerValidation: Send to backend
+```
+
+**When to validate:**
+- `onBlur` (field loses focus) - Primary trigger
+- `onChange` (while typing) - For real-time feedback on complex rules
+- `onSubmit` (form submission) - Final check before sending
+
+#### Server-Side Validation (Final)
+
+Always validate on the server, even if client-side passed.
+
+**Examples:**
+- Check if email already exists
+- Verify appointment slot is still available
+- Confirm budget hasn't changed
+
+### 8.3 Field Validation Patterns
+
+#### Pattern 1: Required Field
+
+```
+┌─────────────────────────────────────────┐
+│  Title *                                │
+│  ┌───────────────────────────────────┐  │
+│  │                                   │  │ ← Empty, not yet touched
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+
+User clicks away (onBlur):
+
+┌─────────────────────────────────────────┐
+│  Title *                                │
+│  ┌───────────────────────────────────┐  │
+│  │                                   │  │ ← Red border
+│  └───────────────────────────────────┘  │
+│  ❌ This field is required              │
+└─────────────────────────────────────────┘
+
+User types "Team":
+
+┌─────────────────────────────────────────┐
+│  Title *                                │
+│  ┌───────────────────────────────────┐  │
+│  │ Team                              │  │ ← Green border
+│  └───────────────────────────────────┘  │
+│  ✅ Looks good                          │
+└─────────────────────────────────────────┘
+```
+
+**Rules:**
+- Show error only **after** user interacts with field (don't show on page load)
+- Remove error as soon as field becomes valid
+- Use ✅ green checkmark for valid state (positive reinforcement)
+
+#### Pattern 2: Email Format
+
+```
+┌─────────────────────────────────────────┐
+│  Email *                                │
+│  ┌───────────────────────────────────┐  │
+│  │ john@                             │  │ ← Orange border (typing)
+│  └───────────────────────────────────┘  │
+│  ⚠️ Email incomplete                    │
+└─────────────────────────────────────────┘
+
+User completes: "john@example.com"
+
+┌─────────────────────────────────────────┐
+│  Email *                                │
+│  ┌───────────────────────────────────┐  │
+│  │ john@example.com                  │  │ ← Green border
+│  └───────────────────────────────────┘  │
+│  ✅ Valid email address                 │
+└─────────────────────────────────────────┘
+```
+
+**Progressive States:**
+- **Empty**: No border, no message
+- **Invalid (typing)**: Orange border, warning (not error)
+- **Valid**: Green border, success message
+
+#### Pattern 3: Password Strength
+
+```
+┌─────────────────────────────────────────┐
+│  Password *                             │
+│  ┌───────────────────────────────────┐  │
+│  │ ••••••                            │  │
+│  └───────────────────────────────────┘  │
+│                                         │
+│  Password strength: Weak                │
+│  [██░░░░░░░░░░░░░░░░░░] 10%            │
+│                                         │
+│  To improve:                            │
+│  ❌ At least 8 characters (currently 6) │
+│  ✅ Contains lowercase letters          │
+│  ❌ Contains uppercase letters          │
+│  ❌ Contains numbers                    │
+│  ❌ Contains special characters         │
+└─────────────────────────────────────────┘
+
+User types: "MyPass123!"
+
+┌─────────────────────────────────────────┐
+│  Password *                             │
+│  ┌───────────────────────────────────┐  │
+│  │ ••••••••••                        │  │
+│  └───────────────────────────────────┘  │
+│                                         │
+│  Password strength: Strong              │
+│  [████████████████] 100%                │
+│                                         │
+│  Requirements:                          │
+│  ✅ At least 8 characters               │
+│  ✅ Contains lowercase letters          │
+│  ✅ Contains uppercase letters          │
+│  ✅ Contains numbers                    │
+│  ✅ Contains special characters         │
+└─────────────────────────────────────────┘
+```
+
+**Real-time Feedback:**
+- Show requirements checklist
+- Update as user types
+- Visual progress bar
+- Never say "weak password" without explaining how to improve
+
+#### Pattern 4: Date/Time Validation
+
+```
+User enters past date for appointment:
+
+┌─────────────────────────────────────────┐
+│  Appointment Date *                     │
+│  ┌───────────────────────────────────┐  │
+│  │ 2025-10-20                        │  │ ← Red border
+│  └───────────────────────────────────┘  │
+│  ❌ Date cannot be in the past          │
+│  💡 Did you mean: 2025-11-20?           │
+│  [Use Suggested Date]                   │
+└─────────────────────────────────────────┘
+```
+
+**Smart Suggestions:**
+- Detect likely mistakes (past dates, invalid formats)
+- Offer corrected alternatives
+- One-click fix button
+
+#### Pattern 5: Numeric Range
+
+```
+Budget amount validation:
+
+┌─────────────────────────────────────────┐
+│  Budget Amount * (€)                    │
+│  ┌───────────────────────────────────┐  │
+│  │ 50000                             │  │ ← Orange border
+│  └───────────────────────────────────┘  │
+│  ⚠️ That's quite high for food budget   │
+│  💡 Typical range: €200 - €1,000        │
+│                                         │
+│  [Keep €50,000] [Use €500 (suggested)] │
+└─────────────────────────────────────────┘
+```
+
+**Soft Warnings:**
+- Allow "unusual" values, but warn user
+- Provide context (typical range, average)
+- Quick fix button with suggested value
+
+### 8.4 Form-Level Validation
+
+#### Cross-Field Validation
+
+```
+Start time: 2:00 PM
+End time: 1:00 PM  ← Problem!
+
+┌─────────────────────────────────────────┐
+│  ❌ End time must be after start time   │
+│                                         │
+│  Start: 2:00 PM                         │
+│  End:   1:00 PM                         │
+│                                         │
+│  💡 Did you mean 3:00 PM?               │
+│  [Fix Automatically]                    │
+└─────────────────────────────────────────┘
+```
+
+**Rules:**
+- Validate relationships between fields
+- Show error at form level (not on individual fields)
+- Offer automatic fix when possible
+
+#### Duplicate Detection
+
+```
+User tries to schedule duplicate appointment:
+
+┌─────────────────────────────────────────┐
+│  ⚠️ Possible Duplicate Detected         │
+│                                         │
+│  You already have a similar appointment:│
+│  "Team Meeting" on Nov 5 at 2:00 PM    │
+│                                         │
+│  Are you sure you want to create this?  │
+│                                         │
+│  [Yes, Create Anyway] [Cancel]          │
+└─────────────────────────────────────────┘
+```
+
+### 8.5 Validation Error Messages
+
+#### ❌ Bad Error Messages
+
+```
+"Invalid input"
+→ What's invalid? How do I fix it?
+
+"Error: ERR_VALIDATION_FAILED"
+→ Technical jargon, no help
+
+"Field cannot be empty"
+→ Which field? I see 10 fields!
+
+"Date must be in format YYYY-MM-DD"
+→ Why not just accept any format and convert it?
+```
+
+#### ✅ Good Error Messages
+
+```
+"Email address is incomplete.
+Example: john@example.com"
+→ Clear, with example
+
+"Appointment date (Nov 5) conflicts with
+existing appointment 'Team Meeting' at 2:00 PM.
+Choose a different time or reschedule the conflict."
+→ Specific, explains conflict, offers solution
+
+"Password must be at least 8 characters.
+Currently: 6 characters."
+→ Shows requirement and current state
+
+"End time (1:00 PM) is before start time (2:00 PM).
+Did you mean 3:00 PM?"
+→ Explains problem, suggests fix
+```
+
+#### Error Message Template
+
+```
+[What's wrong] + [Why it's wrong] + [How to fix]
+
+Example:
+"Budget amount (€50,000) exceeds typical food budget
+range (€200 - €1,000). This seems unusually high.
+Consider using €500 or confirm if intentional."
+
+Parts:
+- What: Budget amount (€50,000)
+- Why: Exceeds typical range
+- How: Use €500 or confirm
+```
+
+### 8.6 Async Validation
+
+#### Pattern: Check Email Availability
+
+```
+User types email: "john@example.com"
+
+Step 1 - Format validation (immediate):
+┌─────────────────────────────────────────┐
+│  Email *                                │
+│  ┌───────────────────────────────────┐  │
+│  │ john@example.com                  │  │ ← Green
+│  └───────────────────────────────────┘  │
+│  ✅ Valid format                        │
+└─────────────────────────────────────────┘
+
+Step 2 - Checking availability (2 seconds):
+┌─────────────────────────────────────────┐
+│  Email *                                │
+│  ┌───────────────────────────────────┐  │
+│  │ john@example.com                  │  │ ← Blue
+│  └───────────────────────────────────┘  │
+│  🔄 Checking availability...            │
+└─────────────────────────────────────────┘
+
+Step 3 - Already exists:
+┌─────────────────────────────────────────┐
+│  Email *                                │
+│  ┌───────────────────────────────────┐  │
+│  │ john@example.com                  │  │ ← Red
+│  └───────────────────────────────────┘  │
+│  ❌ Email already registered            │
+│  💡 Forgot password? [Reset Password]   │
+└─────────────────────────────────────────┘
+```
+
+**Debouncing:**
+- Wait 500ms after user stops typing before checking
+- Show loading indicator during check
+- Cache results to avoid repeated checks
+
+### 8.7 Validation Accessibility
+
+#### Screen Reader Support
+
+```
+[Screen Reader Announces]:
+"Email field. Required. Edit text. Currently: john@example.com.
+Error: Email already registered.
+Suggestion: Link, Reset Password."
+```
+
+**ARIA Attributes:**
+```html
+<input
+  type="email"
+  aria-required="true"
+  aria-invalid="true"
+  aria-describedby="email-error"
+/>
+<div id="email-error" role="alert">
+  Email already registered.
+  <a href="/reset">Reset Password</a>
+</div>
+```
+
+#### Keyboard Navigation
+
+- `Tab` through fields in logical order
+- `Space` to toggle checkboxes
+- `Enter` to submit form
+- Focus moves to first error on failed submit
+
+### 8.8 Form Submission States
+
+```mermaid
+stateDiagram-v2
+    [*] --> Editing
+    Editing --> Validating: User clicks Submit
+    Validating --> HasErrors: Validation fails
+    Validating --> Submitting: Validation passes
+    HasErrors --> Editing: User corrects
+    Submitting --> Success: Server accepts
+    Submitting --> ServerError: Server rejects
+    ServerError --> Editing: User corrects
+    Success --> [*]
+```
+
+#### Submitting State
+
+```
+┌─────────────────────────────────────────┐
+│  Schedule Appointment                   │
+├─────────────────────────────────────────┤
+│  Title:       Team Meeting              │
+│  Date:        Nov 5, 2025               │
+│  Time:        2:00 PM                   │
+│                                         │
+│  [ Scheduling... ]  ← Disabled, loading │
+│  🔄 Creating appointment...             │
+└─────────────────────────────────────────┘
+```
+
+**During Submission:**
+- Disable submit button (prevent double-submit)
+- Show loading indicator
+- Show progress message
+- Keep form visible (don't hide)
+- Allow cancellation if possible
+
+#### Success State
+
+```
+┌─────────────────────────────────────────┐
+│  ✅ Appointment Scheduled               │
+├─────────────────────────────────────────┤
+│                                         │
+│  "Team Meeting" has been added to your  │
+│  calendar for Nov 5, 2025 at 2:00 PM.  │
+│                                         │
+│  [View Appointment] [Schedule Another]  │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**After Success:**
+- Clear success message
+- Summarize what happened
+- Offer next actions
+- Auto-dismiss after 5 seconds OR keep visible (user preference)
+
+---
+
+## 9. Success & Confirmation States
+
+### 9.1 Success State Philosophy
+
+**Core Principle:** Celebrate user accomplishments, provide clear feedback, and guide next steps.
+
+**Success States:**
+- **Instant Success** - Action completed immediately (e.g., mark as read)
+- **Delayed Success** - Action processing (e.g., email sending)
+- **Partial Success** - Some items succeeded, some failed
+
+### 9.2 Success Patterns
+
+#### Pattern 1: Inline Success (Quick Actions)
+
+```
+User marks email as read:
+
+Before:
+┌─────────────────────────────────────────┐
+│ 📧 Email from John                      │
+│ [Mark as Read] [Archive] [Delete]       │
+└─────────────────────────────────────────┘
+
+After (2 seconds):
+┌─────────────────────────────────────────┐
+│ ✅ Marked as read                       │
+└─────────────────────────────────────────┘
+
+Then fades out, email removed from list
+```
+
+**Use When:** Quick, reversible actions with minimal impact
+
+#### Pattern 2: Toast Notification (Background Actions)
+
+```
+User adds expense while browsing calendar:
+
+┌─────────────────────────────────────────┐
+│ ✅ Expense Added                        │
+│ €45.50 added to Food budget             │
+│ [Undo]  [View]                          │
+└─────────────────────────────────────────┘
+     ↑ Appears bottom-right, auto-dismisses after 5s
+```
+
+**Use When:** Action happens in background, user continues other tasks
+
+#### Pattern 3: Modal Success (Important Actions)
+
+```
+User completes trip booking:
+
+┌─────────────────────────────────────────┐
+│  ✅ Trip Booked Successfully            │
+├─────────────────────────────────────────┤
+│                                         │
+│  Your Barcelona trip is confirmed!      │
+│                                         │
+│  📅 Nov 15-17, 2025                     │
+│  ✈️ Flight: BA 456 (9:00 AM)            │
+│  🏨 Hotel: Grand Plaza                  │
+│                                         │
+│  Confirmation sent to your email.       │
+│                                         │
+│  [View Trip Details] [Close]            │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Use When:** Major accomplishment, user should pause and review
+
+#### Pattern 4: Full-Page Success (Onboarding Completion)
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│              ┌──────────┐               │
+│              │    ✅    │               │
+│              │  Success │               │
+│              └──────────┘               │
+│                                         │
+│        You're All Set!                  │
+│                                         │
+│  Fidus is ready to help manage your     │
+│  calendar, finances, and more.          │
+│                                         │
+│  What's next:                           │
+│  • Try saying "What's on my calendar?"  │
+│  • Add your first expense               │
+│  • Explore the dashboard                │
+│                                         │
+│  [Get Started →]                        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Use When:** End of major workflow (onboarding, setup, first-time flows)
+
+### 9.3 Confirmation Patterns
+
+#### Pattern 1: Destructive Action Confirmation
+
+```
+User clicks "Delete Account":
+
+┌─────────────────────────────────────────┐
+│  ⚠️ Delete Account?                     │
+├─────────────────────────────────────────┤
+│                                         │
+│  This will permanently delete:          │
+│  • All your data (calendar, finance)    │
+│  • Your account settings                │
+│  • Chat history                         │
+│                                         │
+│  This action CANNOT be undone.          │
+│                                         │
+│  Type "DELETE" to confirm:              │
+│  ┌───────────────────────────────────┐  │
+│  │                                   │  │
+│  └───────────────────────────────────┘  │
+│                                         │
+│  [Cancel] [Delete Account]              │
+│            ↑ Disabled until typed       │
+└─────────────────────────────────────────┘
+```
+
+**Destructive Actions Require:**
+- Clear warning about what will be deleted
+- Explicit confirmation (typing "DELETE")
+- Disabled button until confirmed
+- Cancel option prominent
+
+#### Pattern 2: High-Value Action Confirmation
+
+```
+User sends email to 50 people:
+
+┌─────────────────────────────────────────┐
+│  📧 Send Email to 50 Recipients?        │
+├─────────────────────────────────────────┤
+│                                         │
+│  You're about to send:                  │
+│  "Team Update - Q4 Goals"               │
+│                                         │
+│  To: All Team Members (50 people)       │
+│                                         │
+│  ☑️ I've reviewed the recipients        │
+│  ☑️ I've checked for typos               │
+│                                         │
+│  [Cancel] [Send Email]                  │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**High-Value Actions Require:**
+- Summary of what will happen
+- List of affected items/people
+- Checklist for user to verify
+- Clear cancel option
+
+#### Pattern 3: Conflict Resolution Confirmation
+
+```
+User schedules overlapping appointment:
+
+┌─────────────────────────────────────────┐
+│  ⚠️ Scheduling Conflict                 │
+├─────────────────────────────────────────┤
+│                                         │
+│  This appointment overlaps with:        │
+│  "Client Call" - 2:00-3:00 PM           │
+│                                         │
+│  How would you like to proceed?         │
+│                                         │
+│  ◉ Find alternative time               │
+│    (recommended)                        │
+│                                         │
+│  ○ Schedule anyway                      │
+│    (creates double-booking)             │
+│                                         │
+│  ○ Reschedule existing appointment     │
+│                                         │
+│  [Cancel] [Continue]                    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Conflict Resolution:**
+- Explain the conflict clearly
+- Provide multiple options
+- Recommend best option
+- Allow user to choose
+
+### 9.4 Progress Indicators (Multi-Step Success)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Step1: Start
+    Step1 --> Step2: Complete Step 1 ✅
+    Step2 --> Step3: Complete Step 2 ✅
+    Step3 --> Success: Complete Step 3 ✅
+    Success --> [*]
+```
+
+#### Pattern: Wizard Progress
+
+```
+Step 1 of 3: Choose Destination ✅
+Step 2 of 3: Select Dates (current)
+Step 3 of 3: Set Budget
+
+┌─────────────────────────────────────────┐
+│  Plan Weekend Trip                      │
+├─────────────────────────────────────────┤
+│                                         │
+│  [██████████░░░░░░░░] 50% complete      │
+│                                         │
+│  ✅ Destination: Barcelona              │
+│  📅 Now: Select your travel dates       │
+│  ⏳ Next: Set your budget                │
+│                                         │
+│  [← Back] [Continue →]                  │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Progress Elements:**
+- Progress bar (visual)
+- Step indicators (✅ done, current, ⏳ upcoming)
+- Current step highlighted
+- Completed steps summarized
+
+### 9.5 Undo Patterns
+
+#### Pattern 1: Immediate Undo (Toast)
+
+```
+User deletes email:
+
+┌─────────────────────────────────────────┐
+│ 🗑️ Email Deleted                        │
+│ [Undo] (5 seconds remaining)            │
+└─────────────────────────────────────────┘
+
+After 5 seconds: Permanently deleted
+```
+
+**Immediate Undo:**
+- 5-30 second window
+- Countdown timer shown
+- Action reversible during window
+
+#### Pattern 2: Recently Deleted (Trash)
+
+```
+User deletes appointment:
+
+Immediate:
+✅ Appointment deleted
+[Undo] (5 seconds)
+
+Later:
+Settings → Calendar → Recently Deleted
+┌─────────────────────────────────────────┐
+│  📅 Recently Deleted (3 items)          │
+├─────────────────────────────────────────┤
+│  Team Meeting - Deleted 2 hours ago     │
+│  [Restore] [Delete Permanently]         │
+│                                         │
+│  Dentist - Deleted yesterday            │
+│  [Restore] [Delete Permanently]         │
+│                                         │
+│  Auto-deleted in 7 days                 │
+└─────────────────────────────────────────┘
+```
+
+**Recently Deleted:**
+- 7-30 day retention
+- Can restore anytime
+- Auto-delete after period
+
+### 9.6 Success Accessibility
+
+#### Screen Reader Announcements
+
+```
+[Screen Reader]:
+"Success. Appointment scheduled.
+Team Meeting added to your calendar for November 5, 2025 at 2:00 PM.
+Buttons: View Appointment, Schedule Another."
+```
+
+**ARIA Attributes:**
+```html
+<div role="alert" aria-live="polite">
+  <h2>✅ Appointment Scheduled</h2>
+  <p>Team Meeting added to your calendar...</p>
+</div>
+```
+
+**Focus Management:**
+- Move focus to success message
+- Allow dismissing with Escape
+- Focus returns to trigger element after dismiss
+
+### 9.7 Success Message Guidelines
+
+#### ✅ Good Success Messages
+
+```
+"Appointment scheduled for Nov 5 at 2:00 PM"
+→ Specific, includes key details
+
+"Budget updated: Food €1,000 → €1,500"
+→ Shows before/after
+
+"Email sent to 50 recipients"
+→ Quantifies impact
+
+"Trip booked! Confirmation #TRV-12345"
+→ Provides reference number
+```
+
+#### ❌ Bad Success Messages
+
+```
+"Success!"
+→ Success at what?
+
+"Operation completed"
+→ What operation?
+
+"Done"
+→ Not helpful
+
+"OK"
+→ No information
+```
+
+#### Success Message Template
+
+```
+[Action completed] + [Key details] + [What's next]
+
+Example:
+"Appointment scheduled for Nov 5 at 2:00 PM.
+Reminder set for 15 minutes before.
+[View] [Add Another]"
+
+Parts:
+- Action: Appointment scheduled
+- Details: Nov 5 at 2:00 PM, reminder
+- Next: View or Add Another
+```
+
+---
+
+## 10. Loading States
+
+### 10.1 Loading State Philosophy
+
+**Core Principle:** Keep users informed during wait times with appropriate feedback.
+
+**Loading State Types:**
+- **Spinner** - Indeterminate progress (unknown duration)
+- **Progress Bar** - Determinate progress (known duration/percentage)
+- **Skeleton Screen** - Content placeholder (best UX)
+- **Inline Loading** - Loading indicator within component
+
+### 10.2 Loading Patterns
+
+#### Pattern 1: Skeleton Screens (Preferred)
+
+**Best for:** Initial page load, list loading
+
+```
+Dashboard loading:
+
+┌─────────────────────────────────────────┐
+│  Dashboard                              │
+├─────────────────────────────────────────┤
+│                                         │
+│  ████████████░░░░░░░░░░░░░░░░░░░░░░░░  │
+│  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │
+│                                         │
+│  [██████] [██████]                      │
+│                                         │
+│  ────────────────────────────────────   │
+│                                         │
+│  ████████████░░░░░░░░░░░░░░░░░░░░░░░░  │
+│  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │
+│                                         │
+│  [██████] [██████]                      │
+│                                         │
+└─────────────────────────────────────────┘
+     ↑ Gray boxes pulse/shimmer
+```
+
+**Why Skeleton Screens:**
+- Perceived performance improvement (feels faster)
+- Shows layout before content loads
+- No jarring empty→full transition
+- Reduces perceived wait time by 20-30%
+
+#### Pattern 2: Inline Spinner (Quick Actions)
+
+```
+User clicks "Mark as Read":
+
+Before:
+[Mark as Read] [Archive]
+
+During (< 1 second):
+[⏳ Marking...] [Archive]
+       ↑ Small spinner
+
+After:
+✅ Marked as read
+```
+
+**Use When:** Action takes 0.5-2 seconds
+
+#### Pattern 3: Chat Typing Indicator
+
+```
+User sends message, Fidus is processing:
+
+┌─────────────────────────────────────────┐
+│  You: What's on my calendar today?      │
+│                                         │
+│  Fidus:                                 │
+│  ● ● ●  ← Animated typing indicator    │
+│                                         │
+└─────────────────────────────────────────┘
+
+Then:
+┌─────────────────────────────────────────┐
+│  You: What's on my calendar today?      │
+│                                         │
+│  Fidus: You have 3 appointments today...│
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Animation:** Three dots that bounce/pulse sequentially
+
+#### Pattern 4: Progress Bar (Known Duration)
+
+```
+Downloading Local AI Model:
+
+┌─────────────────────────────────────────┐
+│  Downloading Local AI Model             │
+├─────────────────────────────────────────┤
+│                                         │
+│  [████████████░░░░░░░░] 65%            │
+│                                         │
+│  Downloaded: 3.1 GB / 4.7 GB            │
+│  Time remaining: ~2 minutes             │
+│                                         │
+│  This happens once. The model stays     │
+│  on your device forever.                │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Use When:**
+- File uploads/downloads
+- Multi-step processes with known steps
+- Long operations (>10 seconds)
+
+#### Pattern 5: Overlay Spinner (Blocking)
+
+```
+User saves settings (takes 2-3 seconds):
+
+┌─────────────────────────────────────────┐
+│  Settings                               │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌───────────────────────────────────┐  │
+│  │                                   │  │
+│  │         ⏳                        │  │
+│  │    Saving settings...             │  │
+│  │                                   │  │
+│  └───────────────────────────────────┘  │
+│         ↑ Overlay blocks interaction    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Use Sparingly:** Only when user MUST wait (saving critical data)
+
+### 10.3 Loading State Timing
+
+```mermaid
+graph LR
+    Start[Action Triggered] --> Check{Duration?}
+
+    Check -->|< 300ms| NoLoader[No Loader<br/>Too fast to notice]
+    Check -->|300ms - 1s| InlineSpinner[Inline Spinner]
+    Check -->|1s - 5s| ModalSpinner[Modal Spinner<br/>+ Message]
+    Check -->|5s - 30s| ProgressBar[Progress Bar<br/>+ Time Estimate]
+    Check -->|> 30s| Background[Background Task<br/>+ Notification]
+
+    style NoLoader fill:#90ee90
+    style InlineSpinner fill:#ffd700
+    style ModalSpinner fill:#ffb84d
+    style ProgressBar fill:#ff9999
+    style Background fill:#ff6666
+```
+
+**Rules:**
+- **< 300ms**: No loader (instant)
+- **300ms - 1s**: Small inline spinner
+- **1s - 5s**: Spinner with "Loading..." text
+- **5s - 30s**: Progress bar with time estimate
+- **> 30s**: Move to background, notify when done
+
+### 10.4 Loading Messages
+
+#### ❌ Bad Loading Messages
+
+```
+"Loading..."
+→ What's loading?
+
+"Please wait..."
+→ Why? How long?
+
+"Processing..."
+→ Processing what?
+```
+
+#### ✅ Good Loading Messages
+
+```
+"Checking your calendar..."
+→ Specific action
+
+"Analyzing 234 transactions..."
+→ Shows what's being processed
+
+"Searching 5 years of emails (45%)..."
+→ Progress indication
+
+"Downloading AI model (3.1 GB / 4.7 GB)..."
+→ Specific progress
+```
+
+#### Loading Message Template
+
+```
+[Action] + [What's being processed] + [Optional: Progress]
+
+Examples:
+"Searching your calendar for conflicts..."
+"Analyzing food expenses (47 transactions)..."
+"Booking flight (step 2 of 3)..."
+"Syncing data across devices (23%)..."
+```
+
+### 10.5 Skeleton Screen Patterns
+
+#### Calendar Skeleton
+
+```
+┌─────────────────────────────────────────┐
+│  📅 Calendar                            │
+├─────────────────────────────────────────┤
+│                                         │
+│  Mon  Tue  Wed  Thu  Fri  Sat  Sun     │
+│  ───  ───  ───  ───  ───  ───  ───     │
+│   1    2    3    4    5    6    7      │
+│        ██   ██   ██                     │
+│   8    9   10   11   12   13   14      │
+│        ██        ██                     │
+│  ...                                    │
+│                                         │
+│  Today's Appointments:                  │
+│  ████████████░░░░░░░░░░░░░░░░░░░░░░    │
+│  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### Finance List Skeleton
+
+```
+┌─────────────────────────────────────────┐
+│  💰 Recent Transactions                 │
+├─────────────────────────────────────────┤
+│                                         │
+│  ████████████░░░░░░░░░░   -€85.50      │
+│  Oct 27 • ████                          │
+│                                         │
+│  ████████████░░░░░░░░░░   -€67.80      │
+│  Oct 25 • ████                          │
+│                                         │
+│  ████████████░░░░░░░░░░   -€12.50      │
+│  Oct 23 • ████                          │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### Card Grid Skeleton
+
+```
+┌─────────────────────────────────────────┐
+│  ✈️ Upcoming Trips                      │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌─────────────┐  ┌─────────────┐      │
+│  │ ████████    │  │ ████████    │      │
+│  │ ████░░░░    │  │ ████░░░░    │      │
+│  │ ░░░░░░░░    │  │ ░░░░░░░░    │      │
+│  └─────────────┘  └─────────────┘      │
+│                                         │
+│  ┌─────────────┐  ┌─────────────┐      │
+│  │ ████████    │  │ ████████    │      │
+│  │ ████░░░░    │  │ ████░░░░    │      │
+│  │ ░░░░░░░░    │  │ ░░░░░░░░    │      │
+│  └─────────────┘  └─────────────┘      │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### 10.6 Background Tasks
+
+For long-running operations (> 30 seconds):
+
+```
+User initiates export:
+
+Step 1 - Immediate feedback:
+┌─────────────────────────────────────────┐
+│  📦 Export Started                      │
+│                                         │
+│  Exporting 2,345 transactions...        │
+│  This will take a few minutes.          │
+│                                         │
+│  You'll receive a notification when     │
+│  the export is ready.                   │
+│                                         │
+│  [OK, Got It]                           │
+└─────────────────────────────────────────┘
+
+User can continue using app
+
+Step 2 - Background indicator:
+┌─────────────────────────────────────────┐
+│  Dashboard            🔄 1 task running │
+│                                         │
+│  [View Background Tasks]                │
+└─────────────────────────────────────────┘
+
+Step 3 - Completion notification:
+┌─────────────────────────────────────────┐
+│  ✅ Export Complete                     │
+│  Your data export is ready              │
+│  [Download] [Dismiss]                   │
+└─────────────────────────────────────────┘
+```
+
+**Background Task Manager:**
+```
+┌─────────────────────────────────────────┐
+│  🔄 Background Tasks                    │
+├─────────────────────────────────────────┤
+│                                         │
+│  Exporting transactions                 │
+│  [███████████░░░░░░░] 75%              │
+│  ~1 minute remaining                    │
+│  [Cancel]                               │
+│                                         │
+│  Syncing calendar                       │
+│  [████████████████] Complete            │
+│  ✅ Synced 47 events                    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### 10.7 Loading State Accessibility
+
+#### Screen Reader Announcements
+
+```
+[Screen Reader]:
+"Loading. Checking your calendar.
+Please wait."
+
+[After 2 seconds]:
+"Loading complete. You have 3 appointments today."
+```
+
+**ARIA Attributes:**
+```html
+<div
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+>
+  <span aria-label="Loading">
+    Checking your calendar...
+  </span>
+</div>
+```
+
+#### Keyboard Accessibility
+
+- Loading overlays trap focus (prevent interaction with hidden content)
+- Escape key cancels if cancellation supported
+- Focus returns to trigger element after loading completes
+
+### 10.8 Loading State Best Practices
+
+**DO:**
+- ✅ Show progress for operations > 1 second
+- ✅ Provide specific messages ("Analyzing 234 transactions...")
+- ✅ Use skeleton screens for initial page loads
+- ✅ Show time estimates for > 5 second operations
+- ✅ Allow cancellation for long operations
+- ✅ Keep UI responsive (don't block everything)
+
+**DON'T:**
+- ❌ Show spinners for < 300ms operations (too fast, causes flicker)
+- ❌ Use generic "Loading..." without context
+- ❌ Block entire app for small operations
+- ❌ Hide critical content behind full-page spinner
+- ❌ Leave users guessing how long they'll wait
+- ❌ Show progress bars that don't actually progress
+
+### 10.9 Loading State Animations
+
+#### Spinner Animation
+
+```css
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+```
+
+#### Pulse Animation (Skeleton)
+
+```css
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.skeleton {
+  animation: pulse 2s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+}
+```
+
+#### Typing Indicator Animation
+
+```css
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; }
+  30% { opacity: 1; }
+}
+
+.dot:nth-child(1) { animation: typing 1.4s infinite 0s; }
+.dot:nth-child(2) { animation: typing 1.4s infinite 0.2s; }
+.dot:nth-child(3) { animation: typing 1.4s infinite 0.4s; }
+```
+
+---
+
+## 11. Error Handling & Recovery
+
+### 11.1 Error Philosophy
 
 **Core Principle:** Errors are opportunities to build trust through transparency and helpful recovery.
 

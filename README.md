@@ -352,7 +352,7 @@ Fidus is built as a **monorepo** with multiple packages:
 ```
 packages/
 ├── api/       - FastAPI backend (Python + LangGraph)
-├── web/       - Next.js frontend (React + TypeScript)
+├── web/       - Next.js Progressive Web App (React + TypeScript)
 ├── cli/       - Command-line interface (Node.js)
 └── shared/    - Shared types and utilities (TypeScript)
 ```
@@ -374,6 +374,53 @@ MCP Tools (External Integrations)
     ↓
 Response + Proactive Suggestions
 ```
+
+### AI-Driven UI Paradigm
+
+Fidus pioneered an **AI-driven UI paradigm** that fundamentally changes how users interact with software:
+
+**🎯 Conversational-First Interface**
+- Natural language is the primary interaction method
+- Chat interface triggers context-specific UIs dynamically
+- No rigid navigation trees or complex menu structures
+
+**🔄 Situational/Contextual UI**
+- UI adapts in real-time based on conversation context
+- Budget discussion → Inline budget chart appears
+- Calendar scheduling → Calendar picker emerges
+- Travel planning → Trip card with options materializes
+- Rich, interactive widgets embedded directly in chat
+
+**🤖 LLM-Driven Logic**
+- UI flow is not hard-coded but determined by AI reasoning
+- System adapts to user intent, not predefined paths
+- Smart defaults based on learned preferences
+- Graceful degradation to rule-based routing when LLM unavailable
+
+**📱 Progressive Web App (PWA)**
+- Offline-first architecture with Service Workers
+- Install to home screen (no app store needed)
+- Native-like experience (full-screen, splash screen)
+- Push notifications for proactive suggestions
+- Background sync when connection restored
+- App shell for instant loading (<100ms perceived)
+
+**🔐 Privacy-Transparent UI**
+- Visual indicators show local vs. cloud processing
+- Permission requests are just-in-time and granular
+- User sees exactly what Fidus does (audit log)
+- Explainable AI: "Why did Fidus suggest this?"
+
+**🎨 Adaptive Design System**
+- UI components respond to AI confidence levels
+- High confidence: Direct actions
+- Low confidence: Multiple options presented
+- Thinking indicators show AI processing state
+- Fallback UI when AI fails (graceful degradation)
+
+**Key Insight:** Traditional UIs present all options upfront. Fidus's AI-driven UI presents exactly what's needed, when it's needed, based on conversational context. This reduces cognitive load while maintaining user control.
+
+See [UX/UI Design Documentation](docs/ux-ui-design/README.md) for detailed patterns.
 
 ### Core Technologies
 

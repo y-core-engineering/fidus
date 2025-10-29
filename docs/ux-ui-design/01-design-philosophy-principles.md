@@ -493,7 +493,7 @@ graph TB
 
 | Pattern | Description | When to Use |
 |---------|-------------|-------------|
-| **Processing Badge** | Shows where LLM processed request (local/cloud) | On every LLM response |
+| **Privacy Badge** | Shows where LLM processed request (local/cloud) | On every LLM response |
 | **Permission Modal** | Just-in-time permission request with clear purpose | When supervisor needs new data access |
 | **Privacy Indicators** | Icons showing data status (🔒 local, ☁️ cloud, 🔐 encrypted) | On cards, forms, settings |
 | **Audit Log** | User-accessible log of all system actions | Always available in Settings |
