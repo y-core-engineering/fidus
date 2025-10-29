@@ -1,380 +1,354 @@
 'use client';
 
-import { Link, Stack } from '@fidus/ui';
+import { Button, ProgressBar, TextInput, Checkbox, Alert, Link, Stack } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { useState } from 'react';
 
 export default function OnboardingPatternPage() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  const totalSteps = 8;
+  const progress = (currentStep / totalSteps) * 100;
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <h1>Onboarding Pattern</h1>
       <p className="lead">
-        Privacy-first user onboarding with 8-step wizard approach that guides new users through account setup while respecting their time and privacy.
+        Multi-step wizard pattern for guiding new users through account setup with clear progress indicators and privacy-first approach.
       </p>
 
-      <h2>Overview</h2>
-      <p className="my-lg">
-        The Fidus onboarding pattern guides new users through account setup with a clear,
-        privacy-focused flow. Unlike traditional onboarding that rushes users through setup,
-        Fidus takes time to explain privacy protections and give users control over their data
-        from day one.
-      </p>
-      <p className="my-lg">
-        The 8-step wizard balances thoroughness with simplicity, ensuring users understand the
-        value proposition while respecting their time and attention.
+      <h2>Interactive Wizard Example</h2>
+      <p className="text-sm text-muted-foreground">
+        A complete onboarding wizard with progress tracking, step navigation, and form validation.
       </p>
 
-      <h2 className="mt-2xl">8-Step Onboarding Flow</h2>
+      <div className="not-prose my-lg">
+        <ComponentPreview code={`const [currentStep, setCurrentStep] = useState(1);
+const totalSteps = 8;
+const progress = (currentStep / totalSteps) * 100;
+
+<div className="max-w-2xl mx-auto">
+  <ProgressBar
+    value={progress}
+    variant="primary"
+    label={\`Step \${currentStep} of \${totalSteps}\`}
+  />
+
+  {/* Step content here */}
+
+  <Stack direction="horizontal" spacing="md" justify="between">
+    <Button
+      variant="secondary"
+      onClick={() => setCurrentStep(prev => prev - 1)}
+      disabled={currentStep === 1}
+    >
+      Back
+    </Button>
+    <Button onClick={() => setCurrentStep(prev => prev + 1)}>
+      {currentStep === totalSteps ? 'Complete' : 'Next'}
+    </Button>
+  </Stack>
+</div>`}>
+          <div className="max-w-2xl mx-auto border border-border rounded-lg p-lg bg-card">
+            <div className="mb-lg">
+              <ProgressBar
+                value={progress}
+                variant="primary"
+                showLabel={false}
+              />
+              <p className="text-sm text-muted-foreground mt-sm">
+                Step {currentStep} of {totalSteps}
+              </p>
+            </div>
+
+            {currentStep === 1 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Welcome to Fidus</h3>
+                <p className="text-muted-foreground">
+                  Your privacy-first AI personal assistant. Let&apos;s get you set up in just a few steps.
+                </p>
+                <div className="p-md bg-muted rounded-lg">
+                  <ul className="space-y-sm text-sm">
+                    <li className="flex gap-sm">
+                      <span className="text-primary">✓</span>
+                      <span>Your data stays on your device</span>
+                    </li>
+                    <li className="flex gap-sm">
+                      <span className="text-primary">✓</span>
+                      <span>End-to-end encryption</span>
+                    </li>
+                    <li className="flex gap-sm">
+                      <span className="text-primary">✓</span>
+                      <span>No selling or sharing data</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 2 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Privacy First</h3>
+                <Alert variant="info" title="Your data is protected">
+                  Fidus uses end-to-end encryption and stores data locally. We never sell or share your personal information.
+                </Alert>
+                <div className="space-y-sm text-sm">
+                  <p className="font-medium">What this means for you:</p>
+                  <ul className="space-y-xs ml-lg">
+                    <li>• Calendar events stay on your device</li>
+                    <li>• Financial data is encrypted</li>
+                    <li>• You control what gets stored</li>
+                    <li>• Delete your data anytime</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Create Your Account</h3>
+                <TextInput
+                  label="Email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <TextInput
+                  label="Password"
+                  type="password"
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  showPasswordToggle
+                  required
+                />
+                <Checkbox
+                  label="I agree to the Terms and Privacy Policy"
+                  checked={agreedToTerms}
+                  onChange={setAgreedToTerms}
+                />
+              </div>
+            )}
+
+            {currentStep === 4 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Connect Your Calendar</h3>
+                <p className="text-sm text-muted-foreground">
+                  Connect your calendar to enable smart scheduling and time management features.
+                </p>
+                <div className="grid gap-sm">
+                  <Button variant="secondary" className="justify-start">
+                    <span>📅</span>
+                    <span>Google Calendar</span>
+                  </Button>
+                  <Button variant="secondary" className="justify-start">
+                    <span>📆</span>
+                    <span>Apple Calendar</span>
+                  </Button>
+                  <Button variant="secondary" className="justify-start">
+                    <span>📋</span>
+                    <span>Outlook Calendar</span>
+                  </Button>
+                </div>
+                <Button variant="ghost" size="small">
+                  Skip for now
+                </Button>
+              </div>
+            )}
+
+            {currentStep === 5 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Financial Tracking</h3>
+                <p className="text-sm text-muted-foreground">
+                  Set up budget tracking to manage your finances with AI-powered insights.
+                </p>
+                <div className="p-md bg-muted rounded-lg">
+                  <p className="text-sm font-medium mb-sm">🔒 Bank-level security</p>
+                  <p className="text-xs text-muted-foreground">
+                    Your financial data is encrypted and stored locally. We use read-only access and never store your banking credentials.
+                  </p>
+                </div>
+                <Stack direction="vertical" spacing="sm">
+                  <Button variant="secondary">Connect Bank Account</Button>
+                  <Button variant="secondary">Manual Entry</Button>
+                  <Button variant="ghost" size="small">Skip for now</Button>
+                </Stack>
+              </div>
+            )}
+
+            {currentStep === 6 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Preferences</h3>
+                <div className="space-y-md">
+                  <div>
+                    <label className="text-sm font-medium mb-xs block">Notifications</label>
+                    <Stack direction="vertical" spacing="xs">
+                      <Checkbox label="Email notifications" checked />
+                      <Checkbox label="Push notifications" checked />
+                      <Checkbox label="Daily summary" />
+                    </Stack>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-xs block">Theme</label>
+                    <Stack direction="horizontal" spacing="sm">
+                      <Button variant="secondary" size="small">Light</Button>
+                      <Button variant="secondary" size="small">Dark</Button>
+                      <Button variant="primary" size="small">Auto</Button>
+                    </Stack>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 7 && (
+              <div className="space-y-md">
+                <h3 className="text-xl font-semibold">Review Your Setup</h3>
+                <div className="space-y-sm">
+                  <div className="p-md border border-border rounded-lg">
+                    <p className="text-sm font-medium mb-xs">Account</p>
+                    <p className="text-sm text-muted-foreground">{email || 'you@example.com'}</p>
+                  </div>
+                  <div className="p-md border border-border rounded-lg">
+                    <p className="text-sm font-medium mb-xs">Connected Services</p>
+                    <p className="text-sm text-muted-foreground">Google Calendar</p>
+                  </div>
+                  <div className="p-md border border-border rounded-lg">
+                    <p className="text-sm font-medium mb-xs">Preferences</p>
+                    <p className="text-sm text-muted-foreground">Notifications enabled, Auto theme</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="small">Edit settings</Button>
+              </div>
+            )}
+
+            {currentStep === 8 && (
+              <div className="space-y-md text-center">
+                <div className="text-6xl">🎉</div>
+                <h3 className="text-xl font-semibold">You&apos;re All Set!</h3>
+                <p className="text-muted-foreground">
+                  Welcome to Fidus. Your personal AI assistant is ready to help you stay organized.
+                </p>
+                <Alert variant="success" title="What&apos;s next?">
+                  <ul className="text-sm space-y-xs text-left mt-sm">
+                    <li>• Add your first calendar event</li>
+                    <li>• Set up your first budget</li>
+                    <li>• Explore AI suggestions</li>
+                  </ul>
+                </Alert>
+              </div>
+            )}
+
+            <Stack direction="horizontal" spacing="md" justify="between" className="mt-lg pt-lg border-t border-border">
+              <Button
+                variant="secondary"
+                onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
+                disabled={currentStep === 1}
+              >
+                Back
+              </Button>
+              <Button
+                onClick={() => setCurrentStep(prev => Math.min(totalSteps, prev + 1))}
+              >
+                {currentStep === totalSteps ? 'Go to Dashboard' : 'Next'}
+              </Button>
+            </Stack>
+          </div>
+        </ComponentPreview>
+      </div>
+
+      <h2>Progress Indicator Patterns</h2>
+      <p className="text-sm text-muted-foreground">
+        Show users where they are in the onboarding process with clear visual indicators.
+      </p>
 
       <div className="not-prose space-y-lg my-lg">
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 1: Welcome and Value Proposition</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Introduce Fidus and explain what makes it different. Focus on privacy, AI assistance,
-            and user control.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Welcoming headline</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Brief explanation of Fidus purpose</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Visual representation (illustration or animation)</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Primary CTA: &quot;Get Started&quot;</span>
-              </li>
-            </ul>
-          </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Linear Progress Bar</h3>
+          <ComponentPreview code={`<ProgressBar
+  value={37.5}
+  variant="primary"
+  label="Step 3 of 8"
+/>`}>
+            <ProgressBar value={37.5} variant="primary" label="Step 3 of 8" />
+          </ComponentPreview>
         </div>
 
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 2: Privacy Overview (Key Differentiator)</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            This is where Fidus stands out. Explain privacy protections before collecting any data.
-            This builds trust from the start.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Headline: &quot;Your Privacy Comes First&quot;</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Data stays on your device</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>End-to-end encryption</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>No selling or sharing data</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>You control what is stored</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Link to full privacy policy</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 3: Account Creation</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Collect minimal information needed to create an account. Support multiple authentication
-            methods for user convenience.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Email and password fields</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Password strength indicator</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Optional: Social login (Google, Apple)</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Terms and privacy policy checkboxes</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Clear error validation</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 4: Calendar Integration</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Connect calendar to enable scheduling features. Explain what data is accessed and how
-            it is used.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>List of supported calendar providers</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>What data will be accessed (read-only by default)</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>How calendar data improves AI suggestions</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>&quot;Skip for now&quot; option</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Can be configured later</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 5: Finance Setup</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Optional step to connect financial accounts or set up manual tracking. Emphasize
-            encryption and security.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Connect bank accounts (via secure provider)</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Manual transaction entry option</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Budget categories setup</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Clear security explanation</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>&quot;Skip for now&quot; option</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 6: Preferences</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Collect user preferences for personalization. All preferences should be changeable later.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Notification preferences</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Time zone and language</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Theme (light/dark/auto)</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>AI suggestion frequency</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Default views and layouts</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 7: Review and Confirm</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Show summary of settings and give users a chance to review or change anything before
-            completing setup.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Connected accounts summary</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Privacy settings summary</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Preferences summary</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Edit links for each section</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>&quot;Complete Setup&quot; button</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-l-4 border-primary pl-lg">
-          <h3 className="text-lg font-semibold mb-md">Step 8: Success and Next Steps</h3>
-          <p className="text-sm text-muted-foreground mb-md">
-            Celebrate completion and guide users to their first action. Provide clear next steps.
-          </p>
-          <div className="bg-muted border border-border rounded-lg p-md text-sm">
-            <p className="font-semibold mb-sm">Key elements:</p>
-            <ul className="space-y-sm ml-lg">
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Success message and visual</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>What happens next</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Suggested first actions</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>Link to help documentation</span>
-              </li>
-              <li className="flex gap-sm">
-                <span className="text-muted-foreground shrink-0">•</span>
-                <span>&quot;Go to Dashboard&quot; button</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <h2 className="mt-2xl">Code Example: Wizard Structure</h2>
-
-      <ComponentPreview code={`import { useState } from 'react';
-import { Button, Progress } from '@fidus/ui';
-
-interface OnboardingWizardProps {
-  onComplete: () => void;
-}
-
-export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 8;
-
-  const steps = [
-    { id: 1, component: WelcomeStep, title: 'Welcome' },
-    { id: 2, component: PrivacyStep, title: 'Privacy' },
-    { id: 3, component: AccountStep, title: 'Account' },
-    { id: 4, component: CalendarStep, title: 'Calendar' },
-    { id: 5, component: FinanceStep, title: 'Finance' },
-    { id: 6, component: PreferencesStep, title: 'Preferences' },
-    { id: 7, component: ReviewStep, title: 'Review' },
-    { id: 8, component: SuccessStep, title: 'Success' },
-  ];
-
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      onComplete();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const CurrentStepComponent = steps[currentStep - 1].component;
-
-  return (
-    <div className="max-w-2xl mx-auto p-lg">
-      <div className="mb-lg">
-        <Progress
-          value={(currentStep / totalSteps) * 100}
-          label={\`Step \${currentStep} of \${totalSteps}\`}
-        />
-      </div>
-      <div className="mb-lg">
-        <CurrentStepComponent
-          onNext={handleNext}
-          onBack={handleBack}
-        />
-      </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Step Indicators</h3>
+          <ComponentPreview code={`<div className="flex items-center justify-between">
+  <div className="flex items-center gap-sm">
+    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+      1
     </div>
-  );
-}`}>
-        <div className="p-lg border border-border rounded-lg bg-background">
-          <p className="text-sm text-muted-foreground">Interactive wizard example - see code above</p>
+    <span className="text-sm font-medium">Account</span>
+  </div>
+  <div className="flex-1 h-px bg-border mx-sm" />
+  {/* Repeat for each step */}
+</div>`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-sm">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">✓</div>
+                <span className="text-sm font-medium">Account</span>
+              </div>
+              <div className="flex-1 h-px bg-border mx-sm" />
+              <div className="flex items-center gap-sm">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">2</div>
+                <span className="text-sm font-medium">Privacy</span>
+              </div>
+              <div className="flex-1 h-px bg-muted mx-sm" />
+              <div className="flex items-center gap-sm">
+                <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-semibold">3</div>
+                <span className="text-sm text-muted-foreground">Setup</span>
+              </div>
+            </div>
+          </ComponentPreview>
         </div>
-      </ComponentPreview>
+      </div>
 
-      <h2 className="mt-2xl">Usage Guidelines</h2>
+      <h2>Navigation Patterns</h2>
+      <p className="text-sm text-muted-foreground">
+        Provide clear navigation between steps with back and next actions.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
+        <ComponentPreview code={`<Stack direction="horizontal" spacing="md" justify="between">
+  <Button variant="secondary" disabled>
+    Back
+  </Button>
+  <Button>Next</Button>
+</Stack>`}>
+          <Stack direction="horizontal" spacing="md" justify="between">
+            <Button variant="secondary" disabled>Back</Button>
+            <Button>Next</Button>
+          </Stack>
+        </ComponentPreview>
+      </div>
+
+      <h2>Usage Guidelines</h2>
       <div className="not-prose space-y-lg my-lg">
         <div>
           <h3 className="text-lg font-semibold mb-md">When to use</h3>
           <ul className="space-y-sm text-sm">
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>User is creating a new account</span>
+              <span>Initial user account creation and setup</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>User needs to understand privacy protections</span>
+              <span>Multi-step configuration processes</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Initial configuration is required</span>
+              <span>When users need context about privacy and features</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Multiple setup steps are needed</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-muted-foreground shrink-0">•</span>
-              <span>Educational content improves experience</span>
+              <span>Complex setups that benefit from step-by-step guidance</span>
             </li>
           </ul>
         </div>
@@ -384,7 +358,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           <ul className="space-y-sm text-sm">
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Explain privacy protections early (Step 2)</span>
+              <span>Show clear progress with visual indicators</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
@@ -392,11 +366,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Show progress clearly with visual indicator</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-muted-foreground shrink-0">•</span>
-              <span>Use welcoming, friendly language</span>
+              <span>Enable going back to previous steps</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
@@ -404,7 +374,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Allow editing of previous steps</span>
+              <span>Explain privacy implications early</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use friendly, welcoming language</span>
             </li>
           </ul>
         </div>
@@ -414,30 +388,29 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           <ul className="space-y-sm text-sm">
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Tab through all interactive elements in logical order</span>
+              <span>Announce current step to screen readers with aria-live</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Announce current step and total steps to screen readers</span>
+              <span>Manage focus when moving between steps</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Announce progress changes with aria-live regions</span>
+              <span>Support keyboard navigation (Tab, Enter, Arrow keys)</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Focus management between steps</span>
+              <span>Provide skip links for optional sections</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Large enough touch targets (44x44px minimum)</span>
+              <span>Ensure sufficient color contrast for step indicators</span>
             </li>
           </ul>
         </div>
       </div>
 
       <h2 className="mt-2xl">Do&apos;s and Don&apos;ts</h2>
-
       <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
         <div className="border-2 border-success rounded-lg p-lg">
           <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
@@ -446,23 +419,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           <ul className="space-y-md text-sm">
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Explain privacy protections early</span>
+              <span>Show progress clearly with visual indicators</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Allow users to skip optional steps</span>
+              <span>Explain privacy protections early in the flow</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Show progress clearly</span>
+              <span>Allow users to go back and edit previous steps</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Use welcoming, friendly language</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-success shrink-0">•</span>
-              <span>Provide context for each step</span>
+              <span>Provide &quot;Skip for now&quot; for optional steps</span>
             </li>
           </ul>
         </div>
@@ -474,23 +443,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           <ul className="space-y-md text-sm">
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Ask for unnecessary information</span>
+              <span>Force users through unnecessary steps</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Hide privacy implications</span>
+              <span>Hide or downplay privacy implications</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Force users through all steps</span>
+              <span>Prevent users from going back</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Use jargon or technical terms</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-error shrink-0">•</span>
-              <span>Block going back to previous steps</span>
+              <span>Use more than 10 steps (consider grouping)</span>
             </li>
           </ul>
         </div>
@@ -499,13 +464,13 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       <h2>Related Components</h2>
       <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
         <Link
-          href="/components/progress"
+          href="/components/progress-bar"
           className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
         >
           <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
-            Progress
+            Progress Bar
           </h3>
-          <p className="text-sm text-muted-foreground">Show completion status</p>
+          <p className="text-sm text-muted-foreground">Visual progress indicators</p>
         </Link>
 
         <Link
@@ -519,34 +484,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         </Link>
 
         <Link
-          href="/components/input"
+          href="/patterns/form-validation"
           className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
         >
           <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
-            Input
+            Form Validation
           </h3>
-          <p className="text-sm text-muted-foreground">Form fields</p>
+          <p className="text-sm text-muted-foreground">Input validation patterns</p>
         </Link>
       </div>
 
       <h2>Resources</h2>
       <div className="not-prose my-lg">
         <ul className="space-y-md">
-          <li>
-            <Link variant="standalone" href="/foundations/privacy-ux">
-              Privacy UX Guidelines
-            </Link>
-          </li>
-          <li>
-            <Link variant="standalone" href="/patterns/form-validation">
-              Form Validation Pattern
-            </Link>
-          </li>
-          <li>
-            <Link variant="standalone" href="/getting-started/design-philosophy">
-              Design Philosophy
-            </Link>
-          </li>
           <li>
             <Link
               variant="standalone"
@@ -560,21 +510,21 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           <li>
             <Link
               variant="standalone"
-              href="https://www.w3.org/WAI/WCAG21/Understanding/error-identification.html"
-              external
-              showIcon
-            >
-              WCAG 2.1: Error Identification
-            </Link>
-          </li>
-          <li>
-            <Link
-              variant="standalone"
               href="https://www.nngroup.com/articles/progress-indicators/"
               external
               showIcon
             >
               Nielsen Norman Group: Progress Indicators
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/foundations/privacy-ux">
+              Privacy UX Guidelines
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
             </Link>
           </li>
         </ul>
