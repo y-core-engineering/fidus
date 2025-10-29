@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NavItem {
   title: string;
@@ -173,8 +173,24 @@ const navigation: NavItem[] = [
 ];
 
 function NavSection({ item }: { item: NavItem }) {
-  const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
+
+  // Check if any child item is active (recursively)
+  const hasActiveChild = (items: NavItem[]): boolean => {
+    return items.some(child => {
+      if (child.href === pathname) return true;
+      if (child.items) return hasActiveChild(child.items);
+      return false;
+    });
+  };
+
+  const isActiveSection = item.items ? hasActiveChild(item.items) : false;
+  const [isOpen, setIsOpen] = useState(isActiveSection);
+
+  // Update isOpen when pathname changes
+  useEffect(() => {
+    setIsOpen(isActiveSection);
+  }, [pathname, isActiveSection]);
 
   if (item.items) {
     return (
@@ -208,6 +224,12 @@ function NavItem({ item }: { item: NavItem }) {
   const pathname = usePathname();
   const isActive = pathname === item.href;
 
+  // If item has sub-items, render as a nested section
+  if (item.items) {
+    return <NavSection item={item} />;
+  }
+
+  // If no href and no items, skip
   if (!item.href) return null;
 
   return (

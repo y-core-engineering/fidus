@@ -2,7 +2,7 @@
 
 import { Button } from '@fidus/ui';
 import Link from 'next/link';
-import { Code, Palette, Book, ArrowRight } from 'lucide-react';
+import { Code, Palette, Book, ArrowRight, Sparkles, Shield, Network, Zap } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -10,21 +10,106 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="pt-12">
         <div className="mx-auto max-w-4xl text-center">
+          <div className="mb-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-primary bg-primary/5 text-black dark:text-white text-sm font-semibold">
+            <Sparkles className="h-4 w-4" />
+            AI-Driven Design System
+          </div>
           <h1 className="mb-6 text-6xl font-bold tracking-tight">
             Fidus Design System
           </h1>
           <p className="mb-8 text-xl text-muted-foreground max-w-2xl mx-auto">
-            A comprehensive design system for building privacy-first, AI-driven user interfaces.
-            Built with React, TypeScript, and Tailwind CSS.
+            Where the <strong>LLM decides the UI</strong>. Build privacy-first, context-adaptive interfaces
+            that respond intelligently to user needs.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/getting-started/overview">
               <Button size="lg">Get Started</Button>
             </Link>
-            <Link href="/components">
+            <Link href="/architecture/ui-decision-layer">
               <Button variant="secondary" size="lg">
-                View Components
+                Explore Architecture
               </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* What Makes Fidus Unique */}
+      <section>
+        <div className="text-center mb-12">
+          <h2 className="mb-4 text-4xl font-bold">
+            What Makes Fidus Unique?
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Fidus isn't just another component library. It's a fundamentally different approach
+            to building user interfaces.
+          </p>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
+          {/* AI-Driven UI Paradigm */}
+          <div className="p-8 border-2 border-primary rounded-xl bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/20">
+              <Sparkles className="h-7 w-7 text-primary" />
+            </div>
+            <h3 className="mb-3 text-2xl font-bold">AI-Driven UI Paradigm</h3>
+            <p className="mb-4 text-muted-foreground leading-relaxed">
+              No fixed screens. No predetermined flows. The <strong>LLM analyzes user context</strong>
+              (time, location, history, intent) and dynamically decides what UI to render—form, chat,
+              widget, or wizard.
+            </p>
+            <Link href="/foundations/ai-driven-ui" className="inline-flex items-center text-primary font-medium hover:underline">
+              Learn the paradigm
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* UI Decision Layer */}
+          <div className="p-8 border-2 border-primary rounded-xl bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/20">
+              <Network className="h-7 w-7 text-primary" />
+            </div>
+            <h3 className="mb-3 text-2xl font-bold">UI Decision Layer</h3>
+            <p className="mb-4 text-muted-foreground leading-relaxed">
+              The backend doesn't just send data—it <strong>decides which UI component to render</strong>.
+              LangGraph agents orchestrate the interface, bridging backend logic with frontend components
+              through a unified API.
+            </p>
+            <Link href="/architecture/ui-decision-layer" className="inline-flex items-center text-primary font-medium hover:underline">
+              Explore architecture
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Privacy-First */}
+          <div className="p-8 border-2 border-border rounded-xl hover:border-primary transition-colors">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-success/20">
+              <Shield className="h-7 w-7 text-success" />
+            </div>
+            <h3 className="mb-3 text-2xl font-bold">Privacy-First Design</h3>
+            <p className="mb-4 text-muted-foreground leading-relaxed">
+              Local-first data storage. End-to-end encryption. User owns and controls all data.
+              GDPR-compliant by design. Privacy isn't a feature—it's the foundation.
+            </p>
+            <Link href="/foundations/privacy-ux" className="inline-flex items-center text-primary font-medium hover:underline">
+              Privacy principles
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Event-Driven Architecture */}
+          <div className="p-8 border-2 border-border rounded-xl hover:border-primary transition-colors">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-warning/20">
+              <Zap className="h-7 w-7 text-warning" />
+            </div>
+            <h3 className="mb-3 text-2xl font-bold">Event-Driven & Real-Time</h3>
+            <p className="mb-4 text-muted-foreground leading-relaxed">
+              WebSocket connections for real-time opportunities. Server-sent events for notifications.
+              Proactive opportunities surface when relevant, not when hardcoded.
+            </p>
+            <Link href="/architecture/frontend-architecture" className="inline-flex items-center text-primary font-medium hover:underline">
+              Frontend architecture
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -98,63 +183,99 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Components & Patterns */}
+      {/* Featured: Architecture & Patterns First */}
       <section>
         <h2 className="mb-8 text-center text-3xl font-bold">
-          Featured Components & Patterns
+          Core Architecture & Unique Patterns
         </h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+          {/* UI Decision Layer - MOST IMPORTANT */}
+          <Link
+            href="/architecture/ui-decision-layer"
+            className="group block p-6 border-2 border-primary rounded-lg hover:shadow-lg transition-all bg-gradient-to-br from-primary/5 to-transparent"
+          >
+            <div className="mb-3">
+              <span className="inline-block px-3 py-1 text-xs font-bold rounded bg-primary text-black">
+                ⭐ CORE ARCHITECTURE
+              </span>
+            </div>
+            <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
+              UI Decision Layer
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              How the backend decides which UI to render. The heart of Fidus's AI-driven approach.
+            </p>
+          </Link>
+
+          {/* Opportunity Surface */}
+          <Link
+            href="/patterns/opportunity-surface"
+            className="group block p-6 border-2 border-primary rounded-lg hover:shadow-lg transition-all bg-gradient-to-br from-primary/5 to-transparent"
+          >
+            <div className="mb-3">
+              <span className="inline-block px-3 py-1 text-xs font-bold rounded bg-primary text-black">
+                ⭐ UNIQUE PATTERN
+              </span>
+            </div>
+            <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
+              Opportunity Surface
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Dynamic dashboard where opportunities appear based on context, not hardcoded rules.
+            </p>
+          </Link>
+
           {/* Opportunity Card */}
           <Link
             href="/components/opportunity-card"
-            className="group block p-6 border border-border rounded-lg hover:border-primary transition-colors bg-card"
+            className="group block p-6 border-2 border-primary rounded-lg hover:shadow-lg transition-all bg-gradient-to-br from-primary/5 to-transparent"
           >
             <div className="mb-3">
-              <span className="inline-block px-2 py-1 text-xs font-medium rounded bg-primary/10 text-primary">
-                Component
+              <span className="inline-block px-3 py-1 text-xs font-bold rounded bg-primary text-black">
+                ⭐ UNIQUE COMPONENT
               </span>
             </div>
             <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
               Opportunity Card
             </h3>
             <p className="text-sm text-muted-foreground">
-              Unique to Fidus: Dynamic cards for the AI-driven opportunity surface.
+              The UI building block for the Opportunity Surface. Context-driven, user-dismissible.
             </p>
           </Link>
 
-          {/* Button */}
+          {/* Component Registry */}
           <Link
-            href="/components/button"
+            href="/architecture/component-registry"
             className="group block p-6 border border-border rounded-lg hover:border-primary transition-colors bg-card"
           >
             <div className="mb-3">
               <span className="inline-block px-2 py-1 text-xs font-medium rounded bg-primary/10 text-primary">
-                Component
+                Architecture
               </span>
             </div>
             <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
-              Button
+              Component Registry
             </h3>
             <p className="text-sm text-muted-foreground">
-              Versatile button component with multiple variants and states.
+              Backend-Frontend bridge. Maps UI decisions to React components.
             </p>
           </Link>
 
-          {/* Modal */}
+          {/* API Response Schema */}
           <Link
-            href="/components/modal"
+            href="/architecture/api-response-schema"
             className="group block p-6 border border-border rounded-lg hover:border-primary transition-colors bg-card"
           >
             <div className="mb-3">
               <span className="inline-block px-2 py-1 text-xs font-medium rounded bg-primary/10 text-primary">
-                Component
+                Architecture
               </span>
             </div>
             <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
-              Modal
+              API Response Schema
             </h3>
             <p className="text-sm text-muted-foreground">
-              Accessible modal dialog for focused interactions.
+              Structured format for UI metadata. How backend tells frontend what to render.
             </p>
           </Link>
 
@@ -172,44 +293,17 @@ export default function HomePage() {
               Onboarding
             </h3>
             <p className="text-sm text-muted-foreground">
-              Privacy-first onboarding flow with 8-step wizard.
+              Privacy-first onboarding flow with 8-step wizard. Builds trust from day one.
             </p>
           </Link>
+        </div>
 
-          {/* Search & Filtering Pattern */}
-          <Link
-            href="/patterns/search-filtering"
-            className="group block p-6 border border-border rounded-lg hover:border-primary transition-colors bg-card"
-          >
-            <div className="mb-3">
-              <span className="inline-block px-2 py-1 text-xs font-medium rounded bg-success/10 text-success">
-                Pattern
-              </span>
-            </div>
-            <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
-              Search & Filtering
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              AI-powered search with traditional filtering options.
-            </p>
-          </Link>
-
-          {/* Settings Pattern */}
-          <Link
-            href="/patterns/settings"
-            className="group block p-6 border border-border rounded-lg hover:border-primary transition-colors bg-card"
-          >
-            <div className="mb-3">
-              <span className="inline-block px-2 py-1 text-xs font-medium rounded bg-success/10 text-success">
-                Pattern
-              </span>
-            </div>
-            <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">
-              Settings Interface
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Comprehensive settings with 9 categories and privacy report.
-            </p>
+        {/* Button to view all components */}
+        <div className="text-center mt-10">
+          <Link href="/components">
+            <Button variant="secondary" size="lg">
+              View All Components
+            </Button>
           </Link>
         </div>
       </section>
@@ -220,6 +314,17 @@ export default function HomePage() {
           Recent Updates
         </h2>
         <div className="max-w-3xl mx-auto space-y-4">
+          <div className="p-6 border border-border rounded-lg bg-card">
+            <div className="flex items-start justify-between mb-2">
+              <h3 className="text-lg font-semibold">Navigation Restructure</h3>
+              <span className="text-sm text-muted-foreground">2025-10-29</span>
+            </div>
+            <p className="text-muted-foreground">
+              Reorganized navigation hierarchy to match design concept. Components now properly
+              grouped under dedicated section with nested categories.
+            </p>
+          </div>
+
           <div className="p-6 border border-border rounded-lg bg-card">
             <div className="flex items-start justify-between mb-2">
               <h3 className="text-lg font-semibold">Global Search Implementation</h3>
@@ -239,17 +344,6 @@ export default function HomePage() {
             <p className="text-muted-foreground">
               Implemented all 9 form components: Text Input, Text Area, Checkbox,
               Radio Button, Toggle Switch, Select, Date Picker, Time Picker, and File Upload.
-            </p>
-          </div>
-
-          <div className="p-6 border border-border rounded-lg bg-card">
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="text-lg font-semibold">Pattern Documentation</h3>
-              <span className="text-sm text-muted-foreground">2025-01-27</span>
-            </div>
-            <p className="text-muted-foreground">
-              Completed documentation for 10 UX patterns including Onboarding,
-              Search & Filtering, and Multi-Tenancy.
             </p>
           </div>
 
