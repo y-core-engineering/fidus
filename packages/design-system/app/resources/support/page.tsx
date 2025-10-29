@@ -244,7 +244,7 @@ export default function SupportPage() {
           <a href="/getting-started/overview">Overview</a> - Introduction to the design system
         </li>
         <li>
-          <a href="/getting-started/for-designers">For Designers</a> - Figma setup and workflow
+          <a href="/getting-started/for-designers">For Designers</a> - Design principles and workflow
         </li>
         <li>
           <a href="/getting-started/for-developers">For Developers</a> - Installation and usage
@@ -271,9 +271,6 @@ export default function SupportPage() {
         </li>
         <li>
           <a href="/resources/github">GitHub Repository</a> - Source code and issues
-        </li>
-        <li>
-          <a href="/resources/changelog">Changelog</a> - Version history
         </li>
       </ul>
 
@@ -360,8 +357,14 @@ export default function SupportPage() {
           <strong>Discord:</strong> Join the #announcements channel
         </li>
         <li>
-          <strong>RSS:</strong> Subscribe to the{' '}
-          <a href="/resources/changelog">changelog feed</a>
+          <strong>GitHub Releases:</strong>{' '}
+          <a
+            href="https://github.com/y-core-engineering/fidus/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Subscribe to release notifications
+          </a>
         </li>
       </ul>
     </div>

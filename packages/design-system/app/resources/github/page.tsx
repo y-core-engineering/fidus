@@ -338,10 +338,10 @@ gh pr create --web`}</code>
           <a href="/resources/contributing">Contributing Guide</a>
         </li>
         <li>
-          <a href="/resources/changelog">Changelog</a>
+          <a href="/resources/support">Support</a>
         </li>
         <li>
-          <a href="/resources/support">Support</a>
+          <a href="/content/glossary">Glossary</a>
         </li>
       </ul>
     </div>

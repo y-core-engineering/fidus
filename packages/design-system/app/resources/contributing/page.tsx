@@ -32,7 +32,7 @@ export default function ContributingPage() {
             <li>Propose new components</li>
             <li>Improve existing patterns</li>
             <li>Create design examples</li>
-            <li>Update Figma library</li>
+            <li>Improve accessibility</li>
           </ul>
         </div>
         <div className="p-6 bg-muted rounded-lg">
@@ -226,9 +226,9 @@ export function Button({ variant, size, children }: ButtonProps) {
 
       <h3>Design</h3>
       <ul>
-        <li>✅ Figma component with variants</li>
-        <li>✅ All states (default, hover, active, disabled, error)</li>
-        <li>✅ Responsive layouts</li>
+        <li>✅ Visual design examples</li>
+        <li>✅ All states documented (default, hover, active, disabled, error)</li>
+        <li>✅ Responsive layout guidelines</li>
         <li>✅ Dark mode variant</li>
       </ul>
 

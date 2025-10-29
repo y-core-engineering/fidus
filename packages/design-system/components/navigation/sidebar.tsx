@@ -153,8 +153,6 @@ const navigation: NavItem[] = [
   {
     title: 'Content',
     items: [
-      { title: 'Voice & Tone', href: '/content/voice-tone' },
-      { title: 'Grammar & Mechanics', href: '/content/grammar-mechanics' },
       { title: 'Glossary', href: '/content/glossary' },
       { title: 'Writing for Privacy', href: '/content/writing-for-privacy' },
     ],
@@ -162,10 +160,7 @@ const navigation: NavItem[] = [
   {
     title: 'Resources',
     items: [
-      { title: 'Figma Library', href: '/resources/figma-library' },
       { title: 'Code Playground', href: '/resources/code-playground' },
-      { title: 'Downloads', href: '/resources/downloads' },
-      { title: 'Changelog', href: '/resources/changelog' },
       { title: 'Contributing', href: '/resources/contributing' },
       { title: 'GitHub', href: '/resources/github' },
       { title: 'Support', href: '/resources/support' },
