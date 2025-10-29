@@ -1,6 +1,6 @@
 'use client';
 
-import { TextInput, Button, Badge, Chip, Tabs, Tab } from '@fidus/ui';
+import { TextInput, Button, Badge, Chip, Tabs, Tab, Link } from '@fidus/ui';
 import { useState } from 'react';
 
 // Mock transaction data

@@ -1,6 +1,6 @@
 'use client';
 
-import { OpportunityCard, Alert, Badge, Button, Tabs, Tab } from '@fidus/ui';
+import { OpportunityCard, Alert, Badge, Button, Tabs, Tab, Link } from '@fidus/ui';
 import { useState } from 'react';
 
 // Mock opportunity data

@@ -1,6 +1,6 @@
 'use client';
 
-import { TextInput, ToggleSwitch, Select, Button, Badge, Modal, Alert } from '@fidus/ui';
+import { TextInput, ToggleSwitch, Select, Button, Badge, Modal, Alert, Link } from '@fidus/ui';
 import { useState } from 'react';
 
 // Mock settings data
