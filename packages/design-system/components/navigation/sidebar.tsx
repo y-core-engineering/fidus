@@ -13,6 +13,16 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   {
+    title: 'Getting Started',
+    items: [
+      { title: 'Overview', href: '/getting-started/overview' },
+      { title: 'For Designers', href: '/getting-started/for-designers' },
+      { title: 'For Developers', href: '/getting-started/for-developers' },
+      { title: 'Design Philosophy', href: '/getting-started/design-philosophy' },
+      { title: 'Contributing', href: '/getting-started/contributing' },
+    ],
+  },
+  {
     title: 'Foundations',
     items: [
       { title: 'Colors', href: '/foundations/colors' },
@@ -96,6 +106,16 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: 'Navigation',
+    items: [
+      { title: 'Tabs', href: '/components/tabs' },
+      { title: 'Breadcrumbs', href: '/components/breadcrumbs' },
+      { title: 'Pagination', href: '/components/pagination' },
+      { title: 'Header', href: '/components/header' },
+      { title: 'Sidebar', href: '/components/sidebar' },
+    ],
+  },
+  {
     title: 'Patterns',
     items: [
       { title: 'Form Validation', href: '/patterns/form-validation' },
@@ -103,6 +123,8 @@ const navigation: NavItem[] = [
       { title: 'Empty States', href: '/patterns/empty-states' },
       { title: 'Loading States', href: '/patterns/loading-states' },
       { title: 'Success Confirmation', href: '/patterns/success-confirmation' },
+      { title: 'Onboarding', href: '/patterns/onboarding' },
+      { title: 'Multi-Tenancy', href: '/patterns/multi-tenancy' },
     ],
   },
 ];
