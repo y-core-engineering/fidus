@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search, Moon, Sun, Menu } from 'lucide-react';
 import { IconButton } from '@fidus/ui';
 import { useState } from 'react';
@@ -30,7 +31,13 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             </IconButton>
           )}
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 no-underline">
-            <div className="h-8 w-8 rounded-md bg-primary" />
+            <Image
+              src="/logo.svg"
+              alt="Fidus logo"
+              width={32}
+              height={32}
+              className="h-8 w-8"
+            />
             <span className="text-xl font-bold">Fidus Design System</span>
           </Link>
         </div>
