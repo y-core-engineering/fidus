@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 
 // Polyfill for jsdom missing methods
 if (typeof Element.prototype.hasPointerCapture === 'undefined') {

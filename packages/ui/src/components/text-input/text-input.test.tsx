@@ -172,7 +172,7 @@ describe('TextInput', () => {
     render(
       <TextInput
         label="Website"
-        prefix={<span data-testid="prefix">https://</span>}
+        prefix={<span data-testid="prefix">https://</span> as any}
       />
     );
     expect(screen.getByTestId('prefix')).toBeInTheDocument();

@@ -269,8 +269,6 @@ describe('Tooltip', () => {
     });
 
     it('should show tooltip on focus', async () => {
-      const user = userEvent.setup();
-
       render(
         <Tooltip content="Tooltip text" delayDuration={0}>
           <button>Focus me</button>
@@ -286,8 +284,6 @@ describe('Tooltip', () => {
     });
 
     it('should hide tooltip on blur', async () => {
-      const user = userEvent.setup();
-
       render(
         <div>
           <Tooltip content="Tooltip text" delayDuration={0}>
