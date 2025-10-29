@@ -13,22 +13,16 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   {
+    title: 'Home',
+    href: '/',
+  },
+  {
     title: 'Getting Started',
     items: [
       { title: 'Overview', href: '/getting-started/overview' },
       { title: 'For Designers', href: '/getting-started/for-designers' },
       { title: 'For Developers', href: '/getting-started/for-developers' },
       { title: 'Design Philosophy', href: '/getting-started/design-philosophy' },
-    ],
-  },
-  {
-    title: 'Design Tokens',
-    items: [
-      { title: 'Colors', href: '/tokens/color-tokens' },
-      { title: 'Typography', href: '/tokens/typography-tokens' },
-      { title: 'Spacing', href: '/tokens/spacing-tokens' },
-      { title: 'Shadows', href: '/tokens/shadow-tokens' },
-      { title: 'Motion', href: '/tokens/motion-tokens' },
     ],
   },
   {
@@ -42,82 +36,87 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: 'Layout',
+    title: 'Components',
     items: [
-      { title: 'Container', href: '/components/container' },
-      { title: 'Grid', href: '/components/grid' },
-      { title: 'Stack', href: '/components/stack' },
-      { title: 'Divider', href: '/components/divider' },
-    ],
-  },
-  {
-    title: 'Actions',
-    items: [
-      { title: 'Button', href: '/components/button' },
-      { title: 'Link', href: '/components/link' },
-      { title: 'Icon Button', href: '/components/icon-button' },
-      { title: 'Button Group', href: '/components/button-group' },
-    ],
-  },
-  {
-    title: 'Data Display',
-    items: [
-      { title: 'Table', href: '/components/table' },
-      { title: 'List', href: '/components/list' },
-      { title: 'Badge', href: '/components/badge' },
-      { title: 'Chip', href: '/components/chip' },
-      { title: 'Avatar', href: '/components/avatar' },
-    ],
-  },
-  {
-    title: 'Cards',
-    items: [
-      { title: 'Opportunity Card', href: '/components/opportunity-card' },
-      { title: 'Detail Card', href: '/components/detail-card' },
-      { title: 'Empty Card', href: '/components/empty-card' },
-    ],
-  },
-  {
-    title: 'Forms',
-    items: [
-      { title: 'Text Input', href: '/components/text-input' },
-      { title: 'Text Area', href: '/components/text-area' },
-      { title: 'Checkbox', href: '/components/checkbox' },
-      { title: 'Radio Button', href: '/components/radio-button' },
-      { title: 'Toggle Switch', href: '/components/toggle-switch' },
-      { title: 'Select', href: '/components/select' },
-      { title: 'Date Picker', href: '/components/date-picker' },
-      { title: 'Time Picker', href: '/components/time-picker' },
-      { title: 'File Upload', href: '/components/file-upload' },
-    ],
-  },
-  {
-    title: 'Feedback',
-    items: [
-      { title: 'Toast', href: '/components/toast' },
-      { title: 'Modal', href: '/components/modal' },
-      { title: 'Alert', href: '/components/alert' },
-      { title: 'Banner', href: '/components/banner' },
-      { title: 'Progress Bar', href: '/components/progress-bar' },
-    ],
-  },
-  {
-    title: 'Overlays',
-    items: [
-      { title: 'Dropdown', href: '/components/dropdown' },
-      { title: 'Popover', href: '/components/popover' },
-      { title: 'Tooltip', href: '/components/tooltip' },
-      { title: 'Drawer', href: '/components/drawer' },
-    ],
-  },
-  {
-    title: 'Navigation',
-    items: [
-      { title: 'Tabs', href: '/components/tabs' },
-      { title: 'Breadcrumbs', href: '/components/breadcrumbs' },
-      { title: 'Pagination', href: '/components/pagination' },
-      { title: 'Header', href: '/components/header' },
-      { title: 'Sidebar', href: '/components/sidebar' },
+      {
+        title: 'Layout',
+        items: [
+          { title: 'Container', href: '/components/container' },
+          { title: 'Grid', href: '/components/grid' },
+          { title: 'Stack', href: '/components/stack' },
+          { title: 'Divider', href: '/components/divider' },
+        ],
+      },
+      {
+        title: 'Actions',
+        items: [
+          { title: 'Button', href: '/components/button' },
+          { title: 'Link', href: '/components/link' },
+          { title: 'Icon Button', href: '/components/icon-button' },
+          { title: 'Button Group', href: '/components/button-group' },
+        ],
+      },
+      {
+        title: 'Forms',
+        items: [
+          { title: 'Text Input', href: '/components/text-input' },
+          { title: 'Text Area', href: '/components/text-area' },
+          { title: 'Checkbox', href: '/components/checkbox' },
+          { title: 'Radio Button', href: '/components/radio-button' },
+          { title: 'Toggle Switch', href: '/components/toggle-switch' },
+          { title: 'Select', href: '/components/select' },
+          { title: 'Date Picker', href: '/components/date-picker' },
+          { title: 'Time Picker', href: '/components/time-picker' },
+          { title: 'File Upload', href: '/components/file-upload' },
+        ],
+      },
+      {
+        title: 'Data Display',
+        items: [
+          { title: 'Table', href: '/components/table' },
+          { title: 'List', href: '/components/list' },
+          { title: 'Badge', href: '/components/badge' },
+          { title: 'Chip', href: '/components/chip' },
+          { title: 'Avatar', href: '/components/avatar' },
+        ],
+      },
+      {
+        title: 'Cards',
+        items: [
+          { title: 'Opportunity Card', href: '/components/opportunity-card' },
+          { title: 'Detail Card', href: '/components/detail-card' },
+          { title: 'Empty Card', href: '/components/empty-card' },
+        ],
+      },
+      {
+        title: 'Feedback',
+        items: [
+          { title: 'Toast', href: '/components/toast' },
+          { title: 'Modal', href: '/components/modal' },
+          { title: 'Alert', href: '/components/alert' },
+          { title: 'Banner', href: '/components/banner' },
+          { title: 'Progress Bar', href: '/components/progress-bar' },
+        ],
+      },
+      {
+        title: 'Overlays',
+        items: [
+          { title: 'Dropdown', href: '/components/dropdown' },
+          { title: 'Popover', href: '/components/popover' },
+          { title: 'Tooltip', href: '/components/tooltip' },
+          { title: 'Drawer', href: '/components/drawer' },
+        ],
+      },
+      {
+        title: 'Navigation',
+        items: [
+          { title: 'Tabs', href: '/components/tabs' },
+          { title: 'Breadcrumbs', href: '/components/breadcrumbs' },
+          { title: 'Pagination', href: '/components/pagination' },
+          { title: 'Header', href: '/components/header' },
+          { title: 'Sidebar', href: '/components/sidebar' },
+        ],
+      },
     ],
   },
   {
@@ -133,6 +132,16 @@ const navigation: NavItem[] = [
       { title: 'Opportunity Surface', href: '/patterns/opportunity-surface' },
       { title: 'Search & Filtering', href: '/patterns/search-filtering' },
       { title: 'Settings', href: '/patterns/settings' },
+    ],
+  },
+  {
+    title: 'Tokens',
+    items: [
+      { title: 'Colors', href: '/tokens/color-tokens' },
+      { title: 'Typography', href: '/tokens/typography-tokens' },
+      { title: 'Spacing', href: '/tokens/spacing-tokens' },
+      { title: 'Shadows', href: '/tokens/shadow-tokens' },
+      { title: 'Motion', href: '/tokens/motion-tokens' },
     ],
   },
   {

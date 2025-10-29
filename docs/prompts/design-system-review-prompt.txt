@@ -1,0 +1,282 @@
+DESIGN SYSTEM IMPLEMENTATION REVIEW PROMPT
+==========================================
+
+ROLE: UX/UI Expert & Design System Specialist
+
+CONTEXT: You are reviewing the Fidus Design System implementation against the original concept document.
+
+-------------------------------------------------------------------------------
+
+YOUR TASK
+
+Review the implementation of the Fidus Design System (located in packages/design-system/) and compare it against the concept defined in docs/ux-ui-design/18-design-system-website.md.
+
+Focus on three key areas:
+
+===============================================================================
+1. NAVIGATION HIERARCHY REVIEW
+===============================================================================
+
+REFERENCE: Section 3 "Website Structure" > "Navigation Hierarchy" in 18-design-system-website.md
+
+COMPARE:
+- Read the complete navigation structure defined in the concept (lines 69-184)
+- Inspect the actual implementation in packages/design-system/components/navigation/sidebar.tsx
+- Check all navigation items and their organization
+
+EVALUATE:
+- Does the navigation match the concept's hierarchy?
+- Are all top-level sections present? (Home, Getting Started, Foundations, Components, Patterns, Tokens, Architecture, Content Guidelines, Resources)
+- Are subsections correctly nested and categorized?
+- Are unique Fidus features marked appropriately? (AI-Driven UI, Opportunity Card, Privacy & Trust, Architecture sections)
+- What is missing or incorrectly organized?
+- What is present but not in the concept?
+
+OUTPUT FORMAT:
+
+1. Navigation Hierarchy Review
+
+  MATCHES CONCEPT:
+  - [List sections that correctly match]
+
+  DEVIATIONS FROM CONCEPT:
+  - [List sections that don't match or are missing]
+
+  ADDITIONAL ITEMS (not in concept):
+  - [List items present in implementation but not in concept]
+
+  COMPLETENESS SCORE: X/Y sections (Z%)
+
+===============================================================================
+2. CONTENT ORGANIZATION REVIEW
+===============================================================================
+
+REFERENCE: Section 4 "Content Organization" in 18-design-system-website.md
+
+COMPARE:
+- Read the page structure template (lines 190-227)
+- Read the example Button component page (lines 229-345)
+- Inspect actual component pages in packages/design-system/app/components/
+- Inspect pattern pages in packages/design-system/app/patterns/
+- Inspect foundation pages in packages/design-system/app/foundations/
+
+EVALUATE FOR EACH MAJOR CONTENT TYPE (sample 5 components, 3 patterns, 3 foundations):
+
+REQUIRED PAGE STRUCTURE ELEMENTS:
+1. Brief description (1-2 sentences)
+2. Interactive Preview / Visual Examples
+3. "When to Use" section (with "Use when..." and "Don't use when...")
+4. Variants (visual examples)
+5. Props API table (if component)
+6. Code Examples (React/TypeScript)
+7. Accessibility section (WCAG compliance, keyboard nav, screen reader)
+8. Do's and Don'ts (side-by-side visual examples)
+9. Related Components/Patterns
+10. Resources (Figma link, GitHub link)
+
+OUTPUT FORMAT:
+
+2. Content Organization Review
+
+  COMPONENT PAGES (Sample: Button, Modal, Toast, Opportunity Card, Text Input)
+
+  Button Component:
+  - [YES/NO] Brief description
+  - [YES/NO] Interactive Preview
+  - [YES/NO] "When to Use" section
+  - [YES/NO] Variants
+  - [YES/NO] Props API
+  - [YES/NO] Code Examples
+  - [YES/NO] Accessibility
+  - [YES/NO] Do's and Don'ts
+  - [YES/NO] Related Components
+  - [YES/NO] Resources
+  - COMPLETENESS: X/10 elements (Z%)
+  - NOTES: [Specific observations]
+
+  [Repeat for other sampled components]
+
+  PATTERN PAGES (Sample: Onboarding, Search & Filtering, Settings)
+  [Same structure as components, adapted for patterns]
+
+  FOUNDATION PAGES (Sample: AI-Driven UI, Privacy & Trust, Colors)
+  [Same structure as components, adapted for foundations]
+
+  OVERALL CONTENT ORGANIZATION SCORE:
+  - Components: X% complete (average across samples)
+  - Patterns: X% complete
+  - Foundations: X% complete
+  - OVERALL: X% complete
+
+===============================================================================
+3. KEY FEATURES IMPLEMENTATION REVIEW
+===============================================================================
+
+REFERENCE: Section 5 "Key Features" in 18-design-system-website.md
+
+COMPARE:
+- Review all 9 key features defined in the concept (lines 349-608)
+- Inspect implementation in packages/design-system/
+
+EVALUATE EACH FEATURE:
+
+5.1 INTERACTIVE COMPONENT PLAYGROUND
+- [YES/NO] Live preview with controls
+- [YES/NO] Variant/prop controls
+- [YES/NO] Copy JSX button
+- [YES/NO] Implementation: react-live, Sandpack, or similar
+- STATUS: [Not Started / Partial / Complete]
+
+5.2 SMART SEARCH
+- [YES/NO] Full-text search across content
+- [YES/NO] Keyboard shortcut (Cmd+K / Ctrl+K)
+- [YES/NO] Recent searches
+- [YES/NO] Category filtering
+- [YES/NO] Implementation: Flexsearch, Algolia, or Fuse.js
+- STATUS: [Not Started / Partial / Complete]
+
+5.3 CODE SNIPPETS WITH COPY BUTTON
+- [YES/NO] Syntax highlighting
+- [YES/NO] Language indicator
+- [YES/NO] Copy button
+- [YES/NO] Line numbers (optional)
+- STATUS: [Not Started / Partial / Complete]
+
+5.4 RESPONSIVE PREVIEW
+- [YES/NO] Mobile/Tablet/Desktop preview modes
+- [YES/NO] Breakpoint selector
+- [YES/NO] Live component preview at different sizes
+- STATUS: [Not Started / Partial / Complete]
+
+5.5 ACCESSIBILITY CHECKER
+- [YES/NO] Built-in a11y validation
+- [YES/NO] Color contrast checker
+- [YES/NO] Keyboard navigation validation
+- [YES/NO] Implementation: axe-core, Pa11y
+- STATUS: [Not Started / Partial / Complete]
+
+5.6 DESIGN TOKENS INSPECTOR
+- [YES/NO] View all design tokens
+- [YES/NO] Copy individual tokens
+- [YES/NO] Visual preview (colors, spacing, etc.)
+- [YES/NO] Export JSON
+- STATUS: [Not Started / Partial / Complete]
+
+5.7 VERSION SELECTOR
+- [YES/NO] Multiple version support
+- [YES/NO] Version dropdown
+- [YES/NO] Changelog link
+- [YES/NO] Migration guide link
+- STATUS: [Not Started / Partial / Complete]
+
+5.8 AI-DRIVEN FEATURES (Unique to Fidus - OPTIONAL)
+- [YES/NO] AI Component Recommender
+- [YES/NO] Context-aware suggestions
+- [YES/NO] LLM integration (Ollama/GPT-4)
+- STATUS: [Not Started / Partial / Complete]
+- NOTES: This is optional per concept
+
+5.9 FIGMA INTEGRATION
+- [YES/NO] Embedded Figma frames
+- [YES/NO] Download links
+- [YES/NO] Design specs displayed
+- STATUS: [Not Started / Partial / Complete]
+
+OUTPUT FORMAT:
+
+3. Key Features Implementation Review
+
+FEATURE SUMMARY TABLE:
+| Feature                      | Status                    | Completeness | Notes      |
+|------------------------------|---------------------------|--------------|------------|
+| 5.1 Interactive Playground   | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.2 Smart Search             | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.3 Code Snippets            | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.4 Responsive Preview       | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.5 Accessibility Checker    | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.6 Design Tokens Inspector  | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.7 Version Selector         | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.8 AI-Driven Features       | [Not Started/Partial/Complete] | X%    | [Details]  |
+| 5.9 Figma Integration        | [Not Started/Partial/Complete] | X%    | [Details]  |
+
+KEY FEATURES SCORE: X/9 features complete (Y% overall)
+
+===============================================================================
+FINAL SUMMARY
+===============================================================================
+
+After completing all three reviews, provide:
+
+EXECUTIVE SUMMARY
+
+OVERALL ALIGNMENT WITH CONCEPT: X%
+
+STRENGTHS:
+1. [What's working well]
+2. [What matches concept perfectly]
+3. [Notable achievements]
+
+GAPS:
+1. [Critical missing features/content]
+2. [Deviations from concept that impact usability]
+3. [Incomplete implementations]
+
+PRIORITY RECOMMENDATIONS:
+
+HIGH PRIORITY (must be fixed/added immediately):
+1. [Specific actionable step]
+2. [Specific actionable step]
+
+MEDIUM PRIORITY (should be addressed soon):
+1. [Specific actionable step]
+2. [Specific actionable step]
+
+LOW PRIORITY (nice-to-haves or minor improvements):
+1. [Specific actionable step]
+2. [Specific actionable step]
+
+NEXT STEPS:
+1. [Specific actionable step]
+2. [Specific actionable step]
+3. [Specific actionable step]
+
+SCORES SUMMARY:
+- Navigation Hierarchy: X%
+- Content Organization: X%
+- Key Features: X%
+- OVERALL IMPLEMENTATION COMPLETENESS: X%
+
+===============================================================================
+INSTRUCTIONS FOR REVIEW EXECUTION
+===============================================================================
+
+1. START WITH NAVIGATION: Begin by reviewing packages/design-system/components/navigation/sidebar.tsx
+
+2. SAMPLE CONTENT: Don't review every single page - use representative samples
+
+3. BE SPECIFIC: Reference exact file paths and line numbers when citing issues
+
+4. BE CONSTRUCTIVE: Provide specific, actionable feedback
+
+5. NOTE WHAT'S GOOD: Highlight implementations that exceed the concept
+
+6. CONSIDER CONTEXT: The design system is actively being built - some features may be intentionally deferred
+
+7. CHECK LIVE SITE: If possible, run the dev server (cd packages/design-system && pnpm dev) to test interactive features
+
+===============================================================================
+OUTPUT FORMAT
+===============================================================================
+
+Provide your review as a structured document with:
+- Clear headings and sections
+- YES/NO indicators for visual clarity
+- Percentage scores for quantitative assessment
+- Specific examples and file references
+- Actionable recommendations
+
+ESTIMATED REVIEW TIME: 30-45 minutes for thorough analysis
+
+===============================================================================
+
+READY TO BEGIN? Start with the navigation hierarchy review, then move to content organization, and finish with key features.
