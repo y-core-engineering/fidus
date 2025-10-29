@@ -33,7 +33,7 @@ export const HeaderPropsSchema = z.object({
 
 export type HeaderLogo = z.infer<typeof headerLogoSchema>;
 export type HeaderItem = z.infer<typeof headerItemSchema>;
-export type HeaderProps = z.infer<typeof HeaderPropsSchema>;
+export type HeaderProps = Partial<z.infer<typeof HeaderPropsSchema>>;
 
 const headerVariants = cva(
   'w-full border-b transition-colors duration-200',

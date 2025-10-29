@@ -38,7 +38,7 @@ export const SidebarPropsSchema = z.object({
 
 export type SidebarItem = z.infer<typeof sidebarItemSchema>;
 export type SidebarSection = z.infer<typeof sidebarSectionSchema>;
-export type SidebarProps = z.infer<typeof SidebarPropsSchema> & {
+export type SidebarProps = Partial<z.infer<typeof SidebarPropsSchema>> & {
   children?: React.ReactNode;
 };
 

@@ -15,14 +15,14 @@ export const breadcrumbItemSchema = z.object({
 
 export const BreadcrumbsPropsSchema = z.object({
   items: z.array(breadcrumbItemSchema).min(1),
-  separator: z.enum(['slash', 'chevron', 'dot']).default('chevron'),
-  size: z.enum(['sm', 'md', 'lg']).default('md'),
+  separator: z.enum(['slash', 'chevron', 'dot']).optional().default('chevron'),
+  size: z.enum(['sm', 'md', 'lg']).optional().default('md'),
   maxItems: z.number().min(2).optional(),
   className: z.string().optional(),
 });
 
 export type BreadcrumbItem = z.infer<typeof breadcrumbItemSchema>;
-export type BreadcrumbsProps = z.infer<typeof BreadcrumbsPropsSchema>;
+export type BreadcrumbsProps = Partial<z.infer<typeof BreadcrumbsPropsSchema>> & { items: BreadcrumbItem[] };
 
 const breadcrumbsVariants = cva('flex items-center flex-wrap', {
   variants: {

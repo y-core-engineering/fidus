@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Sidebar, SidebarRoot, SidebarSection, SidebarItem } from './sidebar';
-import { Home, Settings, User } from 'lucide-react';
+import { Sidebar, SidebarRoot, SidebarItem } from './sidebar';
+import { Home, Settings } from 'lucide-react';
 
 describe('Sidebar', () => {
   const mockItems = [
@@ -404,13 +404,13 @@ describe('Sidebar', () => {
 
   describe('Edge Cases', () => {
     it('should handle empty items array', () => {
-      render(<Sidebar items={[]} />);
+      render(<Sidebar items={[]} width="md" position="left" collapsed={false} />);
 
       expect(screen.getByTestId('sidebar-root')).toBeInTheDocument();
     });
 
     it('should handle empty sections array', () => {
-      render(<Sidebar sections={[]} />);
+      render(<Sidebar sections={[]} width="md" position="left" collapsed={false} />);
 
       expect(screen.getByTestId('sidebar-root')).toBeInTheDocument();
     });
@@ -431,7 +431,7 @@ describe('Sidebar', () => {
         },
       ];
 
-      render(<Sidebar items={deeplyNested} />);
+      render(<Sidebar items={deeplyNested} width="md" position="left" collapsed={false} />);
 
       await user.click(screen.getByTestId('sidebar-item-1'));
 

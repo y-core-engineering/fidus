@@ -20,7 +20,11 @@ export const PaginationPropsSchema = z.object({
   className: z.string().optional(),
 });
 
-export type PaginationProps = z.infer<typeof PaginationPropsSchema>;
+export type PaginationProps = Partial<z.infer<typeof PaginationPropsSchema>> & {
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+};
 
 const paginationVariants = cva('flex items-center gap-1', {
   variants: {
