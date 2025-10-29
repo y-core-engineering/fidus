@@ -568,86 +568,210 @@ Each slice delivers a **complete, usable feature** from infrastructure to UI:
 
 ---
 
-### Slice 10: Search, Deployment & npm Publishing
+### Slice 10: Global Search
 
-**Goal:** Add global search, deploy to production, and publish to npm.
+**Goal:** Add global search functionality to the design system website.
 
 **What You Get:**
-- Global search (Cmd+K)
-- Live design system at `design.fidus.world`
-- `@fidus/ui` published to npm registry
-- Multi-environment deployment strategy
-- CI/CD pipeline
+- Global search (Cmd+K / Ctrl+K)
+- Searchable components, patterns, and documentation
+- Keyboard-accessible search UI
+- Recent searches
 
 **Features:**
 
-1. **Global Search**
-   - Flexsearch index (all components, patterns, pages)
+1. **Flexsearch Integration**
+   - Index all components (34+ components)
+   - Index all patterns (10+ patterns)
+   - Index all documentation pages
+   - Update index on build
+
+2. **Search UI Component**
    - Keyboard shortcut (Cmd+K / Ctrl+K)
-   - Search UI with results preview
-   - Keyboard navigation (arrow keys, enter)
-   - Recent searches
+   - Modal overlay with search input
+   - Results preview with highlighting
+   - Keyboard navigation (arrow keys, enter, esc)
+   - Recent searches (localStorage)
+   - Category filtering (Components, Patterns, Docs)
 
-2. **Multi-Environment Deployment**
+3. **Search Results**
+   - Title + description preview
+   - Category badge
+   - Direct navigation on selection
+   - Mobile-optimized layout
 
-   **Design System Website:**
-   - Vercel deployment
-   - Custom domain: `design.fidus.world`
-   - Environment variables
-   - Static site generation (SSG)
-   - Automatic HTTPS & CDN
-   - Preview deployments for PRs
-
-   **npm Package Publication:**
-   - `@fidus/ui` → npm registry (public or scoped private)
-   - Semantic versioning (semver)
-   - Automated releases via GitHub Actions
-   - Changelog generation
-   - TypeScript types included
-   - Tree-shakeable ESM exports
-
-3. **Deployment Architecture**
-
-   ```
-   fidus.world (Domain)
-   ├── design.fidus.world   → Design System Website (Vercel)
-   ├── app.fidus.world      → Main Fidus App (Future - Vercel)
-   ├── api.fidus.world      → Backend API (Future - Cloud Run/Railway)
-   └── www.fidus.world      → Marketing Site (Future - Vercel/Static)
-
-   npm Registry
-   └── @fidus/ui            → Component Library Package
-       ├── Version: 0.1.0+
-       ├── Exports: ESM + CJS
-       └── Types: TypeScript declarations
-   ```
-
-4. **CI/CD Pipeline**
-
-   **For Design System Website:**
-   - GitHub Actions workflow
-   - Run tests on PRs
-   - Type checking (TypeScript)
-   - Linting (ESLint)
-   - Build verification
-   - Auto-deploy on merge to main → design.fidus.world
-
-   **For npm Package:**
-   - Version bump detection (package.json changes)
-   - Build library (tsup)
-   - Run tests (Vitest)
-   - Generate types (tsc)
-   - Publish to npm (provenance enabled)
-   - Create GitHub release with changelog
-   - Tag commits with version
+**Implementation:**
+- `/components/search/search-dialog.tsx` - Main search modal
+- `/components/search/search-index.ts` - Flexsearch index builder
+- `/lib/search.ts` - Search utilities
+- Global keyboard listener (Cmd+K)
 
 **Deliverable:**
-- Production design system website at `design.fidus.world`
+- Searchable design system website
+- Keyboard-accessible search
+- Improved navigation UX
+
+---
+
+### Slice 11: Vercel Deployment
+
+**Goal:** Deploy design system website to production at `design.fidus.world`.
+
+**What You Get:**
+- Live design system at `design.fidus.world`
+- Automatic HTTPS & CDN
+- Preview deployments for PRs
+- Production-ready infrastructure
+
+**Setup Tasks:**
+
+1. **Vercel Project Configuration**
+   - Connect GitHub repository
+   - Set root directory: `packages/design-system`
+   - Configure build settings
+   - Add environment variables
+
+2. **Custom Domain Setup**
+   - Configure DNS records for `design.fidus.world`
+   - Add domain in Vercel dashboard
+   - Automatic SSL certificate provisioning
+
+3. **Deployment Configuration**
+   - Create `vercel.json` configuration file
+   - Set up security headers
+   - Configure regions (fra1, iad1)
+   - Enable automatic deployments
+
+4. **Environment Variables**
+   ```
+   NODE_ENV=production
+   NEXT_PUBLIC_SITE_URL=https://design.fidus.world
+   NEXT_PUBLIC_NPM_PACKAGE=@fidus/ui
+   ```
+
+**Deployment Architecture:**
+```
+fidus.world (Domain)
+├── design.fidus.world   → Design System Website (Vercel)   [THIS SLICE]
+├── app.fidus.world      → Main Fidus App (Future)
+├── api.fidus.world      → Backend API (Future)
+└── www.fidus.world      → Marketing Site (Future)
+```
+
+**Deliverable:**
+- Production website at `design.fidus.world`
+- Automatic preview deployments
+- CDN-optimized delivery worldwide
+
+---
+
+### Slice 12: npm Package Publishing
+
+**Goal:** Publish `@fidus/ui` component library to npm registry.
+
+**What You Get:**
 - `@fidus/ui` package available on npm
-- Searchable documentation
-- Automated quality checks & releases
-- Multi-environment deployment ready
-- Complete Fidus Design System ✅
+- Semantic versioning
+- Automated releases
+- Provenance-enabled publishing
+
+**Setup Tasks:**
+
+1. **npm Account & Authentication**
+   - Create npm account (npmjs.com)
+   - Generate authentication token
+   - Add `NPM_TOKEN` to GitHub Secrets
+
+2. **Package Configuration**
+   - Update `packages/ui/package.json` for publishing
+   - Configure `publishConfig` with provenance
+   - Add repository metadata
+   - Define package exports (ESM + CJS)
+
+3. **Publishing Workflow**
+   - Create `.github/workflows/publish-ui.yml`
+   - Version bump detection (package.json changes)
+   - Automated build → test → publish
+   - GitHub release creation with changelog
+
+4. **Version Management**
+   - Semantic versioning (semver)
+   - Manual version bumps: `npm version patch|minor|major`
+   - Git tags for releases
+   - Changelog generation
+
+**npm Registry:**
+```
+@fidus/ui
+├── Version: 0.1.0+
+├── Exports: ESM + CJS
+├── Types: TypeScript declarations
+└── Provenance: GitHub Actions
+```
+
+**Publishing Process:**
+1. Update version in `package.json`
+2. Commit & push to main
+3. GitHub Actions detects version change
+4. Builds, tests, and publishes to npm
+5. Creates GitHub release with tag
+
+**Deliverable:**
+- `@fidus/ui` installable via `pnpm add @fidus/ui`
+- Automated publishing pipeline
+- Semantic versioning workflow
+
+---
+
+### Slice 13: CI/CD Pipeline
+
+**Goal:** Automated testing, quality checks, and deployment pipeline.
+
+**What You Get:**
+- Automated tests on every PR
+- Type checking & linting
+- Build verification
+- Auto-deploy on merge
+
+**CI/CD Workflows:**
+
+1. **Design System Website CI** (`.github/workflows/design-system.yml`)
+   - Trigger: Push to main, PRs affecting design-system/ui packages
+   - Steps:
+     - Install dependencies (pnpm)
+     - Type check (TypeScript)
+     - Lint (ESLint)
+     - Test UI components (Vitest)
+     - Build design system
+     - Deploy to Vercel (on main branch)
+
+2. **npm Package Publishing** (`.github/workflows/publish-ui.yml`)
+   - Trigger: Version change in `packages/ui/package.json`
+   - Steps:
+     - Detect version bump
+     - Build @fidus/ui
+     - Run tests
+     - Publish to npm (with provenance)
+     - Create GitHub release
+
+3. **Pre-Push Hooks** (Local)
+   - Lint all packages
+   - Type check all packages
+   - Validate Mermaid diagrams
+   - Prevent direct push to main
+
+**Quality Gates:**
+- ✅ All tests must pass
+- ✅ No TypeScript errors
+- ✅ No ESLint warnings
+- ✅ Build succeeds
+- ✅ Mermaid diagrams valid
+
+**Deliverable:**
+- Automated quality checks on every PR
+- Auto-deployment to production
+- Automated npm publishing
+- Complete CI/CD pipeline ✅
 
 ---
 
@@ -1843,12 +1967,16 @@ By building the design system website with production technologies:
 | **Slice 7** | - | Architecture docs (UIDecisionLayer, Component Registry), Opportunity Surface, Search, Settings patterns | 39 |
 | **Slice 8** | - | Interactive Playground (all 34+ components explorable) | 39 |
 | **Slice 9** | - | All token pages, Content guidelines, Resources | 39 |
-| **Slice 10** | - | Global search, Production deployment, CI/CD | 39 |
+| **Slice 10** | - | Global search (Flexsearch, Cmd+K, search UI) | 39 |
+| **Slice 11** | - | Vercel deployment (design.fidus.world, DNS configuration) | 39 |
+| **Slice 12** | - | npm package publishing (@fidus/ui, semantic versioning) | 39 |
+| **Slice 13** | - | CI/CD pipeline (GitHub Actions, automated testing/deployment) | 39 |
 
 **Progress Tracking:**
 - ✅ **Slice 5:** All 34 core components from 18-design-system-website.md complete
 - ✅ **Slice 6:** +5 navigation components (Header, Sidebar, Tabs, Breadcrumbs, Pagination)
-- ✅ **Slice 7-10:** Complete documentation, patterns, tooling, deployment
+- ✅ **Slice 7-9:** Complete documentation, patterns, tooling
+- ⏳ **Slice 10-13:** Infrastructure and deployment (search, hosting, publishing, automation)
 
 **Key Benefits:**
 - Each slice is **independently deployable and valuable**
