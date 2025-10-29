@@ -568,13 +568,15 @@ Each slice delivers a **complete, usable feature** from infrastructure to UI:
 
 ---
 
-### Slice 10: Search, Deployment & CI/CD
+### Slice 10: Search, Deployment & npm Publishing
 
-**Goal:** Add global search and deploy to production.
+**Goal:** Add global search, deploy to production, and publish to npm.
 
 **What You Get:**
 - Global search (Cmd+K)
-- Live design system at `design.fidus.ai`
+- Live design system at `design.fidus.world`
+- `@fidus/ui` published to npm registry
+- Multi-environment deployment strategy
 - CI/CD pipeline
 
 **Features:**
@@ -586,24 +588,65 @@ Each slice delivers a **complete, usable feature** from infrastructure to UI:
    - Keyboard navigation (arrow keys, enter)
    - Recent searches
 
-2. **Deployment**
-   - Vercel deployment
-   - Custom domain (`design.fidus.ai`)
-   - Environment variables
-   - Static site generation
+2. **Multi-Environment Deployment**
 
-3. **CI/CD Pipeline**
+   **Design System Website:**
+   - Vercel deployment
+   - Custom domain: `design.fidus.world`
+   - Environment variables
+   - Static site generation (SSG)
+   - Automatic HTTPS & CDN
+   - Preview deployments for PRs
+
+   **npm Package Publication:**
+   - `@fidus/ui` → npm registry (public or scoped private)
+   - Semantic versioning (semver)
+   - Automated releases via GitHub Actions
+   - Changelog generation
+   - TypeScript types included
+   - Tree-shakeable ESM exports
+
+3. **Deployment Architecture**
+
+   ```
+   fidus.world (Domain)
+   ├── design.fidus.world   → Design System Website (Vercel)
+   ├── app.fidus.world      → Main Fidus App (Future - Vercel)
+   ├── api.fidus.world      → Backend API (Future - Cloud Run/Railway)
+   └── www.fidus.world      → Marketing Site (Future - Vercel/Static)
+
+   npm Registry
+   └── @fidus/ui            → Component Library Package
+       ├── Version: 0.1.0+
+       ├── Exports: ESM + CJS
+       └── Types: TypeScript declarations
+   ```
+
+4. **CI/CD Pipeline**
+
+   **For Design System Website:**
    - GitHub Actions workflow
    - Run tests on PRs
    - Type checking (TypeScript)
    - Linting (ESLint)
    - Build verification
-   - Auto-deploy on merge to main
+   - Auto-deploy on merge to main → design.fidus.world
+
+   **For npm Package:**
+   - Version bump detection (package.json changes)
+   - Build library (tsup)
+   - Run tests (Vitest)
+   - Generate types (tsc)
+   - Publish to npm (provenance enabled)
+   - Create GitHub release with changelog
+   - Tag commits with version
 
 **Deliverable:**
-- Production design system website
+- Production design system website at `design.fidus.world`
+- `@fidus/ui` package available on npm
 - Searchable documentation
-- Automated quality checks
+- Automated quality checks & releases
+- Multi-environment deployment ready
 - Complete Fidus Design System ✅
 
 ---
@@ -1340,14 +1383,15 @@ export function ComponentPreview({
 
 ## 7. Deployment Strategy
 
-### 7.1 Vercel Deployment
+### 7.1 Design System Website Deployment (Vercel)
 
 **Advantages:**
 - ✅ Zero-config Next.js deployment
 - ✅ Automatic HTTPS
-- ✅ CDN edge caching
+- ✅ CDN edge caching worldwide
 - ✅ Preview deployments for PRs
-- ✅ Custom domains
+- ✅ Custom domains (fidus.world)
+- ✅ Automatic invalidation on redeploy
 
 **Setup:**
 
@@ -1363,24 +1407,249 @@ export function ComponentPreview({
    Build Command: pnpm build
    Output Directory: .next
    Install Command: pnpm install
+   Node Version: 20.x
    ```
 
 3. **Environment Variables**
    ```
    NODE_ENV=production
-   NEXT_PUBLIC_SITE_URL=https://design.fidus.ai
+   NEXT_PUBLIC_SITE_URL=https://design.fidus.world
+   NEXT_PUBLIC_NPM_PACKAGE=@fidus/ui
    ```
 
-4. **Custom Domain**
-   - Add `design.fidus.ai` in Vercel dashboard
-   - Configure DNS records:
-     ```
-     CNAME design.fidus.ai cname.vercel-dns.com
-     ```
+4. **Custom Domain Configuration**
+
+   **DNS Records (at your domain registrar for fidus.world):**
+   ```
+   Type    Name     Value                   TTL
+   ──────────────────────────────────────────────
+   CNAME   design   cname.vercel-dns.com    Auto
+   ```
+
+   **In Vercel Dashboard:**
+   - Project Settings → Domains
+   - Add Domain: `design.fidus.world`
+   - Vercel will automatically provision SSL certificate
+   - Production deployment will be served from this domain
+
+5. **Vercel Configuration File** (`packages/design-system/vercel.json`):
+   ```json
+   {
+     "buildCommand": "pnpm build",
+     "devCommand": "pnpm dev",
+     "installCommand": "pnpm install",
+     "framework": "nextjs",
+     "outputDirectory": ".next",
+     "regions": ["fra1", "iad1"],
+     "headers": [
+       {
+         "source": "/(.*)",
+         "headers": [
+           {
+             "key": "X-Frame-Options",
+             "value": "SAMEORIGIN"
+           },
+           {
+             "key": "X-Content-Type-Options",
+             "value": "nosniff"
+           }
+         ]
+       }
+     ]
+   }
+   ```
 
 ---
 
-### 7.2 GitHub Actions CI/CD
+### 7.2 npm Package Publishing
+
+**Publishing @fidus/ui to npm registry:**
+
+**Prerequisites:**
+1. npm account (npmjs.com)
+2. npm authentication token
+3. Package scope decision: `@fidus/ui` (scoped) vs `fidus-ui` (unscoped)
+
+**Setup:**
+
+1. **Configure package.json for publishing**
+
+   `packages/ui/package.json`:
+   ```json
+   {
+     "name": "@fidus/ui",
+     "version": "0.1.0",
+     "description": "Fidus Design System Component Library",
+     "license": "MIT",
+     "main": "./dist/index.js",
+     "module": "./dist/index.mjs",
+     "types": "./dist/index.d.ts",
+     "files": [
+       "dist",
+       "README.md",
+       "LICENSE"
+     ],
+     "publishConfig": {
+       "access": "public",
+       "provenance": true
+     },
+     "repository": {
+       "type": "git",
+       "url": "https://github.com/y-core-engineering/fidus.git",
+       "directory": "packages/ui"
+     },
+     "keywords": [
+       "react",
+       "design-system",
+       "components",
+       "ui",
+       "fidus",
+       "typescript"
+     ]
+   }
+   ```
+
+2. **GitHub Actions Workflow for npm Publishing**
+
+   `.github/workflows/publish-ui.yml`:
+   ```yaml
+   name: Publish @fidus/ui to npm
+
+   on:
+     push:
+       branches: [main]
+       paths:
+         - 'packages/ui/package.json'
+
+   jobs:
+     check-version:
+       runs-on: ubuntu-latest
+       outputs:
+         changed: ${{ steps.check.outputs.changed }}
+         version: ${{ steps.check.outputs.version }}
+       steps:
+         - uses: actions/checkout@v4
+           with:
+             fetch-depth: 2
+
+         - name: Check if version changed
+           id: check
+           run: |
+             VERSION=$(node -p "require('./packages/ui/package.json').version")
+             git diff HEAD^ HEAD -- packages/ui/package.json | grep '"version"' && echo "changed=true" >> $GITHUB_OUTPUT || echo "changed=false" >> $GITHUB_OUTPUT
+             echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+     publish:
+       needs: check-version
+       if: needs.check-version.outputs.changed == 'true'
+       runs-on: ubuntu-latest
+       permissions:
+         contents: write
+         id-token: write
+       steps:
+         - uses: actions/checkout@v4
+
+         - name: Setup Node.js
+           uses: actions/setup-node@v4
+           with:
+             node-version: '20'
+             registry-url: 'https://registry.npmjs.org'
+
+         - name: Install pnpm
+           uses: pnpm/action-setup@v2
+           with:
+             version: 8
+
+         - name: Install dependencies
+           run: pnpm install
+
+         - name: Build @fidus/ui
+           run: pnpm --filter @fidus/ui build
+
+         - name: Run tests
+           run: pnpm --filter @fidus/ui test
+
+         - name: Publish to npm
+           run: pnpm --filter @fidus/ui publish --no-git-checks
+           env:
+             NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+         - name: Create GitHub Release
+           uses: actions/create-release@v1
+           env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           with:
+             tag_name: "@fidus/ui@${{ needs.check-version.outputs.version }}"
+             release_name: "@fidus/ui v${{ needs.check-version.outputs.version }}"
+             draft: false
+             prerelease: false
+   ```
+
+3. **Manual Publishing (alternative)**
+   ```bash
+   # Build the package
+   cd packages/ui
+   pnpm build
+
+   # Test locally
+   pnpm test
+
+   # Login to npm
+   npm login
+
+   # Publish (with provenance)
+   npm publish --provenance --access public
+   ```
+
+4. **Version Management**
+
+   Use semantic versioning:
+   ```bash
+   # Patch release (0.1.0 → 0.1.1) - Bug fixes
+   cd packages/ui
+   npm version patch
+
+   # Minor release (0.1.0 → 0.2.0) - New features
+   npm version minor
+
+   # Major release (0.1.0 → 1.0.0) - Breaking changes
+   npm version major
+   ```
+
+---
+
+### 7.3 Domain Architecture Overview
+
+**Complete fidus.world Domain Strategy:**
+
+```
+fidus.world
+├── design.fidus.world  → Design System (Vercel)     [SLICE 10]
+├── app.fidus.world     → Main Fidus App (Vercel)    [FUTURE]
+├── api.fidus.world     → Backend API (Cloud Run)    [FUTURE]
+└── www.fidus.world     → Marketing Site (Vercel)    [FUTURE]
+```
+
+**Benefits of Subdomain Structure:**
+- ✅ Clear separation of concerns
+- ✅ Independent deployment & scaling
+- ✅ Different tech stacks per subdomain
+- ✅ Isolated SSL certificates
+- ✅ Service-specific DNS/CDN optimization
+
+**DNS Configuration Example:**
+```
+Type    Name     Value                      TTL    Notes
+────────────────────────────────────────────────────────────────
+A       @        <marketing-ip>            Auto   www.fidus.world
+CNAME   design   cname.vercel-dns.com      Auto   Design System
+CNAME   app      cname.vercel-dns.com      Auto   Main App (Future)
+CNAME   api      <api-endpoint>            Auto   Backend (Future)
+```
+
+---
+
+### 7.4 GitHub Actions CI/CD
 
 #### `.github/workflows/design-system.yml`
 
