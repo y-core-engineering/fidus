@@ -200,6 +200,8 @@ export default function AIDrivenUIPage() {
   const [showWidget, setShowWidget] = useState(false);
   const [llmStep, setLlmStep] = useState(-1); // -1=hidden, 0=thinking, 1-5=steps visible
   const [visibleMessageIndex, setVisibleMessageIndex] = useState(0); // For multi-turn dialogs
+  const [isFormFilling, setIsFormFilling] = useState(false); // Shows "filling..." animation
+  const [filledFields, setFilledFields] = useState<number>(0); // Number of filled fields
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const current = TIMELINE[currentIndex];
 
@@ -256,6 +258,8 @@ export default function AIDrivenUIPage() {
       setVisibleMessages(0);
       setShowWidget(false);
       setVisibleMessageIndex(0);
+      setIsFormFilling(false);
+      setFilledFields(0);
 
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % TIMELINE.length);
@@ -283,6 +287,29 @@ export default function AIDrivenUIPage() {
                     setShowTyping(false);
                   }, 2500);
                 }
+
+                // Check if this message has a booking-form widget - trigger field filling animation
+                if (msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form' && msg.widget.data && 'fields' in msg.widget.data) {
+                  const fields = msg.widget.data.fields as string[];
+                  const numFields = fields.length;
+
+                  // Start filling fields after widget appears (add 500ms delay)
+                  setTimeout(() => {
+                    setFilledFields(0);
+
+                    // Fill each field progressively
+                    for (let fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+                      setTimeout(() => {
+                        setIsFormFilling(true);
+                        // Show typing animation for 600ms, then show filled field
+                        setTimeout(() => {
+                          setFilledFields(fieldIdx + 1);
+                          setIsFormFilling(false);
+                        }, 600);
+                      }, fieldIdx * 800); // 800ms per field (600ms typing + 200ms gap)
+                    }
+                  }, 500);
+                }
               }, currentDelay);
 
               // Timing between messages:
@@ -291,10 +318,16 @@ export default function AIDrivenUIPage() {
               // - Then LLM thinks (2500ms)
               // - Then assistant response appears
               // - Then pause before next user message (1000ms)
+              // - For booking forms, add extra time for field filling animation
+              const hasBookingForm = msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form';
+              const formFillingTime = hasBookingForm && msg.widget && msg.widget.data && 'fields' in msg.widget.data
+                ? ((msg.widget.data.fields as string[]).length * 800 + 1000) // Field filling + pause
+                : 0;
+
               if (msg.type === 'user') {
                 currentDelay += 200; // Quick delay after user message
               } else {
-                currentDelay += 2800; // LLM thinking time + typing indicator
+                currentDelay += 2800 + formFillingTime; // LLM thinking time + typing indicator + form filling
               }
             });
           } else {
@@ -325,7 +358,7 @@ export default function AIDrivenUIPage() {
           // No additional animation needed - card is always visible
         }
       }, 500);
-    }, 12000); // 12 seconds per scene (increased for multi-turn dialogs)
+    }, 20000); // 20 seconds per scene (increased for multi-turn dialogs with form filling)
 
     return () => clearInterval(timer);
   }, [currentIndex]);
@@ -481,7 +514,7 @@ export default function AIDrivenUIPage() {
                                     </div>
                                   )}
 
-                                  {/* Booking Form Widget */}
+                                  {/* Booking Form Widget with progressive field filling */}
                                   {msg.widget.type === 'booking-form' && msg.widget.data && 'hotel' in msg.widget.data && (
                                     <div className="bg-card border border-border rounded-lg p-4">
                                       <div className="flex items-start justify-between mb-3">
@@ -492,12 +525,39 @@ export default function AIDrivenUIPage() {
                                       </div>
                                       <div className="space-y-2 mb-3">
                                         {msg.widget.data.fields?.map((field: string, fieldIdx: number) => (
-                                          <div key={fieldIdx} className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50 text-foreground">
-                                            {field}
+                                          <div key={fieldIdx} className="relative">
+                                            {fieldIdx < filledFields ? (
+                                              // Filled field - show with animation
+                                              <div className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50 text-foreground animate-in fade-in duration-300">
+                                                {field}
+                                              </div>
+                                            ) : fieldIdx === filledFields && isFormFilling ? (
+                                              // Currently filling - show typing animation
+                                              <div className="w-full px-3 py-2 text-xs border border-primary/50 rounded bg-primary/5 flex items-center gap-2">
+                                                <span className="text-muted-foreground">{field.split(':')[0]}:</span>
+                                                <div className="flex gap-0.5">
+                                                  <span className="w-1 h-1 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                  <span className="w-1 h-1 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                  <span className="w-1 h-1 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              // Empty field - waiting to be filled
+                                              <div className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/30 text-muted-foreground/50">
+                                                {field.split(':')[0]}
+                                              </div>
+                                            )}
                                           </div>
                                         ))}
                                       </div>
-                                      <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                      <button
+                                        className={`w-full px-4 py-2 text-sm font-medium rounded transition-all ${
+                                          filledFields >= (msg.widget.data.fields?.length || 0)
+                                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                            : 'bg-muted text-muted-foreground cursor-not-allowed'
+                                        }`}
+                                        disabled={filledFields < (msg.widget.data.fields?.length || 0)}
+                                      >
                                         {msg.widget.data.action}
                                       </button>
                                     </div>
