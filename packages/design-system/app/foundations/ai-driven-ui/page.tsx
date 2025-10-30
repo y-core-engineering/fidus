@@ -56,19 +56,16 @@ const TIMELINE = [
 
 export default function AIDrivenUIPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
   const current = TIMELINE[currentIndex];
 
-  // Auto-advance through timeline
+  // Auto-advance through timeline - continuous loop
   useEffect(() => {
-    if (!isPlaying) return;
-
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % TIMELINE.length);
-    }, 5000); // 5 seconds per scene
+    }, 6000); // 6 seconds per scene
 
     return () => clearInterval(timer);
-  }, [isPlaying]);
+  }, []);
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
@@ -86,9 +83,9 @@ export default function AIDrivenUIPage() {
             {/* Mobile Notch */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-foreground/90 rounded-b-2xl z-30" />
 
-            {/* Status Bar */}
+            {/* Status Bar - Time changes with scenes */}
             <div className="absolute top-2 left-0 right-0 flex justify-between items-center px-8 z-20 text-xs text-muted-foreground">
-              <span>9:41</span>
+              <span className="transition-all duration-500">{current.time.replace(':', ':')} {current.period === 'AM' ? 'AM' : 'PM'}</span>
               <div className="flex gap-1 items-center">
                 <span>📶</span>
                 <span>🔋</span>
@@ -186,42 +183,20 @@ export default function AIDrivenUIPage() {
           </div>
         </div>
 
-        {/* Navigation Controls */}
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <button
-            onClick={() => setCurrentIndex((prev) => (prev === 0 ? TIMELINE.length - 1 : prev - 1))}
-            className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded transition-colors"
-          >
-            ← Previous
-          </button>
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="px-4 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded transition-colors"
-          >
-            {isPlaying ? '⏸ Pause' : '▶ Play'}
-          </button>
-          <div className="flex gap-1.5">
-            {TIMELINE.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`h-2 rounded-full transition-all ${
-                  idx === currentIndex ? 'w-8 bg-primary' : 'w-2 bg-muted-foreground/30'
-                }`}
-                aria-label={`Go to scene ${idx + 1}`}
-              />
-            ))}
-          </div>
-          <button
-            onClick={() => setCurrentIndex((prev) => (prev + 1) % TIMELINE.length)}
-            className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded transition-colors"
-          >
-            Next →
-          </button>
+        {/* Progress Indicator */}
+        <div className="flex items-center justify-center gap-1.5 mt-4">
+          {TIMELINE.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === currentIndex ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
+              }`}
+            />
+          ))}
         </div>
 
         <p className="text-center text-xs md:text-sm text-muted-foreground mt-4">
-          {current.icon} {current.time} {current.period} — {current.title}
+          Watch how Fidus adapts throughout the day — automatic loop, no interaction needed
         </p>
       </div>
 
