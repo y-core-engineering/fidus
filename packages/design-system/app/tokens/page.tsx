@@ -1,11 +1,30 @@
 'use client';
 
-import { Link, Stack, Button } from '@fidus/ui';
+import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
 import { Palette, Type, Ruler, Box, Zap, Download, FileJson, FileCode } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { TokenInspector } from '../../components/helpers/token-inspector';
+import { ComponentPreview } from '../../components/helpers/component-preview';
+import { getAllTokens, type DesignToken } from '../../components/helpers/get-tokens';
 
 export default function TokensOverviewPage() {
   const [exportFormat, setExportFormat] = useState<'json' | 'css'>('json');
+  const [allTokens, setAllTokens] = useState<DesignToken[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Read tokens from CSS variables at runtime
+  useEffect(() => {
+    setIsLoading(true);
+    setAllTokens(getAllTokens());
+    setIsLoading(false);
+  }, []);
+
+  // Calculate actual token counts per category
+  const colorCount = allTokens.filter(t => t.category === 'color').length;
+  const typographyCount = allTokens.filter(t => t.category === 'typography').length;
+  const spacingCount = allTokens.filter(t => t.category === 'spacing').length;
+  const shadowCount = allTokens.filter(t => t.category === 'shadow').length;
+  const motionCount = allTokens.filter(t => t.category === 'motion').length;
 
   const tokenCategories = [
     {
@@ -13,7 +32,7 @@ export default function TokensOverviewPage() {
       href: '/tokens/color-tokens',
       icon: Palette,
       description: 'Brand colors, semantic colors, trust indicators, and neutral shades',
-      count: '50+ tokens',
+      count: colorCount > 0 ? `${colorCount} tokens` : undefined,
       examples: ['Primary', 'Success', 'Error', 'Trust Local', 'Background'],
     },
     {
@@ -21,7 +40,7 @@ export default function TokensOverviewPage() {
       href: '/tokens/typography-tokens',
       icon: Type,
       description: 'Font families, sizes, weights, line heights, and letter spacing',
-      count: '30+ tokens',
+      count: typographyCount > 0 ? `${typographyCount} tokens` : undefined,
       examples: ['Heading XL', 'Body MD', 'Caption SM', 'Code', 'Line Height'],
     },
     {
@@ -29,7 +48,7 @@ export default function TokensOverviewPage() {
       href: '/tokens/spacing-tokens',
       icon: Ruler,
       description: 'Consistent spacing scale for margins, padding, and gaps',
-      count: '12 tokens',
+      count: spacingCount > 0 ? `${spacingCount} tokens` : undefined,
       examples: ['XS (4px)', 'SM (8px)', 'MD (16px)', 'LG (24px)', 'XL (32px)'],
     },
     {
@@ -37,7 +56,7 @@ export default function TokensOverviewPage() {
       href: '/tokens/shadow-tokens',
       icon: Box,
       description: 'Elevation levels and depth indicators for UI hierarchy',
-      count: '6 tokens',
+      count: shadowCount > 0 ? `${shadowCount} tokens` : undefined,
       examples: ['SM', 'MD', 'LG', 'XL', 'Inner', 'None'],
     },
     {
@@ -45,43 +64,23 @@ export default function TokensOverviewPage() {
       href: '/tokens/motion-tokens',
       icon: Zap,
       description: 'Animation durations and easing functions for smooth transitions',
-      count: '10+ tokens',
+      count: motionCount > 0 ? `${motionCount} tokens` : undefined,
       examples: ['Fast', 'Normal', 'Slow', 'Ease In', 'Ease Out'],
     },
   ];
 
-  const handleExportAll = () => {
-    // This would aggregate all tokens from all pages
-    const allTokens = {
-      colors: {},
-      typography: {},
-      spacing: {},
-      shadows: {},
-      motion: {},
-    };
 
+  const handleExportAll = () => {
+    // Export all tokens in the selected format
     let output = '';
     if (exportFormat === 'json') {
-      output = JSON.stringify(allTokens, null, 2);
+      const jsonData = allTokens.reduce((acc, token) => {
+        acc[token.name] = token.value;
+        return acc;
+      }, {} as Record<string, string>);
+      output = JSON.stringify(jsonData, null, 2);
     } else {
-      output = `:root {
-  /* Color Tokens */
-  --color-primary: 45 100% 51%;
-  --color-success: 122 39% 49%;
-
-  /* Typography Tokens */
-  --font-family-sans: Inter, system-ui, sans-serif;
-  --font-size-md: 1rem;
-
-  /* Spacing Tokens */
-  --spacing-md: 1rem;
-
-  /* Shadow Tokens */
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-
-  /* Motion Tokens */
-  --duration-normal: 200ms;
-}`;
+      output = `:root {\n${allTokens.map(t => `  ${t.variable}: ${t.value};`).join('\n')}\n}`;
     }
 
     const blob = new Blob([output], { type: 'text/plain' });
@@ -181,7 +180,13 @@ export default function TokensOverviewPage() {
                   </h3>
                   <p className="text-sm text-muted-foreground">{category.description}</p>
                   <div className="flex items-center gap-md pt-xs">
-                    <span className="text-xs font-medium text-primary">{category.count}</span>
+                    {isLoading ? (
+                      <div className="w-16">
+                        <ProgressBar indeterminate variant="primary" size="sm" />
+                      </div>
+                    ) : (
+                      <span className="text-xs font-medium text-primary">{category.count}</span>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       {category.examples.slice(0, 3).join(' • ')}
                     </span>
@@ -191,6 +196,27 @@ export default function TokensOverviewPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Interactive Token Inspector */}
+      <h2>Interactive Token Inspector</h2>
+      <p>
+        Explore all design tokens from every category. Use search and filters to find specific tokens,
+        copy values, and see visual previews. This inspector includes all {allTokens.length} tokens from
+        colors, typography, spacing, shadows, and motion.
+      </p>
+
+      <div className="not-prose my-lg">
+        {isLoading ? (
+          <div className="rounded-lg border border-border bg-card p-lg">
+            <div className="space-y-sm py-xl">
+              <p className="text-sm text-muted-foreground text-center">Loading design tokens...</p>
+              <ProgressBar indeterminate variant="primary" />
+            </div>
+          </div>
+        ) : (
+          <TokenInspector tokens={allTokens} type="color" />
+        )}
       </div>
 
       {/* Export Options */}
@@ -287,44 +313,79 @@ function MyComponent() {
         </div>
       </div>
 
-      {/* Best Practices */}
-      <h2>Best Practices</h2>
-      <div className="not-prose my-lg">
-        <div className="space-y-md">
-          <div className="flex gap-sm">
-            <span className="text-success shrink-0 text-lg">✓</span>
-            <div>
-              <strong>Use semantic tokens</strong> - Use <code>--color-error</code> instead of{' '}
-              <code>--color-red-500</code> for better maintainability
-            </div>
+      {/* Do's and Don'ts */}
+      <h2 className="mt-2xl">Do's and Don'ts</h2>
+
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        {/* Do's */}
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use semantic tokens like <code>--color-error</code> instead of <code>--color-red-500</code></span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Stay within the design system - always use tokens instead of hardcoded values</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use Tailwind utilities like <code>bg-primary</code> over custom CSS</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Reference tokens from individual category pages for complete token sets</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Export tokens in your preferred format (JSON/CSS) for external use</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-success/10 rounded-md">
+            <ComponentPreview code={`<Button className="bg-primary text-primary-foreground p-md">\n  Good Example\n</Button>`}>
+              <Button className="bg-primary text-primary-foreground p-md">
+                Good Example
+              </Button>
+            </ComponentPreview>
           </div>
-          <div className="flex gap-sm">
-            <span className="text-success shrink-0 text-lg">✓</span>
-            <div>
-              <strong>Stay within the system</strong> - Always use design tokens instead of
-              hardcoded values
-            </div>
-          </div>
-          <div className="flex gap-sm">
-            <span className="text-success shrink-0 text-lg">✓</span>
-            <div>
-              <strong>Use Tailwind utilities</strong> - Prefer <code>bg-primary</code> over custom
-              CSS with <code>var(--color-primary)</code>
-            </div>
-          </div>
-          <div className="flex gap-sm">
-            <span className="text-error shrink-0 text-lg">✗</span>
-            <div>
-              <strong>Don't hardcode values</strong> - Avoid <code>padding: 16px</code> - use{' '}
-              <code>p-md</code> instead
-            </div>
-          </div>
-          <div className="flex gap-sm">
-            <span className="text-error shrink-0 text-lg">✗</span>
-            <div>
-              <strong>Don't create custom tokens</strong> - If a token doesn't exist, request it
-              through the design system
-            </div>
+        </div>
+
+        {/* Don'ts */}
+        <div className="border-2 border-error bg-error/10 rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don't
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't hardcode values like <code>padding: 16px</code> - use <code>p-md</code></span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't create custom tokens outside the design system</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use arbitrary Tailwind values like <code>p-[17px]</code></span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't mix token systems - stick to Fidus tokens consistently</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Don't use color codes directly - use semantic color tokens</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-error/20 rounded-md">
+            <ComponentPreview code={`<button style={{ padding: '16px', background: '#FFD700' }}>\n  Bad Example\n</button>`}>
+              <button style={{ padding: '16px', background: '#FFD700' }} className="rounded-md text-black">
+                Bad Example
+              </button>
+            </ComponentPreview>
           </div>
         </div>
       </div>
