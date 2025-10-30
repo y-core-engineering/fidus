@@ -24,8 +24,8 @@ export const TextInputPropsSchema = z.object({
   showPasswordToggle: z.boolean().optional(),
   maxLength: z.number().optional(),
   showCharCount: z.boolean().optional(),
-  prefix: z.any().optional(),
-  suffix: z.any().optional(),
+  leadingIcon: z.any().optional(),
+  trailingIcon: z.any().optional(),
   onChange: z
     .function()
     .args(z.custom<React.ChangeEvent<HTMLInputElement>>())
@@ -93,8 +93,8 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       showPasswordToggle = true,
       maxLength,
       showCharCount = false,
-      prefix,
-      suffix,
+      leadingIcon,
+      trailingIcon,
       onChange,
       onBlur,
       onFocus,
@@ -124,8 +124,8 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       (isPassword && showPasswordToggle) ||
       hasError ||
       isValid ||
-      !!suffix;
-    const hasPrefix = !!prefix;
+      !!trailingIcon;
+    const hasLeadingIcon = !!leadingIcon;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (value === undefined) {
@@ -157,10 +157,10 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
 
         {/* Input Container */}
         <div className="relative">
-          {/* Prefix */}
-          {prefix && (
+          {/* Leading Icon */}
+          {leadingIcon && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              {prefix}
+              {leadingIcon}
             </div>
           )}
 
@@ -178,7 +178,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
             onBlur={handleBlur}
             className={inputVariants({
               state,
-              hasPrefix,
+              hasPrefix: hasLeadingIcon,
               hasSuffix: hasSuffixIcon,
             })}
             aria-invalid={hasError}
@@ -195,8 +195,8 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
           {/* Suffix Icons */}
           {hasSuffixIcon && (
             <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-              {/* Custom Suffix */}
-              {suffix && !hasError && !isValid && <div>{suffix}</div>}
+              {/* Custom Trailing Icon */}
+              {trailingIcon && !hasError && !isValid && <div>{trailingIcon}</div>}
 
               {/* Valid Icon */}
               {isValid && showValidIcon && (
