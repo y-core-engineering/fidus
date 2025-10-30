@@ -77,7 +77,7 @@ export default function SpacingTokensPage() {
         Our spacing scale follows a progressive scale that doubles at each step after the base unit,
         ensuring visual rhythm and consistency.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {spacingTokens.map((token) => (
           <TokenDisplay
             key={token.variable}
@@ -100,7 +100,7 @@ export default function SpacingTokensPage() {
       <h2>Visual Examples</h2>
 
       <h3>Padding Examples</h3>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <div className="border border-border rounded-md p-xs bg-muted">
           <div className="bg-primary rounded-sm h-8 flex items-center justify-center text-xs text-primary-foreground">
             padding-xs (4px)
@@ -124,9 +124,9 @@ export default function SpacingTokensPage() {
       </div>
 
       <h3>Gap Examples</h3>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <div>
-          <p className="text-sm text-muted-foreground mb-2">gap-sm (8px)</p>
+          <p className="text-sm text-muted-foreground mb-xs">gap-sm (8px)</p>
           <div className="flex gap-sm">
             <div className="w-12 h-12 bg-primary rounded-md" />
             <div className="w-12 h-12 bg-primary rounded-md" />
@@ -134,7 +134,7 @@ export default function SpacingTokensPage() {
           </div>
         </div>
         <div>
-          <p className="text-sm text-muted-foreground mb-2">gap-md (16px)</p>
+          <p className="text-sm text-muted-foreground mb-xs">gap-md (16px)</p>
           <div className="flex gap-md">
             <div className="w-12 h-12 bg-primary rounded-md" />
             <div className="w-12 h-12 bg-primary rounded-md" />
@@ -142,7 +142,7 @@ export default function SpacingTokensPage() {
           </div>
         </div>
         <div>
-          <p className="text-sm text-muted-foreground mb-2">gap-lg (24px)</p>
+          <p className="text-sm text-muted-foreground mb-xs">gap-lg (24px)</p>
           <div className="flex gap-lg">
             <div className="w-12 h-12 bg-primary rounded-md" />
             <div className="w-12 h-12 bg-primary rounded-md" />
@@ -155,7 +155,7 @@ export default function SpacingTokensPage() {
       <p>
         Standard border radius values for rounded corners. Most components use medium radius by default.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {radiusTokens.map((token) => (
           <TokenDisplay
             key={token.variable}

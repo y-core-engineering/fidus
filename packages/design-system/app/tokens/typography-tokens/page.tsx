@@ -65,7 +65,7 @@ export default function TypographyTokensPage() {
       </p>
 
       <h2>Font Families</h2>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {fontFamilies.map((font) => (
           <TokenDisplay
             key={font.variable}
@@ -91,15 +91,15 @@ export default function TypographyTokensPage() {
       </div>
 
       <h3>Font Family Examples</h3>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <div className="p-md bg-muted rounded-lg">
-          <p className="font-sans text-lg mb-2">
+          <p className="font-sans text-lg mb-xs">
             The quick brown fox jumps over the lazy dog.
           </p>
           <p className="text-sm text-muted-foreground">Inter (Sans Serif) - Primary UI font</p>
         </div>
         <div className="p-md bg-muted rounded-lg">
-          <p className="font-mono text-lg mb-2">
+          <p className="font-mono text-lg mb-xs">
             The quick brown fox jumps over the lazy dog.
           </p>
           <p className="text-sm text-muted-foreground">Fira Code (Monospace) - Code font</p>
@@ -110,7 +110,7 @@ export default function TypographyTokensPage() {
       <p>
         Type scale based on a modular scale for consistent visual hierarchy. Base size is 16px (1rem).
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {fontSizes.map((size) => (
           <TokenDisplay
             key={size.variable}
@@ -147,7 +147,7 @@ export default function TypographyTokensPage() {
       </div>
 
       <h3>Type Scale Examples</h3>
-      <div className="not-prose mb-8 space-y-2">
+      <div className="not-prose mb-2xl space-y-xs">
         <p className="text-xs">Extra Small (12px) - Captions and fine print</p>
         <p className="text-sm">Small (14px) - Secondary content and metadata</p>
         <p className="text-md">Medium (16px) - Body text and default size</p>
@@ -162,7 +162,7 @@ export default function TypographyTokensPage() {
       <p>
         Line height tokens for optimal readability at different text sizes and contexts.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {lineHeights.map((lineHeight) => (
           <TokenDisplay
             key={lineHeight.variable}
@@ -175,10 +175,10 @@ export default function TypographyTokensPage() {
       </div>
 
       <h3>Line Height Examples</h3>
-      <div className="not-prose mb-8 space-y-6">
+      <div className="not-prose mb-2xl space-y-6">
         <div className="p-md bg-muted rounded-lg">
           <p
-            className="text-md mb-2"
+            className="text-md mb-xs"
             style={{ lineHeight: 'var(--line-height-tight)' }}
           >
             Tight line height (1.25) - Perfect for headings where lines are close together for
@@ -188,7 +188,7 @@ export default function TypographyTokensPage() {
         </div>
         <div className="p-md bg-muted rounded-lg">
           <p
-            className="text-md mb-2"
+            className="text-md mb-xs"
             style={{ lineHeight: 'var(--line-height-normal)' }}
           >
             Normal line height (1.5) - Standard for body text, balancing readability with
@@ -198,7 +198,7 @@ export default function TypographyTokensPage() {
         </div>
         <div className="p-md bg-muted rounded-lg">
           <p
-            className="text-md mb-2"
+            className="text-md mb-xs"
             style={{ lineHeight: 'var(--line-height-relaxed)' }}
           >
             Relaxed line height (1.75) - Generous spacing for long-form content like articles
@@ -213,7 +213,7 @@ export default function TypographyTokensPage() {
         Predefined heading styles with font size, weight, and line height. All headings use
         semibold weight (600) and tight tracking for visual impact.
       </p>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <h1 className="text-4xl font-semibold">Heading 1 (36px)</h1>
         <h2 className="text-3xl font-semibold">Heading 2 (30px)</h2>
         <h3 className="text-2xl font-semibold">Heading 3 (24px)</h3>

@@ -91,7 +91,7 @@ export default function ShadowTokensPage() {
       <p>
         Four-level shadow system from subtle to prominent, based on Material Design elevation principles.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {shadowTokens.map((shadow) => (
           <TokenDisplay
             key={shadow.variable}
@@ -119,7 +119,7 @@ export default function ShadowTokensPage() {
       </div>
 
       <h3>Shadow Examples</h3>
-      <div className="not-prose mb-8">
+      <div className="not-prose mb-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <p className="text-sm text-muted-foreground mb-4">Small Shadow</p>
@@ -160,7 +160,7 @@ export default function ShadowTokensPage() {
       <p>
         Organized z-index values to prevent stacking conflicts. Higher values appear above lower values.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {zIndexTokens.map((zIndex) => (
           <TokenDisplay
             key={zIndex.variable}
@@ -173,7 +173,7 @@ export default function ShadowTokensPage() {
       </div>
 
       <h3>Z-Index Visualization</h3>
-      <div className="not-prose mb-8">
+      <div className="not-prose mb-2xl">
         <div className="relative h-64 bg-muted rounded-lg p-4 overflow-hidden">
           <div
             className="absolute bottom-4 left-4 w-32 h-32 bg-background border-2 border-border rounded-md flex items-center justify-center text-sm font-semibold"

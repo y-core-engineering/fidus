@@ -72,7 +72,7 @@ export default function MotionTokensPage() {
         Three timing options for different animation needs. Faster for micro-interactions,
         slower for complex transitions.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {durationTokens.map((duration) => (
           <TokenDisplay
             key={duration.variable}
@@ -85,9 +85,9 @@ export default function MotionTokensPage() {
       </div>
 
       <h3>Duration Comparison</h3>
-      <div className="not-prose mb-8 space-y-6">
+      <div className="not-prose mb-2xl space-y-6">
         <div>
-          <Stack direction="horizontal" spacing="md" className="mb-2">
+          <Stack direction="horizontal" spacing="md" className="mb-xs">
             <span className="text-sm text-muted-foreground w-24">Fast (150ms)</span>
             <Button
               variant="primary"
@@ -110,7 +110,7 @@ export default function MotionTokensPage() {
         </div>
 
         <div>
-          <Stack direction="horizontal" spacing="md" className="mb-2">
+          <Stack direction="horizontal" spacing="md" className="mb-xs">
             <span className="text-sm text-muted-foreground w-24">Normal (250ms)</span>
             <Button
               variant="primary"
@@ -133,7 +133,7 @@ export default function MotionTokensPage() {
         </div>
 
         <div>
-          <Stack direction="horizontal" spacing="md" className="mb-2">
+          <Stack direction="horizontal" spacing="md" className="mb-xs">
             <span className="text-sm text-muted-foreground w-24">Slow (350ms)</span>
             <Button
               variant="primary"
@@ -161,7 +161,7 @@ export default function MotionTokensPage() {
         Cubic bezier curves that define the acceleration and deceleration of animations.
         Different curves create different feelings of motion.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {easingTokens.map((easing) => (
           <TokenDisplay
             key={easing.variable}
@@ -174,10 +174,10 @@ export default function MotionTokensPage() {
       </div>
 
       <h3>Easing Curve Visualization</h3>
-      <div className="not-prose mb-8">
+      <div className="not-prose mb-2xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="mb-2 text-sm font-semibold">Standard</div>
+            <div className="mb-xs text-sm font-semibold">Standard</div>
             <svg viewBox="0 0 100 100" className="w-full h-24 bg-muted rounded-md">
               <path
                 d="M 0 100 C 40 100, 20 0, 100 0"
@@ -189,7 +189,7 @@ export default function MotionTokensPage() {
             <p className="text-xs text-muted-foreground mt-2">Balanced acceleration</p>
           </div>
           <div className="text-center">
-            <div className="mb-2 text-sm font-semibold">Decelerate</div>
+            <div className="mb-xs text-sm font-semibold">Decelerate</div>
             <svg viewBox="0 0 100 100" className="w-full h-24 bg-muted rounded-md">
               <path
                 d="M 0 100 C 0 100, 20 0, 100 0"
@@ -201,7 +201,7 @@ export default function MotionTokensPage() {
             <p className="text-xs text-muted-foreground mt-2">Slow ending (enter)</p>
           </div>
           <div className="text-center">
-            <div className="mb-2 text-sm font-semibold">Accelerate</div>
+            <div className="mb-xs text-sm font-semibold">Accelerate</div>
             <svg viewBox="0 0 100 100" className="w-full h-24 bg-muted rounded-md">
               <path
                 d="M 0 100 C 40 100, 100 0, 100 0"

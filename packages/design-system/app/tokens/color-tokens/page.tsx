@@ -81,7 +81,7 @@ export default function ColorTokensPage() {
       <p>
         Core brand colors including the signature Fidus gold and neutral black and white.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-2xl">
         {brandColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -92,7 +92,7 @@ export default function ColorTokensPage() {
         Colors indicating privacy levels and data processing locations. Used in Privacy Badges
         to communicate transparency to users.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-2xl">
         {trustColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -102,7 +102,7 @@ export default function ColorTokensPage() {
       <p>
         Standard semantic colors for feedback, alerts, and status indicators.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-2xl">
         {semanticColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -112,7 +112,7 @@ export default function ColorTokensPage() {
       <p>
         Colors used to indicate urgency levels in OpportunityCards and priority indicators.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-2xl">
         {urgencyColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -122,7 +122,7 @@ export default function ColorTokensPage() {
       <p>
         Foundation colors for backgrounds, text, and surfaces. These adapt in dark mode.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-2xl">
         {neutralColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -166,7 +166,7 @@ export default function ColorTokensPage() {
         remain consistent across themes for recognition and consistency.
       </p>
       <div className="not-prose bg-muted p-md rounded-md">
-        <p className="text-sm text-muted-foreground mb-2">Dark mode overrides:</p>
+        <p className="text-sm text-muted-foreground mb-xs">Dark mode overrides:</p>
         <pre className="text-xs">
           <code>{`.dark {
   --color-background: 0 0% 9%;     /* #171717 */
