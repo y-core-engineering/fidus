@@ -333,7 +333,7 @@ export default function AIDrivenUIPage() {
             {/* Content Area with auto-scroll */}
             <div
               ref={scrollContainerRef}
-              className="absolute inset-0 pt-24 pb-20 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              className="absolute inset-0 pt-24 pb-32 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
               style={{ scrollBehavior: 'smooth' }}
             >
               {/* Dashboard view for Card scenes */}
