@@ -5,43 +5,35 @@ import { useState, useEffect, useRef } from 'react';
 
 // Timeline data - complex scenarios showing different UI forms
 const TIMELINE = [
-  // Scenario 1a: Multi-turn conversation - Initial query
+  // Scenario 1: Multi-turn trip planning conversation (4 messages)
   {
     time: '8:15',
     period: 'AM',
     title: 'Morning',
     icon: '☕',
-    context: 'User asks about weekend plans',
+    context: 'User plans weekend trip with follow-up',
     inputSource: 'User Request',
-    inputDetail: 'Complex query requiring clarification',
+    inputDetail: 'Multi-turn conversation → Form',
     chat: {
-      query: 'Help me plan a weekend trip to Munich',
-      response: 'I found 3 options: 1) Stay near Marienplatz (€180/night), 2) Schwabing district (€120/night), or 3) Near Olympic Park (€95/night). Which area interests you?',
-      widget: null
-    }
-  },
-  // Scenario 1b: User selects option → LLM shows booking form
-  {
-    time: '8:16',
-    period: 'AM',
-    title: 'Morning',
-    icon: '🏨',
-    context: 'User selected Schwabing option',
-    inputSource: 'User Request',
-    inputDetail: 'Follow-up choice → Dynamic form',
-    chat: {
-      query: 'Schwabing sounds good',
-      response: 'Great choice! Hotel München Palace (Schwabing): €120/night, 4.2★. Let me prepare the booking:',
-      widget: {
-        type: 'booking-form',
-        data: {
-          hotel: 'Hotel München Palace',
-          pricePerNight: '€120',
-          rating: '4.2★',
-          fields: ['Check-in', 'Check-out', 'Guests'],
-          action: 'Book Now'
+      messages: [
+        { type: 'user', content: 'Help me plan a weekend trip to Munich' },
+        { type: 'assistant', content: 'I found 3 options: 1) Stay near Marienplatz (€180/night), 2) Schwabing district (€120/night), or 3) Near Olympic Park (€95/night). Which area interests you?', widget: null },
+        { type: 'user', content: 'Schwabing sounds good' },
+        {
+          type: 'assistant',
+          content: 'Great choice! Hotel München Palace (Schwabing): €120/night, 4.2★. Let me prepare the booking:',
+          widget: {
+            type: 'booking-form',
+            data: {
+              hotel: 'Hotel München Palace',
+              pricePerNight: '€120',
+              rating: '4.2★',
+              fields: ['Check-in', 'Check-out', 'Guests'],
+              action: 'Book Now'
+            }
+          }
         }
-      }
+      ]
     }
   },
   // Scenario 2: Proactive card based on pattern detection
@@ -61,50 +53,46 @@ const TIMELINE = [
       secondary: 'Ignore'
     }
   },
-  // Scenario 3a: Flight search with widget
+  // Scenario 3: Flight booking conversation (4 messages)
   {
     time: '2:00',
     period: 'PM',
     title: 'Afternoon',
     icon: '✈️',
-    context: 'User books flight after trip planning',
+    context: 'User books flight with confirmation',
     inputSource: 'User Request',
-    inputDetail: 'Structured data entry via dynamic form',
+    inputDetail: 'Widget → Action → Confirmation',
     chat: {
-      query: 'Book the 10:30 AM flight to Munich on Friday',
-      response: 'Found Lufthansa LH2134 (10:30 AM, €89). Shall I book it?',
-      widget: {
-        type: 'flight-card',
-        data: {
-          airline: 'Lufthansa LH2134',
-          departure: '10:30 AM',
-          arrival: '11:45 AM',
-          price: '€89',
-          actions: ['Book Now', 'Compare Prices']
+      messages: [
+        { type: 'user', content: 'Book the 10:30 AM flight to Munich on Friday' },
+        {
+          type: 'assistant',
+          content: 'Found Lufthansa LH2134 (10:30 AM, €89). Shall I book it?',
+          widget: {
+            type: 'flight-card',
+            data: {
+              airline: 'Lufthansa LH2134',
+              departure: '10:30 AM',
+              arrival: '11:45 AM',
+              price: '€89',
+              actions: ['Book Now', 'Compare Prices']
+            }
+          }
+        },
+        { type: 'user', content: 'Book it' },
+        {
+          type: 'assistant',
+          content: '✓ Booked! Lufthansa LH2134 on Friday 10:30 AM. Confirmation sent to your email. Added to calendar.',
+          widget: {
+            type: 'confirmation',
+            data: {
+              status: 'success',
+              title: 'Flight Booked',
+              details: ['Confirmation: LH2134-XY789', 'Calendar updated', 'Email sent']
+            }
+          }
         }
-      }
-    }
-  },
-  // Scenario 3b: User confirms → Success confirmation
-  {
-    time: '2:01',
-    period: 'PM',
-    title: 'Afternoon',
-    icon: '✅',
-    context: 'Flight booked successfully',
-    inputSource: 'User Request',
-    inputDetail: 'Action confirmation → Success state',
-    chat: {
-      query: 'Book it',
-      response: '✓ Booked! Lufthansa LH2134 on Friday 10:30 AM. Confirmation sent to your email. Added to calendar.',
-      widget: {
-        type: 'confirmation',
-        data: {
-          status: 'success',
-          title: 'Flight Booked',
-          details: ['Confirmation: LH2134-XY789', 'Calendar updated', 'Email sent']
-        }
-      }
+      ]
     }
   },
   // Scenario 4: Budget threshold with contextual actions
@@ -124,48 +112,44 @@ const TIMELINE = [
       secondary: 'Adjust'
     }
   },
-  // Scenario 5a: Ambiguous query requiring wizard
+  // Scenario 5: Meeting scheduling wizard conversation (4 messages)
   {
     time: '7:20',
     period: 'PM',
     title: 'Evening',
     icon: '📅',
-    context: 'User wants to schedule something complex',
+    context: 'User schedules meeting via wizard',
     inputSource: 'User Request',
-    inputDetail: 'Ambiguous intent → Multi-step wizard',
+    inputDetail: 'Wizard → Confirmation',
     chat: {
-      query: 'Schedule team meeting next week',
-      response: 'I need a few details. Which day works best?',
-      widget: {
-        type: 'wizard-step-1',
-        data: {
-          step: '1 of 3',
-          question: 'Which day?',
-          options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+      messages: [
+        { type: 'user', content: 'Schedule team meeting next week' },
+        {
+          type: 'assistant',
+          content: 'I need a few details. Which day works best?',
+          widget: {
+            type: 'wizard-step-1',
+            data: {
+              step: '1 of 3',
+              question: 'Which day?',
+              options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+            }
+          }
+        },
+        { type: 'user', content: 'Wednesday afternoon, 1 hour' },
+        {
+          type: 'assistant',
+          content: '✓ Team meeting scheduled: Wednesday 2:00-3:00 PM. Invites sent to 4 participants.',
+          widget: {
+            type: 'confirmation',
+            data: {
+              status: 'success',
+              title: 'Meeting Scheduled',
+              details: ['Wed 2:00-3:00 PM', '4 participants', 'Calendar invites sent']
+            }
+          }
         }
-      }
-    }
-  },
-  // Scenario 5b: Wizard completed → Calendar event created
-  {
-    time: '7:21',
-    period: 'PM',
-    title: 'Evening',
-    icon: '✓',
-    context: 'Meeting scheduled successfully',
-    inputSource: 'User Request',
-    inputDetail: 'Wizard completion → Confirmation',
-    chat: {
-      query: 'Wednesday afternoon, 1 hour',
-      response: '✓ Team meeting scheduled: Wednesday 2:00-3:00 PM. Invites sent to 4 participants.',
-      widget: {
-        type: 'confirmation',
-        data: {
-          status: 'success',
-          title: 'Meeting Scheduled',
-          details: ['Wed 2:00-3:00 PM', '4 participants', 'Calendar invites sent']
-        }
-      }
+      ]
     }
   }
 ];
@@ -176,6 +160,7 @@ export default function AIDrivenUIPage() {
   const [visibleMessages, setVisibleMessages] = useState(0);
   const [showWidget, setShowWidget] = useState(false);
   const [llmStep, setLlmStep] = useState(-1); // -1=hidden, 0=thinking, 1-5=steps visible
+  const [visibleMessageIndex, setVisibleMessageIndex] = useState(0); // For multi-turn dialogs
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const current = TIMELINE[currentIndex];
 
@@ -187,7 +172,7 @@ export default function AIDrivenUIPage() {
         behavior: 'smooth'
       });
     }
-  }, [visibleMessages, showWidget, showTyping]);
+  }, [visibleMessages, showWidget, showTyping, visibleMessageIndex]);
 
   // LLM thinking animation - steps appear sequentially
   useEffect(() => {
@@ -226,6 +211,7 @@ export default function AIDrivenUIPage() {
       setShowTyping(false);
       setVisibleMessages(0);
       setShowWidget(false);
+      setVisibleMessageIndex(0);
 
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % TIMELINE.length);
@@ -235,32 +221,67 @@ export default function AIDrivenUIPage() {
         const nextScene = TIMELINE[nextIndex];
 
         if (nextScene.chat) {
-          // 1. Show user message IMMEDIATELY (before LLM thinking)
-          setVisibleMessages(1);
+          // Check if this is a multi-turn dialog (messages array) or single turn (query/response)
+          if (nextScene.chat.messages) {
+            // Multi-turn dialog - progressively show messages
+            const messages = nextScene.chat.messages;
+            let currentDelay = 0;
 
-          // 2. Show typing indicator immediately after user message (LLM is thinking)
-          setTimeout(() => {
-            setShowTyping(true);
-          }, 200);
+            messages.forEach((msg, idx) => {
+              setTimeout(() => {
+                setVisibleMessageIndex(idx + 1);
 
-          // 3. LLM thinks for ~2500ms (300ms + 2000ms steps + 200ms buffer)
-          // 4. After LLM completes, hide typing and show response
-          setTimeout(() => {
-            setShowTyping(false);
-            setVisibleMessages(2);
+                // Show typing indicator before assistant responses
+                if (msg.type === 'assistant' && idx < messages.length) {
+                  setTimeout(() => setShowTyping(true), 100);
+                  // LLM thinking time before showing assistant response
+                  setTimeout(() => {
+                    setShowTyping(false);
+                  }, 2500);
+                }
+              }, currentDelay);
 
-            // Show widget after response
-            if (nextScene.chat.widget) {
-              setTimeout(() => setShowWidget(true), 500);
-            }
-          }, 2700); // Typing visible during entire LLM process
+              // Timing between messages:
+              // - User message appears immediately
+              // - Then typing indicator (100ms)
+              // - Then LLM thinks (2500ms)
+              // - Then assistant response appears
+              // - Then pause before next user message (1000ms)
+              if (msg.type === 'user') {
+                currentDelay += 200; // Quick delay after user message
+              } else {
+                currentDelay += 2800; // LLM thinking time + typing indicator
+              }
+            });
+          } else {
+            // Single-turn dialog (old format)
+            // 1. Show user message IMMEDIATELY (before LLM thinking)
+            setVisibleMessages(1);
+
+            // 2. Show typing indicator immediately after user message (LLM is thinking)
+            setTimeout(() => {
+              setShowTyping(true);
+            }, 200);
+
+            // 3. LLM thinks for ~2500ms (300ms + 2000ms steps + 200ms buffer)
+            // 4. After LLM completes, hide typing and show response
+            setTimeout(() => {
+              setShowTyping(false);
+              setVisibleMessages(2);
+
+              // Show widget after response
+              if (nextScene.chat.widget) {
+                setTimeout(() => setShowWidget(true), 500);
+              }
+            }, 2700); // Typing visible during entire LLM process
+          }
         } else if (nextScene.card) {
           // For cards (Signal/Event), LLM thinking happens first
           // Card is rendered when llmStep >= 5 (Rendering Complete)
           // No additional animation needed - card is always visible
         }
       }, 500);
-    }, 8000); // 8 seconds per scene
+    }, 12000); // 12 seconds per scene (increased for multi-turn dialogs)
 
     return () => clearInterval(timer);
   }, [currentIndex]);
@@ -371,122 +392,252 @@ export default function AIDrivenUIPage() {
               {/* Render Chat with progressive animation */}
               {current.chat && (
                 <div className="space-y-3 mt-20">
-                  {/* User message - appears first */}
-                  {visibleMessages >= 1 && (
-                    <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
-                      <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%]">
-                        <p className="text-sm">{current.chat.query}</p>
-                      </div>
-                    </div>
-                  )}
+                  {/* Multi-turn dialog (messages array) */}
+                  {current.chat.messages ? (
+                    <>
+                      {current.chat.messages.slice(0, visibleMessageIndex).map((msg, idx) => (
+                        <div key={idx}>
+                          {msg.type === 'user' ? (
+                            <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
+                              <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%]">
+                                <p className="text-sm">{msg.content}</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                                  <p className="text-sm">{msg.content}</p>
+                                </div>
+                              </div>
+                              {/* Show widget if present in assistant message */}
+                              {msg.widget && (
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 mt-2">
+                                  {/* Flight Card Widget */}
+                                  {msg.widget.type === 'flight-card' && msg.widget.data && 'airline' in msg.widget.data && (
+                                    <div className="bg-card border border-border rounded-lg p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-xl">✈️</span>
+                                        <div>
+                                          <p className="text-sm font-semibold">{msg.widget.data.airline}</p>
+                                          <p className="text-xs text-muted-foreground">{msg.widget.data.departure} → {msg.widget.data.arrival}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-lg font-bold text-primary">{msg.widget.data.price}</p>
+                                        <div className="flex gap-2">
+                                          {msg.widget.data.actions?.map((action: string, actionIdx: number) => (
+                                            <button key={actionIdx} className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                              {action}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
 
-                  {/* Typing indicator */}
-                  {showTyping && (
-                    <div className="flex justify-start animate-in fade-in duration-200">
-                      <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
-                        <div className="flex gap-1">
-                          <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                  {/* Booking Form Widget */}
+                                  {msg.widget.type === 'booking-form' && msg.widget.data && 'hotel' in msg.widget.data && (
+                                    <div className="bg-card border border-border rounded-lg p-4">
+                                      <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                          <p className="text-sm font-semibold">{msg.widget.data.hotel}</p>
+                                          <p className="text-xs text-muted-foreground">{msg.widget.data.pricePerNight} · {msg.widget.data.rating}</p>
+                                        </div>
+                                      </div>
+                                      <div className="space-y-2 mb-3">
+                                        {msg.widget.data.fields?.map((field: string, fieldIdx: number) => (
+                                          <input
+                                            key={fieldIdx}
+                                            type="text"
+                                            placeholder={field}
+                                            className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50"
+                                            readOnly
+                                          />
+                                        ))}
+                                      </div>
+                                      <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                        {msg.widget.data.action}
+                                      </button>
+                                    </div>
+                                  )}
+
+                                  {/* Wizard Widget */}
+                                  {msg.widget.type === 'wizard-step-1' && msg.widget.data && 'step' in msg.widget.data && (
+                                    <div className="bg-card border border-border rounded-lg p-4">
+                                      <p className="text-xs text-muted-foreground mb-2">{msg.widget.data.step}</p>
+                                      <p className="text-sm font-semibold mb-3">{msg.widget.data.question}</p>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {msg.widget.data.options?.map((option: string, optionIdx: number) => (
+                                          <button key={optionIdx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
+                                            {option}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Confirmation Widget */}
+                                  {msg.widget.type === 'confirmation' && msg.widget.data && 'status' in msg.widget.data && (
+                                    <div className="bg-success/10 border border-success/20 rounded-lg p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-2xl">✓</span>
+                                        <p className="text-sm font-bold text-success">{msg.widget.data.title}</p>
+                                      </div>
+                                      <div className="space-y-1">
+                                        {msg.widget.data.details?.map((detail: string, detailIdx: number) => (
+                                          <p key={detailIdx} className="text-xs text-muted-foreground flex items-center gap-2">
+                                            <span className="text-success">•</span>
+                                            {detail}
+                                          </p>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          )}
                         </div>
-                      </div>
-                    </div>
-                  )}
+                      ))}
 
-                  {/* Assistant response - appears after typing */}
-                  {visibleMessages >= 2 && (
-                    <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
-                      <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
-                        <p className="text-sm">{current.chat.response}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Widget appears after response */}
-                  {current.chat.widget && showWidget && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      {/* Flight Card Widget */}
-                      {current.chat.widget.type === 'flight-card' && current.chat.widget.data && 'airline' in current.chat.widget.data && (
-                        <div className="bg-card border border-border rounded-lg p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl">✈️</span>
-                            <div>
-                              <p className="text-sm font-semibold">{current.chat.widget.data.airline}</p>
-                              <p className="text-xs text-muted-foreground">{current.chat.widget.data.departure} → {current.chat.widget.data.arrival}</p>
+                      {/* Typing indicator for multi-turn */}
+                      {showTyping && (
+                        <div className="flex justify-start animate-in fade-in duration-200">
+                          <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                            <div className="flex gap-1">
+                              <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                             </div>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-lg font-bold text-primary">{current.chat.widget.data.price}</p>
-                            <div className="flex gap-2">
-                              {current.chat.widget.data.actions?.map((action: string, idx: number) => (
-                                <button key={idx} className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
-                                  {action}
-                                </button>
-                              ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Single-turn dialog (old format) */}
+                      {/* User message - appears first */}
+                      {visibleMessages >= 1 && 'query' in current.chat && typeof current.chat.query === 'string' && (
+                        <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
+                          <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%]">
+                            <p className="text-sm">{current.chat.query}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Typing indicator */}
+                      {showTyping && (
+                        <div className="flex justify-start animate-in fade-in duration-200">
+                          <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                            <div className="flex gap-1">
+                              <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                             </div>
                           </div>
                         </div>
                       )}
 
-                      {/* Booking Form Widget */}
-                      {current.chat.widget.type === 'booking-form' && current.chat.widget.data && 'hotel' in current.chat.widget.data && (
-                        <div className="bg-card border border-border rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="text-sm font-semibold">{current.chat.widget.data.hotel}</p>
-                              <p className="text-xs text-muted-foreground">{current.chat.widget.data.pricePerNight} · {current.chat.widget.data.rating}</p>
-                            </div>
+                      {/* Assistant response - appears after typing */}
+                      {visibleMessages >= 2 && 'response' in current.chat && typeof current.chat.response === 'string' && (
+                        <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                          <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                            <p className="text-sm">{current.chat.response}</p>
                           </div>
-                          <div className="space-y-2 mb-3">
-                            {current.chat.widget.data.fields?.map((field: string, idx: number) => (
-                              <input
-                                key={idx}
-                                type="text"
-                                placeholder={field}
-                                className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50"
-                                readOnly
-                              />
-                            ))}
-                          </div>
-                          <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
-                            {current.chat.widget.data.action}
-                          </button>
                         </div>
                       )}
 
-                      {/* Wizard Widget */}
-                      {current.chat.widget.type === 'wizard-step-1' && current.chat.widget.data && 'step' in current.chat.widget.data && (
-                        <div className="bg-card border border-border rounded-lg p-4">
-                          <p className="text-xs text-muted-foreground mb-2">{current.chat.widget.data.step}</p>
-                          <p className="text-sm font-semibold mb-3">{current.chat.widget.data.question}</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {current.chat.widget.data.options?.map((option: string, idx: number) => (
-                              <button key={idx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
-                                {option}
+                      {/* Widget appears after response */}
+                      {'widget' in current.chat && current.chat.widget && typeof current.chat.widget === 'object' && 'type' in current.chat.widget && showWidget && (() => {
+                        const widget = current.chat.widget as { type: string; data: any };
+                        return (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                          {/* Flight Card Widget */}
+                          {widget.type === 'flight-card' && widget.data && 'airline' in widget.data && (
+                            <div className="bg-card border border-border rounded-lg p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-xl">✈️</span>
+                                <div>
+                                  <p className="text-sm font-semibold">{widget.data.airline}</p>
+                                  <p className="text-xs text-muted-foreground">{widget.data.departure} → {widget.data.arrival}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-lg font-bold text-primary">{widget.data.price}</p>
+                                <div className="flex gap-2">
+                                  {widget.data.actions?.map((action: string, idx: number) => (
+                                    <button key={idx} className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                      {action}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Booking Form Widget */}
+                          {widget.type === 'booking-form' && widget.data && 'hotel' in widget.data && (
+                            <div className="bg-card border border-border rounded-lg p-4">
+                              <div className="flex items-start justify-between mb-3">
+                                <div>
+                                  <p className="text-sm font-semibold">{widget.data.hotel}</p>
+                                  <p className="text-xs text-muted-foreground">{widget.data.pricePerNight} · {widget.data.rating}</p>
+                                </div>
+                              </div>
+                              <div className="space-y-2 mb-3">
+                                {widget.data.fields?.map((field: string, idx: number) => (
+                                  <input
+                                    key={idx}
+                                    type="text"
+                                    placeholder={field}
+                                    className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50"
+                                    readOnly
+                                  />
+                                ))}
+                              </div>
+                              <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                {widget.data.action}
                               </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                            </div>
+                          )}
 
-                      {/* Confirmation Widget */}
-                      {current.chat.widget.type === 'confirmation' && current.chat.widget.data && 'status' in current.chat.widget.data && (
-                        <div className="bg-success/10 border border-success/20 rounded-lg p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-2xl">✓</span>
-                            <p className="text-sm font-bold text-success">{current.chat.widget.data.title}</p>
-                          </div>
-                          <div className="space-y-1">
-                            {current.chat.widget.data.details?.map((detail: string, idx: number) => (
-                              <p key={idx} className="text-xs text-muted-foreground flex items-center gap-2">
-                                <span className="text-success">•</span>
-                                {detail}
-                              </p>
-                            ))}
-                          </div>
+                          {/* Wizard Widget */}
+                          {widget.type === 'wizard-step-1' && widget.data && 'step' in widget.data && (
+                            <div className="bg-card border border-border rounded-lg p-4">
+                              <p className="text-xs text-muted-foreground mb-2">{widget.data.step}</p>
+                              <p className="text-sm font-semibold mb-3">{widget.data.question}</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {widget.data.options?.map((option: string, idx: number) => (
+                                  <button key={idx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
+                                    {option}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Confirmation Widget */}
+                          {widget.type === 'confirmation' && widget.data && 'status' in widget.data && (
+                            <div className="bg-success/10 border border-success/20 rounded-lg p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-2xl">✓</span>
+                                <p className="text-sm font-bold text-success">{widget.data.title}</p>
+                              </div>
+                              <div className="space-y-1">
+                                {widget.data.details?.map((detail: string, idx: number) => (
+                                  <p key={idx} className="text-xs text-muted-foreground flex items-center gap-2">
+                                    <span className="text-success">•</span>
+                                    {detail}
+                                  </p>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                        );
+                      })()}
+                    </>
                   )}
                 </div>
               )}
