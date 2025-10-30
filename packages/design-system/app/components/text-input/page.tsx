@@ -91,12 +91,12 @@ export default function TextInputPage() {
       description: 'Show character count (requires maxLength)',
     },
     {
-      name: 'prefix',
+      name: 'leadingIcon',
       type: 'ReactNode',
       description: 'Content before input (icon, text)',
     },
     {
-      name: 'suffix',
+      name: 'trailingIcon',
       type: 'ReactNode',
       description: 'Content after input (icon, text)',
     },
@@ -271,43 +271,40 @@ export default function TextInputPage() {
   <TextInput
     label="Search"
     placeholder="Search..."
-    prefix={<Search className="h-5 w-5" />}
+    leadingIcon={<Search className="h-5 w-5" />}
   />
   <TextInput
     label="Email"
     type="email"
     placeholder="you@example.com"
-    prefix={<Mail className="h-5 w-5" />}
+    leadingIcon={<Mail className="h-5 w-5" />}
   />
   <TextInput
     label="Password"
     type="password"
     placeholder="Enter password"
-    prefix={<Lock className="h-5 w-5" />}
+    leadingIcon={<Lock className="h-5 w-5" />}
     showPasswordToggle
   />
 </Stack>`}
       >
         <Stack direction="vertical" spacing="lg">
-          {/* @ts-expect-error - prefix prop type conflict with InputHTMLAttributes */}
           <TextInput
             label="Search"
             placeholder="Search..."
-            prefix={<Search className="h-5 w-5" />}
+            leadingIcon={<Search className="h-5 w-5" />}
           />
-          {/* @ts-expect-error - prefix prop type conflict with InputHTMLAttributes */}
           <TextInput
             label="Email"
             type="email"
             placeholder="you@example.com"
-            prefix={<Mail className="h-5 w-5" />}
+            leadingIcon={<Mail className="h-5 w-5" />}
           />
-          {/* @ts-expect-error - prefix prop type conflict with InputHTMLAttributes */}
           <TextInput
             label="Password"
             type="password"
             placeholder="Enter password"
-            prefix={<Lock className="h-5 w-5" />}
+            leadingIcon={<Lock className="h-5 w-5" />}
             showPasswordToggle
           />
         </Stack>
@@ -401,7 +398,7 @@ export default function TextInputPage() {
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Use prefix icons to clarify the input purpose (search, email, etc.)</span>
+              <span>Use leading icons to clarify the input purpose (search, email, etc.)</span>
             </li>
           </ul>
         </div>
@@ -464,7 +461,7 @@ export default function TextInputPage() {
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Use prefix icons to make the input purpose immediately clear</span>
+              <span>Use leading icons to make the input purpose immediately clear</span>
             </li>
           </ul>
           <div className="mt-md p-md bg-success/10 rounded-md">
@@ -473,16 +470,15 @@ export default function TextInputPage() {
   label="Email Address"
   type="email"
   placeholder="you@example.com"
-  prefix={<Mail className="h-5 w-5" />}
+  leadingIcon={<Mail className="h-5 w-5" />}
   helperText="We'll send a confirmation to this address"
 />`}
             >
-              {/* @ts-expect-error - prefix prop type conflict with InputHTMLAttributes */}
               <TextInput
                 label="Email Address"
                 type="email"
                 placeholder="you@example.com"
-                prefix={<Mail className="h-5 w-5" />}
+                leadingIcon={<Mail className="h-5 w-5" />}
                 helperText="We'll send a confirmation to this address"
               />
             </ComponentPreview>
