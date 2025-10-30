@@ -41,6 +41,8 @@ export * from './components/modal';
 export * from './components/alert';
 export * from './components/banner';
 export * from './components/progress-bar';
+export * from './components/spinner';
+export * from './components/skeleton';
 
 // Overlay Components
 export * from './components/dropdown';
