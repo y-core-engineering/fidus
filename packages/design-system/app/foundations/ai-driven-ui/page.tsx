@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 
 // Timeline data - complex scenarios showing different UI forms
 const TIMELINE = [
-  // Scenario 1: Multi-turn conversation with follow-up questions
+  // Scenario 1a: Multi-turn conversation - Initial query
   {
     time: '8:15',
     period: 'AM',
@@ -18,6 +18,30 @@ const TIMELINE = [
       query: 'Help me plan a weekend trip to Munich',
       response: 'I found 3 options: 1) Stay near Marienplatz (€180/night), 2) Schwabing district (€120/night), or 3) Near Olympic Park (€95/night). Which area interests you?',
       widget: null
+    }
+  },
+  // Scenario 1b: User selects option → LLM shows booking form
+  {
+    time: '8:16',
+    period: 'AM',
+    title: 'Morning',
+    icon: '🏨',
+    context: 'User selected Schwabing option',
+    inputSource: 'User Request',
+    inputDetail: 'Follow-up choice → Dynamic form',
+    chat: {
+      query: 'Schwabing sounds good',
+      response: 'Great choice! Hotel München Palace (Schwabing): €120/night, 4.2★. Let me prepare the booking:',
+      widget: {
+        type: 'booking-form',
+        data: {
+          hotel: 'Hotel München Palace',
+          pricePerNight: '€120',
+          rating: '4.2★',
+          fields: ['Check-in', 'Check-out', 'Guests'],
+          action: 'Book Now'
+        }
+      }
     }
   },
   // Scenario 2: Proactive card based on pattern detection
@@ -37,7 +61,7 @@ const TIMELINE = [
       secondary: 'Ignore'
     }
   },
-  // Scenario 3: Form-based interaction with embedded widget
+  // Scenario 3a: Flight search with widget
   {
     time: '2:00',
     period: 'PM',
@@ -61,6 +85,28 @@ const TIMELINE = [
       }
     }
   },
+  // Scenario 3b: User confirms → Success confirmation
+  {
+    time: '2:01',
+    period: 'PM',
+    title: 'Afternoon',
+    icon: '✅',
+    context: 'Flight booked successfully',
+    inputSource: 'User Request',
+    inputDetail: 'Action confirmation → Success state',
+    chat: {
+      query: 'Book it',
+      response: '✓ Booked! Lufthansa LH2134 on Friday 10:30 AM. Confirmation sent to your email. Added to calendar.',
+      widget: {
+        type: 'confirmation',
+        data: {
+          status: 'success',
+          title: 'Flight Booked',
+          details: ['Confirmation: LH2134-XY789', 'Calendar updated', 'Email sent']
+        }
+      }
+    }
+  },
   // Scenario 4: Budget threshold with contextual actions
   {
     time: '6:45',
@@ -78,7 +124,7 @@ const TIMELINE = [
       secondary: 'Adjust'
     }
   },
-  // Scenario 5: Ambiguous query requiring wizard
+  // Scenario 5a: Ambiguous query requiring wizard
   {
     time: '7:20',
     period: 'PM',
@@ -89,13 +135,35 @@ const TIMELINE = [
     inputDetail: 'Ambiguous intent → Multi-step wizard',
     chat: {
       query: 'Schedule team meeting next week',
-      response: 'I need a few details: 1) Which day works best? 2) Morning or afternoon? 3) How long?',
+      response: 'I need a few details. Which day works best?',
       widget: {
         type: 'wizard-step-1',
         data: {
           step: '1 of 3',
           question: 'Which day?',
           options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        }
+      }
+    }
+  },
+  // Scenario 5b: Wizard completed → Calendar event created
+  {
+    time: '7:21',
+    period: 'PM',
+    title: 'Evening',
+    icon: '✓',
+    context: 'Meeting scheduled successfully',
+    inputSource: 'User Request',
+    inputDetail: 'Wizard completion → Confirmation',
+    chat: {
+      query: 'Wednesday afternoon, 1 hour',
+      response: '✓ Team meeting scheduled: Wednesday 2:00-3:00 PM. Invites sent to 4 participants.',
+      widget: {
+        type: 'confirmation',
+        data: {
+          status: 'success',
+          title: 'Meeting Scheduled',
+          details: ['Wed 2:00-3:00 PM', '4 participants', 'Calendar invites sent']
         }
       }
     }
@@ -360,6 +428,32 @@ export default function AIDrivenUIPage() {
                         </div>
                       )}
 
+                      {/* Booking Form Widget */}
+                      {current.chat.widget.type === 'booking-form' && current.chat.widget.data && 'hotel' in current.chat.widget.data && (
+                        <div className="bg-card border border-border rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <p className="text-sm font-semibold">{current.chat.widget.data.hotel}</p>
+                              <p className="text-xs text-muted-foreground">{current.chat.widget.data.pricePerNight} · {current.chat.widget.data.rating}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-2 mb-3">
+                            {current.chat.widget.data.fields?.map((field: string, idx: number) => (
+                              <input
+                                key={idx}
+                                type="text"
+                                placeholder={field}
+                                className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50"
+                                readOnly
+                              />
+                            ))}
+                          </div>
+                          <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                            {current.chat.widget.data.action}
+                          </button>
+                        </div>
+                      )}
+
                       {/* Wizard Widget */}
                       {current.chat.widget.type === 'wizard-step-1' && current.chat.widget.data && 'step' in current.chat.widget.data && (
                         <div className="bg-card border border-border rounded-lg p-4">
@@ -370,6 +464,24 @@ export default function AIDrivenUIPage() {
                               <button key={idx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
                                 {option}
                               </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Confirmation Widget */}
+                      {current.chat.widget.type === 'confirmation' && current.chat.widget.data && 'status' in current.chat.widget.data && (
+                        <div className="bg-success/10 border border-success/20 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-2xl">✓</span>
+                            <p className="text-sm font-bold text-success">{current.chat.widget.data.title}</p>
+                          </div>
+                          <div className="space-y-1">
+                            {current.chat.widget.data.details?.map((detail: string, idx: number) => (
+                              <p key={idx} className="text-xs text-muted-foreground flex items-center gap-2">
+                                <span className="text-success">•</span>
+                                {detail}
+                              </p>
                             ))}
                           </div>
                         </div>
