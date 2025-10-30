@@ -53,7 +53,7 @@ export default function PrivacyUXPage() {
         processing location:
       </p>
 
-      <div className="space-y-4 my-lg">
+      <div className="space-y-md my-lg">
         <div className="flex items-center gap-sm p-sm border border-border rounded-lg">
           <Badge>🔒 Local</Badge>
           <div>
@@ -102,11 +102,11 @@ export default function PrivacyUXPage() {
       <p>Always include privacy badge in header showing data source:</p>
       <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md">
         <div className="flex items-center justify-between mb-sm">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-xs">
             <span>💰</span>
             <strong className="text-sm">Budget Alert</strong>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-xs">
             <Badge>🔒 Local</Badge>
             <button className="text-sm">✕</button>
           </div>
@@ -133,7 +133,7 @@ export default function PrivacyUXPage() {
         <p className="text-xs text-muted-foreground mb-sm">
           🔒 This data stays on your device and is never shared.
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-xs">
           <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded">
             Save
           </button>
@@ -147,15 +147,15 @@ export default function PrivacyUXPage() {
       <p>Show when data syncs to external services:</p>
 
       <div className="space-y-sm my-lg">
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-xs text-sm">
           <div className="h-2 w-2 rounded-full bg-success"></div>
           <span>Connected to Google Calendar</span>
         </div>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-xs text-sm">
           <div className="h-2 w-2 rounded-full bg-warning"></div>
           <span>Syncing transactions (2 pending)</span>
         </div>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-xs text-sm">
           <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>
           <span>Bank connection offline</span>
         </div>
@@ -175,7 +175,7 @@ export default function PrivacyUXPage() {
           <li>✓ Update existing events</li>
           <li>✗ Access to other Google services</li>
         </ul>
-        <div className="flex gap-2">
+        <div className="flex gap-xs">
           <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded">
             Allow Access
           </button>
@@ -189,7 +189,7 @@ export default function PrivacyUXPage() {
 
       <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
         <h3 className="text-base font-semibold mb-md">AI Processing Location</h3>
-        <div className="space-y-4">
+        <div className="space-y-md">
           <label className="flex items-start gap-sm cursor-pointer">
             <input type="radio" name="ai-processing" className="mt-1" defaultChecked />
             <div>
