@@ -118,10 +118,12 @@ export default function AIDrivenUIPage() {
         to each moment.
       </p>
 
-      {/* Mobile Phone Demo */}
+      {/* Mobile Phone Demo with Two-Column Layout */}
       <div className="not-prose my-lg md:my-xl">
-        <div className="mx-auto w-[380px] max-w-full">
-          <div className="relative bg-gradient-to-br from-primary/5 via-background to-muted/20 rounded-[2.5rem] overflow-hidden border-8 border-foreground/20 shadow-2xl h-[780px]">
+        <div className="grid md:grid-cols-[380px_1fr] gap-8 items-start">
+          {/* Left: Mobile Phone */}
+          <div className="mx-auto w-[380px] max-w-full shrink-0">
+            <div className="relative bg-gradient-to-br from-primary/5 via-background to-muted/20 rounded-[2.5rem] overflow-hidden border-8 border-foreground/20 shadow-2xl h-[780px]">
             {/* Mobile Notch */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-foreground/90 rounded-b-2xl z-30" />
 
@@ -247,8 +249,118 @@ export default function AIDrivenUIPage() {
               </div>
             </div>
 
-            {/* Home Indicator */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-muted-foreground/40 rounded-full" />
+              {/* Home Indicator */}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-muted-foreground/40 rounded-full" />
+            </div>
+          </div>
+
+          {/* Right: LLM Decision Process Panel */}
+          <div className="hidden md:block">
+            <div className="sticky top-24 space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-2xl">🤖</span>
+                </div>
+                <div>
+                  <h3 className="text-base md:text-lg font-semibold">LLM Decision Process</h3>
+                  <p className="text-sm md:text-base text-muted-foreground">Real-time context analysis</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 bg-muted/30 rounded-xl p-4 border border-border">
+                {/* Step 1: Context Analysis */}
+                <div className="transition-all duration-500 opacity-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-sm">1</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm md:text-base font-semibold mb-1">Context Analysis</p>
+                      <div className="space-y-1 text-xs md:text-sm text-muted-foreground">
+                        <p className="transition-all duration-300 translate-x-0 opacity-100">
+                          ⏰ Time: {current.time} {current.period}
+                        </p>
+                        <p className="transition-all duration-300 delay-100 translate-x-0 opacity-100">
+                          📍 Context: {current.context}
+                        </p>
+                        <p className="transition-all duration-300 delay-200 translate-x-0 opacity-100">
+                          🎯 Type: {current.card ? 'Proactive Alert' : 'Chat Query'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2: Intent Detection */}
+                <div className="transition-all duration-500 delay-200 opacity-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-sm">2</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm md:text-base font-semibold mb-1">Intent Detection</p>
+                      <div className="text-xs md:text-sm text-muted-foreground transition-all duration-300 delay-300 translate-x-0 opacity-100">
+                        <p className="mb-1">
+                          {current.card ? `⚠️ ${current.card.type.charAt(0).toUpperCase() + current.card.type.slice(1)} notification needed` : '💬 Informational query'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: UI Form Selection */}
+                <div className="transition-all duration-500 delay-400 opacity-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-sm">3</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm md:text-base font-semibold mb-1">UI Form Selection</p>
+                      <div className="transition-all duration-300 delay-500 translate-x-0 opacity-100">
+                        <div className="bg-primary/10 rounded-md px-2 py-1.5 text-xs md:text-sm font-medium">
+                          {current.card
+                            ? `${current.card.type.toUpperCase()} OpportunityCard`
+                            : current.chat
+                              ? `Chat-based response with ${current.chat.widget ? 'embedded widget' : 'text'}`
+                              : 'Dynamic UI'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 4: Rendering */}
+                <div className="transition-all duration-500 delay-600 opacity-100 scale-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-sm">✓</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm md:text-base font-semibold mb-1 text-success">Rendering UI</p>
+                      <div className="text-xs md:text-sm text-muted-foreground transition-all duration-300 delay-700 translate-x-0 opacity-100">
+                        <p>Components assembled & displayed</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Metadata */}
+              <div className="bg-muted/20 rounded-lg p-3 text-xs md:text-sm space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Processing Time:</span>
+                  <span className="font-medium">~230ms</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">LLM Tokens:</span>
+                  <span className="font-medium">~450</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Confidence:</span>
+                  <span className="font-medium">95%</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
