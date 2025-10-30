@@ -167,9 +167,14 @@ export default function AIDrivenUIPage() {
   // Auto-scroll to bottom when new messages appear
   useEffect(() => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: scrollContainerRef.current.scrollHeight,
-        behavior: 'smooth'
+      // Use requestAnimationFrame to ensure DOM is updated before scrolling
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({
+            top: scrollContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
       });
     }
   }, [visibleMessages, showWidget, showTyping, visibleMessageIndex]);
@@ -329,6 +334,7 @@ export default function AIDrivenUIPage() {
             <div
               ref={scrollContainerRef}
               className="absolute inset-0 pt-24 pb-20 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              style={{ scrollBehavior: 'smooth' }}
             >
               {/* Dashboard view for Card scenes */}
               {current.card && (
