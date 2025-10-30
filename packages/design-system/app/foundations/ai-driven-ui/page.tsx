@@ -11,6 +11,8 @@ const TIMELINE = [
     title: 'Wake Up',
     icon: '🌅',
     context: 'Meeting at 9:00 AM, no alarm set',
+    inputSource: 'Signal',
+    inputDetail: 'Calendar event without alarm',
     card: {
       type: 'urgent',
       title: 'No Alarm Set',
@@ -25,6 +27,8 @@ const TIMELINE = [
     title: 'Breakfast',
     icon: '☕',
     context: 'User asks: "What is today?"',
+    inputSource: 'User Request',
+    inputDetail: 'Text query via chat interface',
     chat: {
       query: 'What is today?',
       response: 'You have 3 meetings today. Here is your schedule:',
@@ -44,6 +48,8 @@ const TIMELINE = [
     title: 'Lunch',
     icon: '💰',
     context: 'Food budget 95% (€475/€500)',
+    inputSource: 'Event',
+    inputDetail: 'BudgetThresholdExceeded event',
     card: {
       type: 'important',
       title: 'Budget Alert',
@@ -59,6 +65,7 @@ export default function AIDrivenUIPage() {
   const [showTyping, setShowTyping] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState(0);
   const [showWidget, setShowWidget] = useState(false);
+  const [llmStep, setLlmStep] = useState(0); // 0-5: tracks which LLM step is visible
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const current = TIMELINE[currentIndex];
 
@@ -71,6 +78,23 @@ export default function AIDrivenUIPage() {
       });
     }
   }, [visibleMessages, showWidget, showTyping]);
+
+  // LLM thinking animation - steps appear sequentially
+  useEffect(() => {
+    // Reset LLM steps when scene changes
+    setLlmStep(0);
+
+    // Step 0: Input Source (immediately)
+    setTimeout(() => setLlmStep(1), 100);
+    // Step 1: Context Analysis (after 400ms)
+    setTimeout(() => setLlmStep(2), 500);
+    // Step 2: Intent Detection (after 800ms)
+    setTimeout(() => setLlmStep(3), 900);
+    // Step 3: UI Form Selection (after 1200ms)
+    setTimeout(() => setLlmStep(4), 1300);
+    // Step 4: Rendering (after 1600ms)
+    setTimeout(() => setLlmStep(5), 1700);
+  }, [currentIndex]);
 
   // Auto-advance through timeline with progressive animations
   useEffect(() => {
@@ -88,20 +112,26 @@ export default function AIDrivenUIPage() {
         const nextScene = TIMELINE[nextIndex];
 
         if (nextScene.chat) {
-          // Show user message first
-          setTimeout(() => setVisibleMessages(1), 300);
-
-          // Show typing indicator
+          // Wait for LLM processing to complete (2000ms), then show UI response
           setTimeout(() => {
-            setShowTyping(true);
-            // Then show assistant response
+            // Show user message first
+            setVisibleMessages(1);
+
+            // Show typing indicator
             setTimeout(() => {
-              setShowTyping(false);
-              setVisibleMessages(2);
-              // Show widget after response
-              setTimeout(() => setShowWidget(true), 500);
-            }, 800);
-          }, 1200);
+              setShowTyping(true);
+              // Then show assistant response
+              setTimeout(() => {
+                setShowTyping(false);
+                setVisibleMessages(2);
+                // Show widget after response
+                setTimeout(() => setShowWidget(true), 500);
+              }, 800);
+            }, 300);
+          }, 2000); // Wait for LLM animation to complete
+        } else if (nextScene.card) {
+          // For cards, wait for LLM processing then show card
+          // Card is already rendered, so no additional animation needed
         }
       }, 500);
     }, 8000); // 8 seconds per scene
@@ -267,82 +297,130 @@ export default function AIDrivenUIPage() {
                 </div>
               </div>
 
-              <div className="space-y-3 bg-muted/30 rounded-xl p-4 border border-border">
-                {/* Step 1: Context Analysis */}
-                <div className="transition-all duration-500 opacity-100">
-                  <div className="flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-sm">1</span>
+              <div className="space-y-3 bg-muted/30 rounded-xl p-4 border border-border min-h-[400px]">
+                {/* Thinking Indicator */}
+                {llmStep === 0 && (
+                  <div className="flex items-center gap-3 p-4 animate-pulse">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm md:text-base font-semibold mb-1">Context Analysis</p>
-                      <div className="space-y-1 text-xs md:text-sm text-muted-foreground">
-                        <p className="transition-all duration-300 translate-x-0 opacity-100">
-                          ⏰ Time: {current.time} {current.period}
-                        </p>
-                        <p className="transition-all duration-300 delay-100 translate-x-0 opacity-100">
-                          📍 Context: {current.context}
-                        </p>
-                        <p className="transition-all duration-300 delay-200 translate-x-0 opacity-100">
-                          🎯 Type: {current.card ? 'Proactive Alert' : 'Chat Query'}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-sm text-muted-foreground">Analyzing context...</p>
                   </div>
-                </div>
+                )}
 
-                {/* Step 2: Intent Detection */}
-                <div className="transition-all duration-500 delay-200 opacity-100">
-                  <div className="flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-sm">2</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm md:text-base font-semibold mb-1">Intent Detection</p>
-                      <div className="text-xs md:text-sm text-muted-foreground transition-all duration-300 delay-300 translate-x-0 opacity-100">
-                        <p className="mb-1">
-                          {current.card ? `⚠️ ${current.card.type.charAt(0).toUpperCase() + current.card.type.slice(1)} notification needed` : '💬 Informational query'}
-                        </p>
+                {/* Step 0: Input Source */}
+                {llmStep >= 1 && (
+                  <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex items-start gap-3 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
+                        <span className="text-base">📥</span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Step 3: UI Form Selection */}
-                <div className="transition-all duration-500 delay-400 opacity-100">
-                  <div className="flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-sm">3</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm md:text-base font-semibold mb-1">UI Form Selection</p>
-                      <div className="transition-all duration-300 delay-500 translate-x-0 opacity-100">
-                        <div className="bg-primary/10 rounded-md px-2 py-1.5 text-xs md:text-sm font-medium">
-                          {current.card
-                            ? `${current.card.type.toUpperCase()} OpportunityCard`
-                            : current.chat
-                              ? `Chat-based response with ${current.chat.widget ? 'embedded widget' : 'text'}`
-                              : 'Dynamic UI'}
+                      <div className="flex-1">
+                        <p className="text-sm md:text-base font-bold mb-2">Input Source Detected</p>
+                        <div className="space-y-1 text-xs md:text-sm">
+                          <p className="font-semibold text-purple-700 dark:text-purple-300">
+                            {current.inputSource}
+                          </p>
+                          <p className="text-muted-foreground">
+                            {current.inputDetail}
+                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Step 4: Rendering */}
-                <div className="transition-all duration-500 delay-600 opacity-100 scale-100">
-                  <div className="flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-sm">✓</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm md:text-base font-semibold mb-1 text-success">Rendering UI</p>
-                      <div className="text-xs md:text-sm text-muted-foreground transition-all duration-300 delay-700 translate-x-0 opacity-100">
-                        <p>Components assembled & displayed</p>
+                {/* Step 1: Context Analysis */}
+                {llmStep >= 2 && (
+                  <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex items-start gap-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-bold">1</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm md:text-base font-bold mb-2">Analyzing Context</p>
+                        <div className="space-y-1.5 text-xs md:text-sm">
+                          <div className="flex items-start gap-2">
+                            <span>⏰</span>
+                            <span className="text-muted-foreground">Time: <strong className="text-foreground">{current.time} {current.period}</strong></span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span>📍</span>
+                            <span className="text-muted-foreground">Situation: <strong className="text-foreground">{current.context}</strong></span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span>🎯</span>
+                            <span className="text-muted-foreground">Type: <strong className="text-foreground">{current.card ? 'Proactive Alert' : 'Chat Query'}</strong></span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* Step 2: Intent Detection */}
+                {llmStep >= 3 && (
+                  <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex items-start gap-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-bold">2</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm md:text-base font-bold mb-2">Detecting Intent</p>
+                        <div className="text-xs md:text-sm">
+                          <p className="text-muted-foreground">
+                            User needs: <strong className="text-foreground">
+                              {current.card ? `${current.card.type.charAt(0).toUpperCase() + current.card.type.slice(1)} notification` : 'Informational response'}
+                            </strong>
+                          </p>
+                          {current.card && (
+                            <p className="text-xs mt-1 text-amber-700 dark:text-amber-300">⚠️ Action required</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: UI Form Selection */}
+                {llmStep >= 4 && (
+                  <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex items-start gap-3 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-bold">3</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm md:text-base font-bold mb-2">Selecting UI Form</p>
+                        <div className="bg-green-500/20 rounded-md px-3 py-2 text-xs md:text-sm font-semibold text-green-800 dark:text-green-200">
+                          {current.card
+                            ? `✓ ${current.card.type.toUpperCase()} OpportunityCard`
+                            : current.chat
+                              ? `✓ Chat response ${current.chat.widget ? '+ embedded widget' : '(text only)'}`
+                              : '✓ Dynamic UI'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: Rendering */}
+                {llmStep >= 5 && (
+                  <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-4 scale-in">
+                    <div className="flex items-start gap-3 p-3 bg-emerald-500/10 rounded-lg border-2 border-emerald-500/30 shadow-lg">
+                      <div className="w-8 h-8 rounded-full bg-emerald-500/30 flex items-center justify-center shrink-0">
+                        <span className="text-base font-bold text-emerald-700 dark:text-emerald-300">✓</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm md:text-base font-bold mb-2 text-emerald-700 dark:text-emerald-300">Rendering Complete</p>
+                        <div className="text-xs md:text-sm text-muted-foreground">
+                          <p>UI components assembled and displayed to user</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Metadata */}
