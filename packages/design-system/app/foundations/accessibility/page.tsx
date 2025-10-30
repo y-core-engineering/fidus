@@ -174,7 +174,7 @@ export default function AccessibilityPage() {
       Cancel
     </Button>
     <Button
-      variant="text"
+      variant="tertiary"
       onClick={() => setFocusedElement('Help')}
       onFocus={() => setFocusedElement('Help (focused)')}
       onBlur={() => setFocusedElement(null)}
@@ -210,7 +210,7 @@ export default function AccessibilityPage() {
               Cancel
             </Button>
             <Button
-              variant="text"
+              variant="tertiary"
               onClick={() => setFocusedElement('Help (clicked)')}
               onFocus={() => setFocusedElement('Help (focused)')}
               onBlur={() => setFocusedElement(null)}

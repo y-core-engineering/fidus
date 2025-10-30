@@ -516,14 +516,14 @@ const [isUploading, setIsUploading] = useState(false);
 
 <div className="flex items-center justify-between">
   <p className="text-sm">Budget: Groceries 2024</p>
-  <Button variant="secondary" size="small">
+  <Button variant="secondary" size="sm">
     ★ Favorite
   </Button>
 </div>`}>
             <div className="rounded-lg border border-border bg-card p-lg">
               <div className="flex items-center justify-between">
                 <p className="text-sm">Budget: Groceries 2024</p>
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   ★ Favorite
                 </Button>
               </div>
@@ -557,10 +557,10 @@ const [isUploading, setIsUploading] = useState(false);
     <ProgressBar value={45} variant="primary" />
   </div>
   <Stack direction="horizontal" spacing="sm">
-    <Button variant="secondary" size="small">
+    <Button variant="secondary" size="sm">
       Cancel
     </Button>
-    <Button variant="secondary" size="small">
+    <Button variant="secondary" size="sm">
       Run in Background
     </Button>
   </Stack>
@@ -571,10 +571,10 @@ const [isUploading, setIsUploading] = useState(false);
                 <ProgressBar value={45} variant="primary" />
               </div>
               <Stack direction="horizontal" spacing="sm">
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   Cancel
                 </Button>
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   Run in Background
                 </Button>
               </Stack>
@@ -587,10 +587,10 @@ const [isUploading, setIsUploading] = useState(false);
           <ComponentPreview code={`<Alert variant="error" title="Request timed out">
   <p className="mb-md">The operation is taking longer than expected.</p>
   <Stack direction="horizontal" spacing="sm">
-    <Button variant="secondary" size="small">
+    <Button variant="secondary" size="sm">
       Retry
     </Button>
-    <Button variant="secondary" size="small">
+    <Button variant="secondary" size="sm">
       Continue Waiting
     </Button>
   </Stack>
@@ -598,10 +598,10 @@ const [isUploading, setIsUploading] = useState(false);
             <Alert variant="error" title="Request timed out">
               <p className="mb-md">The operation is taking longer than expected.</p>
               <Stack direction="horizontal" spacing="sm">
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   Retry
                 </Button>
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   Continue Waiting
                 </Button>
               </Stack>

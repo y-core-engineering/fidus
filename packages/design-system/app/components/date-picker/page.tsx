@@ -6,8 +6,8 @@ import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';
 
 export default function DatePickerPage() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [birthday, setBirthday] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [birthday, setBirthday] = useState<Date | undefined>(new Date());
 
   // Date constraints
   const today = new Date();
@@ -131,7 +131,7 @@ export default function DatePickerPage() {
   label="Birthday"
   placeholder="Select your birthday"
   value={birthday}
-  onChange={setBirthday}
+  onChange={(date) => setBirthday(date ?? undefined)}
   helperText="Today is pre-selected"
 />`}
       >
@@ -139,7 +139,7 @@ export default function DatePickerPage() {
           label="Birthday"
           placeholder="Select your birthday"
           value={birthday}
-          onChange={setBirthday}
+          onChange={(date) => setBirthday(date ?? undefined)}
           helperText="Today is pre-selected"
         />
       </ComponentPreview>
@@ -306,7 +306,7 @@ export default function DatePickerPage() {
     label="Flexible Date"
     placeholder="Optional date"
     value={selectedDate}
-    onChange={setSelectedDate}
+    onChange={(date) => setSelectedDate(date ?? undefined)}
     showClearButton
     helperText="Click X to clear the selected date"
   />
@@ -324,7 +324,7 @@ export default function DatePickerPage() {
             label="Flexible Date"
             placeholder="Optional date"
             value={selectedDate}
-            onChange={setSelectedDate}
+            onChange={(date) => setSelectedDate(date ?? undefined)}
             showClearButton
             helperText="Click X to clear the selected date"
           />

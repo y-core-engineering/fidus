@@ -560,13 +560,13 @@ export default function PopoverPage() {
   <Stack spacing="sm">
     <h3 className="font-semibold text-sm">Actions</h3>
     <Stack spacing="xs">
-      <Button variant="ghost" size="sm" className="justify-start">
+      <Button variant="tertiary" size="sm" className="justify-start">
         Edit
       </Button>
-      <Button variant="ghost" size="sm" className="justify-start">
+      <Button variant="tertiary" size="sm" className="justify-start">
         Share
       </Button>
-      <Button variant="ghost" size="sm" className="justify-start">
+      <Button variant="tertiary" size="sm" className="justify-start">
         Archive
       </Button>
     </Stack>
@@ -579,13 +579,13 @@ export default function PopoverPage() {
                 <Stack spacing="sm">
                   <h3 className="font-semibold text-sm">Actions</h3>
                   <Stack spacing="xs">
-                    <Button variant="ghost" size="sm" className="justify-start">
+                    <Button variant="tertiary" size="sm" className="justify-start">
                       Edit
                     </Button>
-                    <Button variant="ghost" size="sm" className="justify-start">
+                    <Button variant="tertiary" size="sm" className="justify-start">
                       Share
                     </Button>
-                    <Button variant="ghost" size="sm" className="justify-start">
+                    <Button variant="tertiary" size="sm" className="justify-start">
                       Archive
                     </Button>
                   </Stack>

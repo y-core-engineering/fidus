@@ -74,6 +74,19 @@ export function SearchDialog({
     }
   }, [query, selectedCategory]);
 
+  // Handle result selection
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      saveRecentSearch(query);
+      setRecentSearches(getRecentSearches());
+      externalOnClose?.();
+      setQuery('');
+      setResults([]);
+      router.push(result.href);
+    },
+    [query, router, externalOnClose]
+  );
+
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -92,20 +105,7 @@ export function SearchDialog({
         handleSelect(results[selectedIndex]);
       }
     },
-    [results, selectedIndex, externalOnClose]
-  );
-
-  // Handle result selection
-  const handleSelect = useCallback(
-    (result: SearchResult) => {
-      saveRecentSearch(query);
-      setRecentSearches(getRecentSearches());
-      externalOnClose?.();
-      setQuery('');
-      setResults([]);
-      router.push(result.href);
-    },
-    [query, router, externalOnClose]
+    [results, selectedIndex, externalOnClose, handleSelect]
   );
 
   // Handle recent search selection

@@ -134,10 +134,9 @@ function BudgetWizard() {
 
         {step === 1 && (
           <Stack direction="vertical" spacing="md">
-            <Alert
-              variant="info"
-              description="Let's create your first budget! A budget helps you track and limit spending in specific categories."
-            />
+            <Alert variant="info">
+              Let's create your first budget! A budget helps you track and limit spending in specific categories.
+            </Alert>
             <Select
               label="What do you want to budget for?"
               options={[
@@ -222,7 +221,7 @@ function ConversationalResponse({ message }: any) {
 
 function TextResponse({ message }: any) {
   return (
-    <Alert variant="info" description={message} />
+    <Alert variant="info">{message}</Alert>
   );
 }
 
@@ -1101,10 +1100,9 @@ export default function UIDecisionLayerPage() {
 
                             {experimentalDecision && experimentalDecision.uiForm !== decision.uiForm && (
                               <div className="space-y-2">
-                                <Alert
-                                  variant="success"
-                                  description={`Decision Changed! With this context, the optimal UI form is now ${experimentalDecision.uiForm} (${(experimentalDecision.confidence * 100).toFixed(0)}% confidence)`}
-                                />
+                                <Alert variant="success">
+                                  Decision Changed! With this context, the optimal UI form is now {experimentalDecision.uiForm} ({(experimentalDecision.confidence * 100).toFixed(0)}% confidence)
+                                </Alert>
                                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                                   <div className="text-sm">
                                     <strong className="text-primary">Why this changed:</strong>

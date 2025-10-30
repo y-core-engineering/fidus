@@ -123,7 +123,7 @@ export default function HeaderPage() {
 
       <h2>Basic Example</h2>
       <ComponentPreview code={`<Header
-  logo={{ text: 'MyApp' }}
+  logo={{ href: '/', text: 'MyApp' }}
   items={[
     { label: 'Home', href: '/', active: true },
     { label: 'Products', href: '/products' },
@@ -132,7 +132,7 @@ export default function HeaderPage() {
   actions={<Button size="sm">Sign In</Button>}
 />`}>
         <Header
-          logo={{ text: 'MyApp' }}
+          logo={{ href: '/', text: 'MyApp' }}
           items={navItems}
           actions={<Button size="sm">Sign In</Button>}
         />
@@ -159,7 +159,7 @@ export default function HeaderPage() {
 
       <h2>With Navigation Icons</h2>
       <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   items={[
     { label: 'Home', href: '/', icon: <Home />, active: true },
     { label: 'Team', href: '/team', icon: <Users /> },
@@ -167,24 +167,24 @@ export default function HeaderPage() {
   ]}
   actions={
     <Stack direction="horizontal" spacing="sm">
-      <Button variant="ghost" size="icon-sm"><Search /></Button>
-      <Button variant="ghost" size="icon-sm"><Bell /></Button>
-      <Button variant="ghost" size="icon-sm"><User /></Button>
+      <Button variant="tertiary" size="sm"><Search /></Button>
+      <Button variant="tertiary" size="sm"><Bell /></Button>
+      <Button variant="tertiary" size="sm"><User /></Button>
     </Stack>
   }
 />`}>
         <Header
-          logo={{ image: '/logo.svg', text: 'Fidus' }}
+          logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
           items={navItemsWithIcons}
           actions={
             <Stack direction="horizontal" spacing="sm">
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="tertiary" size="sm">
                 <Search className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="tertiary" size="sm">
                 <Bell className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="tertiary" size="sm">
                 <User className="h-4 w-4" />
               </Button>
             </Stack>
@@ -194,27 +194,27 @@ export default function HeaderPage() {
 
       <h2>Sizes</h2>
       <ComponentPreview code={`<Stack direction="vertical" spacing="lg">
-  <Header logo={{ image: '/logo.svg', text: 'Fidus' }} items={navItems} size="sm" />
-  <Header logo={{ image: '/logo.svg', text: 'Fidus' }} items={navItems} size="md" />
-  <Header logo={{ image: '/logo.svg', text: 'Fidus' }} items={navItems} size="lg" />
+  <Header logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }} items={navItems} size="sm" />
+  <Header logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }} items={navItems} size="md" />
+  <Header logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }} items={navItems} size="lg" />
 </Stack>`}>
         <Stack direction="vertical" spacing="lg">
-          <Header logo={{ image: '/logo.svg', text: 'Fidus' }} items={navItems} size="sm" />
-          <Header logo={{ image: '/logo.svg', text: 'Fidus' }} items={navItems} size="md" />
-          <Header logo={{ image: '/logo.svg', text: 'Fidus' }} items={navItems} size="lg" />
+          <Header logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }} items={navItems} size="sm" />
+          <Header logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }} items={navItems} size="md" />
+          <Header logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }} items={navItems} size="lg" />
         </Stack>
       </ComponentPreview>
 
       <h2>Sticky Header</h2>
       <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   items={navItems}
   sticky
   actions={<Button size="sm">Get Started</Button>}
 />`}>
         <div className="space-y-md">
           <Header
-            logo={{ image: '/logo.svg', text: 'Fidus' }}
+            logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
             items={navItems}
             sticky
             actions={<Button size="sm">Get Started</Button>}
@@ -229,7 +229,7 @@ export default function HeaderPage() {
       <ComponentPreview code={`<div className="relative overflow-hidden">
   <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600">
     <Header
-      logo={{ image: '/logo.svg', text: 'Fidus' }}
+      logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
       items={navItems}
       transparent
       actions={<Button size="sm" variant="secondary">Sign In</Button>}
@@ -243,7 +243,7 @@ export default function HeaderPage() {
         <div className="relative overflow-hidden rounded-lg border border-border">
           <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 p-lg">
             <Header
-              logo={{ image: '/logo.svg', text: 'Fidus' }}
+              logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
               items={navItems}
               transparent
               actions={<Button size="sm" variant="secondary">Sign In</Button>}
@@ -258,7 +258,7 @@ export default function HeaderPage() {
 
       <h2>With Mobile Menu</h2>
       <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   items={navItems}
   actions={<Button size="sm">Sign In</Button>}
   onMobileMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -268,7 +268,7 @@ export default function HeaderPage() {
             Mobile menu button appears on smaller screens (hidden on md+). Resize browser to see the button.
           </p>
           <Header
-            logo={{ image: '/logo.svg', text: 'Fidus' }}
+            logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
             items={navItems}
             actions={<Button size="sm">Sign In</Button>}
             onMobileMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -290,21 +290,21 @@ export default function HeaderPage() {
 
       <h2>Multiple Action Buttons</h2>
       <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   items={navItems}
   actions={
     <Stack direction="horizontal" spacing="sm">
-      <Button variant="ghost" size="sm">Sign In</Button>
+      <Button variant="tertiary" size="sm">Sign In</Button>
       <Button size="sm">Sign Up</Button>
     </Stack>
   }
 />`}>
         <Header
-          logo={{ image: '/logo.svg', text: 'Fidus' }}
+          logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
           items={navItems}
           actions={
             <Stack direction="horizontal" spacing="sm">
-              <Button variant="ghost" size="sm">Sign In</Button>
+              <Button variant="tertiary" size="sm">Sign In</Button>
               <Button size="sm">Sign Up</Button>
             </Stack>
           }
@@ -313,19 +313,19 @@ export default function HeaderPage() {
 
       <h2>Logo and Actions Only</h2>
       <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   actions={
     <Stack direction="horizontal" spacing="sm">
-      <Button variant="ghost" size="icon-sm"><Search /></Button>
+      <Button variant="tertiary" size="sm"><Search /></Button>
       <Button size="sm">Get Started</Button>
     </Stack>
   }
 />`}>
         <Header
-          logo={{ image: '/logo.svg', text: 'Fidus' }}
+          logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
           actions={
             <Stack direction="horizontal" spacing="sm">
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="tertiary" size="sm">
                 <Search className="h-4 w-4" />
               </Button>
               <Button size="sm">Get Started</Button>
@@ -464,7 +464,7 @@ export default function HeaderPage() {
           </ul>
           <div className="mt-md p-md bg-success/10 rounded-md">
             <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   items={[
     { label: 'Home', href: '/', active: true },
     { label: 'Products', href: '/products' },
@@ -474,7 +474,7 @@ export default function HeaderPage() {
   actions={<Button size="sm">Sign In</Button>}
 />`}>
               <Header
-                logo={{ image: '/logo.svg', text: 'Fidus' }}
+                logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
                 items={[
                   { label: 'Home', href: '/', active: true },
                   { label: 'Products', href: '/products' },
@@ -516,7 +516,7 @@ export default function HeaderPage() {
           </ul>
           <div className="mt-md p-md bg-error/20 rounded-md">
             <ComponentPreview code={`<Header
-  logo={{ image: '/logo.svg', text: 'Fidus' }}
+  logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
   items={[
     { label: 'Home', href: '/' },
     { label: 'Products', href: '/products' },
@@ -529,7 +529,7 @@ export default function HeaderPage() {
   ]}
 />`}>
               <Header
-                logo={{ image: '/logo.svg', text: 'Fidus' }}
+                logo={{ href: '/', image: '/logo.svg', text: 'Fidus' }}
                 items={[
                   { label: 'Home', href: '/' },
                   { label: 'Products', href: '/products' },

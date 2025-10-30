@@ -53,99 +53,83 @@ export default function AlertPage() {
 
       <h2>Variants</h2>
       <ComponentPreview
-        code={`<Alert
-  variant="success"
-  description="Your changes have been saved successfully."
-/>`}
+        code={`<Alert variant="success">
+          Your changes have been saved successfully.
+        </Alert>`}
       >
-        <Alert
-          variant="success"
-          description="Your changes have been saved successfully."
-        />
+        <Alert variant="success">
+          Your changes have been saved successfully.
+        </Alert>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Alert
-  variant="error"
-  description="There was an error processing your request. Please try again."
-/>`}
+        code={`<Alert variant="error">
+          There was an error processing your request. Please try again.
+        </Alert>`}
       >
-        <Alert
-          variant="error"
-          description="There was an error processing your request. Please try again."
-        />
+        <Alert variant="error">
+          There was an error processing your request. Please try again.
+        </Alert>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Alert
-  variant="warning"
-  description="This action will permanently delete your account and cannot be undone."
-/>`}
+        code={`<Alert variant="warning">
+          This action will permanently delete your account and cannot be undone.
+        </Alert>`}
       >
-        <Alert
-          variant="warning"
-          description="This action will permanently delete your account and cannot be undone."
-        />
+        <Alert variant="warning">
+          This action will permanently delete your account and cannot be undone.
+        </Alert>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Alert
-  variant="info"
-  description="A new software update is available for download."
-/>`}
+        code={`<Alert variant="info">
+          A new software update is available for download.
+        </Alert>`}
       >
-        <Alert
-          variant="info"
-          description="A new software update is available for download."
-        />
+        <Alert variant="info">
+          A new software update is available for download.
+        </Alert>
       </ComponentPreview>
 
       <h2>With Title</h2>
       <ComponentPreview
         code={`<Stack direction="vertical" spacing="lg">
-  <Alert
-    variant="success"
-    title="Success"
-    description="Your payment has been processed. You will receive an email confirmation shortly."
-  />
-  <Alert
-    variant="error"
-    title="Error"
-    description="Unable to connect to the server. Please check your internet connection and try again."
-  />
-  <Alert
-    variant="warning"
-    title="Warning"
-    description="Your session will expire in 5 minutes. Please save your work."
-  />
-  <Alert
-    variant="info"
-    title="Information"
-    description="We have updated our privacy policy. Please review the changes."
-  />
+  <Alert variant="success"
+    title="Success">
+          Your payment has been processed. You will receive an email confirmation shortly.
+        </Alert>
+  <Alert variant="error"
+    title="Error">
+          Unable to connect to the server. Please check your internet connection and try again.
+        </Alert>
+  <Alert variant="warning"
+    title="Warning">
+          Your session will expire in 5 minutes. Please save your work.
+        </Alert>
+  <Alert variant="info"
+    title="Information">
+          We have updated our privacy policy. Please review the changes.
+        </Alert>
 </Stack>`}
       >
         <Stack direction="vertical" spacing="lg">
-          <Alert
-            variant="success"
-            title="Success"
-            description="Your payment has been processed. You will receive an email confirmation shortly."
-          />
-          <Alert
-            variant="error"
-            title="Error"
-            description="Unable to connect to the server. Please check your internet connection and try again."
-          />
-          <Alert
-            variant="warning"
-            title="Warning"
-            description="Your session will expire in 5 minutes. Please save your work."
-          />
-          <Alert
-            variant="info"
-            title="Information"
-            description="We have updated our privacy policy. Please review the changes."
-          />
+          <Alert variant="success"
+            title="Success">
+          Your payment has been processed. You will receive an email confirmation shortly.
+        </Alert>
+          <Alert variant="error"
+            title="Error">
+          Unable to connect to the server. Please check your internet connection and try again.
+        </Alert>
+          <Alert variant="warning"
+            title="Warning">
+          Your session will expire in 5 minutes. Please save your work.
+        </Alert>
+          <Alert variant="info"
+            title="Information">
+          We have updated our privacy policy. Please review the changes.
+        </Alert>
         </Stack>
       </ComponentPreview>
 
@@ -163,10 +147,11 @@ export default function AlertPage() {
           <Alert
             variant="info"
             title="Dismissible Alert"
-            description="Click the X button to dismiss this alert."
             dismissible
             onDismiss={() => setDismissibleVisible(false)}
-          />
+          >
+            Click the X button to dismiss this alert.
+          </Alert>
         )}
         {!dismissibleVisible && (
           <Stack direction="vertical" spacing="md" align="center">
@@ -220,27 +205,30 @@ export default function AlertPage() {
           <Alert
             variant="info"
             title="Update Available"
-            description="A new version of the application is available."
             actions={[
               { label: 'Update Now', onClick: () => alert('Updating...') },
               { label: 'Remind Me Later', onClick: () => alert('Reminder set') },
             ]}
-          />
+          >
+            A new version of the application is available.
+          </Alert>
           <Alert
             variant="warning"
             title="Unsaved Changes"
-            description="You have unsaved changes that will be lost if you leave this page."
             actions={[
               { label: 'Save Changes', onClick: () => alert('Saving...') },
               { label: 'Discard', onClick: () => alert('Discarded') },
             ]}
-          />
+          >
+            You have unsaved changes that will be lost if you leave this page.
+          </Alert>
           <Alert
             variant="error"
             title="Connection Lost"
-            description="Unable to reach the server. Your changes may not be saved."
             actions={[{ label: 'Retry Connection', onClick: () => alert('Retrying...') }]}
-          />
+          >
+            Unable to reach the server. Your changes may not be saved.
+          </Alert>
         </Stack>
       </ComponentPreview>
 
@@ -260,13 +248,14 @@ export default function AlertPage() {
         <Alert
           variant="success"
           title="Account Created"
-          description="Your account has been created successfully. Would you like to complete your profile?"
           dismissible
           actions={[
             { label: 'Complete Profile', onClick: () => alert('Navigating to profile...') },
             { label: 'Skip', onClick: () => alert('Skipped') },
           ]}
-        />
+        >
+          Your account has been created successfully. Would you like to complete your profile?
+        </Alert>
       </ComponentPreview>
 
       <h2>Props</h2>
@@ -380,16 +369,20 @@ export default function AlertPage() {
               code={`<Alert
   variant="success"
   title="Payment Processed"
-  description="Your payment of $49.99 has been successfully processed."
+ 
   dismissible
-/>`}
+>
+            Your payment of $49.99 has been successfully processed.
+          </Alert>`}
             >
               <Alert
                 variant="success"
                 title="Payment Processed"
-                description="Your payment of $49.99 has been successfully processed."
+               
                 dismissible
-              />
+              >
+            Your payment of $49.99 has been successfully processed.
+          </Alert>
             </ComponentPreview>
           </div>
         </div>
@@ -421,15 +414,19 @@ export default function AlertPage() {
             <ComponentPreview
               code={`<Alert
   variant="error"
-  description="Oops!"
+ 
   dismissible
-/>`}
+>
+            Oops!
+          </Alert>`}
             >
               <Alert
                 variant="error"
-                description="Oops!"
+               
                 dismissible
-              />
+              >
+            Oops!
+          </Alert>
             </ComponentPreview>
           </div>
         </div>

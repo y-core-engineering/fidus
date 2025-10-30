@@ -63,7 +63,7 @@ export default function IconButtonPage() {
   <IconButton variant="tertiary" aria-label="Share">
     <Share2 className="h-5 w-5" />
   </IconButton>
-  <IconButton variant="error" aria-label="Delete">
+  <IconButton variant="destructive" aria-label="Delete">
     <Trash2 className="h-5 w-5" />
   </IconButton>
 </Stack>`}
@@ -78,7 +78,7 @@ export default function IconButtonPage() {
           <IconButton variant="tertiary" aria-label="Share">
             <Share2 className="h-5 w-5" />
           </IconButton>
-          <IconButton variant="error" aria-label="Delete">
+          <IconButton variant="destructive" aria-label="Delete">
             <Trash2 className="h-5 w-5" />
           </IconButton>
         </Stack>
@@ -244,7 +244,7 @@ export default function IconButtonPage() {
   <IconButton variant="secondary" aria-label="Edit">
     <Search className="h-5 w-5" />
   </IconButton>
-  <IconButton variant="error" aria-label="Delete">
+  <IconButton variant="destructive" aria-label="Delete">
     <Trash2 className="h-5 w-5" />
   </IconButton>
 </Stack>`}
@@ -253,7 +253,7 @@ export default function IconButtonPage() {
                 <IconButton variant="secondary" aria-label="Edit">
                   <Search className="h-5 w-5" />
                 </IconButton>
-                <IconButton variant="error" aria-label="Delete">
+                <IconButton variant="destructive" aria-label="Delete">
                   <Trash2 className="h-5 w-5" />
                 </IconButton>
               </Stack>

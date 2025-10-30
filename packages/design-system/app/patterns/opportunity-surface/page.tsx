@@ -7,6 +7,15 @@ import { useState } from 'react';
 type TimeOfDay = 'morning' | 'afternoon' | 'evening';
 type UserSituation = 'normal' | 'overspent' | 'traveling';
 
+interface Opportunity {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  category: string;
+}
+
 const OPPORTUNITIES_BY_CONTEXT = {
   morning: {
     normal: [
@@ -133,7 +142,7 @@ const OPPORTUNITIES_BY_CONTEXT = {
 export default function OpportunitySurfacePage() {
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('morning');
   const [userSituation, setUserSituation] = useState<UserSituation>('normal');
-  const [opportunities, setOpportunities] = useState(OPPORTUNITIES_BY_CONTEXT.morning.normal);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(OPPORTUNITIES_BY_CONTEXT.morning.normal);
 
   const updateContext = (newTime: TimeOfDay, newSituation: UserSituation) => {
     setTimeOfDay(newTime);
@@ -246,21 +255,21 @@ const updateContext = (newTime, newSituation) => {
                 <h4 className="text-sm font-semibold mb-sm">🕐 Time of Day</h4>
                 <Stack direction="horizontal" spacing="sm">
                   <Button
-                    size="small"
+                    size="sm"
                     variant={timeOfDay === 'morning' ? 'primary' : 'secondary'}
                     onClick={() => updateContext('morning', userSituation)}
                   >
                     Morning (7 AM)
                   </Button>
                   <Button
-                    size="small"
+                    size="sm"
                     variant={timeOfDay === 'afternoon' ? 'primary' : 'secondary'}
                     onClick={() => updateContext('afternoon', userSituation)}
                   >
                     Afternoon (2 PM)
                   </Button>
                   <Button
-                    size="small"
+                    size="sm"
                     variant={timeOfDay === 'evening' ? 'primary' : 'secondary'}
                     onClick={() => updateContext('evening', userSituation)}
                   >
@@ -273,21 +282,21 @@ const updateContext = (newTime, newSituation) => {
                 <h4 className="text-sm font-semibold mb-sm">👤 User Situation</h4>
                 <Stack direction="horizontal" spacing="sm">
                   <Button
-                    size="small"
+                    size="sm"
                     variant={userSituation === 'normal' ? 'primary' : 'secondary'}
                     onClick={() => updateContext(timeOfDay, 'normal')}
                   >
                     Normal Day
                   </Button>
                   <Button
-                    size="small"
+                    size="sm"
                     variant={userSituation === 'overspent' ? 'primary' : 'secondary'}
                     onClick={() => updateContext(timeOfDay, 'overspent')}
                   >
                     Budget Overspent
                   </Button>
                   <Button
-                    size="small"
+                    size="sm"
                     variant={userSituation === 'traveling' ? 'primary' : 'secondary'}
                     onClick={() => updateContext(timeOfDay, 'traveling')}
                   >
@@ -301,10 +310,10 @@ const updateContext = (newTime, newSituation) => {
             <div className="rounded-lg bg-primary/10 border border-primary/30 p-md">
               <div className="flex items-center gap-sm text-sm">
                 <span className="font-semibold">Current Context:</span>
-                <Badge variant="default">
+                <Badge variant="info">
                   {timeOfDay === 'morning' ? '🌅 7:00 AM' : timeOfDay === 'afternoon' ? '☀️ 2:00 PM' : '🌆 8:00 PM'}
                 </Badge>
-                <Badge variant="default">
+                <Badge variant="info">
                   {userSituation === 'normal' ? '📅 Normal' : userSituation === 'overspent' ? '💰 Budget Alert' : '✈️ Travel'}
                 </Badge>
               </div>

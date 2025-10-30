@@ -76,15 +76,14 @@ const tenants = [
               </div>
             </div>
             <Select
+              label="Select Tenant"
               value={currentTenant}
-              onChange={(e) => setCurrentTenant(e.target.value)}
-            >
-              {tenants.map(tenant => (
-                <option key={tenant.id} value={tenant.id}>
-                  {tenant.icon} {tenant.name}
-                </option>
-              ))}
-            </Select>
+              onChange={(value) => setCurrentTenant(value)}
+              options={tenants.map(tenant => ({
+                value: tenant.id,
+                label: `${tenant.icon} ${tenant.name}`,
+              }))}
+            />
           </div>
 
           <Alert variant="info" title="Current Context" className="mt-md">
@@ -118,7 +117,7 @@ const tenants = [
           )}
         </div>
       </div>
-      <Button variant="secondary" size="small" className="w-full">
+      <Button variant="secondary" size="sm" className="w-full">
         Switch
       </Button>
     </div>
@@ -174,7 +173,7 @@ const tenants = [
         </p>
       </div>
     </div>
-    <Button variant="ghost" size="small">Switch</Button>
+    <Button variant="ghost" size="sm">Switch</Button>
   </div>
 </Alert>`}>
           <Alert variant="info">
@@ -188,7 +187,7 @@ const tenants = [
                   </p>
                 </div>
               </div>
-              <Button variant="ghost" size="small">Switch</Button>
+              <Button variant="tertiary" size="sm">Switch</Button>
             </div>
           </Alert>
         </ComponentPreview>

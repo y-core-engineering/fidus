@@ -157,7 +157,6 @@ export default function EmptyStatesPage() {
     action={{
       label: 'Clear Search',
       onClick: () => setSearchQuery(''),
-      variant: 'secondary',
     }}
   />
 )}`}>
@@ -178,7 +177,6 @@ export default function EmptyStatesPage() {
                     action={{
                       label: 'Clear Search',
                       onClick: () => setSearchQuery(''),
-                      variant: 'secondary',
                     }}
                   />
                 </div>
@@ -195,10 +193,10 @@ export default function EmptyStatesPage() {
   icon="🔍"
 >
   <Stack direction="horizontal" spacing="sm">
-    <Button variant="secondary" size="small">
+    <Button variant="secondary" size="sm">
       Clear Search
     </Button>
-    <Button variant="secondary" size="small">
+    <Button variant="secondary" size="sm">
       View All Transactions
     </Button>
   </Stack>
@@ -209,10 +207,10 @@ export default function EmptyStatesPage() {
               icon="🔍"
             >
               <Stack direction="horizontal" spacing="sm" className="mt-md">
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   Clear Search
                 </Button>
-                <Button variant="secondary" size="small">
+                <Button variant="secondary" size="sm">
                   View All Transactions
                 </Button>
               </Stack>
@@ -244,10 +242,10 @@ export default function EmptyStatesPage() {
     icon="🔍"
   >
     <Stack direction="horizontal" spacing="sm">
-      <Button variant="secondary" size="small" onClick={() => setFilterValue('')}>
+      <Button variant="secondary" size="sm" onClick={() => setFilterValue('')}>
         Clear Filters
       </Button>
-      <Button variant="secondary" size="small">
+      <Button variant="secondary" size="sm">
         View All Categories
       </Button>
     </Stack>
@@ -269,10 +267,10 @@ export default function EmptyStatesPage() {
                     icon="🔍"
                   >
                     <Stack direction="horizontal" spacing="sm" className="mt-md">
-                      <Button variant="secondary" size="small" onClick={() => setFilterValue('')}>
+                      <Button variant="secondary" size="sm" onClick={() => setFilterValue('')}>
                         Clear Filters
                       </Button>
-                      <Button variant="secondary" size="small">
+                      <Button variant="secondary" size="sm">
                         View All Categories
                       </Button>
                     </Stack>
@@ -292,21 +290,22 @@ export default function EmptyStatesPage() {
     <li>Date Range: Last 7 days</li>
     <li>Amount: More than 50 EUR</li>
   </ul>
-  <Button variant="secondary" size="small">
+  <Button variant="secondary" size="sm">
     Clear All Filters
   </Button>
 </Alert>`}>
-            <Alert variant="info" title="No transactions found">
-              <p className="mb-sm">No transactions match your current filters:</p>
+            <div className="rounded-md border border-info bg-info/10 p-md">
+              <h4 className="font-semibold text-info mb-sm">No transactions found</h4>
+              <p className="mb-sm text-sm">No transactions match your current filters:</p>
               <ul className="mb-md list-inside list-disc text-sm">
                 <li>Category: Food</li>
                 <li>Date Range: Last 7 days</li>
                 <li>Amount: More than 50 EUR</li>
               </ul>
-              <Button variant="secondary" size="small">
+              <Button variant="secondary" size="sm">
                 Clear All Filters
               </Button>
-            </Alert>
+            </div>
           </ComponentPreview>
         </div>
       </div>

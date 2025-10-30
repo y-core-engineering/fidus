@@ -47,84 +47,84 @@ export default function ContainerPage() {
 
       <h2>Sizes</h2>
       <ComponentPreview
-        code={`<Container size="sm">
+        code={`<Container size="sm" padding="md">
   <div className="bg-muted p-md rounded-md">Small Container (max-w-2xl)</div>
 </Container>`}
       >
-        <Container size="sm">
+        <Container size="sm" padding="md">
           <div className="bg-muted p-md rounded-md">Small Container (max-w-2xl)</div>
         </Container>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Container size="md">
+        code={`<Container size="md" padding="md">
   <div className="bg-muted p-md rounded-md">Medium Container (max-w-4xl)</div>
 </Container>`}
       >
-        <Container size="md">
+        <Container size="md" padding="md">
           <div className="bg-muted p-md rounded-md">Medium Container (max-w-4xl)</div>
         </Container>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Container size="lg">
+        code={`<Container size="lg" padding="md">
   <div className="bg-muted p-md rounded-md">Large Container (max-w-6xl) - Default</div>
 </Container>`}
       >
-        <Container size="lg">
+        <Container size="lg" padding="md">
           <div className="bg-muted p-md rounded-md">Large Container (max-w-6xl) - Default</div>
         </Container>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Container size="xl">
+        code={`<Container size="xl" padding="md">
   <div className="bg-muted p-md rounded-md">Extra Large Container (max-w-7xl)</div>
 </Container>`}
       >
-        <Container size="xl">
+        <Container size="xl" padding="md">
           <div className="bg-muted p-md rounded-md">Extra Large Container (max-w-7xl)</div>
         </Container>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Container size="full">
+        code={`<Container size="full" padding="md">
   <div className="bg-muted p-md rounded-md">Full Width Container</div>
 </Container>`}
       >
-        <Container size="full">
+        <Container size="full" padding="md">
           <div className="bg-muted p-md rounded-md">Full Width Container</div>
         </Container>
       </ComponentPreview>
 
       <h2>Padding</h2>
       <ComponentPreview
-        code={`<Container padding="none">
+        code={`<Container size="lg" padding="none">
   <div className="bg-muted p-md rounded-md">No Padding</div>
 </Container>`}
       >
-        <Container padding="none">
+        <Container size="lg" padding="none">
           <div className="bg-muted p-md rounded-md">No Padding</div>
         </Container>
       </ComponentPreview>
 
       <ComponentPreview
-        code={`<Container padding="sm">
+        code={`<Container size="lg" padding="sm">
   <div className="bg-muted p-md rounded-md">Small Padding (16px)</div>
 </Container>`}
       >
-        <Container padding="sm">
+        <Container size="lg" padding="sm">
           <div className="bg-muted p-md rounded-md">Small Padding (16px)</div>
         </Container>
       </ComponentPreview>
 
       <h2>Semantic HTML</h2>
       <ComponentPreview
-        code={`<Container as="main">
+        code={`<Container size="lg" padding="md" as="main">
   <h1>Page Content</h1>
   <p>Using semantic main element</p>
 </Container>`}
       >
-        <Container as="main">
+        <Container size="lg" padding="md" as="main">
           <h1>Page Content</h1>
           <p>Using semantic main element</p>
         </Container>
@@ -226,14 +226,14 @@ export default function ContainerPage() {
           </ul>
           <div className="mt-md p-md bg-success/10 rounded-md">
             <ComponentPreview
-              code={`<Container size="md" as="main">
+              code={`<Container size="md" padding="md" as="main">
   <Stack direction="vertical" spacing="lg">
     <h1>Article Title</h1>
     <p>Content with optimal line length for readability.</p>
   </Stack>
 </Container>`}
             >
-              <Container size="md" as="main">
+              <Container size="md" padding="md" as="main">
                 <Stack direction="vertical" spacing="lg">
                   <h1>Article Title</h1>
                   <p>Content with optimal line length for readability.</p>
@@ -268,15 +268,15 @@ export default function ContainerPage() {
           </ul>
           <div className="mt-md p-md bg-error/20 rounded-md">
             <ComponentPreview
-              code={`<Container size="sm">
-  <Container size="lg">
+              code={`<Container size="sm" padding="md">
+  <Container size="lg" padding="md">
     {/* Unnecessary nesting */}
     <p>Content</p>
   </Container>
 </Container>`}
             >
-              <Container size="sm">
-                <Container size="lg">
+              <Container size="sm" padding="md">
+                <Container size="lg" padding="md">
                   <p>Content</p>
                 </Container>
               </Container>

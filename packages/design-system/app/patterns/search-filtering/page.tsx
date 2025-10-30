@@ -140,14 +140,14 @@ const toggleFilter = (filter: string) => {
 <Stack direction="horizontal" spacing="sm" className="mb-md">
   <Button
     variant={searchMode === 'traditional' ? 'primary' : 'secondary'}
-    size="small"
+    size="sm"
     onClick={() => setSearchMode('traditional')}
   >
     Traditional Search
   </Button>
   <Button
     variant={searchMode === 'ai' ? 'primary' : 'secondary'}
-    size="small"
+    size="sm"
     onClick={() => setSearchMode('ai')}
   >
     AI-Powered Search
@@ -182,14 +182,14 @@ const toggleFilter = (filter: string) => {
           <Stack direction="horizontal" spacing="sm" className="mb-md">
             <Button
               variant={searchMode === 'traditional' ? 'primary' : 'secondary'}
-              size="small"
+              size="sm"
               onClick={() => setSearchMode('traditional')}
             >
               Traditional Search
             </Button>
             <Button
               variant={searchMode === 'ai' ? 'primary' : 'secondary'}
-              size="small"
+              size="sm"
               onClick={() => setSearchMode('ai')}
             >
               AI-Powered Search
@@ -199,6 +199,7 @@ const toggleFilter = (filter: string) => {
           {searchMode === 'traditional' && (
             <div className="space-y-md rounded-lg border border-border bg-card p-lg">
               <TextInput
+                label="Search"
                 placeholder="Search by merchant name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -210,10 +211,12 @@ const toggleFilter = (filter: string) => {
                   {['Food', 'Transport', 'Entertainment', 'Shopping'].map(category => (
                     <Chip
                       key={category}
-                      label={category}
-                      active={activeFilters.includes(category)}
-                      onToggle={() => toggleFilter(category)}
-                    />
+                      variant={activeFilters.includes(category) ? 'filled' : 'outlined'}
+                      onClick={() => toggleFilter(category)}
+                      className="cursor-pointer"
+                    >
+                      {category}
+                    </Chip>
                   ))}
                 </div>
               </div>
@@ -223,14 +226,14 @@ const toggleFilter = (filter: string) => {
                 <Stack direction="horizontal" spacing="sm">
                   <Button
                     variant={sortBy === 'date' ? 'primary' : 'secondary'}
-                    size="small"
+                    size="sm"
                     onClick={() => setSortBy('date')}
                   >
                     Date
                   </Button>
                   <Button
                     variant={sortBy === 'amount' ? 'primary' : 'secondary'}
-                    size="small"
+                    size="sm"
                     onClick={() => setSortBy('amount')}
                   >
                     Amount
@@ -272,6 +275,7 @@ const toggleFilter = (filter: string) => {
           {searchMode === 'ai' && (
             <div className="space-y-md rounded-lg border border-border bg-card p-lg">
               <TextInput
+                label="AI Search"
                 placeholder="Ask anything... (e.g., 'Show me food expenses last month')"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

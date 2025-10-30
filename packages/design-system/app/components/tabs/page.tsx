@@ -368,7 +368,7 @@ export default function TabsPage() {
         code={`const [value, setValue] = useState('tab1');
 
 <div className="space-y-md">
-  <Stack direction="horizontal" spacing="sm" align="center" justify="space-between">
+  <Stack direction="horizontal" spacing="sm" align="center" justify="between">
     <p className="text-sm text-muted-foreground">Current tab: {value}</p>
     <Stack direction="horizontal" spacing="sm">
       <Button size="sm" onClick={() => setValue('tab1')}>Go to Tab 1</Button>
@@ -380,7 +380,7 @@ export default function TabsPage() {
 </div>`}
       >
         <div className="space-y-md">
-          <Stack direction="horizontal" spacing="sm" align="center" justify="space-between">
+          <Stack direction="horizontal" spacing="sm" align="center" justify="between">
             <p className="text-sm text-muted-foreground">Current tab: {value}</p>
             <Stack direction="horizontal" spacing="sm">
               <Button size="sm" onClick={() => setValue('tab1')}>Go to Tab 1</Button>
