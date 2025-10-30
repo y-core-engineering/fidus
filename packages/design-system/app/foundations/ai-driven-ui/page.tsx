@@ -1,14 +1,229 @@
 'use client';
 
+import { OpportunityCard } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+
+// Timeline data - different moments throughout the day
+const TIMELINE = [
+  {
+    time: '6:30',
+    period: 'AM',
+    title: 'Wake Up',
+    icon: '🌅',
+    context: 'Meeting at 9:00 AM, no alarm set',
+    card: {
+      type: 'urgent',
+      title: 'No Alarm Set',
+      content: 'Client meeting at 9:00 AM (5km away). Raining — add 5 min travel time.',
+      primary: 'Set Alarm',
+      secondary: 'Reschedule'
+    }
+  },
+  {
+    time: '7:45',
+    period: 'AM',
+    title: 'Breakfast',
+    icon: '☕',
+    context: 'User asks: "What is today?"',
+    chat: {
+      query: 'What is today?',
+      response: 'You have 3 meetings today. Here is your schedule:',
+      widget: {
+        type: 'calendar',
+        events: [
+          { time: '9:00 AM', title: 'Client Meeting', location: 'Office' },
+          { time: '1:00 PM', title: 'Team Sync', location: 'Video call' },
+          { time: '4:00 PM', title: 'Project Review', location: 'Conference room' }
+        ]
+      }
+    }
+  },
+  {
+    time: '12:30',
+    period: 'PM',
+    title: 'Lunch',
+    icon: '💰',
+    context: 'Food budget 95% (€475/€500)',
+    card: {
+      type: 'important',
+      title: 'Budget Alert',
+      content: 'You have spent €475 of €500 (95%) with 3 days remaining.',
+      primary: 'View Transactions',
+      secondary: 'Adjust Budget'
+    }
+  }
+];
+
 export default function AIDrivenUIPage() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const current = TIMELINE[currentIndex];
+
+  // Auto-advance through timeline
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % TIMELINE.length);
+    }, 5000); // 5 seconds per scene
+
+    return () => clearInterval(timer);
+  }, [isPlaying]);
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <h1>AI-Driven UI Paradigm</h1>
       <p className="lead">
-        Fidus implements a fundamentally different UI paradigm than traditional applications.
-        Instead of fixed screens and predetermined flows, Fidus uses an AI-Driven UI where the LLM
-        dynamically decides what interface to present based on context.
+        Fidus implements a fundamentally different UI paradigm. Instead of fixed screens and predetermined flows,
+        the LLM dynamically decides what interface to present based on context, creating situational UI that adapts
+        to each moment.
       </p>
+
+      {/* Mobile Phone Demo */}
+      <div className="not-prose my-lg md:my-xl">
+        <div className="mx-auto w-[380px] max-w-full">
+          <div className="relative bg-gradient-to-br from-primary/5 via-background to-muted/20 rounded-[2.5rem] overflow-hidden border-8 border-foreground/20 shadow-2xl h-[780px]">
+            {/* Mobile Notch */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-foreground/90 rounded-b-2xl z-30" />
+
+            {/* Status Bar */}
+            <div className="absolute top-2 left-0 right-0 flex justify-between items-center px-8 z-20 text-xs text-muted-foreground">
+              <span>9:41</span>
+              <div className="flex gap-1 items-center">
+                <span>📶</span>
+                <span>🔋</span>
+              </div>
+            </div>
+
+            {/* Time Display */}
+            <div className="absolute top-8 left-4 z-20">
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold">{current.time}</span>
+                <span className="text-xl font-medium text-muted-foreground">{current.period}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-lg">{current.icon}</span>
+                <span className="text-xs font-medium text-muted-foreground">{current.title}</span>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="absolute inset-0 pt-24 pb-20 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="mb-4">
+                <div className="inline-flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-muted-foreground">{current.context}</span>
+                </div>
+              </div>
+
+              {/* Render OpportunityCard if current scene has one */}
+              {current.card && (
+                <OpportunityCard
+                  title={current.card.title}
+                  urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
+                  context="AI-Generated"
+                  primaryAction={{
+                    label: current.card.primary,
+                    onClick: () => {}
+                  }}
+                  secondaryAction={{
+                    label: current.card.secondary,
+                    onClick: () => {}
+                  }}
+                >
+                  <p className="text-sm">{current.card.content}</p>
+                </OpportunityCard>
+              )}
+
+              {/* Render Chat widget if current scene has one */}
+              {current.chat && (
+                <div className="space-y-3">
+                  <div className="flex justify-end">
+                    <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%]">
+                      <p className="text-sm">{current.chat.query}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-start">
+                    <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                      <p className="text-sm">{current.chat.response}</p>
+                    </div>
+                  </div>
+                  {current.chat.widget && (
+                    <div className="bg-card border border-border rounded-lg p-3 space-y-2">
+                      {current.chat.widget.events?.map((event, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-xs">
+                          <span className="text-muted-foreground w-16">{event.time}</span>
+                          <div>
+                            <p className="font-medium">{event.title}</p>
+                            <p className="text-muted-foreground">{event.location}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Chat Input Bar */}
+            <div className="absolute bottom-14 left-0 right-0 px-4 pb-3 bg-gradient-to-t from-background via-background to-transparent">
+              <div className="flex items-center gap-2 bg-muted/90 backdrop-blur-sm border border-border rounded-full px-4 py-3 shadow-lg">
+                <span className="text-lg">💬</span>
+                <input
+                  type="text"
+                  placeholder="Ask Fidus anything..."
+                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  readOnly
+                />
+                <button className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
+                  →
+                </button>
+              </div>
+            </div>
+
+            {/* Home Indicator */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-muted-foreground/40 rounded-full" />
+          </div>
+        </div>
+
+        {/* Navigation Controls */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={() => setCurrentIndex((prev) => (prev === 0 ? TIMELINE.length - 1 : prev - 1))}
+            className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded transition-colors"
+          >
+            ← Previous
+          </button>
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="px-4 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded transition-colors"
+          >
+            {isPlaying ? '⏸ Pause' : '▶ Play'}
+          </button>
+          <div className="flex gap-1.5">
+            {TIMELINE.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`h-2 rounded-full transition-all ${
+                  idx === currentIndex ? 'w-8 bg-primary' : 'w-2 bg-muted-foreground/30'
+                }`}
+                aria-label={`Go to scene ${idx + 1}`}
+              />
+            ))}
+          </div>
+          <button
+            onClick={() => setCurrentIndex((prev) => (prev + 1) % TIMELINE.length)}
+            className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded transition-colors"
+          >
+            Next →
+          </button>
+        </div>
+
+        <p className="text-center text-xs md:text-sm text-muted-foreground mt-4">
+          {current.icon} {current.time} {current.period} — {current.title}
+        </p>
+      </div>
 
       <h2>The Paradigm Shift</h2>
 
