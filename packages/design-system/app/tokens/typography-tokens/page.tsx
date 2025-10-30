@@ -2,6 +2,7 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
+import { CodeBlock } from '../../../components/helpers/code-block';
 import { Link, ProgressBar } from '@fidus/ui';
 import { useState, useEffect } from 'react';
 import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
@@ -226,8 +227,10 @@ export default function TypographyTokensPage() {
       <p>
         Always use typography tokens instead of hardcoded values:
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ CORRECT: Use typography tokens */
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`/* ✅ CORRECT: Use typography tokens */
 .heading {
   font-family: var(--font-sans);
   font-size: var(--font-size-3xl);
@@ -245,37 +248,84 @@ export default function TypographyTokensPage() {
   font-family: 'Inter', sans-serif;
   font-size: 30px;
   line-height: 1.25;
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Tailwind CSS Classes</h3>
-      <pre className="not-prose">
-        <code>{`<h1 className="text-4xl font-semibold">Hero Heading</h1>
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="tsx"
+          code={`<h1 className="text-4xl font-semibold">Hero Heading</h1>
 <h2 className="text-3xl font-semibold">Section Heading</h2>
 <p className="text-md leading-normal">Body text paragraph</p>
-<code className="font-mono text-sm">Code snippet</code>`}</code>
-      </pre>
+<code className="font-mono text-sm">Code snippet</code>`}
+        />
+      </div>
 
       <h2>Best Practices</h2>
-      <ul>
-        <li>Use <code>font-sans</code> for all UI text and body content</li>
-        <li>Use <code>font-mono</code> only for code, technical data, and numeric values</li>
-        <li>Default to <code>font-size-md</code> (16px) for body text</li>
-        <li>Use <code>line-height-normal</code> (1.5) for most body text</li>
-        <li>Use <code>line-height-tight</code> (1.25) for headings</li>
-        <li>Use <code>line-height-relaxed</code> (1.75) for long-form content</li>
-        <li>Maintain consistent hierarchy - don't skip heading levels</li>
-        <li>Limit line length to 60-75 characters for optimal readability</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>font-sans</code> for all UI text and body content</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>font-mono</code> only for code, technical data, and numeric values</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Default to <code>font-size-md</code> (16px) for body text</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>line-height-normal</code> (1.5) for most body text</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>line-height-tight</code> (1.25) for headings</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>line-height-relaxed</code> (1.75) for long-form content</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Maintain consistent hierarchy - don't skip heading levels</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Limit line length to 60-75 characters for optimal readability</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Accessibility</h2>
-      <ul>
-        <li>Base font size is 16px for comfortable reading across devices</li>
-        <li>All text sizes are in rem units for user font-size preference support</li>
-        <li>Sufficient contrast ratios maintained for all text sizes</li>
-        <li>Line heights ensure comfortable reading for users with dyslexia</li>
-        <li>Font weights provide clear visual hierarchy for screen readers</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Base font size is 16px for comfortable reading across devices</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>All text sizes are in rem units for user font-size preference support</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Sufficient contrast ratios maintained for all text sizes</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Line heights ensure comfortable reading for users with dyslexia</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Font weights provide clear visual hierarchy for screen readers</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Line Height Rationale</h2>
       <p>
