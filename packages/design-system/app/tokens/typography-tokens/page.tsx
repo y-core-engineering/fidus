@@ -2,95 +2,59 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link } from '@fidus/ui';
+import { Link, ProgressBar } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
+
+// Token metadata for descriptions (values come from CSS at runtime)
+const tokenMetadata: Record<string, { description: string; subcategory: string; example?: string }> = {
+  '--font-sans': { description: 'Primary font for UI and body text', subcategory: 'family' },
+  '--font-mono': { description: 'Font for code blocks and technical content', subcategory: 'family' },
+  '--font-size-xs': { description: 'Extra small text - captions, labels', subcategory: 'size', example: '0.75rem (12px)' },
+  '--font-size-sm': { description: 'Small text - secondary content, metadata', subcategory: 'size', example: '0.875rem (14px)' },
+  '--font-size-md': { description: 'Medium text - body text, default size', subcategory: 'size', example: '1rem (16px)' },
+  '--font-size-lg': { description: 'Large text - emphasized content', subcategory: 'size', example: '1.125rem (18px)' },
+  '--font-size-xl': { description: 'Extra large text - subheadings', subcategory: 'size', example: '1.25rem (20px)' },
+  '--font-size-2xl': { description: '2X large text - section headings', subcategory: 'size', example: '1.5rem (24px)' },
+  '--font-size-3xl': { description: '3X large text - page titles', subcategory: 'size', example: '1.875rem (30px)' },
+  '--font-size-4xl': { description: '4X large text - hero headings', subcategory: 'size', example: '2.25rem (36px)' },
+  '--line-height-tight': { description: 'For headings and short text', subcategory: 'lineHeight' },
+  '--line-height-normal': { description: 'Default line height for body text', subcategory: 'lineHeight' },
+  '--line-height-relaxed': { description: 'For long-form content', subcategory: 'lineHeight' },
+};
 
 export default function TypographyTokensPage() {
-  const fontFamilies = [
-    {
-      name: 'Sans Serif',
-      variable: '--font-sans',
-      value: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      description: 'Primary font for UI and body text',
-    },
-    {
-      name: 'Monospace',
-      variable: '--font-mono',
-      value: "'Fira Code', 'Monaco', 'Courier New', monospace",
-      description: 'Font for code blocks and technical content',
-    },
-  ];
+  const [allTypographyTokens, setAllTypographyTokens] = useState<DesignToken[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fontSizes = [
-    {
-      name: 'Extra Small',
-      variable: '--font-size-xs',
-      value: '0.75rem (12px)',
-      example: 'Extra small text - captions, labels',
-    },
-    {
-      name: 'Small',
-      variable: '--font-size-sm',
-      value: '0.875rem (14px)',
-      example: 'Small text - secondary content, metadata',
-    },
-    {
-      name: 'Medium',
-      variable: '--font-size-md',
-      value: '1rem (16px)',
-      example: 'Medium text - body text, default size',
-    },
-    {
-      name: 'Large',
-      variable: '--font-size-lg',
-      value: '1.125rem (18px)',
-      example: 'Large text - emphasized content',
-    },
-    {
-      name: 'Extra Large',
-      variable: '--font-size-xl',
-      value: '1.25rem (20px)',
-      example: 'Extra large text - subheadings',
-    },
-    {
-      name: '2X Large',
-      variable: '--font-size-2xl',
-      value: '1.5rem (24px)',
-      example: '2X large text - section headings',
-    },
-    {
-      name: '3X Large',
-      variable: '--font-size-3xl',
-      value: '1.875rem (30px)',
-      example: '3X large text - page titles',
-    },
-    {
-      name: '4X Large',
-      variable: '--font-size-4xl',
-      value: '2.25rem (36px)',
-      example: '4X large text - hero headings',
-    },
-  ];
+  useEffect(() => {
+    setIsLoading(true);
+    const tokens = getAllTokens().filter(t => t.category === 'typography');
+    const tokensWithDescriptions = tokens.map(token => ({
+      ...token,
+      description: tokenMetadata[token.variable]?.description || '',
+    }));
+    setAllTypographyTokens(tokensWithDescriptions);
+    setIsLoading(false);
+  }, []);
 
-  const lineHeights = [
-    {
-      name: 'Tight',
-      variable: '--line-height-tight',
-      value: '1.25',
-      description: 'For headings and short text',
-    },
-    {
-      name: 'Normal',
-      variable: '--line-height-normal',
-      value: '1.5',
-      description: 'Default line height for body text',
-    },
-    {
-      name: 'Relaxed',
-      variable: '--line-height-relaxed',
-      value: '1.75',
-      description: 'For long-form content',
-    },
-  ];
+  const fontFamilies = allTypographyTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'family');
+  const fontSizes = allTypographyTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'size');
+  const lineHeights = allTypographyTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'lineHeight');
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Typography Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading typography tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">

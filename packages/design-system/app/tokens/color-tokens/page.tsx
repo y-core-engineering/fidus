@@ -2,155 +2,72 @@
 
 import { ColorSwatch } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link, Stack, Button } from '@fidus/ui';
+import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
+
+// Token descriptions mapping (for documentation purposes)
+// Values come from CSS at runtime via getAllTokens()
+const tokenMetadata: Record<string, { description: string; subcategory: string }> = {
+  '--color-primary': { description: 'Gold brand color for backgrounds and primary actions', subcategory: 'brand' },
+  '--color-primary-foreground': { description: 'Black text on gold backgrounds', subcategory: 'brand' },
+  '--color-primary-hover': { description: 'Hover state for primary elements', subcategory: 'brand' },
+  '--color-primary-active': { description: 'Active/pressed state for primary elements', subcategory: 'brand' },
+  '--color-black': { description: 'Pure black', subcategory: 'brand' },
+  '--color-white': { description: 'Pure white', subcategory: 'brand' },
+  '--color-trust-local': { description: 'Green - Local processing (maximum privacy)', subcategory: 'trust' },
+  '--color-trust-cloud': { description: 'Orange - Cloud processing', subcategory: 'trust' },
+  '--color-trust-encrypted': { description: 'Blue - Encrypted data', subcategory: 'trust' },
+  '--color-success': { description: 'Success states and confirmations', subcategory: 'semantic' },
+  '--color-warning': { description: 'Warning states and cautions', subcategory: 'semantic' },
+  '--color-error': { description: 'Error states and destructive actions', subcategory: 'semantic' },
+  '--color-info': { description: 'Informational messages', subcategory: 'semantic' },
+  '--color-urgent': { description: 'High urgency opportunities (red)', subcategory: 'urgency' },
+  '--color-medium': { description: 'Medium urgency opportunities (amber)', subcategory: 'urgency' },
+  '--color-low': { description: 'Low urgency opportunities (blue)', subcategory: 'urgency' },
+  '--color-background': { description: 'Main background color', subcategory: 'neutral' },
+  '--color-foreground': { description: 'Main text color', subcategory: 'neutral' },
+  '--color-muted': { description: 'Lighter background for cards and surfaces', subcategory: 'neutral' },
+  '--color-muted-foreground': { description: 'Subdued text color for secondary content', subcategory: 'neutral' },
+  '--color-border': { description: 'Border color for dividers and outlines', subcategory: 'neutral' },
+  '--color-input-bg': { description: 'Background color for input fields', subcategory: 'neutral' },
+};
 
 export default function ColorTokensPage() {
-  const brandColors = [
-    {
-      name: 'Primary',
-      variable: '--color-primary',
-      value: '45 100% 51%',
-      description: 'Gold brand color for backgrounds and primary actions',
-    },
-    {
-      name: 'Primary Foreground',
-      variable: '--color-primary-foreground',
-      value: '0 0% 0%',
-      description: 'Black text on gold backgrounds',
-    },
-    {
-      name: 'Primary Hover',
-      variable: '--color-primary-hover',
-      value: '45 100% 45%',
-      description: 'Hover state for primary elements',
-    },
-    {
-      name: 'Primary Active',
-      variable: '--color-primary-active',
-      value: '45 100% 38%',
-      description: 'Active/pressed state for primary elements',
-    },
-    {
-      name: 'Black',
-      variable: '--color-black',
-      value: '0 0% 0%',
-      description: 'Pure black',
-    },
-    {
-      name: 'White',
-      variable: '--color-white',
-      value: '0 0% 100%',
-      description: 'Pure white',
-    },
-  ];
+  const [allColorTokens, setAllColorTokens] = useState<DesignToken[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const trustColors = [
-    {
-      name: 'Trust Local',
-      variable: '--color-trust-local',
-      value: '122 39% 33%',
-      description: 'Green - Local processing (maximum privacy)',
-    },
-    {
-      name: 'Trust Cloud',
-      variable: '--color-trust-cloud',
-      value: '27 96% 48%',
-      description: 'Orange - Cloud processing',
-    },
-    {
-      name: 'Trust Encrypted',
-      variable: '--color-trust-encrypted',
-      value: '207 77% 47%',
-      description: 'Blue - Encrypted data',
-    },
-  ];
+  useEffect(() => {
+    setIsLoading(true);
+    const tokens = getAllTokens().filter(t => t.category === 'color');
+    // Add descriptions from metadata mapping
+    const tokensWithDescriptions = tokens.map(token => ({
+      ...token,
+      description: tokenMetadata[token.variable]?.description || '',
+    }));
+    setAllColorTokens(tokensWithDescriptions);
+    setIsLoading(false);
+  }, []);
 
-  const semanticColors = [
-    {
-      name: 'Success',
-      variable: '--color-success',
-      value: '122 39% 49%',
-      description: 'Success states and confirmations',
-    },
-    {
-      name: 'Warning',
-      variable: '--color-warning',
-      value: '36 100% 50%',
-      description: 'Warning states and cautions',
-    },
-    {
-      name: 'Error',
-      variable: '--color-error',
-      value: '4 90% 58%',
-      description: 'Error states and destructive actions',
-    },
-    {
-      name: 'Info',
-      variable: '--color-info',
-      value: '207 90% 54%',
-      description: 'Informational messages',
-    },
-  ];
+  const brandColors = allColorTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'brand');
+  const trustColors = allColorTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'trust');
+  const semanticColors = allColorTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'semantic');
+  const urgencyColors = allColorTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'urgency');
+  const neutralColors = allColorTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'neutral');
 
-  const urgencyColors = [
-    {
-      name: 'Urgent',
-      variable: '--color-urgent',
-      value: '4 90% 58%',
-      description: 'High urgency opportunities (red)',
-    },
-    {
-      name: 'Medium',
-      variable: '--color-medium',
-      value: '36 100% 50%',
-      description: 'Medium urgency opportunities (amber)',
-    },
-    {
-      name: 'Low',
-      variable: '--color-low',
-      value: '207 90% 54%',
-      description: 'Low urgency opportunities (blue)',
-    },
-  ];
-
-  const neutralColors = [
-    {
-      name: 'Background',
-      variable: '--color-background',
-      value: '0 0% 100%',
-      description: 'Main background color (light mode)',
-    },
-    {
-      name: 'Foreground',
-      variable: '--color-foreground',
-      value: '0 0% 0%',
-      description: 'Main text color (light mode)',
-    },
-    {
-      name: 'Muted',
-      variable: '--color-muted',
-      value: '0 0% 96%',
-      description: 'Lighter background for cards and surfaces',
-    },
-    {
-      name: 'Muted Foreground',
-      variable: '--color-muted-foreground',
-      value: '0 0% 40%',
-      description: 'Subdued text color for secondary content',
-    },
-    {
-      name: 'Border',
-      variable: '--color-border',
-      value: '0 0% 88%',
-      description: 'Border color for dividers and outlines',
-    },
-    {
-      name: 'Input Background',
-      variable: '--color-input-bg',
-      value: '0 0% 100%',
-      description: 'Background color for input fields',
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Color Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading color tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
@@ -288,8 +205,8 @@ export default function ColorTokensPage() {
         <code>{`<Stack direction="horizontal" spacing="sm">
   <Button variant="primary">Primary</Button>
   <Button variant="secondary">Secondary</Button>
-  <Button variant="outline">Outline</Button>
-  <Button variant="ghost">Ghost</Button>
+  <Button variant="tertiary">Tertiary</Button>
+  <Button variant="destructive">Destructive</Button>
 </Stack>`}</code>
       </pre>
 
@@ -324,16 +241,9 @@ export default function ColorTokensPage() {
         </div>
       </div>
 
-      <TokenInspector
-        tokens={[
-          ...brandColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
-          ...trustColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
-          ...semanticColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
-          ...urgencyColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
-          ...neutralColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
-        ]}
-        type="color"
-      />
+      <h2>All Color Tokens</h2>
+      <p>Interactive inspector with all {allColorTokens.length} color tokens:</p>
+      <TokenInspector tokens={allColorTokens} type="color" />
 
       <h2>Related Tokens</h2>
       <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">

@@ -2,53 +2,34 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link } from '@fidus/ui';
+import { Link, ProgressBar } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens } from '../../../components/helpers/get-tokens';
 
 export default function SpacingTokensPage() {
-  const spacingTokens = [
-    {
-      name: 'Extra Small',
-      variable: '--spacing-xs',
-      value: '0.25rem (4px)',
-      size: '4px',
-    },
-    {
-      name: 'Small',
-      variable: '--spacing-sm',
-      value: '0.5rem (8px)',
-      size: '8px',
-    },
-    {
-      name: 'Medium',
-      variable: '--spacing-md',
-      value: '1rem (16px)',
-      size: '16px',
-    },
-    {
-      name: 'Large',
-      variable: '--spacing-lg',
-      value: '1.5rem (24px)',
-      size: '24px',
-    },
-    {
-      name: 'Extra Large',
-      variable: '--spacing-xl',
-      value: '2rem (32px)',
-      size: '32px',
-    },
-    {
-      name: '2X Large',
-      variable: '--spacing-2xl',
-      value: '3rem (48px)',
-      size: '48px',
-    },
-    {
-      name: '3X Large',
-      variable: '--spacing-3xl',
-      value: '4rem (64px)',
-      size: '64px',
-    },
-  ];
+  const [spacingTokens, setSpacingTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const tokens = getAllTokens().filter(t => t.category === 'spacing');
+    setSpacingTokens(tokens);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Spacing Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading spacing tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const radiusTokens = [
     {
