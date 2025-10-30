@@ -512,7 +512,7 @@ export default function AIDrivenUIPage() {
                                         <p className="text-lg font-bold text-primary">{msg.widget.data.price}</p>
                                         <div className="flex gap-2">
                                           {msg.widget.data.actions?.map((action: string, actionIdx: number) => (
-                                            <Button key={actionIdx} variant="secondary" size="sm">
+                                            <Button key={actionIdx} variant={actionIdx === 0 ? 'primary' : 'secondary'} size="sm">
                                               {action}
                                             </Button>
                                           ))}
@@ -707,7 +707,7 @@ export default function AIDrivenUIPage() {
                                 <p className="text-lg font-bold text-primary">{widget.data.price}</p>
                                 <div className="flex gap-2">
                                   {widget.data.actions?.map((action: string, idx: number) => (
-                                    <Button key={idx} variant="secondary" size="sm">
+                                    <Button key={idx} variant={idx === 0 ? 'primary' : 'secondary'} size="sm">
                                       {action}
                                     </Button>
                                   ))}
