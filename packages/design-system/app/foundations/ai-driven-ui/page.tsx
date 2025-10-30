@@ -182,19 +182,17 @@ export default function AIDrivenUIPage() {
               </div>
             </div>
 
-            {/* Time Display - only show for Chat scenes */}
-            {current.chat && (
-              <div className="absolute top-8 left-4 z-20">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">{current.time}</span>
-                  <span className="text-xl font-medium text-muted-foreground">{current.period}</span>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-lg">{current.icon}</span>
-                  <span className="text-xs font-medium text-muted-foreground">{current.title}</span>
-                </div>
+            {/* Time Display */}
+            <div className="absolute top-8 left-4 z-20">
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold">{current.time}</span>
+                <span className="text-xl font-medium text-muted-foreground">{current.period}</span>
               </div>
-            )}
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-lg">{current.icon}</span>
+                <span className="text-xs font-medium text-muted-foreground">{current.title}</span>
+              </div>
+            </div>
 
             {/* Content Area with auto-scroll */}
             <div
@@ -203,7 +201,7 @@ export default function AIDrivenUIPage() {
             >
               {/* Dashboard view for Card scenes */}
               {current.card && (
-                <div className="space-y-4">
+                <div className="space-y-4 mt-20">
                   {/* Quick Stats */}
                   <div className="grid grid-cols-3 gap-2">
                     <div className="bg-muted/50 rounded-lg p-2.5 border border-border">
