@@ -10,8 +10,8 @@ export default function SpacingPage() {
     variable: string;
     pixels: string;
   }) => (
-    <div className="border border-border rounded-lg p-4">
-      <div className="flex items-center gap-4">
+    <div className="border border-border rounded-lg p-md">
+      <div className="flex items-center gap-md">
         <div
           className="bg-primary shrink-0"
           style={{
@@ -43,7 +43,7 @@ export default function SpacingPage() {
         while maintaining visual harmony.
       </p>
 
-      <div className="not-prose space-y-4 my-6">
+      <div className="not-prose space-y-4 my-lg">
         <SpacingExample name="XS" variable="--spacing-xs" pixels="4px (0.25rem)" />
         <SpacingExample name="SM" variable="--spacing-sm" pixels="8px (0.5rem)" />
         <SpacingExample name="MD" variable="--spacing-md" pixels="16px (1rem)" />
@@ -58,9 +58,9 @@ export default function SpacingPage() {
       <h2>Usage Examples</h2>
 
       <h3>Component Padding</h3>
-      <div className="not-prose my-6">
+      <div className="not-prose my-lg">
         <div className="border border-border rounded-lg overflow-hidden">
-          <div className="bg-muted/30 p-4 border-b border-border">
+          <div className="not-prose bg-muted/30 p-md border-b border-border">
             <code className="text-sm">padding: var(--spacing-xs)</code>
           </div>
           <div style={{ padding: 'var(--spacing-xs)' }} className="bg-muted/10">
@@ -71,9 +71,9 @@ export default function SpacingPage() {
         </div>
       </div>
 
-      <div className="not-prose my-6">
+      <div className="not-prose my-lg">
         <div className="border border-border rounded-lg overflow-hidden">
-          <div className="bg-muted/30 p-4 border-b border-border">
+          <div className="not-prose bg-muted/30 p-md border-b border-border">
             <code className="text-sm">padding: var(--spacing-md)</code>
           </div>
           <div style={{ padding: 'var(--spacing-md)' }} className="bg-muted/10">
@@ -84,9 +84,9 @@ export default function SpacingPage() {
         </div>
       </div>
 
-      <div className="not-prose my-6">
+      <div className="not-prose my-lg">
         <div className="border border-border rounded-lg overflow-hidden">
-          <div className="bg-muted/30 p-4 border-b border-border">
+          <div className="not-prose bg-muted/30 p-md border-b border-border">
             <code className="text-sm">padding: var(--spacing-xl)</code>
           </div>
           <div style={{ padding: 'var(--spacing-xl)' }} className="bg-muted/10">
@@ -98,20 +98,20 @@ export default function SpacingPage() {
       </div>
 
       <h3>Component Gaps</h3>
-      <div className="not-prose my-6">
+      <div className="not-prose my-lg">
         <div className="border border-border rounded-lg overflow-hidden">
-          <div className="bg-muted/30 p-4 border-b border-border">
+          <div className="not-prose bg-muted/30 p-md border-b border-border">
             <code className="text-sm">gap: var(--spacing-sm)</code>
           </div>
-          <div className="p-4 bg-muted/10">
+          <div className="p-md bg-muted/10">
             <div className="flex" style={{ gap: 'var(--spacing-sm)' }}>
-              <div className="bg-primary/20 border border-primary rounded px-4 py-2">
+              <div className="bg-primary/20 border border-primary rounded-md px-4 py-2">
                 Item 1
               </div>
-              <div className="bg-primary/20 border border-primary rounded px-4 py-2">
+              <div className="bg-primary/20 border border-primary rounded-md px-4 py-2">
                 Item 2
               </div>
-              <div className="bg-primary/20 border border-primary rounded px-4 py-2">
+              <div className="bg-primary/20 border border-primary rounded-md px-4 py-2">
                 Item 3
               </div>
             </div>
@@ -119,20 +119,20 @@ export default function SpacingPage() {
         </div>
       </div>
 
-      <div className="not-prose my-6">
+      <div className="not-prose my-lg">
         <div className="border border-border rounded-lg overflow-hidden">
-          <div className="bg-muted/30 p-4 border-b border-border">
+          <div className="not-prose bg-muted/30 p-md border-b border-border">
             <code className="text-sm">gap: var(--spacing-lg)</code>
           </div>
-          <div className="p-4 bg-muted/10">
+          <div className="p-md bg-muted/10">
             <div className="flex" style={{ gap: 'var(--spacing-lg)' }}>
-              <div className="bg-primary/20 border border-primary rounded px-4 py-2">
+              <div className="bg-primary/20 border border-primary rounded-md px-4 py-2">
                 Item 1
               </div>
-              <div className="bg-primary/20 border border-primary rounded px-4 py-2">
+              <div className="bg-primary/20 border border-primary rounded-md px-4 py-2">
                 Item 2
               </div>
-              <div className="bg-primary/20 border border-primary rounded px-4 py-2">
+              <div className="bg-primary/20 border border-primary rounded-md px-4 py-2">
                 Item 3
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function SpacingPage() {
       <p>
         When using Tailwind CSS, spacing values are available through standard utilities:
       </p>
-      <div className="not-prose bg-muted/30 rounded-lg p-4 my-4">
+      <div className="not-prose bg-muted/30 rounded-lg p-md my-md">
         <pre className="text-sm">
           <code>{`<!-- Padding -->
 <div className="p-xs">4px padding</div>

@@ -10,7 +10,7 @@ export default function TypographyPage() {
     variable: string;
     example: string;
   }) => (
-    <div className="border border-border rounded-lg p-6 space-y-2">
+    <div className="border border-border rounded-lg p-lg space-y-sm">
       <div className="text-sm text-muted-foreground font-mono">{variable}</div>
       <div style={{ fontSize: `var(${variable})` }} className="font-sans">
         {example}
@@ -35,8 +35,8 @@ export default function TypographyPage() {
         sizes and a modern, neutral appearance.
       </p>
 
-      <div className="not-prose border border-border rounded-lg p-6 my-6">
-        <div className="text-4xl font-sans mb-2">Inter</div>
+      <div className="not-prose border border-border rounded-lg p-lg my-lg">
+        <div className="text-4xl font-sans mb-sm">Inter</div>
         <div className="text-muted-foreground">
           ABCDEFGHIJKLMNOPQRSTUVWXYZ
           <br />
@@ -52,7 +52,7 @@ export default function TypographyPage() {
         of hierarchy in the interface.
       </p>
 
-      <div className="not-prose space-y-4 my-6">
+      <div className="not-prose space-y-4 my-lg">
         <TypeScale
           level="5XL"
           variable="--font-size-5xl"
@@ -105,25 +105,25 @@ export default function TypographyPage() {
         Inter supports a range of weights. We primarily use three weights in our interface:
       </p>
 
-      <div className="not-prose border border-border rounded-lg divide-y divide-border my-6">
-        <div className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">
+      <div className="not-prose border border-border rounded-lg divide-y divide-border my-lg">
+        <div className="p-md">
+          <div className="text-sm text-muted-foreground mb-sm">
             Regular (400) - var(--font-weight-normal)
           </div>
           <div className="text-lg" style={{ fontWeight: 'var(--font-weight-normal)' }}>
             Used for body text and most interface elements
           </div>
         </div>
-        <div className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">
+        <div className="p-md">
+          <div className="text-sm text-muted-foreground mb-sm">
             Medium (500) - var(--font-weight-medium)
           </div>
           <div className="text-lg" style={{ fontWeight: 'var(--font-weight-medium)' }}>
             Used for emphasized text and active states
           </div>
         </div>
-        <div className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">
+        <div className="p-md">
+          <div className="text-sm text-muted-foreground mb-sm">
             Bold (700) - var(--font-weight-bold)
           </div>
           <div className="text-lg" style={{ fontWeight: 'var(--font-weight-bold)' }}>
@@ -138,9 +138,9 @@ export default function TypographyPage() {
         optimized for different use cases:
       </p>
 
-      <div className="not-prose space-y-4 my-6">
-        <div className="border border-border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground mb-2">
+      <div className="not-prose space-y-4 my-lg">
+        <div className="border border-border rounded-lg p-md">
+          <div className="text-sm text-muted-foreground mb-sm">
             Tight (1.25) - var(--line-height-tight)
           </div>
           <div style={{ lineHeight: 'var(--line-height-tight)' }}>
@@ -148,8 +148,8 @@ export default function TypographyPage() {
             fox jumps over the lazy dog.
           </div>
         </div>
-        <div className="border border-border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground mb-2">
+        <div className="border border-border rounded-lg p-md">
+          <div className="text-sm text-muted-foreground mb-sm">
             Normal (1.5) - var(--line-height-normal)
           </div>
           <div style={{ lineHeight: 'var(--line-height-normal)' }}>
@@ -157,8 +157,8 @@ export default function TypographyPage() {
             reading. The quick brown fox jumps over the lazy dog.
           </div>
         </div>
-        <div className="border border-border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground mb-2">
+        <div className="border border-border rounded-lg p-md">
+          <div className="text-sm text-muted-foreground mb-sm">
             Relaxed (1.75) - var(--line-height-relaxed)
           </div>
           <div style={{ lineHeight: 'var(--line-height-relaxed)' }}>
