@@ -554,8 +554,8 @@ export default function ResponsiveDesignPage() {
           </ul>
         </div>
 
-        <div className="border border-destructive/20 bg-destructive/5 rounded-lg p-md">
-          <h3 className="text-sm font-semibold text-destructive mb-sm">✗ Don&apos;t</h3>
+        <div className="border border-error/20 bg-error/5 rounded-lg p-md">
+          <h3 className="text-sm font-semibold text-error mb-sm">✗ Don&apos;t</h3>
           <ul className="text-sm space-y-xs">
             <li>• Assume desktop-only usage</li>
             <li>• Use device-specific CSS</li>

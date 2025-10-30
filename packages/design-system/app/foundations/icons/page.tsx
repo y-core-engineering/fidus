@@ -23,7 +23,7 @@ import {
   Cloud,
   Link as LinkIcon,
 } from 'lucide-react';
-import { Link } from '@fidus/ui';
+import { Link, Stack } from '@fidus/ui';
 
 export default function IconsPage() {
   const domainIcons = [
@@ -91,136 +91,183 @@ export default function IconsPage() {
       <h2>Domain Icons</h2>
       <p>Each Fidus domain has a representative icon used in cards, navigation, and badges:</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 not-prose">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg not-prose">
         {domainIcons.map((item) => (
-          <div key={item.name} className="flex items-start gap-3 p-3 border border-border rounded-lg">
-            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded">
+          <Stack
+            key={item.name}
+            direction="horizontal"
+            spacing="sm"
+            align="start"
+            className="p-sm border border-border rounded-lg"
+          >
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded-md">
               {item.icon}
             </div>
             <div>
               <p className="text-sm font-medium">{item.name}</p>
               <p className="text-xs text-muted-foreground">{item.usage}</p>
             </div>
-          </div>
+          </Stack>
         ))}
       </div>
 
       <h2>System Icons</h2>
       <p>Common system functionality icons:</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 not-prose">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg not-prose">
         {systemIcons.map((item) => (
-          <div key={item.name} className="flex items-start gap-3 p-3 border border-border rounded-lg">
-            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded">
+          <Stack
+            key={item.name}
+            direction="horizontal"
+            spacing="sm"
+            align="start"
+            className="p-sm border border-border rounded-lg"
+          >
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded-md">
               {item.icon}
             </div>
             <div>
               <p className="text-sm font-medium">{item.name}</p>
               <p className="text-xs text-muted-foreground">{item.usage}</p>
             </div>
-          </div>
+          </Stack>
         ))}
       </div>
 
       <h2>Navigation Icons</h2>
       <p>Icons for navigation and user actions:</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 not-prose">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg not-prose">
         {navigationIcons.map((item) => (
-          <div key={item.name} className="flex items-start gap-3 p-3 border border-border rounded-lg">
-            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded">
+          <Stack
+            key={item.name}
+            direction="horizontal"
+            spacing="sm"
+            align="start"
+            className="p-sm border border-border rounded-lg"
+          >
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded-md">
               {item.icon}
             </div>
             <div>
               <p className="text-sm font-medium">{item.name}</p>
               <p className="text-xs text-muted-foreground">{item.usage}</p>
             </div>
-          </div>
+          </Stack>
         ))}
       </div>
 
       <h2>Status & Privacy Icons</h2>
       <p>Icons indicating status, privacy level, and data source:</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 not-prose">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg not-prose">
         {statusIcons.map((item) => (
-          <div key={item.name} className="flex items-start gap-3 p-3 border border-border rounded-lg">
-            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded">
+          <Stack
+            key={item.name}
+            direction="horizontal"
+            spacing="sm"
+            align="start"
+            className="p-sm border border-border rounded-lg"
+          >
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-muted rounded-md">
               {item.icon}
             </div>
             <div>
               <p className="text-sm font-medium">{item.name}</p>
               <p className="text-xs text-muted-foreground">{item.usage}</p>
             </div>
-          </div>
+          </Stack>
         ))}
       </div>
 
       <h2>Icon Sizes</h2>
       <p>Consistent sizing scale for different use cases:</p>
 
-      <div className="space-y-4 my-6 not-prose">
-        <div className="flex items-center gap-4 p-3 border border-border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded">
+      <div className="space-y-md my-lg not-prose">
+        <Stack
+          direction="horizontal"
+          spacing="md"
+          align="center"
+          className="p-sm border border-border rounded-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded-md">
             <Calendar className="h-3 w-3" />
           </div>
           <div>
             <p className="text-sm font-medium">Small (12px)</p>
             <p className="text-xs text-muted-foreground">Inline with text, tight spaces</p>
-            <code className="text-xs">className="h-3 w-3"</code>
+            <code className="text-xs">className=&quot;h-3 w-3&quot;</code>
           </div>
-        </div>
+        </Stack>
 
-        <div className="flex items-center gap-4 p-3 border border-border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded">
+        <Stack
+          direction="horizontal"
+          spacing="md"
+          align="center"
+          className="p-sm border border-border rounded-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded-md">
             <Calendar className="h-4 w-4" />
           </div>
           <div>
             <p className="text-sm font-medium">Medium (16px) - Default</p>
             <p className="text-xs text-muted-foreground">Buttons, cards, most UI elements</p>
-            <code className="text-xs">className="h-4 w-4"</code>
+            <code className="text-xs">className=&quot;h-4 w-4&quot;</code>
           </div>
-        </div>
+        </Stack>
 
-        <div className="flex items-center gap-4 p-3 border border-border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded">
+        <Stack
+          direction="horizontal"
+          spacing="md"
+          align="center"
+          className="p-sm border border-border rounded-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded-md">
             <Calendar className="h-5 w-5" />
           </div>
           <div>
             <p className="text-sm font-medium">Large (20px)</p>
             <p className="text-xs text-muted-foreground">Headers, prominent features</p>
-            <code className="text-xs">className="h-5 w-5"</code>
+            <code className="text-xs">className=&quot;h-5 w-5&quot;</code>
           </div>
-        </div>
+        </Stack>
 
-        <div className="flex items-center gap-4 p-3 border border-border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded">
+        <Stack
+          direction="horizontal"
+          spacing="md"
+          align="center"
+          className="p-sm border border-border rounded-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 bg-muted rounded-md">
             <Calendar className="h-6 w-6" />
           </div>
           <div>
             <p className="text-sm font-medium">Extra Large (24px)</p>
             <p className="text-xs text-muted-foreground">Page headers, hero sections</p>
-            <code className="text-xs">className="h-6 w-6"</code>
+            <code className="text-xs">className=&quot;h-6 w-6&quot;</code>
           </div>
-        </div>
+        </Stack>
       </div>
 
       <h2>Usage Examples</h2>
 
       <h3>In Buttons</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
+      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
         <pre className="text-xs">
           {`import { Calendar } from 'lucide-react';
+import { Button, Stack } from '@fidus/ui';
 
-<button className="flex items-center gap-2">
-  <Calendar className="h-4 w-4" />
-  <span>Add Event</span>
-</button>`}
+<Button>
+  <Stack direction="horizontal" spacing="sm" align="center">
+    <Calendar className="h-4 w-4" />
+    <span>Add Event</span>
+  </Stack>
+</Button>`}
         </pre>
       </div>
 
       <h3>In Card Headers</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
+      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
         <pre className="text-xs">
           {`import { DollarSign } from 'lucide-react';
 
@@ -235,7 +282,7 @@ export default function IconsPage() {
       </div>
 
       <h3>As Status Indicators</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
+      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
         <pre className="text-xs">
           {`import { Lock, Cloud, Link } from 'lucide-react';
 
@@ -254,23 +301,23 @@ export default function IconsPage() {
 
       <h3>Color</h3>
       <p>Use Tailwind text color utilities:</p>
-      <div className="flex items-center gap-3 my-4">
+      <Stack direction="horizontal" spacing="sm" className="my-md">
         <Calendar className="h-6 w-6 text-foreground" />
         <Calendar className="h-6 w-6 text-muted-foreground" />
         <Calendar className="h-6 w-6 text-primary" />
         <Calendar className="h-6 w-6 text-success" />
         <Calendar className="h-6 w-6 text-warning" />
-        <Calendar className="h-6 w-6 text-destructive" />
-      </div>
+        <Calendar className="h-6 w-6 text-error" />
+      </Stack>
 
       <h3>Stroke Width</h3>
       <p>Adjust stroke width for visual weight:</p>
-      <div className="flex items-center gap-3 my-4">
+      <Stack direction="horizontal" spacing="sm" className="my-md">
         <Calendar className="h-6 w-6" strokeWidth={1} />
         <Calendar className="h-6 w-6" strokeWidth={1.5} />
         <Calendar className="h-6 w-6" strokeWidth={2} />
         <Calendar className="h-6 w-6" strokeWidth={2.5} />
-      </div>
+      </Stack>
 
       <h2>Best Practices</h2>
 
@@ -298,19 +345,21 @@ export default function IconsPage() {
       <h2>Accessibility</h2>
 
       <h3>Decorative Icons</h3>
-      <p>Icons that accompany text don't need additional labels:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
+      <p>Icons that accompany text don&apos;t need additional labels:</p>
+      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
         <pre className="text-xs">
-          {`<button>
-  <Calendar className="h-4 w-4" />
-  <span>Add Event</span>  {/* Text provides context */}
-</button>`}
+          {`<Button>
+  <Stack direction="horizontal" spacing="sm" align="center">
+    <Calendar className="h-4 w-4" />
+    <span>Add Event</span>  {/* Text provides context */}
+  </Stack>
+</Button>`}
         </pre>
       </div>
 
       <h3>Standalone Icons</h3>
       <p>Icons without text need aria-label:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
+      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
         <pre className="text-xs">
           {`<button aria-label="Close">
   <X className="h-4 w-4" />

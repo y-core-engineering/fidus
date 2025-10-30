@@ -265,8 +265,8 @@ export default function AccessibilityPage() {
           </pre>
         </div>
 
-        <div className="border border-destructive/20 bg-destructive/5 rounded-lg p-md">
-          <h4 className="text-sm font-semibold text-destructive mb-sm">✗ Bad</h4>
+        <div className="border border-error/20 bg-error/5 rounded-lg p-md">
+          <h4 className="text-sm font-semibold text-error mb-sm">✗ Bad</h4>
           <pre className="text-xs">
             {`<div onClick={...}>
   Submit

@@ -254,7 +254,7 @@ export default function PrivacyUXPage() {
         <button className="px-4 py-2 text-sm border border-border rounded">
           Export All Data
         </button>
-        <button className="px-4 py-2 text-sm border border-destructive text-destructive rounded">
+        <button className="px-4 py-2 text-sm border border-error text-error rounded">
           Delete All Data
         </button>
       </div>
