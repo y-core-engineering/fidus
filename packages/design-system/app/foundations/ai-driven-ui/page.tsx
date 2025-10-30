@@ -182,17 +182,19 @@ export default function AIDrivenUIPage() {
               </div>
             </div>
 
-            {/* Time Display */}
-            <div className="absolute top-8 left-4 z-20">
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">{current.time}</span>
-                <span className="text-xl font-medium text-muted-foreground">{current.period}</span>
+            {/* Time Display - only show for Chat scenes */}
+            {current.chat && (
+              <div className="absolute top-8 left-4 z-20">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold">{current.time}</span>
+                  <span className="text-xl font-medium text-muted-foreground">{current.period}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-lg">{current.icon}</span>
+                  <span className="text-xs font-medium text-muted-foreground">{current.title}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-lg">{current.icon}</span>
-                <span className="text-xs font-medium text-muted-foreground">{current.title}</span>
-              </div>
-            </div>
+            )}
 
             {/* Content Area with auto-scroll */}
             <div
