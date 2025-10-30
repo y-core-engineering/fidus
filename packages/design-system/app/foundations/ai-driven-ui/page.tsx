@@ -5,15 +5,15 @@ import { useState, useEffect, useRef } from 'react';
 
 // Timeline data - complex scenarios showing different UI forms
 const TIMELINE = [
-  // Scenario 1: Multi-turn trip planning conversation (4 messages)
+  // Scenario 1: Complete booking flow with form filling, payment, and dashboard (11 messages)
   {
     time: '8:15',
     period: 'AM',
     title: 'Morning',
     icon: '☕',
-    context: 'User plans weekend trip with follow-up',
+    context: 'Complete hotel booking flow',
     inputSource: 'User Request',
-    inputDetail: 'Multi-turn conversation → Form',
+    inputDetail: 'Multi-turn conversation → Form filling → Payment → Confirmation → Dashboard',
     chat: {
       messages: [
         { type: 'user', content: 'Help me plan a weekend trip to Munich' },
@@ -21,19 +21,58 @@ const TIMELINE = [
         { type: 'user', content: 'Schwabing sounds good' },
         {
           type: 'assistant',
-          content: 'Great choice! Hotel München Palace (Schwabing): €120/night, 4.2★. Let me prepare the booking:',
+          content: 'Great choice! Hotel München Palace (Schwabing): €120/night, 4.2★. Please fill in your booking details:',
           widget: {
             type: 'booking-form',
             data: {
               hotel: 'Hotel München Palace',
               pricePerNight: '€120',
               rating: '4.2★',
-              fields: ['Check-in', 'Check-out', 'Guests'],
+              fields: ['Check-in: Nov 15', 'Check-out: Nov 17', 'Guests: 2'],
               action: 'Book Now'
+            }
+          }
+        },
+        {
+          type: 'user',
+          content: 'Book it',
+          typingEffect: true // Special flag for showing form submission
+        },
+        {
+          type: 'assistant',
+          content: 'How would you like to pay?',
+          widget: {
+            type: 'payment-options',
+            data: {
+              options: ['Apple Pay', 'Credit Card', 'PayPal']
+            }
+          }
+        },
+        { type: 'user', content: 'Apple Pay' },
+        {
+          type: 'assistant',
+          content: '✓ Payment confirmed! Your booking is complete.',
+          widget: {
+            type: 'booking-confirmation',
+            data: {
+              status: 'success',
+              title: 'Booking Confirmed',
+              hotel: 'Hotel München Palace',
+              details: ['Nov 15-17, 2024 (2 nights)', '2 Guests', 'Total: €240', 'Paid with Apple Pay'],
+              swipeable: true
             }
           }
         }
       ]
+    },
+    // After swipe, show dashboard with booking
+    dashboardAfterSwipe: {
+      booking: {
+        hotel: 'Hotel München Palace',
+        dates: 'Nov 15-17',
+        location: 'Munich, Schwabing',
+        price: '€240'
+      }
     }
   },
   // Scenario 2: Proactive card based on pattern detection
@@ -274,8 +313,8 @@ export default function AIDrivenUIPage() {
               setShowTyping(false);
               setVisibleMessages(2);
 
-              // Show widget after response
-              if (nextScene.chat.widget) {
+              // Show widget after response (only for old single-turn format)
+              if ('widget' in nextScene.chat && nextScene.chat.widget) {
                 setTimeout(() => setShowWidget(true), 500);
               }
             }, 2700); // Typing visible during entire LLM process
@@ -453,13 +492,9 @@ export default function AIDrivenUIPage() {
                                       </div>
                                       <div className="space-y-2 mb-3">
                                         {msg.widget.data.fields?.map((field: string, fieldIdx: number) => (
-                                          <input
-                                            key={fieldIdx}
-                                            type="text"
-                                            placeholder={field}
-                                            className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50"
-                                            readOnly
-                                          />
+                                          <div key={fieldIdx} className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50 text-foreground">
+                                            {field}
+                                          </div>
                                         ))}
                                       </div>
                                       <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
@@ -480,6 +515,47 @@ export default function AIDrivenUIPage() {
                                           </button>
                                         ))}
                                       </div>
+                                    </div>
+                                  )}
+
+                                  {/* Payment Options Widget */}
+                                  {msg.widget.type === 'payment-options' && msg.widget.data && 'options' in msg.widget.data && (
+                                    <div className="bg-card border border-border rounded-lg p-4">
+                                      <div className="space-y-2">
+                                        {msg.widget.data.options?.map((option: string, optionIdx: number) => (
+                                          <button key={optionIdx} className="w-full px-4 py-3 text-sm font-medium border-2 border-border rounded-lg hover:border-primary hover:bg-primary/5 flex items-center justify-between">
+                                            <span>{option}</span>
+                                            {option === 'Apple Pay' && <span className="text-lg"></span>}
+                                            {option === 'Credit Card' && <span className="text-lg">💳</span>}
+                                            {option === 'PayPal' && <span className="text-lg">🅿️</span>}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Booking Confirmation Widget */}
+                                  {msg.widget.type === 'booking-confirmation' && msg.widget.data && 'status' in msg.widget.data && 'hotel' in msg.widget.data && (
+                                    <div className="bg-success/10 border border-success/20 rounded-lg p-4">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-2xl">✓</span>
+                                        <p className="text-sm font-bold text-success">{msg.widget.data.title}</p>
+                                      </div>
+                                      <p className="text-sm font-semibold mb-2">{msg.widget.data.hotel}</p>
+                                      <div className="space-y-1">
+                                        {msg.widget.data.details?.map((detail: string, detailIdx: number) => (
+                                          <p key={detailIdx} className="text-xs text-muted-foreground flex items-center gap-2">
+                                            <span className="text-success">•</span>
+                                            {detail}
+                                          </p>
+                                        ))}
+                                      </div>
+                                      {'swipeable' in msg.widget.data && msg.widget.data.swipeable && (
+                                        <div className="mt-3 pt-3 border-t border-success/20 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                                          <span>👆</span>
+                                          <span>Swipe to dismiss</span>
+                                        </div>
+                                      )}
                                     </div>
                                   )}
 
@@ -593,13 +669,9 @@ export default function AIDrivenUIPage() {
                               </div>
                               <div className="space-y-2 mb-3">
                                 {widget.data.fields?.map((field: string, idx: number) => (
-                                  <input
-                                    key={idx}
-                                    type="text"
-                                    placeholder={field}
-                                    className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50"
-                                    readOnly
-                                  />
+                                  <div key={idx} className="w-full px-3 py-2 text-xs border border-border rounded bg-muted/50 text-foreground">
+                                    {field}
+                                  </div>
                                 ))}
                               </div>
                               <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
@@ -783,7 +855,7 @@ export default function AIDrivenUIPage() {
                           {current.card
                             ? `✓ ${current.card.type.toUpperCase()} OpportunityCard`
                             : current.chat
-                              ? `✓ Chat response ${current.chat.widget ? '+ embedded widget' : '(text only)'}`
+                              ? `✓ Chat response ${('widget' in current.chat && current.chat.widget) || ('messages' in current.chat) ? '+ embedded widget' : '(text only)'}`
                               : '✓ Dynamic UI'}
                         </div>
                       </div>
