@@ -3,7 +3,7 @@
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { CodeBlock } from '../../../components/helpers/code-block';
-import { Link, ProgressBar } from '@fidus/ui';
+import { Link, ProgressBar, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@fidus/ui';
 import { useState, useEffect } from 'react';
 import { getAllTokens } from '../../../components/helpers/get-tokens';
 
@@ -258,49 +258,49 @@ export default function SpacingTokensPage() {
       </div>
 
       <h2>Component Guidelines</h2>
-      <div className="not-prose my-lg overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="text-left p-md font-semibold text-sm">Component</th>
-              <th className="text-left p-md font-semibold text-sm">Padding</th>
-              <th className="text-left p-md font-semibold text-sm">Gap</th>
-              <th className="text-left p-md font-semibold text-sm">Radius</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b border-border hover:bg-muted/30 transition-colors">
-              <td className="p-md text-sm">Button</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">sm-md</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">sm</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">md</td>
-            </tr>
-            <tr className="border-b border-border hover:bg-muted/30 transition-colors">
-              <td className="p-md text-sm">Card</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">md-lg</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">md</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">lg</td>
-            </tr>
-            <tr className="border-b border-border hover:bg-muted/30 transition-colors">
-              <td className="p-md text-sm">Input</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">sm-md</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">-</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">md</td>
-            </tr>
-            <tr className="border-b border-border hover:bg-muted/30 transition-colors">
-              <td className="p-md text-sm">Modal</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">lg-xl</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">md</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">lg</td>
-            </tr>
-            <tr className="hover:bg-muted/30 transition-colors">
-              <td className="p-md text-sm">Badge</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">xs-sm</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">xs</td>
-              <td className="p-md text-sm font-mono text-muted-foreground">sm</td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="not-prose my-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Component</TableHead>
+              <TableHead>Padding</TableHead>
+              <TableHead>Gap</TableHead>
+              <TableHead>Radius</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell>Button</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm-md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Card</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md-lg</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Input</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm-md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">-</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Modal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg-xl</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Badge</TableCell>
+              <TableCell className="font-mono text-muted-foreground">xs-sm</TableCell>
+              <TableCell className="font-mono text-muted-foreground">xs</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
 
       <h2>When to Use Which Spacing</h2>
