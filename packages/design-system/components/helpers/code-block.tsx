@@ -54,7 +54,7 @@ export function CodeBlock({
 
   if (isLoading) {
     return (
-      <pre className="p-4 overflow-x-auto bg-muted/50 text-sm">
+      <pre className="bg-muted rounded-lg p-lg overflow-x-auto text-sm">
         <code className="font-mono">{code}</code>
       </pre>
     );
@@ -62,7 +62,7 @@ export function CodeBlock({
 
   return (
     <div
-      className="shiki-wrapper overflow-x-auto"
+      className="bg-muted rounded-lg p-lg overflow-x-auto shiki-wrapper"
       dangerouslySetInnerHTML={{ __html: highlightedCode }}
     />
   );
