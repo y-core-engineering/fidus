@@ -475,45 +475,47 @@ export default function MotionTokensPage() {
       <p>
         Our motion system is built on four core principles that guide when and how to animate:
       </p>
-      <div className="not-prose my-lg space-y-lg">
-        <div>
-          <h3 className="text-xl font-semibold mb-sm">Purpose Over Polish</h3>
-          <p className="text-sm text-muted-foreground">
-            Animations should communicate state changes and guide user attention, not just add visual
-            decoration. Every animation must serve a functional purpose - whether that's confirming an
-            action, directing focus to new content, or showing a transition between states. If you can't
-            explain why an animation exists beyond "it looks nice," it probably shouldn't be there.
-          </p>
-        </div>
+      <div className="not-prose my-lg">
+        <div className="space-y-md">
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Purpose Over Polish</h3>
+            <p className="text-sm">
+              Animations should communicate state changes and guide user attention, not just add visual
+              decoration. Every animation must serve a functional purpose - whether that's confirming an
+              action, directing focus to new content, or showing a transition between states. If you can't
+              explain why an animation exists beyond "it looks nice," it probably shouldn't be there.
+            </p>
+          </div>
 
-        <div>
-          <h3 className="text-xl font-semibold mb-sm">Consistency</h3>
-          <p className="text-sm text-muted-foreground">
-            Use the same duration and easing for similar interactions across the application for
-            predictable behavior. When users see a button hover animation, they form expectations about
-            how other interactive elements will behave. Breaking these expectations creates cognitive
-            load. Consistent motion patterns build user confidence and make the interface feel cohesive.
-          </p>
-        </div>
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Consistency</h3>
+            <p className="text-sm">
+              Use the same duration and easing for similar interactions across the application for
+              predictable behavior. When users see a button hover animation, they form expectations about
+              how other interactive elements will behave. Breaking these expectations creates cognitive
+              load. Consistent motion patterns build user confidence and make the interface feel cohesive.
+            </p>
+          </div>
 
-        <div>
-          <h3 className="text-xl font-semibold mb-sm">Hierarchy</h3>
-          <p className="text-sm text-muted-foreground">
-            More important elements get more noticeable animations. Modals use slower, more prominent
-            animations than tooltips. A critical notification might slide in with a bounce, while a
-            subtle state change gets a quick fade. This hierarchy helps users understand what demands
-            their immediate attention versus what can wait.
-          </p>
-        </div>
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Hierarchy</h3>
+            <p className="text-sm">
+              More important elements get more noticeable animations. Modals use slower, more prominent
+              animations than tooltips. A critical notification might slide in with a bounce, while a
+              subtle state change gets a quick fade. This hierarchy helps users understand what demands
+              their immediate attention versus what can wait.
+            </p>
+          </div>
 
-        <div>
-          <h3 className="text-xl font-semibold mb-sm">Performance</h3>
-          <p className="text-sm text-muted-foreground">
-            Prefer transforms and opacity changes (GPU-accelerated) over animating layout properties
-            like width and height. Animating layout properties forces the browser to recalculate styles,
-            layout, and paint - an expensive operation that causes jank. Transforms and opacity changes
-            are handled by the GPU compositor, ensuring smooth 60fps animations even on lower-end devices.
-          </p>
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Performance</h3>
+            <p className="text-sm">
+              Prefer transforms and opacity changes (GPU-accelerated) over animating layout properties
+              like width and height. Animating layout properties forces the browser to recalculate styles,
+              layout, and paint - an expensive operation that causes jank. Transforms and opacity changes
+              are handled by the GPU compositor, ensuring smooth 60fps animations even on lower-end devices.
+            </p>
+          </div>
         </div>
       </div>
       <div className="not-prose my-lg">
