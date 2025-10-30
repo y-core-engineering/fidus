@@ -65,7 +65,7 @@ export default function AIDrivenUIPage() {
   const [showTyping, setShowTyping] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState(0);
   const [showWidget, setShowWidget] = useState(false);
-  const [llmStep, setLlmStep] = useState(0); // 0-5: tracks which LLM step is visible
+  const [llmStep, setLlmStep] = useState(-1); // -1=hidden, 0=thinking, 1-5=steps visible
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const current = TIMELINE[currentIndex];
 
@@ -81,20 +81,33 @@ export default function AIDrivenUIPage() {
 
   // LLM thinking animation - steps appear sequentially
   useEffect(() => {
-    // Reset LLM steps when scene changes
-    setLlmStep(0);
+    // For chat scenes: wait for user message to appear first
+    // For card scenes: start thinking immediately
+    if (current.chat) {
+      // Start hidden
+      setLlmStep(-1);
 
-    // Step 0: Input Source (immediately)
-    setTimeout(() => setLlmStep(1), 100);
-    // Step 1: Context Analysis (after 400ms)
-    setTimeout(() => setLlmStep(2), 500);
-    // Step 2: Intent Detection (after 800ms)
-    setTimeout(() => setLlmStep(3), 900);
-    // Step 3: UI Form Selection (after 1200ms)
-    setTimeout(() => setLlmStep(4), 1300);
-    // Step 4: Rendering (after 1600ms)
-    setTimeout(() => setLlmStep(5), 1700);
-  }, [currentIndex]);
+      // Show "thinking..." indicator IMMEDIATELY after user message appears (300ms)
+      setTimeout(() => setLlmStep(0), 300);
+
+      // Then show steps (thinking indicator visible for 500ms before first step)
+      setTimeout(() => setLlmStep(1), 800);
+      setTimeout(() => setLlmStep(2), 1200);
+      setTimeout(() => setLlmStep(3), 1600);
+      setTimeout(() => setLlmStep(4), 2000);
+      setTimeout(() => setLlmStep(5), 2400);
+    } else {
+      // For cards: start thinking immediately with indicator
+      setLlmStep(0);
+
+      // Thinking indicator visible for 500ms before first step
+      setTimeout(() => setLlmStep(1), 500);
+      setTimeout(() => setLlmStep(2), 900);
+      setTimeout(() => setLlmStep(3), 1300);
+      setTimeout(() => setLlmStep(4), 1700);
+      setTimeout(() => setLlmStep(5), 2100);
+    }
+  }, [currentIndex, current.chat]);
 
   // Auto-advance through timeline with progressive animations
   useEffect(() => {
@@ -115,7 +128,7 @@ export default function AIDrivenUIPage() {
           // 1. Show user message IMMEDIATELY (before LLM thinking)
           setVisibleMessages(1);
 
-          // 2. LLM thinks for 2000ms (Steps 0-4 appear during this time)
+          // 2. LLM thinks for 2300ms (hidden 300ms + steps 0-4 over 2000ms)
           // 3. After LLM completes, show typing indicator and response
           setTimeout(() => {
             setShowTyping(true);
@@ -130,7 +143,7 @@ export default function AIDrivenUIPage() {
                 setTimeout(() => setShowWidget(true), 500);
               }
             }, 800);
-          }, 2000); // Wait for LLM animation to complete
+          }, 2300); // Wait for LLM animation to complete (300ms delay + 2000ms steps)
         } else if (nextScene.card) {
           // For cards (Signal/Event), LLM thinking happens first
           // Card is rendered when llmStep >= 5 (Rendering Complete)
@@ -303,15 +316,15 @@ export default function AIDrivenUIPage() {
               </div>
 
               <div className="space-y-3 bg-muted/30 rounded-xl p-4 border border-border min-h-[400px]">
-                {/* Thinking Indicator */}
-                {llmStep === 0 && (
-                  <div className="flex items-center gap-3 p-4 animate-pulse">
+                {/* Thinking Indicator - visible throughout entire LLM process */}
+                {llmStep >= 0 && llmStep < 5 && (
+                  <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/10 animate-pulse">
                     <div className="flex gap-1">
                       <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                       <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
-                    <p className="text-sm text-muted-foreground">Analyzing context...</p>
+                    <p className="text-sm md:text-base font-medium text-muted-foreground">Analyzing context...</p>
                   </div>
                 )}
 
