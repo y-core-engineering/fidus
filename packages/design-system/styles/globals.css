@@ -148,4 +148,21 @@
   a {
     @apply text-foreground underline hover:no-underline;
   }
+
+  /* Shiki syntax highlighting styles */
+  .shiki-wrapper pre {
+    @apply p-4 overflow-x-auto rounded-md text-sm font-mono;
+    margin: 0;
+  }
+
+  .shiki-wrapper code {
+    @apply font-mono;
+  }
+
+  /* Ensure proper dark mode support for Shiki */
+  .dark .shiki,
+  .dark .shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
 }
