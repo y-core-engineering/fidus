@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { Link, Stack, Button } from '@fidus/ui';
 
 export default function MotionTokensPage() {
   const [isAnimating1, setIsAnimating1] = useState(false);
@@ -78,15 +79,16 @@ export default function MotionTokensPage() {
       <h3>Duration Comparison</h3>
       <div className="not-prose mb-8 space-y-6">
         <div>
-          <div className="flex items-center gap-4 mb-2">
+          <Stack direction="horizontal" spacing="md" className="mb-2">
             <span className="text-sm text-muted-foreground w-24">Fast (150ms)</span>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setIsAnimating1(!isAnimating1)}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium"
             >
               Trigger
-            </button>
-          </div>
+            </Button>
+          </Stack>
           <div className="relative h-16 bg-muted rounded-lg overflow-hidden">
             <div
               className="absolute top-4 w-12 h-8 bg-primary rounded-md transition-all"
@@ -100,15 +102,16 @@ export default function MotionTokensPage() {
         </div>
 
         <div>
-          <div className="flex items-center gap-4 mb-2">
+          <Stack direction="horizontal" spacing="md" className="mb-2">
             <span className="text-sm text-muted-foreground w-24">Normal (250ms)</span>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setIsAnimating2(!isAnimating2)}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium"
             >
               Trigger
-            </button>
-          </div>
+            </Button>
+          </Stack>
           <div className="relative h-16 bg-muted rounded-lg overflow-hidden">
             <div
               className="absolute top-4 w-12 h-8 bg-primary rounded-md transition-all"
@@ -122,15 +125,16 @@ export default function MotionTokensPage() {
         </div>
 
         <div>
-          <div className="flex items-center gap-4 mb-2">
+          <Stack direction="horizontal" spacing="md" className="mb-2">
             <span className="text-sm text-muted-foreground w-24">Slow (350ms)</span>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setIsAnimating3(!isAnimating3)}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium"
             >
               Trigger
-            </button>
-          </div>
+            </Button>
+          </Stack>
           <div className="relative h-16 bg-muted rounded-lg overflow-hidden">
             <div
               className="absolute top-4 w-12 h-8 bg-primary rounded-md transition-all"
@@ -391,6 +395,130 @@ export default function MotionTokensPage() {
         <li>Animations should enhance, not obstruct functionality</li>
         <li>Loading animations are exempt from motion reduction (they convey state)</li>
       </ul>
+
+      <h2>Animation Principles</h2>
+      <p>
+        Our motion system is built on four core principles that guide when and how to animate:
+      </p>
+
+      <h3>Purpose Over Polish</h3>
+      <p>
+        Animations should communicate state changes and guide user attention, not just add visual
+        decoration. Every animation must serve a functional purpose - whether that's confirming an
+        action, directing focus to new content, or showing a transition between states. If you can't
+        explain why an animation exists beyond "it looks nice," it probably shouldn't be there.
+      </p>
+
+      <h3>Consistency</h3>
+      <p>
+        Use the same duration and easing for similar interactions across the application for
+        predictable behavior. When users see a button hover animation, they form expectations about
+        how other interactive elements will behave. Breaking these expectations creates cognitive
+        load. Consistent motion patterns build user confidence and make the interface feel cohesive.
+      </p>
+
+      <h3>Hierarchy</h3>
+      <p>
+        More important elements get more noticeable animations. Modals use slower, more prominent
+        animations than tooltips. A critical notification might slide in with a bounce, while a
+        subtle state change gets a quick fade. This hierarchy helps users understand what demands
+        their immediate attention versus what can wait.
+      </p>
+
+      <h3>Performance</h3>
+      <p>
+        Prefer transforms and opacity changes (GPU-accelerated) over animating layout properties
+        like width and height. Animating layout properties forces the browser to recalculate styles,
+        layout, and paint - an expensive operation that causes jank. Transforms and opacity changes
+        are handled by the GPU compositor, ensuring smooth 60fps animations even on lower-end devices.
+      </p>
+      <pre className="not-prose">
+        <code>{`/* ✅ GOOD: GPU-accelerated */
+.element {
+  transform: translateX(100px);
+  opacity: 0;
+  transition: transform var(--duration-normal), opacity var(--duration-normal);
+}
+
+/* ❌ BAD: Triggers layout recalculation */
+.element {
+  width: 200px;
+  left: 100px;
+  transition: width var(--duration-normal), left var(--duration-normal);
+}`}</code>
+      </pre>
+
+      <h2>Related Tokens</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/tokens/color-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Color Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Colors for animated state changes</p>
+        </Link>
+        <Link
+          href="/tokens/shadow-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Shadow Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Elevation transitions and shadow animations</p>
+        </Link>
+        <Link
+          href="/tokens/spacing-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Spacing Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Transform distances for slide animations</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/design-system/app/tokens/motion-tokens/page.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API"
+              external
+              showIcon
+            >
+              Web Animations API Documentation
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://web.dev/animations/"
+              external
+              showIcon
+            >
+              Animation Performance Best Practices
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
