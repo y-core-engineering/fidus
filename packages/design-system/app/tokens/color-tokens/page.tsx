@@ -2,7 +2,6 @@
 
 import { ColorSwatch } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { CodeBlock } from '../../../components/helpers/code-block';
 import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
 import { useState, useEffect } from 'react';
@@ -156,22 +155,27 @@ export default function ColorTokensPage() {
         Tailwind utility classes are preconfigured to use these color tokens:
       </p>
       <div className="not-prose my-lg">
-        <ComponentPreview code={`<button className="bg-primary text-primary-foreground hover:bg-primary-hover">
+        <CodeBlock
+          language="tsx"
+          code={`<button className="bg-primary text-primary-foreground hover:bg-primary-hover">
   Primary Button
 </button>
 
 <div className="bg-muted text-muted-foreground border border-border">
   Muted Card
-</div>`}>
-          <div className="space-y-md">
-            <button className="bg-primary text-primary-foreground hover:bg-primary-hover px-md py-sm rounded-md transition-colors">
-              Primary Button
-            </button>
-            <div className="bg-muted text-muted-foreground border border-border p-md rounded-md">
-              Muted Card
-            </div>
+</div>`}
+        />
+      </div>
+      <p className="text-sm text-muted-foreground">Live preview:</p>
+      <div className="not-prose my-lg">
+        <div className="space-y-md p-md border border-border rounded-lg bg-card">
+          <button className="bg-primary text-primary-foreground hover:bg-primary-hover px-md py-sm rounded-md transition-colors">
+            Primary Button
+          </button>
+          <div className="bg-muted text-muted-foreground border border-border p-md rounded-md">
+            Muted Card
           </div>
-        </ComponentPreview>
+        </div>
       </div>
 
       <h2>Dark Mode</h2>
