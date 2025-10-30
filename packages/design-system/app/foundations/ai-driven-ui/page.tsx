@@ -205,36 +205,62 @@ export default function AIDrivenUIPage() {
                   {/* Dashboard Header */}
                   <div>
                     <h2 className="text-lg font-bold mb-1">Good morning</h2>
-                    <p className="text-xs text-muted-foreground">Here are your opportunities</p>
+                    <p className="text-xs text-muted-foreground">Your day at a glance</p>
                   </div>
 
-                  {/* Opportunity Surface - Card appears after LLM thinking */}
-                  {llmStep >= 5 && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <OpportunityCard
-                        title={current.card.title}
-                        urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
-                        context="AI-Generated"
-                        primaryAction={{
-                          label: current.card.primary,
-                          onClick: () => {}
-                        }}
-                        secondaryAction={{
-                          label: current.card.secondary,
-                          onClick: () => {}
-                        }}
-                      >
-                        <p className="text-sm">{current.card.content}</p>
-                      </OpportunityCard>
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-muted/50 rounded-lg p-2.5 border border-border">
+                      <div className="text-xs text-muted-foreground mb-0.5">Calendar</div>
+                      <div className="text-sm font-semibold">3 events</div>
                     </div>
-                  )}
+                    <div className="bg-muted/50 rounded-lg p-2.5 border border-border">
+                      <div className="text-xs text-muted-foreground mb-0.5">Budget</div>
+                      <div className="text-sm font-semibold">€475/500</div>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-2.5 border border-border">
+                      <div className="text-xs text-muted-foreground mb-0.5">Tasks</div>
+                      <div className="text-sm font-semibold">5 open</div>
+                    </div>
+                  </div>
 
-                  {/* Empty state before LLM completes */}
-                  {llmStep < 5 && (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p className="text-sm">Loading opportunities...</p>
-                    </div>
-                  )}
+                  {/* Opportunities Section */}
+                  <div>
+                    <h3 className="text-sm font-semibold mb-2">Opportunities</h3>
+
+                    {/* Opportunity Surface - Card appears after LLM thinking */}
+                    {llmStep >= 5 ? (
+                      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <OpportunityCard
+                          title={current.card.title}
+                          urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
+                          context="AI-Generated"
+                          primaryAction={{
+                            label: current.card.primary,
+                            onClick: () => {}
+                          }}
+                          secondaryAction={{
+                            label: current.card.secondary,
+                            onClick: () => {}
+                          }}
+                        >
+                          <p className="text-sm">{current.card.content}</p>
+                        </OpportunityCard>
+                      </div>
+                    ) : (
+                      // Empty state before LLM completes - shows dashboard skeleton
+                      <div className="bg-muted/30 rounded-lg p-4 border border-dashed border-border">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="flex gap-1">
+                            <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          </div>
+                          <span>Analyzing your day...</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
