@@ -4,7 +4,7 @@ import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
 import { Palette, Type, Ruler, Box, Zap, Download, FileJson, FileCode } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TokenInspector } from '../../components/helpers/token-inspector';
-import { ComponentPreview } from '../../components/helpers/component-preview';
+import { CodeBlock } from '../../components/helpers/code-block';
 import { getAllTokens, type DesignToken } from '../../components/helpers/get-tokens';
 
 export default function TokensOverviewPage() {
@@ -271,35 +271,33 @@ export default function TokensOverviewPage() {
       <div className="not-prose my-lg space-y-lg">
         <div>
           <h3 className="text-lg font-semibold mb-md">In CSS</h3>
-          <div className="bg-muted rounded-md p-md font-mono text-sm">
-            <pre className="text-foreground">
-              {`.button {
+          <CodeBlock
+            language="css"
+            code={`.button {
   background-color: hsl(var(--color-primary));
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   transition: background-color var(--duration-normal);
 }`}
-            </pre>
-          </div>
+          />
         </div>
 
         <div>
           <h3 className="text-lg font-semibold mb-md">In Tailwind CSS</h3>
-          <div className="bg-muted rounded-md p-md font-mono text-sm">
-            <pre className="text-foreground">
-              {`<button className="bg-primary text-primary-foreground px-lg py-md rounded-md text-md hover:bg-primary-hover transition-colors duration-normal">
+          <CodeBlock
+            language="tsx"
+            code={`<button className="bg-primary text-primary-foreground px-lg py-md rounded-md text-md hover:bg-primary-hover transition-colors duration-normal">
   Click me
 </button>`}
-            </pre>
-          </div>
+          />
         </div>
 
         <div>
           <h3 className="text-lg font-semibold mb-md">In React Components</h3>
-          <div className="bg-muted rounded-md p-md font-mono text-sm">
-            <pre className="text-foreground">
-              {`import { Button } from '@fidus/ui';
+          <CodeBlock
+            language="tsx"
+            code={`import { Button } from '@fidus/ui';
 
 function MyComponent() {
   return (
@@ -308,8 +306,7 @@ function MyComponent() {
     </Button>
   );
 }`}
-            </pre>
-          </div>
+          />
         </div>
       </div>
 
@@ -344,17 +341,18 @@ function MyComponent() {
               <span>Export tokens in your preferred format (JSON/CSS) for external use</span>
             </li>
           </ul>
-          <div className="mt-md p-md bg-success/10 rounded-md">
-            <ComponentPreview code={`<Button className="bg-primary text-primary-foreground p-md">\n  Good Example\n</Button>`}>
-              <Button className="bg-primary text-primary-foreground p-md">
-                Good Example
-              </Button>
-            </ComponentPreview>
+          <div className="mt-md">
+            <CodeBlock
+              language="tsx"
+              code={`<Button className="bg-primary text-primary-foreground p-md">
+  Good Example
+</Button>`}
+            />
           </div>
         </div>
 
         {/* Don'ts */}
-        <div className="border-2 border-error bg-error/10 rounded-lg p-lg">
+        <div className="border-2 border-error rounded-lg p-lg">
           <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
             <span className="text-2xl">✗</span> Don't
           </h3>
@@ -380,12 +378,13 @@ function MyComponent() {
               <span>Don't use color codes directly - use semantic color tokens</span>
             </li>
           </ul>
-          <div className="mt-md p-md bg-error/20 rounded-md">
-            <ComponentPreview code={`<button style={{ padding: '16px', background: '#FFD700' }}>\n  Bad Example\n</button>`}>
-              <button style={{ padding: '16px', background: '#FFD700' }} className="rounded-md text-black">
-                Bad Example
-              </button>
-            </ComponentPreview>
+          <div className="mt-md">
+            <CodeBlock
+              language="tsx"
+              code={`<button style={{ padding: '16px', background: '#FFD700' }}>
+  Bad Example
+</button>`}
+            />
           </div>
         </div>
       </div>
