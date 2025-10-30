@@ -1,640 +1,681 @@
 'use client';
 
-import { OpportunityCard, Alert, Badge, Button, Tabs, Tab } from '@fidus/ui';
+import { OpportunityCard, Alert, Badge, Button, Link, Stack } from '@fidus/ui';
+import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 
-// Mock opportunity data
-const mockOpportunities = [
-  {
-    id: '1',
-    type: 'budget-alert',
-    title: 'Food Budget Exceeded',
-    description: 'You have spent €1,250 of your €1,000 monthly food budget.',
-    priority: 'high' as const,
-    category: 'Finance',
-    timestamp: new Date(),
-    actions: [
-      { label: 'Adjust Budget', onClick: () => {} },
-      { label: 'View Transactions', onClick: () => {} },
+type TimeOfDay = 'morning' | 'afternoon' | 'evening';
+type UserSituation = 'normal' | 'overspent' | 'traveling';
+
+const OPPORTUNITIES_BY_CONTEXT = {
+  morning: {
+    normal: [
+      {
+        id: 'm1',
+        type: 'calendar-today',
+        title: 'Your Day at a Glance',
+        description: 'You have 3 meetings today. Next: Team Standup at 9:00 AM (in 30 minutes).',
+        priority: 'medium' as const,
+        category: 'Calendar',
+      },
+      {
+        id: 'm2',
+        type: 'commute-traffic',
+        title: 'Heavy Traffic on Your Route',
+        description: 'Your usual route to work has 15 min delays. Consider leaving 10 minutes early.',
+        priority: 'low' as const,
+        category: 'Travel',
+      },
+    ],
+    overspent: [
+      {
+        id: 'm3',
+        type: 'budget-alert',
+        title: 'Food Budget Exceeded',
+        description: 'You&apos;ve spent €1,250 of your €1,000 monthly food budget. Consider meal planning.',
+        priority: 'high' as const,
+        category: 'Finance',
+      },
+      {
+        id: 'm1',
+        type: 'calendar-today',
+        title: 'Your Day at a Glance',
+        description: 'You have 3 meetings today. Next: Team Standup at 9:00 AM (in 30 minutes).',
+        priority: 'medium' as const,
+        category: 'Calendar',
+      },
+    ],
+    traveling: [
+      {
+        id: 'm4',
+        type: 'flight-checkin',
+        title: 'Flight to Berlin - Check-in Open',
+        description: 'Your flight LH2134 departs tomorrow at 10:30 AM. Check in now to select your seat.',
+        priority: 'high' as const,
+        category: 'Travel',
+      },
+      {
+        id: 'm5',
+        type: 'weather-destination',
+        title: 'Rain Expected in Berlin',
+        description: 'Pack an umbrella - 80% chance of rain on Wednesday.',
+        priority: 'low' as const,
+        category: 'Weather',
+      },
     ],
   },
-  {
-    id: '2',
-    type: 'calendar-conflict',
-    title: 'Schedule Conflict Detected',
-    description: 'You have two appointments at 2:00 PM today: Team Meeting and Doctor Appointment.',
-    priority: 'high' as const,
-    category: 'Calendar',
-    timestamp: new Date(),
-    actions: [
-      { label: 'Reschedule', onClick: () => {} },
-      { label: 'View Calendar', onClick: () => {} },
+  afternoon: {
+    normal: [
+      {
+        id: 'a1',
+        type: 'email-pending',
+        title: '3 Emails Need Response',
+        description: 'You have 3 unread emails that require action.',
+        priority: 'medium' as const,
+        category: 'Communication',
+      },
+    ],
+    overspent: [
+      {
+        id: 'a2',
+        type: 'spending-insight',
+        title: 'Spending Pattern Detected',
+        description: 'You spend 40% more on weekends vs. weekdays. Review your budget strategy?',
+        priority: 'low' as const,
+        category: 'Finance',
+      },
+    ],
+    traveling: [
+      {
+        id: 'a3',
+        type: 'meeting-prep',
+        title: 'Tomorrow&apos;s Meeting in Berlin',
+        description: 'Client presentation at 2 PM. Meeting room booked, agenda ready.',
+        priority: 'medium' as const,
+        category: 'Calendar',
+      },
     ],
   },
-  {
-    id: '3',
-    type: 'weather',
-    title: 'Rain Expected This Afternoon',
-    description: 'There is a 80% chance of rain starting at 3:00 PM. Consider bringing an umbrella.',
-    priority: 'low' as const,
-    category: 'Weather',
-    timestamp: new Date(),
-    actions: [
-      { label: 'View Forecast', onClick: () => {} },
+  evening: {
+    normal: [
+      {
+        id: 'e1',
+        type: 'tomorrow-preview',
+        title: 'Tomorrow: 2 Meetings, 1 Deadline',
+        description: 'Your schedule tomorrow: Client call 10 AM, Team sync 3 PM, Q4 report due.',
+        priority: 'low' as const,
+        category: 'Calendar',
+      },
+    ],
+    overspent: [
+      {
+        id: 'e2',
+        type: 'grocery-suggestion',
+        title: 'Meal Plan for This Week?',
+        description: 'Save €200/month by meal planning. Create a grocery list based on your budget.',
+        priority: 'medium' as const,
+        category: 'Finance',
+      },
+    ],
+    traveling: [
+      {
+        id: 'e3',
+        type: 'packing-reminder',
+        title: 'Don&apos;t Forget to Pack',
+        description: 'Flight tomorrow at 10:30 AM. Chargers, passport, presentation materials.',
+        priority: 'high' as const,
+        category: 'Travel',
+      },
     ],
   },
-  {
-    id: '4',
-    type: 'travel-prep',
-    title: 'Upcoming Trip to Berlin',
-    description: 'Your flight to Berlin is in 3 days. Time to start packing and checking travel documents.',
-    priority: 'medium' as const,
-    category: 'Travel',
-    timestamp: new Date(),
-    actions: [
-      { label: 'View Checklist', onClick: () => {} },
-      { label: 'Flight Details', onClick: () => {} },
-    ],
-  },
-  {
-    id: '5',
-    type: 'bill-due',
-    title: 'Internet Bill Due Soon',
-    description: 'Your internet bill of €49.99 is due in 2 days. Pay now to avoid late fees.',
-    priority: 'medium' as const,
-    category: 'Finance',
-    timestamp: new Date(),
-    actions: [
-      { label: 'Pay Now', onClick: () => {} },
-      { label: 'Set Reminder', onClick: () => {} },
-    ],
-  },
-];
+};
 
 export default function OpportunitySurfacePage() {
-  const [opportunities, setOpportunities] = useState(mockOpportunities);
-  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('morning');
+  const [userSituation, setUserSituation] = useState<UserSituation>('normal');
+  const [opportunities, setOpportunities] = useState(OPPORTUNITIES_BY_CONTEXT.morning.normal);
+
+  const updateContext = (newTime: TimeOfDay, newSituation: UserSituation) => {
+    setTimeOfDay(newTime);
+    setUserSituation(newSituation);
+    setOpportunities(OPPORTUNITIES_BY_CONTEXT[newTime][newSituation]);
+  };
 
   const handleDismiss = (id: string) => {
     setOpportunities(opportunities.filter(opp => opp.id !== id));
   };
 
-  const filteredOpportunities = activeFilter === 'all'
-    ? opportunities
-    : opportunities.filter(opp => opp.category.toLowerCase() === activeFilter);
-
   return (
-    <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
-      <div>
-        <h1 className="mb-2 text-4xl font-bold">Opportunity Surface</h1>
-        <p className="text-lg text-muted-foreground">
-          The AI-curated dashboard that dynamically shows relevant opportunities based on context, replacing traditional static dashboards.
-        </p>
+    <div className="prose prose-neutral dark:prose-invert max-w-none">
+      <h1>Opportunity Surface Pattern</h1>
+      <p className="lead">
+        AI-driven dashboard that shows contextually relevant opportunities instead of static widgets. Same user, different context = different dashboard.
+      </p>
+
+      <h2>The Problem with Traditional Dashboards</h2>
+      <p>
+        Traditional dashboards show the <strong>same widgets</strong> to everyone, all the time:
+      </p>
+
+      <div className="not-prose my-lg">
+        <div className="rounded-lg border-2 border-border bg-muted/30 p-lg">
+          <h3 className="text-base font-semibold mb-md">❌ Traditional Dashboard (Static)</h3>
+          <div className="grid gap-md md:grid-cols-3">
+            <div className="rounded-lg border border-border bg-card p-md">
+              <div className="text-sm font-semibold mb-xs">Weather Widget</div>
+              <div className="text-xs text-muted-foreground">Always visible, even when irrelevant</div>
+            </div>
+            <div className="rounded-lg border border-border bg-card p-md">
+              <div className="text-sm font-semibold mb-xs">Calendar Widget</div>
+              <div className="text-xs text-muted-foreground">Shows full month, not today&apos;s urgency</div>
+            </div>
+            <div className="rounded-lg border border-border bg-card p-md">
+              <div className="text-sm font-semibold mb-xs">Finance Widget</div>
+              <div className="text-xs text-muted-foreground">Generic totals, no actionable insights</div>
+            </div>
+          </div>
+          <div className="mt-md text-sm text-muted-foreground">
+            💡 Same layout at 7 AM (rushing to work) and 8 PM (planning tomorrow)
+          </div>
+        </div>
       </div>
 
-      {/* What is Opportunity Surface */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">What is Opportunity Surface?</h2>
-          <div className="space-y-3 rounded-lg border border-border bg-card p-6">
-            <p className="text-muted-foreground">
-              The Opportunity Surface is Fidus's AI-driven dashboard that replaces traditional static dashboards with dynamic, contextual content.
-              Instead of showing fixed widgets, it displays relevant opportunities that are curated by an LLM based on:
-            </p>
-            <ul className="ml-6 list-disc space-y-2 text-muted-foreground">
-              <li><strong>Time:</strong> Morning might show weather and today's schedule, evening might show tomorrow's appointments</li>
-              <li><strong>Location:</strong> Nearby events, local weather, location-based reminders</li>
-              <li><strong>User History:</strong> Previously engaged opportunities, user preferences, behavior patterns</li>
-              <li><strong>Domain Signals:</strong> Budget alerts, calendar conflicts, bill due dates, travel preparations</li>
+      <h2>Opportunity Surface: Context-Adaptive Dashboard</h2>
+      <p>
+        The Opportunity Surface shows <strong>only what&apos;s relevant right now</strong>. The LLM evaluates:
+      </p>
+
+      <div className="not-prose my-lg">
+        <div className="grid gap-md md:grid-cols-2">
+          <div className="rounded-lg border border-border bg-card p-md">
+            <h4 className="text-sm font-semibold mb-sm">🕐 Time Context</h4>
+            <ul className="text-xs space-y-xs text-muted-foreground">
+              <li>• Morning (7 AM): Today&apos;s schedule + commute traffic</li>
+              <li>• Afternoon (2 PM): Pending tasks + emails</li>
+              <li>• Evening (8 PM): Tomorrow&apos;s prep</li>
             </ul>
-            <Alert variant="info" className="mt-4">
-              <strong>Key Principle:</strong> The LLM decides what to show, not hardcoded logic. The same user might see different opportunities at different times based on contextual relevance.
-            </Alert>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-md">
+            <h4 className="text-sm font-semibold mb-sm">📊 User Situation</h4>
+            <ul className="text-xs space-y-xs text-muted-foreground">
+              <li>• Budget overspent: Financial guidance cards</li>
+              <li>• Traveling tomorrow: Flight check-in, weather, packing</li>
+              <li>• Normal day: Calendar + relevant tasks</li>
+            </ul>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Traditional vs Opportunity Surface */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Traditional Dashboard vs Opportunity Surface</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-3 text-left font-semibold">Aspect</th>
-                  <th className="p-3 text-left font-semibold">Traditional Dashboard</th>
-                  <th className="p-3 text-left font-semibold">Opportunity Surface</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-semibold">Content</td>
-                  <td className="p-3 text-muted-foreground">Fixed widgets (Weather, Calendar, Finance)</td>
-                  <td className="p-3 text-muted-foreground">Dynamic opportunity cards</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-semibold">Visibility</td>
-                  <td className="p-3 text-muted-foreground">Always visible</td>
-                  <td className="p-3 text-muted-foreground">Contextually relevant</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-semibold">Configuration</td>
-                  <td className="p-3 text-muted-foreground">User configures manually</td>
-                  <td className="p-3 text-muted-foreground">LLM decides based on context</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-semibold">Dismissal</td>
-                  <td className="p-3 text-muted-foreground">Auto-hide after timeout</td>
-                  <td className="p-3 text-muted-foreground">User controls (swipe/X button)</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-semibold">Personalization</td>
-                  <td className="p-3 text-muted-foreground">Limited to widget selection</td>
-                  <td className="p-3 text-muted-foreground">Deep contextual adaptation</td>
-                </tr>
-              </tbody>
-            </table>
+      <h2>Interactive Context Demo</h2>
+      <p className="text-sm text-muted-foreground">
+        Change the time and user situation to see how the Opportunity Surface adapts dynamically.
+      </p>
+
+      <div className="not-prose my-lg">
+        <ComponentPreview code={`const [timeOfDay, setTimeOfDay] = useState('morning');
+const [userSituation, setUserSituation] = useState('normal');
+const [opportunities, setOpportunities] = useState(OPPORTUNITIES_BY_CONTEXT.morning.normal);
+
+const updateContext = (newTime, newSituation) => {
+  setOpportunities(OPPORTUNITIES_BY_CONTEXT[newTime][newSituation]);
+};
+
+<div className="space-y-md">
+  {/* Context Controls */}
+  <div className="flex gap-md">
+    <Button onClick={() => updateContext('morning', userSituation)}>
+      Morning (7 AM)
+    </Button>
+    <Button onClick={() => updateContext('afternoon', userSituation)}>
+      Afternoon (2 PM)
+    </Button>
+    <Button onClick={() => updateContext('evening', userSituation)}>
+      Evening (8 PM)
+    </Button>
+  </div>
+
+  {/* Opportunities */}
+  {opportunities.map(opp => (
+    <OpportunityCard key={opp.id} {...opp} onDismiss={() => handleDismiss(opp.id)} />
+  ))}
+</div>`}>
+          <div className="space-y-md">
+            {/* Context Controls */}
+            <div className="rounded-lg bg-muted/50 p-md border border-border">
+              <div className="mb-md">
+                <h4 className="text-sm font-semibold mb-sm">🕐 Time of Day</h4>
+                <Stack direction="horizontal" spacing="sm">
+                  <Button
+                    size="small"
+                    variant={timeOfDay === 'morning' ? 'primary' : 'secondary'}
+                    onClick={() => updateContext('morning', userSituation)}
+                  >
+                    Morning (7 AM)
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={timeOfDay === 'afternoon' ? 'primary' : 'secondary'}
+                    onClick={() => updateContext('afternoon', userSituation)}
+                  >
+                    Afternoon (2 PM)
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={timeOfDay === 'evening' ? 'primary' : 'secondary'}
+                    onClick={() => updateContext('evening', userSituation)}
+                  >
+                    Evening (8 PM)
+                  </Button>
+                </Stack>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold mb-sm">👤 User Situation</h4>
+                <Stack direction="horizontal" spacing="sm">
+                  <Button
+                    size="small"
+                    variant={userSituation === 'normal' ? 'primary' : 'secondary'}
+                    onClick={() => updateContext(timeOfDay, 'normal')}
+                  >
+                    Normal Day
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={userSituation === 'overspent' ? 'primary' : 'secondary'}
+                    onClick={() => updateContext(timeOfDay, 'overspent')}
+                  >
+                    Budget Overspent
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={userSituation === 'traveling' ? 'primary' : 'secondary'}
+                    onClick={() => updateContext(timeOfDay, 'traveling')}
+                  >
+                    Traveling Tomorrow
+                  </Button>
+                </Stack>
+              </div>
+            </div>
+
+            {/* Current Context Indicator */}
+            <div className="rounded-lg bg-primary/10 border border-primary/30 p-md">
+              <div className="flex items-center gap-sm text-sm">
+                <span className="font-semibold">Current Context:</span>
+                <Badge variant="default">
+                  {timeOfDay === 'morning' ? '🌅 7:00 AM' : timeOfDay === 'afternoon' ? '☀️ 2:00 PM' : '🌆 8:00 PM'}
+                </Badge>
+                <Badge variant="default">
+                  {userSituation === 'normal' ? '📅 Normal' : userSituation === 'overspent' ? '💰 Budget Alert' : '✈️ Travel'}
+                </Badge>
+              </div>
+            </div>
+
+            {/* Opportunity Cards */}
+            <div className="space-y-md">
+              {opportunities.length > 0 ? (
+                opportunities.map(opp => (
+                  <OpportunityCard
+                    key={opp.id}
+                    {...opp}
+                    onDismiss={() => handleDismiss(opp.id)}
+                  />
+                ))
+              ) : (
+                <div className="rounded-lg border border-dashed border-border bg-card p-xl text-center">
+                  <p className="text-sm text-muted-foreground">
+                    All opportunities dismissed. The LLM will evaluate new ones based on changing context.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </ComponentPreview>
+      </div>
 
-      {/* How it Works */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">How It Works</h2>
-          <div className="space-y-4">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white font-semibold">1</div>
-                  <div>
-                    <h3 className="font-semibold">Domains Emit Triggers</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Each domain (Finance, Calendar, Travel, etc.) emits proactive triggers when something relevant happens:
-                      BUDGET_EXCEEDED, CALENDAR_CONFLICT, BILL_DUE_SOON, etc.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white font-semibold">2</div>
-                  <div>
-                    <h3 className="font-semibold">Opportunity Service Evaluates Relevance</h3>
-                    <p className="text-sm text-muted-foreground">
-                      The Opportunity Service uses an LLM to evaluate each trigger's relevance based on current context
-                      (time, location, user history, current activity).
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white font-semibold">3</div>
-                  <div>
-                    <h3 className="font-semibold">Ranks by Weighted Score</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Opportunities are ranked by a weighted score combining urgency, relevance, confidence, and user engagement history.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white font-semibold">4</div>
-                  <div>
-                    <h3 className="font-semibold">Renders as OpportunityCard Components</h3>
-                    <p className="text-sm text-muted-foreground">
-                      The top 5-7 opportunities are rendered as dismissible cards on the dashboard.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white font-semibold">5</div>
-                  <div>
-                    <h3 className="font-semibold">User Dismisses</h3>
-                    <p className="text-sm text-muted-foreground">
-                      User can dismiss cards via swipe gesture or X button. Dismissal state is persisted to avoid showing the same opportunity again.
-                    </p>
-                  </div>
+      <h2>Real-World Example: Same User, 3 Different Times</h2>
+      <div className="not-prose my-lg space-y-md">
+        <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-md">
+          <div className="flex items-start gap-md">
+            <div className="text-2xl">🌅</div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold mb-xs">Morning (7:00 AM) - Rushing to Work</h4>
+              <div className="text-xs text-muted-foreground mb-sm">
+                <strong>Context:</strong> User is about to leave for work
+              </div>
+              <div className="bg-card rounded-lg p-sm border border-border">
+                <div className="text-xs space-y-xs">
+                  <div>✓ <strong>Today&apos;s Schedule</strong> - First meeting in 2 hours</div>
+                  <div>✓ <strong>Traffic Alert</strong> - Route has 15 min delay</div>
+                  <div className="text-muted-foreground">❌ Tomorrow&apos;s calendar (not urgent)</div>
+                  <div className="text-muted-foreground">❌ Weekly spending report (not time-sensitive)</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Opportunity Card Structure */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Opportunity Card Structure</h2>
-          <p className="mb-4 text-muted-foreground">
-            Each opportunity is rendered as an OpportunityCard component with a consistent structure:
-          </p>
-
-          <div className="rounded-lg border border-border bg-card p-6">
-            <div className="mb-4 rounded-lg bg-muted p-4">
-              <p className="mb-2 text-sm font-semibold">OpportunityCard Props:</p>
-              <pre className="overflow-x-auto text-xs">
-{`interface OpportunityCardProps {
-  id: string;                    // Unique identifier
-  type: string;                  // Trigger type (e.g., 'budget-alert')
-  title: string;                 // Card title
-  description: string;           // Detailed description
-  priority: 'low' | 'medium' | 'high';  // Visual urgency
-  category?: string;             // Domain category (Finance, Calendar, etc.)
-  timestamp?: Date;              // When opportunity was created
-  actions?: Array<{              // Action buttons
-    label: string;
-    onClick: () => void;
-  }>;
-  onDismiss: () => void;        // Dismiss handler
-}`}
-              </pre>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Example */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Live Example</h2>
-          <p className="mb-4 text-muted-foreground">
-            This is what an Opportunity Surface might look like. Try dismissing cards using the X button.
-          </p>
-
-          {/* Filter tabs */}
-          <div className="mb-4 flex gap-2">
-            <Button
-              variant={activeFilter === 'all' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setActiveFilter('all')}
-            >
-              All ({opportunities.length})
-            </Button>
-            <Button
-              variant={activeFilter === 'finance' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setActiveFilter('finance')}
-            >
-              Finance ({opportunities.filter(o => o.category === 'Finance').length})
-            </Button>
-            <Button
-              variant={activeFilter === 'calendar' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setActiveFilter('calendar')}
-            >
-              Calendar ({opportunities.filter(o => o.category === 'Calendar').length})
-            </Button>
-            <Button
-              variant={activeFilter === 'travel' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setActiveFilter('travel')}
-            >
-              Travel ({opportunities.filter(o => o.category === 'Travel').length})
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {filteredOpportunities.length > 0 ? (
-              filteredOpportunities.map(opp => (
-                <OpportunityCard
-                  key={opp.id}
-                  {...opp}
-                  onDismiss={() => handleDismiss(opp.id)}
-                />
-              ))
-            ) : (
-              <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
-                <p className="text-muted-foreground">No opportunities to show right now. Check back later!</p>
+        <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-md">
+          <div className="flex items-start gap-md">
+            <div className="text-2xl">☀️</div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold mb-xs">Afternoon (2:00 PM) - Work Mode</h4>
+              <div className="text-xs text-muted-foreground mb-sm">
+                <strong>Context:</strong> User is at work, focused on tasks
               </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Opportunity Types */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Opportunity Types (Examples)</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="p-3 text-left font-semibold">Type</th>
-                  <th className="p-3 text-left font-semibold">Domain</th>
-                  <th className="p-3 text-left font-semibold">Priority</th>
-                  <th className="p-3 text-left font-semibold">Example</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-mono text-xs">BUDGET_EXCEEDED</td>
-                  <td className="p-3">Finance</td>
-                  <td className="p-3">
-                    <Badge variant="error">High</Badge>
-                  </td>
-                  <td className="p-3 text-muted-foreground">Food budget exceeded by €250</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-mono text-xs">CALENDAR_CONFLICT</td>
-                  <td className="p-3">Calendar</td>
-                  <td className="p-3">
-                    <Badge variant="error">High</Badge>
-                  </td>
-                  <td className="p-3 text-muted-foreground">Two appointments at same time</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-mono text-xs">BILL_DUE_SOON</td>
-                  <td className="p-3">Finance</td>
-                  <td className="p-3">
-                    <Badge variant="warning">Medium</Badge>
-                  </td>
-                  <td className="p-3 text-muted-foreground">Internet bill due in 2 days</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-mono text-xs">TRAVEL_PREP</td>
-                  <td className="p-3">Travel</td>
-                  <td className="p-3">
-                    <Badge variant="warning">Medium</Badge>
-                  </td>
-                  <td className="p-3 text-muted-foreground">Flight in 3 days, start packing</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-mono text-xs">WEATHER_RELEVANT</td>
-                  <td className="p-3">Weather</td>
-                  <td className="p-3">
-                    <Badge variant="default">Low</Badge>
-                  </td>
-                  <td className="p-3 text-muted-foreground">Rain expected this afternoon</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="p-3 font-mono text-xs">SAVINGS_SUGGESTION</td>
-                  <td className="p-3">Finance</td>
-                  <td className="p-3">
-                    <Badge variant="default">Low</Badge>
-                  </td>
-                  <td className="p-3 text-muted-foreground">You could save €50/month on subscriptions</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Ranking & Filtering */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Ranking & Filtering</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-card p-6">
-            <div>
-              <h3 className="mb-2 font-semibold">Relevance Factors</h3>
-              <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
-                <li><strong>Time-based:</strong> Morning = weather and today's schedule, evening = tomorrow's appointments</li>
-                <li><strong>Location-based:</strong> Nearby events, local weather, location-triggered reminders</li>
-                <li><strong>User Behavior:</strong> Previously engaged with similar opportunities, preferences</li>
-                <li><strong>Confidence Score:</strong> Domain's confidence in the opportunity's accuracy</li>
-                <li><strong>Urgency:</strong> High-priority opportunities (conflicts, exceeded budgets) rank higher</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="mb-2 font-semibold">User Controls</h3>
-              <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
-                <li><strong>Filter by Category:</strong> Show only Finance, Calendar, Travel, etc.</li>
-                <li><strong>Dismiss Individual Cards:</strong> Swipe or X button removes card</li>
-                <li><strong>Snooze:</strong> Remind me later (reappears based on time)</li>
-                <li><strong>Never Show Again:</strong> Permanently dismiss this type of opportunity</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="mb-2 font-semibold">Display Limits</h3>
-              <p className="text-sm text-muted-foreground">
-                Show maximum 5-7 opportunities at once to avoid overwhelming the user. Lower-priority opportunities
-                are queued and shown after higher-priority ones are dismissed or resolved.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Code Examples */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Implementation Examples</h2>
-
-          <div className="space-y-4">
-            <div>
-              <h3 className="mb-3 font-semibold">Fetching Opportunities</h3>
-              <div className="rounded-lg bg-muted p-4">
-                <pre className="overflow-x-auto text-xs">
-{`import { useQuery } from '@tanstack/react-query';
-
-function useOpportunities() {
-  return useQuery({
-    queryKey: ['opportunities'],
-    queryFn: async () => {
-      const response = await fetch('/api/opportunities', {
-        headers: {
-          'X-User-Context': JSON.stringify({
-            time: new Date().toISOString(),
-            location: userLocation,
-            activity: currentActivity,
-          }),
-        },
-      });
-      return response.json();
-    },
-    refetchInterval: 60000, // Refetch every minute
-  });
-}
-
-function OpportunitySurface() {
-  const { data: opportunities, isLoading } = useOpportunities();
-
-  if (isLoading) return <LoadingState />;
-
-  return (
-    <div className="space-y-4">
-      {opportunities.map(opp => (
-        <OpportunityCard key={opp.id} {...opp} />
-      ))}
-    </div>
-  );
-}`}
-                </pre>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="mb-3 font-semibold">Handling Dismissal</h3>
-              <div className="rounded-lg bg-muted p-4">
-                <pre className="overflow-x-auto text-xs">
-{`async function handleDismiss(opportunityId: string) {
-  // Optimistic update
-  setOpportunities(prev => prev.filter(o => o.id !== opportunityId));
-
-  // Persist dismissal
-  await fetch(\`/api/opportunities/\${opportunityId}/dismiss\`, {
-    method: 'POST',
-  });
-
-  // Show toast confirmation
-  toast({
-    title: 'Opportunity dismissed',
-    variant: 'success',
-  });
-}
-
-<OpportunityCard
-  {...opportunity}
-  onDismiss={() => handleDismiss(opportunity.id)}
-/>`}
-                </pre>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="mb-3 font-semibold">Real-time Updates (WebSocket)</h3>
-              <div className="rounded-lg bg-muted p-4">
-                <pre className="overflow-x-auto text-xs">
-{`import { useEffect } from 'react';
-
-function useOpportunityUpdates() {
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const ws = new WebSocket('ws://api.fidus.ai/opportunities');
-
-    ws.onmessage = (event) => {
-      const update = JSON.parse(event.data);
-
-      if (update.type === 'new_opportunity') {
-        // Add new opportunity to the list
-        queryClient.setQueryData(['opportunities'], (old: any[]) => [
-          update.opportunity,
-          ...old,
-        ]);
-      } else if (update.type === 'opportunity_resolved') {
-        // Remove resolved opportunity
-        queryClient.setQueryData(['opportunities'], (old: any[]) =>
-          old.filter(o => o.id !== update.opportunityId)
-        );
-      }
-    };
-
-    return () => ws.close();
-  }, [queryClient]);
-}`}
-                </pre>
+              <div className="bg-card rounded-lg p-sm border border-border">
+                <div className="text-xs space-y-xs">
+                  <div>✓ <strong>3 Emails Need Response</strong> - Pending actions</div>
+                  <div>✓ <strong>Meeting Prep</strong> - Tomorrow&apos;s client call</div>
+                  <div className="text-muted-foreground">❌ Traffic alerts (already at work)</div>
+                  <div className="text-muted-foreground">❌ Morning schedule (past)</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Best Practices */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Best Practices</h2>
-          <div className="space-y-4">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h3 className="mb-3 font-semibold text-success">✅ Do</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Let the LLM decide what opportunities to show based on context</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Provide clear, actionable buttons (not just "View Details")</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Allow user dismissal via swipe or X button</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Limit to 5-7 visible opportunities at once</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Update in real-time when new opportunities arise</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Persist dismissal state to avoid re-showing</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-lg border border-error bg-error/5 p-6">
-              <h3 className="mb-3 font-semibold text-error">❌ Don't</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Auto-hide opportunities after a timeout</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Show too many opportunities at once (causes overwhelm)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Ignore user context (time, location, history)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Use hardcoded "if morning, show weather" logic</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Require user to manually configure what to show</span>
-                </li>
-              </ul>
+        <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-md">
+          <div className="flex items-start gap-md">
+            <div className="text-2xl">🌆</div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold mb-xs">Evening (8:00 PM) - Planning Mode</h4>
+              <div className="text-xs text-muted-foreground mb-sm">
+                <strong>Context:</strong> User is home, planning tomorrow
+              </div>
+              <div className="bg-card rounded-lg p-sm border border-border">
+                <div className="text-xs space-y-xs">
+                  <div>✓ <strong>Tomorrow Preview</strong> - 2 meetings, 1 deadline</div>
+                  <div>✓ <strong>Flight Check-in</strong> - If traveling tomorrow</div>
+                  <div className="text-muted-foreground">❌ Today&apos;s schedule (past)</div>
+                  <div className="text-muted-foreground">❌ Current traffic (not relevant)</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Accessibility */}
-      <section className="space-y-4">
+      <h2>How It Works</h2>
+      <div className="not-prose space-y-md my-lg">
+        <div className="flex items-start gap-md">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold text-sm">1</div>
+          <div>
+            <h3 className="font-semibold mb-xs">Domains Emit Triggers</h3>
+            <p className="text-sm text-muted-foreground">
+              Finance domain detects: <code className="text-xs">BUDGET_EXCEEDED</code><br/>
+              Calendar domain detects: <code className="text-xs">MEETING_IN_30MIN</code><br/>
+              Travel domain detects: <code className="text-xs">FLIGHT_CHECKIN_OPEN</code>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-md">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold text-sm">2</div>
+          <div>
+            <h3 className="font-semibold mb-xs">LLM Scores Relevance</h3>
+            <p className="text-sm text-muted-foreground">
+              Context: 7:00 AM, user at home, normal day<br/>
+              • <code className="text-xs">MEETING_IN_30MIN</code> → Score: 95 (high urgency + time-sensitive)<br/>
+              • <code className="text-xs">BUDGET_EXCEEDED</code> → Score: 40 (important but not urgent now)<br/>
+              • <code className="text-xs">WEEKLY_REPORT</code> → Score: 10 (not time-sensitive)
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-md">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold text-sm">3</div>
+          <div>
+            <h3 className="font-semibold mb-xs">Top Opportunities Rendered</h3>
+            <p className="text-sm text-muted-foreground">
+              Only opportunities with score &gt; 70 are shown as OpportunityCards on the dashboard. User controls dismissal (no auto-hide).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h2>Usage Guidelines</h2>
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Accessibility</h2>
-          <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-            <li><strong>Screen Reader Announcements:</strong> New opportunities announced with aria-live="polite"</li>
-            <li><strong>Keyboard Navigation:</strong> Tab to navigate cards, Enter to activate actions, X key to dismiss</li>
-            <li><strong>Focus Management:</strong> Focus moves to next card after dismissal</li>
-            <li><strong>Alternative Text:</strong> Icons and visual indicators have text alternatives</li>
-            <li><strong>Color Independence:</strong> Priority indicated by badge text, not just color</li>
+          <h3 className="text-lg font-semibold mb-md">When to use</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>As the main dashboard/home screen in AI-driven applications</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When user context significantly affects what&apos;s relevant (time, location, situation)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When you want to surface proactive insights, not just reactive responses</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When different users (or same user at different times) need different content</span>
+            </li>
           </ul>
         </div>
-      </section>
 
-      {/* Mobile Considerations */}
-      <section className="space-y-4">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Mobile Considerations</h2>
-          <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-            <li><strong>Swipe to Dismiss:</strong> Swipe left/right on card to dismiss (like iOS notifications)</li>
-            <li><strong>Tap Actions:</strong> Primary action on tap, secondary actions in bottom sheet</li>
-            <li><strong>Vertical Scroll:</strong> Cards stack vertically with comfortable spacing</li>
-            <li><strong>Pull to Refresh:</strong> Pull down to fetch latest opportunities</li>
-            <li><strong>Reduced Motion:</strong> Respect prefers-reduced-motion for animations</li>
+          <h3 className="text-lg font-semibold mb-md">Best practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Let LLM decide relevance based on context - don&apos;t hardcode &quot;if morning, show X&quot;</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>User controls dismissal (X button, swipe) - NEVER auto-hide based on timers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Show 2-5 opportunities max - prioritize quality over quantity</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Re-evaluate opportunities when context changes (time passes, location changes)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Include actionable CTAs in OpportunityCards (not just passive info)</span>
+            </li>
           </ul>
         </div>
-      </section>
 
-      {/* Related Components */}
-      <section className="space-y-4">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Related Components</h2>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="default">OpportunityCard</Badge>
-            <Badge variant="default">Alert</Badge>
-            <Badge variant="default">Banner</Badge>
-            <Badge variant="default">Toast</Badge>
-            <Badge variant="default">Badge</Badge>
-          </div>
+          <h3 className="text-lg font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Announce new opportunities with aria-live=&quot;polite&quot;</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Dismissal buttons must have clear aria-labels (&quot;Dismiss budget alert&quot;)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Ensure keyboard navigation between opportunities and actions</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>High-priority opportunities should have higher contrast/visual weight</span>
+            </li>
+          </ul>
         </div>
-      </section>
+      </div>
+
+      <h2 className="mt-2xl">Do&apos;s and Don&apos;ts</h2>
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Let LLM evaluate relevance based on full context</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Give user full control over dismissal (X button, swipe)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Re-evaluate opportunities as context changes</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Include clear CTAs in opportunity cards</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Show empty state when no relevant opportunities exist</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Prioritize time-sensitive opportunities in the morning</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="border-2 border-error rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don&apos;t
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Hardcode &quot;if morning, show calendar widget&quot; logic</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Auto-hide opportunities after timeout (user controls dismissal)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Show static widgets that never change</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Overwhelm with 10+ opportunities at once</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Ignore context changes (time, location, user state)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Mix Opportunity Surface with traditional fixed navigation</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Related Components &amp; Patterns</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/components/opportunity-card"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            OpportunityCard
+          </h3>
+          <p className="text-sm text-muted-foreground">The card component used in Opportunity Surface</p>
+        </Link>
+
+        <Link
+          href="/architecture/ui-decision-layer"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            UI Decision Layer
+          </h3>
+          <p className="text-sm text-muted-foreground">How LLM decides which UI to render</p>
+        </Link>
+
+        <Link
+          href="/foundations/ai-driven-ui"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            AI-Driven UI Paradigm
+          </h3>
+          <p className="text-sm text-muted-foreground">Core principles of context-adaptive UI</p>
+        </Link>
+
+        <Link
+          href="/components/alert"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Alert
+          </h3>
+          <p className="text-sm text-muted-foreground">For high-priority opportunities</p>
+        </Link>
+
+        <Link
+          href="/components/badge"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Badge
+          </h3>
+          <p className="text-sm text-muted-foreground">Priority and category indicators</p>
+        </Link>
+
+        <Link
+          href="/patterns/empty-states"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Empty States
+          </h3>
+          <p className="text-sm text-muted-foreground">When no opportunities exist</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link variant="standalone" href="/foundations/ai-driven-ui">
+              AI-Driven UI Paradigm - Core Philosophy
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/architecture/ui-decision-layer">
+              UI Decision Layer - Technical Implementation
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.nngroup.com/articles/personalization/"
+              external
+              showIcon
+            >
+              Nielsen Norman Group: Personalization
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.nngroup.com/articles/context-sensitive-help/"
+              external
+              showIcon
+            >
+              Nielsen Norman Group: Context-Sensitive Help
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

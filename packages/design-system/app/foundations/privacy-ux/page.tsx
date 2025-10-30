@@ -14,32 +14,32 @@ export default function PrivacyUXPage() {
 
       <h2>Core Privacy Principles</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-        <div className="border border-border rounded-lg p-4 bg-card">
-          <h3 className="text-base font-semibold mb-2">1. Transparency</h3>
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+        <div className="border border-border rounded-lg p-md bg-card">
+          <h3 className="text-base font-semibold mb-sm">1. Transparency</h3>
           <p className="text-sm">
             Users always know where their data is processed, stored, and who has access. No hidden
             data flows.
           </p>
         </div>
 
-        <div className="border border-border rounded-lg p-4 bg-card">
-          <h3 className="text-base font-semibold mb-2">2. User Control</h3>
+        <div className="border border-border rounded-lg p-md bg-card">
+          <h3 className="text-base font-semibold mb-sm">2. User Control</h3>
           <p className="text-sm">
             Users decide what data to share, with whom, and for how long. Easy revocation of
             permissions.
           </p>
         </div>
 
-        <div className="border border-border rounded-lg p-4 bg-card">
-          <h3 className="text-base font-semibold mb-2">3. Local-First</h3>
+        <div className="border border-border rounded-lg p-md bg-card">
+          <h3 className="text-base font-semibold mb-sm">3. Local-First</h3>
           <p className="text-sm">
             Sensitive data processed locally when possible. Cloud sync is optional and explicit.
           </p>
         </div>
 
-        <div className="border border-border rounded-lg p-4 bg-card">
-          <h3 className="text-base font-semibold mb-2">4. Data Minimization</h3>
+        <div className="border border-border rounded-lg p-md bg-card">
+          <h3 className="text-base font-semibold mb-sm">4. Data Minimization</h3>
           <p className="text-sm">
             Only collect and process data necessary for the feature. No excessive data hoarding.
           </p>
@@ -53,8 +53,8 @@ export default function PrivacyUXPage() {
         processing location:
       </p>
 
-      <div className="space-y-4 my-6">
-        <div className="flex items-center gap-3 p-3 border border-border rounded-lg">
+      <div className="space-y-md my-lg">
+        <div className="flex items-center gap-sm p-sm border border-border rounded-lg">
           <Badge>🔒 Local</Badge>
           <div>
             <p className="text-sm font-medium">Local Processing</p>
@@ -64,7 +64,7 @@ export default function PrivacyUXPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 border border-border rounded-lg">
+        <div className="flex items-center gap-sm p-sm border border-border rounded-lg">
           <Badge>☁️ Cloud</Badge>
           <div>
             <p className="text-sm font-medium">Private Cloud</p>
@@ -74,7 +74,7 @@ export default function PrivacyUXPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 border border-border rounded-lg">
+        <div className="flex items-center gap-sm p-sm border border-border rounded-lg">
           <Badge>🔗 External</Badge>
           <div>
             <p className="text-sm font-medium">External Service</p>
@@ -85,7 +85,7 @@ export default function PrivacyUXPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 border border-border rounded-lg">
+        <div className="flex items-center gap-sm p-sm border border-border rounded-lg">
           <Badge>🤖 AI</Badge>
           <div>
             <p className="text-sm font-medium">AI Processing</p>
@@ -100,13 +100,13 @@ export default function PrivacyUXPage() {
 
       <h3>Opportunity Cards</h3>
       <p>Always include privacy badge in header showing data source:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md">
+        <div className="flex items-center justify-between mb-sm">
+          <div className="flex items-center gap-xs">
             <span>💰</span>
             <strong className="text-sm">Budget Alert</strong>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-xs">
             <Badge>🔒 Local</Badge>
             <button className="text-sm">✕</button>
           </div>
@@ -116,8 +116,8 @@ export default function PrivacyUXPage() {
 
       <h3>Inline Widgets</h3>
       <p>Badge in widget header or footer:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md">
+        <div className="flex items-center justify-between mb-sm">
           <strong className="text-sm">Today's Schedule</strong>
           <Badge>🔗 External</Badge>
         </div>
@@ -126,18 +126,18 @@ export default function PrivacyUXPage() {
 
       <h3>Forms</h3>
       <p>Privacy notice before submission:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
-        <p className="text-sm mb-3">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md">
+        <p className="text-sm mb-sm">
           <strong>Add New Transaction</strong>
         </p>
-        <p className="text-xs text-muted-foreground mb-2">
+        <p className="text-xs text-muted-foreground mb-sm">
           🔒 This data stays on your device and is never shared.
         </p>
-        <div className="flex gap-2">
-          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded">
+        <div className="flex gap-xs">
+          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md">
             Save
           </button>
-          <button className="px-3 py-1.5 text-sm border border-border rounded">Cancel</button>
+          <button className="px-3 py-1.5 text-sm border border-border rounded-md">Cancel</button>
         </div>
       </div>
 
@@ -146,16 +146,16 @@ export default function PrivacyUXPage() {
       <h3>Connection Indicators</h3>
       <p>Show when data syncs to external services:</p>
 
-      <div className="space-y-3 my-6">
-        <div className="flex items-center gap-2 text-sm">
+      <div className="space-y-sm my-lg">
+        <div className="flex items-center gap-xs text-sm">
           <div className="h-2 w-2 rounded-full bg-success"></div>
           <span>Connected to Google Calendar</span>
         </div>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-xs text-sm">
           <div className="h-2 w-2 rounded-full bg-warning"></div>
           <span>Syncing transactions (2 pending)</span>
         </div>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-xs text-sm">
           <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>
           <span>Bank connection offline</span>
         </div>
@@ -164,22 +164,22 @@ export default function PrivacyUXPage() {
       <h3>Permission Requests</h3>
       <p>Clear, contextual permission requests:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4">
-        <h4 className="text-sm font-semibold mb-2">Connect to Google Calendar</h4>
-        <p className="text-sm text-muted-foreground mb-4">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md">
+        <h4 className="text-sm font-semibold mb-sm">Connect to Google Calendar</h4>
+        <p className="text-sm text-muted-foreground mb-md">
           Fidus needs access to read and write calendar events to manage your schedule.
         </p>
-        <ul className="text-xs space-y-1 mb-4 text-muted-foreground">
+        <ul className="text-xs space-y-1 mb-md text-muted-foreground">
           <li>✓ View your calendar events</li>
           <li>✓ Create new events</li>
           <li>✓ Update existing events</li>
           <li>✗ Access to other Google services</li>
         </ul>
-        <div className="flex gap-2">
-          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded">
+        <div className="flex gap-xs">
+          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md">
             Allow Access
           </button>
-          <button className="px-3 py-1.5 text-sm border border-border rounded">Deny</button>
+          <button className="px-3 py-1.5 text-sm border border-border rounded-md">Deny</button>
         </div>
       </div>
 
@@ -187,10 +187,10 @@ export default function PrivacyUXPage() {
 
       <p>Users choose where AI processing happens:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-6 my-6">
-        <h3 className="text-base font-semibold mb-4">AI Processing Location</h3>
-        <div className="space-y-4">
-          <label className="flex items-start gap-3 cursor-pointer">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
+        <h3 className="text-base font-semibold mb-md">AI Processing Location</h3>
+        <div className="space-y-md">
+          <label className="flex items-start gap-sm cursor-pointer">
             <input type="radio" name="ai-processing" className="mt-1" defaultChecked />
             <div>
               <p className="text-sm font-medium">Local Processing (Recommended)</p>
@@ -200,7 +200,7 @@ export default function PrivacyUXPage() {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className="flex items-start gap-sm cursor-pointer">
             <input type="radio" name="ai-processing" className="mt-1" />
             <div>
               <p className="text-sm font-medium">Cloud Processing</p>
@@ -217,44 +217,44 @@ export default function PrivacyUXPage() {
       <h3>Granular Control</h3>
       <p>Users control privacy at feature level:</p>
 
-      <div className="space-y-3 my-6">
-        <div className="flex items-center justify-between p-3 border border-border rounded-lg">
+      <div className="space-y-sm my-lg">
+        <div className="flex items-center justify-between p-sm border border-border rounded-lg">
           <div>
             <p className="text-sm font-medium">Calendar Sync</p>
             <p className="text-xs text-muted-foreground">Sync with Google Calendar</p>
           </div>
-          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded">
+          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md">
             Enabled
           </button>
         </div>
 
-        <div className="flex items-center justify-between p-3 border border-border rounded-lg">
+        <div className="flex items-center justify-between p-sm border border-border rounded-lg">
           <div>
             <p className="text-sm font-medium">Budget Alerts</p>
             <p className="text-xs text-muted-foreground">Proactive spending notifications</p>
           </div>
-          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded">
+          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md">
             Enabled
           </button>
         </div>
 
-        <div className="flex items-center justify-between p-3 border border-border rounded-lg">
+        <div className="flex items-center justify-between p-sm border border-border rounded-lg">
           <div>
             <p className="text-sm font-medium">Cloud Backup</p>
             <p className="text-xs text-muted-foreground">Encrypted backup to cloud</p>
           </div>
-          <button className="px-3 py-1 text-xs border border-border rounded">Disabled</button>
+          <button className="px-3 py-1 text-xs border border-border rounded-md">Disabled</button>
         </div>
       </div>
 
       <h3>Data Export & Deletion</h3>
       <p>Users can export or delete all data at any time:</p>
 
-      <div className="flex gap-3 my-6">
-        <button className="px-4 py-2 text-sm border border-border rounded">
+      <div className="flex gap-sm my-lg">
+        <button className="px-4 py-2 text-sm border border-border rounded-md">
           Export All Data
         </button>
-        <button className="px-4 py-2 text-sm border border-destructive text-destructive rounded">
+        <button className="px-4 py-2 text-sm border border-error text-error rounded-md">
           Delete All Data
         </button>
       </div>
@@ -293,9 +293,9 @@ export default function PrivacyUXPage() {
 
       <p>Each tenant (user) has complete data isolation:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-6 my-6">
-        <h3 className="text-base font-semibold mb-3">Tenant Isolation Guarantees</h3>
-        <ul className="space-y-2 text-sm">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
+        <h3 className="text-base font-semibold mb-sm">Tenant Isolation Guarantees</h3>
+        <ul className="space-y-sm text-sm">
           <li>✓ Data is never shared between tenants</li>
           <li>✓ Each tenant has separate encryption keys</li>
           <li>✓ API requests are tenant-scoped</li>
@@ -327,8 +327,8 @@ export default function PrivacyUXPage() {
 
       <h2>Key Takeaways</h2>
 
-      <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 my-6">
-        <ul className="space-y-2 text-sm">
+      <div className="bg-primary/10 border border-primary/20 rounded-lg p-lg my-lg">
+        <ul className="space-y-sm text-sm">
           <li>✅ Every UI element shows privacy badge</li>
           <li>✅ Users choose local vs. cloud processing</li>
           <li>✅ Granular privacy controls per feature</li>

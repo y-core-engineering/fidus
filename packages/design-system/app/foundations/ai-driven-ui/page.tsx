@@ -40,14 +40,14 @@ export default function AIDrivenUIPage() {
         result in different interfaces based on situation.
       </p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-6 my-6">
-        <h4 className="text-sm font-semibold mb-4">Context-Driven UI Flow</h4>
-        <ol className="text-sm space-y-2">
-          <li>1. User provides context (query, action, or time-based trigger)</li>
-          <li>2. LLM analyzes: intent, urgency, data complexity, user history</li>
-          <li>3. LLM decides optimal UI form: Card, Form, Chat, Widget, or Wizard</li>
-          <li>4. UI is rendered with appropriate content and actions</li>
-          <li>5. User interacts or dismisses (swipe/X button)</li>
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
+        <h4 className="text-sm font-semibold mb-md">Context-Driven UI Flow</h4>
+        <ol className="text-sm space-y-sm">
+          <li>User provides context (query, action, or time-based trigger)</li>
+          <li>LLM analyzes: intent, urgency, data complexity, user history</li>
+          <li>LLM decides optimal UI form: Card, Form, Chat, Widget, or Wizard</li>
+          <li>UI is rendered with appropriate content and actions</li>
+          <li>User interacts or dismisses (swipe/X button)</li>
         </ol>
       </div>
 
@@ -76,13 +76,13 @@ export default function AIDrivenUIPage() {
 
       <h3>Example: "Show my budget"</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-        <div className="border border-border rounded-lg p-4 bg-card">
-          <h4 className="text-sm font-semibold mb-2">Context 1: Stable Mid-Month</h4>
-          <p className="text-sm text-muted-foreground mb-3">
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+        <div className="border border-border rounded-lg p-md bg-card">
+          <h4 className="text-sm font-semibold mb-sm">Context 1: Stable Mid-Month</h4>
+          <p className="text-sm text-muted-foreground mb-sm">
             User has stable spending, mid-month
           </p>
-          <div className="bg-muted/50 rounded p-3 text-xs">
+          <div className="not-prose bg-muted/50 rounded-md p-sm text-xs">
             <strong>LLM Decision:</strong> Simple text response
             <br />
             <br />
@@ -90,10 +90,10 @@ export default function AIDrivenUIPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-4 bg-card">
-          <h4 className="text-sm font-semibold mb-2">Context 2: Near Limit End-Month</h4>
-          <p className="text-sm text-muted-foreground mb-3">User is 95% of budget, 3 days left</p>
-          <div className="bg-muted/50 rounded p-3 text-xs">
+        <div className="border border-border rounded-lg p-md bg-card">
+          <h4 className="text-sm font-semibold mb-sm">Context 2: Near Limit End-Month</h4>
+          <p className="text-sm text-muted-foreground mb-sm">User is 95% of budget, 3 days left</p>
+          <div className="not-prose bg-muted/50 rounded-md p-sm text-xs">
             <strong>LLM Decision:</strong> OpportunityCard with urgency
             <br />
             <br />
@@ -151,9 +151,9 @@ export default function AIDrivenUIPage() {
 
       <h2>LLM Decision Factors</h2>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-6 my-6">
-        <h3 className="text-base font-semibold mb-4">The LLM considers:</h3>
-        <ul className="space-y-3 text-sm">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
+        <h3 className="text-base font-semibold mb-md">The LLM considers:</h3>
+        <ul className="space-y-sm text-sm">
           <li>
             <strong>Urgency:</strong> Time-sensitive issues get OpportunityCards
           </li>
@@ -233,11 +233,11 @@ export default function AIDrivenUIPage() {
       <h2>Examples in Practice</h2>
 
       <h3>Morning Routine</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4 text-sm">
-        <p className="mb-2">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md text-sm">
+        <p className="mb-sm">
           <strong>8:00 AM:</strong> LLM detects morning context
         </p>
-        <p className="mb-2">
+        <p className="mb-sm">
           <strong>Surfaces:</strong> OpportunityCard with today's calendar (3 meetings detected)
         </p>
         <p>
@@ -246,11 +246,11 @@ export default function AIDrivenUIPage() {
       </div>
 
       <h3>Budget Warning</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4 text-sm">
-        <p className="mb-2">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md text-sm">
+        <p className="mb-sm">
           <strong>Context:</strong> 95% of food budget spent, 3 days left in month
         </p>
-        <p className="mb-2">
+        <p className="mb-sm">
           <strong>Surfaces:</strong> OpportunityCard with "urgent" styling, progress bar, and
           actions
         </p>
@@ -261,11 +261,11 @@ export default function AIDrivenUIPage() {
       </div>
 
       <h3>Quick Calendar Check</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-4 my-4 text-sm">
-        <p className="mb-2">
+      <div className="not-prose bg-muted/30 border border-border rounded-lg p-md my-md text-sm">
+        <p className="mb-sm">
           <strong>Query:</strong> "What's my schedule today?"
         </p>
-        <p className="mb-2">
+        <p className="mb-sm">
           <strong>LLM Decision:</strong> Inline widget (not OpportunityCard - not urgent)
         </p>
         <p>
@@ -276,8 +276,8 @@ export default function AIDrivenUIPage() {
 
       <h2>Key Takeaways</h2>
 
-      <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 my-6">
-        <ul className="space-y-2 text-sm">
+      <div className="bg-primary/10 border border-primary/20 rounded-lg p-lg my-lg">
+        <ul className="space-y-sm text-sm">
           <li>✅ LLM decides UI form based on context</li>
           <li>✅ Same query can render differently based on situation</li>
           <li>✅ User controls visibility (dismiss, never auto-hide)</li>

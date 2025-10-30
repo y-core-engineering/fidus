@@ -1,6 +1,7 @@
 'use client';
 
-import { EmptyCard, Button, Alert, TextInput } from '@fidus/ui';
+import { EmptyCard, Button, Alert, TextInput, Link, Stack } from '@fidus/ui';
+import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 
 export default function EmptyStatesPage() {
@@ -8,113 +9,63 @@ export default function EmptyStatesPage() {
   const [filterValue, setFilterValue] = useState('');
 
   return (
-    <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
-      <div>
-        <h1 className="mb-2 text-4xl font-bold">Empty State Patterns</h1>
-        <p className="text-lg text-muted-foreground">
-          Empty states guide users when there is no content to display. They should be encouraging, helpful, and provide clear next steps.
-        </p>
-      </div>
+    <div className="prose prose-neutral dark:prose-invert max-w-none">
+      <h1>Empty State Patterns</h1>
+      <p className="lead">
+        Empty states guide users when there is no content to display. They should be encouraging, helpful, and provide clear next steps.
+      </p>
 
       {/* When to Use */}
-      <section className="space-y-4">
-        <h2 className="mb-4 text-2xl font-semibold">When to Use Empty States</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="p-3 text-left font-semibold">Type</th>
-                <th className="p-3 text-left font-semibold">Context</th>
-                <th className="p-3 text-left font-semibold">Message Tone</th>
-                <th className="p-3 text-left font-semibold">Call-to-Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-border">
-                <td className="p-3 font-semibold">First Use</td>
-                <td className="p-3">User has not created any content yet</td>
-                <td className="p-3">Encouraging, welcoming</td>
-                <td className="p-3 text-muted-foreground">Create first item</td>
-              </tr>
-              <tr className="border-b border-border">
-                <td className="p-3 font-semibold">No Results</td>
-                <td className="p-3">Search or filter returned nothing</td>
-                <td className="p-3">Neutral, helpful</td>
-                <td className="p-3 text-muted-foreground">Adjust search, clear filters</td>
-              </tr>
-              <tr className="border-b border-border">
-                <td className="p-3 font-semibold">Cleared</td>
-                <td className="p-3">User deleted all content</td>
-                <td className="p-3">Neutral, supportive</td>
-                <td className="p-3 text-muted-foreground">Create new item</td>
-              </tr>
-              <tr className="border-b border-border">
-                <td className="p-3 font-semibold">Permission Denied</td>
-                <td className="p-3">User lacks access to view content</td>
-                <td className="p-3">Informative, not accusatory</td>
-                <td className="p-3 text-muted-foreground">Request access</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <h2>When to Use Empty States</h2>
+      <div className="not-prose my-lg overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="p-md text-left font-semibold">Type</th>
+              <th className="p-md text-left font-semibold">Context</th>
+              <th className="p-md text-left font-semibold">Message Tone</th>
+              <th className="p-md text-left font-semibold">Call-to-Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-border">
+              <td className="p-md font-semibold">First Use</td>
+              <td className="p-md">User has not created any content yet</td>
+              <td className="p-md">Encouraging, welcoming</td>
+              <td className="p-md text-muted-foreground">Create first item</td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="p-md font-semibold">No Results</td>
+              <td className="p-md">Search or filter returned nothing</td>
+              <td className="p-md">Neutral, helpful</td>
+              <td className="p-md text-muted-foreground">Adjust search, clear filters</td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="p-md font-semibold">Cleared</td>
+              <td className="p-md">User deleted all content</td>
+              <td className="p-md">Neutral, supportive</td>
+              <td className="p-md text-muted-foreground">Create new item</td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="p-md font-semibold">Permission Denied</td>
+              <td className="p-md">User lacks access to view content</td>
+              <td className="p-md">Informative, not accusatory</td>
+              <td className="p-md text-muted-foreground">Request access</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* First-Use Empty States */}
-      <section className="space-y-4">
+      <h2>First-Use Empty States</h2>
+      <p className="text-sm text-muted-foreground">
+        When users first encounter a feature, empty states should be welcoming and guide them to create their first item.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">First-Use Empty States</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            When users first encounter a feature, empty states should be welcoming and guide them to create their first item.
-          </p>
-
-          <div className="space-y-6">
-            {/* No Budgets Yet */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Budgets Yet</h3>
-              <EmptyCard
-                title="No budgets yet"
-                description="Create your first budget to start tracking your spending."
-                icon="💰"
-                action={{
-                  label: 'Create Budget',
-                  onClick: () => console.log('Create budget'),
-                }}
-              />
-            </div>
-
-            {/* No Appointments */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Appointments</h3>
-              <EmptyCard
-                title="Your calendar is empty"
-                description="Add your first appointment to get started with scheduling."
-                icon="📅"
-                action={{
-                  label: 'Add Appointment',
-                  onClick: () => console.log('Add appointment'),
-                }}
-              />
-            </div>
-
-            {/* No Travel Plans */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Travel Plans</h3>
-              <EmptyCard
-                title="Ready for an adventure?"
-                description="Start planning your next trip by adding a destination."
-                icon="✈️"
-                action={{
-                  label: 'Plan Trip',
-                  onClick: () => console.log('Plan trip'),
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-lg bg-muted p-4">
-            <p className="mb-2 text-sm font-semibold">Implementation:</p>
-            <pre className="overflow-x-auto text-xs">
-{`<EmptyCard
+          <h3 className="text-lg font-semibold mb-md">No Budgets Yet</h3>
+          <ComponentPreview code={`<EmptyCard
   title="No budgets yet"
   description="Create your first budget to start tracking your spending."
   icon="💰"
@@ -122,491 +73,728 @@ export default function EmptyStatesPage() {
     label: 'Create Budget',
     onClick: handleCreateBudget,
   }}
-/>`}
-            </pre>
-          </div>
+/>`}>
+            <EmptyCard
+              title="No budgets yet"
+              description="Create your first budget to start tracking your spending."
+              icon="💰"
+              action={{
+                label: 'Create Budget',
+                onClick: () => console.log('Create budget'),
+              }}
+            />
+          </ComponentPreview>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">No Appointments</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="Your calendar is empty"
+  description="Add your first appointment to get started with scheduling."
+  icon="📅"
+  action={{
+    label: 'Add Appointment',
+    onClick: handleAddAppointment,
+  }}
+/>`}>
+            <EmptyCard
+              title="Your calendar is empty"
+              description="Add your first appointment to get started with scheduling."
+              icon="📅"
+              action={{
+                label: 'Add Appointment',
+                onClick: () => console.log('Add appointment'),
+              }}
+            />
+          </ComponentPreview>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">No Travel Plans</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="Ready for an adventure?"
+  description="Start planning your next trip by adding a destination."
+  icon="✈️"
+  action={{
+    label: 'Plan Trip',
+    onClick: handlePlanTrip,
+  }}
+/>`}>
+            <EmptyCard
+              title="Ready for an adventure?"
+              description="Start planning your next trip by adding a destination."
+              icon="✈️"
+              action={{
+                label: 'Plan Trip',
+                onClick: () => console.log('Plan trip'),
+              }}
+            />
+          </ComponentPreview>
+        </div>
+      </div>
 
       {/* Search with No Results */}
-      <section className="space-y-4">
+      <h2>Search with No Results</h2>
+      <p className="text-sm text-muted-foreground">
+        When a search returns no results, provide helpful suggestions to refine the search or try alternative actions.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Search with No Results</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            When a search returns no results, provide helpful suggestions to refine the search or try alternative actions.
-          </p>
+          <h3 className="text-lg font-semibold mb-md">Interactive Search Demo</h3>
+          <ComponentPreview code={`<TextInput
+  label="Search budgets"
+  placeholder="Try searching..."
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+/>
 
-          <div className="space-y-6">
-            {/* Search Demo */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Interactive Search Demo</h3>
-              <div className="rounded-lg border border-border bg-card p-6">
-                <TextInput
-                  label="Search budgets"
-                  placeholder="Try searching for something that doesn't exist..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+{searchQuery && (
+  <EmptyCard
+    title={\`No results for "\${searchQuery}"\`}
+    description="Try adjusting your search terms or check for typos."
+    icon="🔍"
+    action={{
+      label: 'Clear Search',
+      onClick: () => setSearchQuery(''),
+      variant: 'secondary',
+    }}
+  />
+)}`}>
+            <div className="rounded-lg border border-border bg-card p-lg">
+              <TextInput
+                label="Search budgets"
+                placeholder="Try searching for something that doesn&apos;t exist..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
 
-                {searchQuery && (
-                  <div className="mt-4">
-                    <EmptyCard
-                      title={`No results for "${searchQuery}"`}
-                      description="Try adjusting your search terms or check for typos."
-                      icon="🔍"
-                      action={{
-                        label: 'Clear Search',
-                        onClick: () => setSearchQuery(''),
-                        variant: 'secondary',
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Alternative Actions */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">With Alternative Actions</h3>
-              <EmptyCard
-                title="No transactions found"
-                description="We could not find any transactions matching your search."
-                icon="🔍"
-              >
-                <div className="mt-4 flex gap-2">
-                  <Button variant="secondary" size="small">
-                    Clear Search
-                  </Button>
-                  <Button variant="secondary" size="small">
-                    View All Transactions
-                  </Button>
+              {searchQuery && (
+                <div className="mt-md">
+                  <EmptyCard
+                    title={`No results for "${searchQuery}"`}
+                    description="Try adjusting your search terms or check for typos."
+                    icon="🔍"
+                    action={{
+                      label: 'Clear Search',
+                      onClick: () => setSearchQuery(''),
+                      variant: 'secondary',
+                    }}
+                  />
                 </div>
-              </EmptyCard>
+              )}
             </div>
-          </div>
-
-          <div className="mt-4 rounded-lg bg-muted p-4">
-            <p className="mb-2 text-sm font-semibold">Best Practices for Search Empty States:</p>
-            <ul className="list-inside list-disc space-y-1 text-xs text-muted-foreground">
-              <li>Show the search query in the empty state message</li>
-              <li>Provide suggestions to refine the search</li>
-              <li>Offer a way to clear the search or view all items</li>
-              <li>Consider showing suggested searches or popular items</li>
-            </ul>
-          </div>
+          </ComponentPreview>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">With Alternative Actions</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="No transactions found"
+  description="We could not find any transactions matching your search."
+  icon="🔍"
+>
+  <Stack direction="horizontal" spacing="sm">
+    <Button variant="secondary" size="small">
+      Clear Search
+    </Button>
+    <Button variant="secondary" size="small">
+      View All Transactions
+    </Button>
+  </Stack>
+</EmptyCard>`}>
+            <EmptyCard
+              title="No transactions found"
+              description="We could not find any transactions matching your search."
+              icon="🔍"
+            >
+              <Stack direction="horizontal" spacing="sm" className="mt-md">
+                <Button variant="secondary" size="small">
+                  Clear Search
+                </Button>
+                <Button variant="secondary" size="small">
+                  View All Transactions
+                </Button>
+              </Stack>
+            </EmptyCard>
+          </ComponentPreview>
+        </div>
+      </div>
 
       {/* Filtered List with No Matches */}
-      <section className="space-y-4">
+      <h2>Filtered List with No Matches</h2>
+      <p className="text-sm text-muted-foreground">
+        When filters are applied but no items match, provide a way to adjust or clear filters.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Filtered List with No Matches</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            When filters are applied but no items match, provide a way to adjust or clear filters.
-          </p>
+          <h3 className="text-lg font-semibold mb-md">Interactive Filter Demo</h3>
+          <ComponentPreview code={`<TextInput
+  label="Filter by category"
+  placeholder="e.g., Food, Transport"
+  value={filterValue}
+  onChange={(e) => setFilterValue(e.target.value)}
+/>
 
-          <div className="space-y-6">
-            {/* Filter Demo */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Interactive Filter Demo</h3>
-              <div className="rounded-lg border border-border bg-card p-6">
-                <TextInput
-                  label="Filter by category"
-                  placeholder="e.g., Food, Transport"
-                  value={filterValue}
-                  onChange={(e) => setFilterValue(e.target.value)}
-                />
+{filterValue && (
+  <EmptyCard
+    title="No items match your filters"
+    description={\`No items found in category "\${filterValue}".\`}
+    icon="🔍"
+  >
+    <Stack direction="horizontal" spacing="sm">
+      <Button variant="secondary" size="small" onClick={() => setFilterValue('')}>
+        Clear Filters
+      </Button>
+      <Button variant="secondary" size="small">
+        View All Categories
+      </Button>
+    </Stack>
+  </EmptyCard>
+)}`}>
+            <div className="rounded-lg border border-border bg-card p-lg">
+              <TextInput
+                label="Filter by category"
+                placeholder="e.g., Food, Transport"
+                value={filterValue}
+                onChange={(e) => setFilterValue(e.target.value)}
+              />
 
-                {filterValue && (
-                  <div className="mt-4">
-                    <EmptyCard
-                      title="No items match your filters"
-                      description={`No items found in category "${filterValue}".`}
-                      icon="🔍"
-                    >
-                      <div className="mt-4 flex gap-2">
-                        <Button variant="secondary" size="small" onClick={() => setFilterValue('')}>
-                          Clear Filters
-                        </Button>
-                        <Button variant="secondary" size="small">
-                          View All Categories
-                        </Button>
-                      </div>
-                    </EmptyCard>
-                  </div>
-                )}
-              </div>
+              {filterValue && (
+                <div className="mt-md">
+                  <EmptyCard
+                    title="No items match your filters"
+                    description={`No items found in category "${filterValue}".`}
+                    icon="🔍"
+                  >
+                    <Stack direction="horizontal" spacing="sm" className="mt-md">
+                      <Button variant="secondary" size="small" onClick={() => setFilterValue('')}>
+                        Clear Filters
+                      </Button>
+                      <Button variant="secondary" size="small">
+                        View All Categories
+                      </Button>
+                    </Stack>
+                  </EmptyCard>
+                </div>
+              )}
             </div>
-
-            {/* Multiple Filters */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Multiple Active Filters</h3>
-              <Alert variant="info" title="No transactions found">
-                <p className="mb-2">No transactions match your current filters:</p>
-                <ul className="mb-4 list-inside list-disc text-sm">
-                  <li>Category: Food</li>
-                  <li>Date Range: Last 7 days</li>
-                  <li>Amount: More than 50 EUR</li>
-                </ul>
-                <Button variant="secondary" size="small">
-                  Clear All Filters
-                </Button>
-              </Alert>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-lg bg-muted p-4">
-            <p className="mb-2 text-sm font-semibold">Best Practices for Filter Empty States:</p>
-            <ul className="list-inside list-disc space-y-1 text-xs text-muted-foreground">
-              <li>Show which filters are currently active</li>
-              <li>Provide a clear way to remove individual filters</li>
-              <li>Offer a "Clear all filters" option</li>
-              <li>Consider showing the total number of unfiltered items</li>
-            </ul>
-          </div>
+          </ComponentPreview>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Multiple Active Filters</h3>
+          <ComponentPreview code={`<Alert variant="info" title="No transactions found">
+  <p className="mb-sm">No transactions match your current filters:</p>
+  <ul className="mb-md list-inside list-disc text-sm">
+    <li>Category: Food</li>
+    <li>Date Range: Last 7 days</li>
+    <li>Amount: More than 50 EUR</li>
+  </ul>
+  <Button variant="secondary" size="small">
+    Clear All Filters
+  </Button>
+</Alert>`}>
+            <Alert variant="info" title="No transactions found">
+              <p className="mb-sm">No transactions match your current filters:</p>
+              <ul className="mb-md list-inside list-disc text-sm">
+                <li>Category: Food</li>
+                <li>Date Range: Last 7 days</li>
+                <li>Amount: More than 50 EUR</li>
+              </ul>
+              <Button variant="secondary" size="small">
+                Clear All Filters
+              </Button>
+            </Alert>
+          </ComponentPreview>
+        </div>
+      </div>
 
       {/* Cleared/Deleted Content */}
-      <section className="space-y-4">
+      <h2>Cleared or Deleted Content</h2>
+      <p className="text-sm text-muted-foreground">
+        When users have deleted all content, the empty state should acknowledge this and encourage them to create new content.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Cleared or Deleted Content</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            When users have deleted all content, the empty state should acknowledge this and encourage them to create new content.
-          </p>
-
-          <div className="space-y-6">
-            {/* All Tasks Completed */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">All Tasks Completed</h3>
-              <EmptyCard
-                title="All done!"
-                description="You have completed all your tasks. Great work!"
-                icon="✅"
-                action={{
-                  label: 'Add New Task',
-                  onClick: () => console.log('Add task'),
-                }}
-              />
-            </div>
-
-            {/* Inbox Zero */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Inbox Zero</h3>
-              <EmptyCard
-                title="Inbox zero achieved!"
-                description="You are all caught up. No messages to display."
-                icon="📬"
-              />
-            </div>
-
-            {/* Trash Emptied */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Trash Emptied</h3>
-              <EmptyCard
-                title="Trash is empty"
-                description="Deleted items will appear here for 30 days before being permanently removed."
-                icon="🗑️"
-              />
-            </div>
-          </div>
+          <h3 className="text-lg font-semibold mb-md">All Tasks Completed</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="All done!"
+  description="You have completed all your tasks. Great work!"
+  icon="✅"
+  action={{
+    label: 'Add New Task',
+    onClick: handleAddTask,
+  }}
+/>`}>
+            <EmptyCard
+              title="All done!"
+              description="You have completed all your tasks. Great work!"
+              icon="✅"
+              action={{
+                label: 'Add New Task',
+                onClick: () => console.log('Add task'),
+              }}
+            />
+          </ComponentPreview>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Inbox Zero</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="Inbox zero achieved!"
+  description="You are all caught up. No messages to display."
+  icon="📬"
+/>`}>
+            <EmptyCard
+              title="Inbox zero achieved!"
+              description="You are all caught up. No messages to display."
+              icon="📬"
+            />
+          </ComponentPreview>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Trash Emptied</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="Trash is empty"
+  description="Deleted items will appear here for 30 days before being permanently removed."
+  icon="🗑️"
+/>`}>
+            <EmptyCard
+              title="Trash is empty"
+              description="Deleted items will appear here for 30 days before being permanently removed."
+              icon="🗑️"
+            />
+          </ComponentPreview>
+        </div>
+      </div>
 
       {/* Empty Dashboard Sections */}
-      <section className="space-y-4">
+      <h2>Empty Dashboard Sections</h2>
+      <p className="text-sm text-muted-foreground">
+        Dashboard sections may be empty when there is no relevant data or opportunities to display.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Empty Dashboard Sections</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Dashboard sections may be empty when there is no relevant data or opportunities to display.
-          </p>
-
-          <div className="space-y-6">
-            {/* No Opportunities */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Opportunities</h3>
-              <EmptyCard
-                title="No suggestions right now"
-                description="Fidus will show relevant suggestions here when opportunities arise."
-                icon="💡"
-              />
-            </div>
-
-            {/* No Recent Activity */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Recent Activity</h3>
-              <EmptyCard
-                title="No recent activity"
-                description="Your recent actions and updates will appear here."
-                icon="📊"
-              />
-            </div>
-
-            {/* No Upcoming Events */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Upcoming Events</h3>
-              <EmptyCard
-                title="Nothing scheduled"
-                description="You have no upcoming appointments or events."
-                icon="📅"
-                action={{
-                  label: 'Add Event',
-                  onClick: () => console.log('Add event'),
-                }}
-              />
-            </div>
-          </div>
+          <h3 className="text-lg font-semibold mb-md">No Opportunities</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="No suggestions right now"
+  description="Fidus will show relevant suggestions here when opportunities arise."
+  icon="💡"
+/>`}>
+            <EmptyCard
+              title="No suggestions right now"
+              description="Fidus will show relevant suggestions here when opportunities arise."
+              icon="💡"
+            />
+          </ComponentPreview>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">No Recent Activity</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="No recent activity"
+  description="Your recent actions and updates will appear here."
+  icon="📊"
+/>`}>
+            <EmptyCard
+              title="No recent activity"
+              description="Your recent actions and updates will appear here."
+              icon="📊"
+            />
+          </ComponentPreview>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">No Upcoming Events</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="Nothing scheduled"
+  description="You have no upcoming appointments or events."
+  icon="📅"
+  action={{
+    label: 'Add Event',
+    onClick: handleAddEvent,
+  }}
+/>`}>
+            <EmptyCard
+              title="Nothing scheduled"
+              description="You have no upcoming appointments or events."
+              icon="📅"
+              action={{
+                label: 'Add Event',
+                onClick: () => console.log('Add event'),
+              }}
+            />
+          </ComponentPreview>
+        </div>
+      </div>
 
       {/* Permission Denied */}
-      <section className="space-y-4">
+      <h2>Permission Denied Empty States</h2>
+      <p className="text-sm text-muted-foreground">
+        When users lack permission to view content, explain why and provide a path forward.
+      </p>
+
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Permission Denied Empty States</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            When users lack permission to view content, explain why and provide a path forward.
-          </p>
-
-          <div className="space-y-6">
-            {/* No Access */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">No Access</h3>
-              <EmptyCard
-                title="You don't have access"
-                description="You need permission to view this content. Contact your administrator for access."
-                icon="🔒"
-                action={{
-                  label: 'Request Access',
-                  onClick: () => console.log('Request access'),
-                }}
-              />
-            </div>
-
-            {/* Feature Not Available */}
-            <div>
-              <h3 className="mb-2 text-sm font-semibold">Feature Not Available</h3>
-              <EmptyCard
-                title="Feature not available"
-                description="This feature is not included in your current plan."
-                icon="⭐"
-                action={{
-                  label: 'Upgrade Plan',
-                  onClick: () => console.log('Upgrade plan'),
-                }}
-              />
-            </div>
-          </div>
+          <h3 className="text-lg font-semibold mb-md">No Access</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="You don't have access"
+  description="You need permission to view this content. Contact your administrator for access."
+  icon="🔒"
+  action={{
+    label: 'Request Access',
+    onClick: handleRequestAccess,
+  }}
+/>`}>
+            <EmptyCard
+              title="You don&apos;t have access"
+              description="You need permission to view this content. Contact your administrator for access."
+              icon="🔒"
+              action={{
+                label: 'Request Access',
+                onClick: () => console.log('Request access'),
+              }}
+            />
+          </ComponentPreview>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Feature Not Available</h3>
+          <ComponentPreview code={`<EmptyCard
+  title="Feature not available"
+  description="This feature is not included in your current plan."
+  icon="⭐"
+  action={{
+    label: 'Upgrade Plan',
+    onClick: handleUpgradePlan,
+  }}
+/>`}>
+            <EmptyCard
+              title="Feature not available"
+              description="This feature is not included in your current plan."
+              icon="⭐"
+              action={{
+                label: 'Upgrade Plan',
+                onClick: () => console.log('Upgrade plan'),
+              }}
+            />
+          </ComponentPreview>
+        </div>
+      </div>
 
       {/* Empty State vs Error State */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Empty State vs Error State</h2>
-          <p className="mb-4 text-sm text-muted-foreground">
-            It is critical to distinguish between empty states and error states to provide the right user experience.
-          </p>
+      <h2>Empty State vs Error State</h2>
+      <p className="text-sm text-muted-foreground">
+        It is critical to distinguish between empty states and error states to provide the right user experience.
+      </p>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h3 className="mb-3 font-semibold">Empty State</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span>✓</span>
-                  <span>System is working correctly</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>✓</span>
-                  <span>No content exists (yet)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>✓</span>
-                  <span>Encouraging and helpful tone</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>✓</span>
-                  <span>Call-to-action to create content</span>
-                </li>
-              </ul>
-              <div className="mt-4">
-                <EmptyCard
-                  title="No budgets yet"
-                  description="Create your first budget to start tracking spending."
-                  icon="💰"
-                  action={{
-                    label: 'Create Budget',
-                    onClick: () => console.log('Create'),
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-error bg-error/5 p-6">
-              <h3 className="mb-3 font-semibold text-error">Error State</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span>✗</span>
-                  <span>Something went wrong</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>✗</span>
-                  <span>Content should exist but cannot load</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>✗</span>
-                  <span>Informative and solution-oriented</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>✗</span>
-                  <span>Recovery or retry options</span>
-                </li>
-              </ul>
-              <div className="mt-4">
-                <Alert variant="error" title="Failed to load budgets">
-                  Unable to retrieve your budget data. Please try again.
-                </Alert>
-              </div>
-            </div>
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        <div className="rounded-lg border border-border bg-card p-lg">
+          <h3 className="font-semibold mb-md">Empty State</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">✓</span>
+              <span>System is working correctly</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">✓</span>
+              <span>No content exists (yet)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">✓</span>
+              <span>Encouraging and helpful tone</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">✓</span>
+              <span>Call-to-action to create content</span>
+            </li>
+          </ul>
+          <div className="mt-md">
+            <EmptyCard
+              title="No budgets yet"
+              description="Create your first budget to start tracking spending."
+              icon="💰"
+              action={{
+                label: 'Create Budget',
+                onClick: () => console.log('Create'),
+              }}
+            />
           </div>
         </div>
-      </section>
 
-      {/* Best Practices */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Best Practices</h2>
-
-          <div className="space-y-6">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h3 className="mb-3 font-semibold">✅ Do</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Use friendly, encouraging language</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Include a clear call-to-action</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Use icons or illustrations to make empty states more engaging</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Explain why the state is empty</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Provide helpful suggestions or tips</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-success">✓</span>
-                  <span>Show the search query or active filters</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-lg border border-error bg-error/5 p-6">
-              <h3 className="mb-3 font-semibold text-error">❌ Don't</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Use negative or discouraging language</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Leave empty states completely blank</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Show a generic "No data" message</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Confuse empty states with error states</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Use overly technical language</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-error">✗</span>
-                  <span>Provide too many call-to-action options</span>
-                </li>
-              </ul>
-            </div>
+        <div className="rounded-lg border border-error bg-error/5 p-lg">
+          <h3 className="font-semibold text-error mb-md">Error State</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">✗</span>
+              <span>Something went wrong</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">✗</span>
+              <span>Content should exist but cannot load</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">✗</span>
+              <span>Informative and solution-oriented</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">✗</span>
+              <span>Recovery or retry options</span>
+            </li>
+          </ul>
+          <div className="mt-md">
+            <Alert variant="error" title="Failed to load budgets">
+              Unable to retrieve your budget data. Please try again.
+            </Alert>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Writing Empty State Copy */}
-      <section className="space-y-4">
+      {/* Usage Guidelines */}
+      <h2>Usage Guidelines</h2>
+      <div className="not-prose space-y-lg my-lg">
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">Writing Empty State Copy</h2>
-
-          <div className="space-y-6">
-            {/* Good Examples */}
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h3 className="mb-3 font-semibold">✅ Good Empty State Messages</h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="mb-1 text-sm font-semibold">Title:</p>
-                  <p className="text-sm">"Ready to start budgeting?"</p>
-                  <p className="text-xs text-muted-foreground">Engaging and action-oriented</p>
-                </div>
-                <div>
-                  <p className="mb-1 text-sm font-semibold">Description:</p>
-                  <p className="text-sm">"Create your first budget to take control of your spending."</p>
-                  <p className="text-xs text-muted-foreground">Clear benefit and next step</p>
-                </div>
-                <div>
-                  <p className="mb-1 text-sm font-semibold">Button:</p>
-                  <p className="text-sm">"Create Budget"</p>
-                  <p className="text-xs text-muted-foreground">Specific action verb</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bad Examples */}
-            <div className="rounded-lg border border-error bg-error/5 p-6">
-              <h3 className="mb-3 font-semibold text-error">❌ Bad Empty State Messages</h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="mb-1 text-sm font-semibold">Title:</p>
-                  <p className="text-sm">"No budgets"</p>
-                  <p className="text-xs text-muted-foreground">Too terse and uninviting</p>
-                </div>
-                <div>
-                  <p className="mb-1 text-sm font-semibold">Description:</p>
-                  <p className="text-sm">"The budget list is empty."</p>
-                  <p className="text-xs text-muted-foreground">States the obvious without guidance</p>
-                </div>
-                <div>
-                  <p className="mb-1 text-sm font-semibold">Button:</p>
-                  <p className="text-sm">"Click here"</p>
-                  <p className="text-xs text-muted-foreground">Generic, unclear action</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Accessibility */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="mb-4 text-2xl font-semibold">Accessibility</h2>
-          <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-            <li>Empty state messages announced to screen readers</li>
-            <li>Call-to-action buttons have descriptive labels</li>
-            <li>Icons are decorative and hidden from screen readers</li>
-            <li>Focus management when transitioning from content to empty state</li>
-            <li>Keyboard users can navigate to and activate call-to-action buttons</li>
-            <li>Empty state cards use semantic HTML (section, heading)</li>
+          <h3 className="text-lg font-semibold mb-md">When to use</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When there is no content to display in a section or page</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When a search or filter returns no results</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When a user first encounters a feature before creating content</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When a user has deleted all content from a list</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>When a user lacks permission to view content</span>
+            </li>
           </ul>
         </div>
-      </section>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Best practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use friendly, encouraging language that motivates action</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Include a clear call-to-action that helps users proceed</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use icons or illustrations to make empty states more engaging</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Explain why the state is empty and what the user can do</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>For search/filter states, show the query or active filters</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Never leave empty states completely blank</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Empty state messages are announced to screen readers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Call-to-action buttons have descriptive labels</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Icons are decorative and hidden from screen readers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Focus management when transitioning from content to empty state</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Keyboard users can navigate to and activate call-to-action buttons</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Do's and Don'ts */}
+      <h2 className="mt-2xl">Do&apos;s and Don&apos;ts</h2>
+
+      <div className="not-prose grid md:grid-cols-2 gap-lg my-lg">
+        {/* Do's */}
+        <div className="border-2 border-success rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+            <span className="text-2xl">✓</span> Do
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use friendly, encouraging language</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Include a clear call-to-action</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use icons to make empty states engaging</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Explain why the state is empty</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-success/10 rounded-md">
+            <ComponentPreview code={`<EmptyCard
+  title="Ready to start budgeting?"
+  description="Create your first budget to take control of your spending."
+  icon="💰"
+  action={{ label: 'Create Budget', onClick: handleCreate }}
+/>`}>
+              <EmptyCard
+                title="Ready to start budgeting?"
+                description="Create your first budget to take control of your spending."
+                icon="💰"
+                action={{
+                  label: 'Create Budget',
+                  onClick: () => console.log('Create'),
+                }}
+              />
+            </ComponentPreview>
+          </div>
+        </div>
+
+        {/* Don'ts */}
+        <div className="border-2 border-error rounded-lg p-lg">
+          <h3 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+            <span className="text-2xl">✗</span> Don&apos;t
+          </h3>
+          <ul className="space-y-md text-sm">
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Use negative or discouraging language</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Leave empty states completely blank</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Show a generic &quot;No data&quot; message</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
+              <span>Confuse empty states with error states</span>
+            </li>
+          </ul>
+          <div className="mt-md p-md bg-error/10 rounded-md">
+            <ComponentPreview code={`<EmptyCard
+  title="No budgets"
+  description="The budget list is empty."
+/>`}>
+              <EmptyCard
+                title="No budgets"
+                description="The budget list is empty."
+              />
+            </ComponentPreview>
+          </div>
+        </div>
+      </div>
+
+      {/* Related Components */}
+      <h2>Related Components</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/components/empty-card"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Empty Card
+          </h3>
+          <p className="text-sm text-muted-foreground">Component for displaying empty states</p>
+        </Link>
+
+        <Link
+          href="/components/alert"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Alert
+          </h3>
+          <p className="text-sm text-muted-foreground">Inline contextual messages</p>
+        </Link>
+
+        <Link
+          href="/components/button"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Button
+          </h3>
+          <p className="text-sm text-muted-foreground">Actionable buttons for CTAs</p>
+        </Link>
+      </div>
+
+      {/* Resources */}
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.nngroup.com/articles/empty-state-interface-design/"
+              external
+              showIcon
+            >
+              Nielsen Norman Group: Empty State Design Patterns
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://uxdesign.cc/empty-state-designing-the-void-77e4297e3fc6"
+              external
+              showIcon
+            >
+              UX Collective: Designing the Void - Empty State Best Practices
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/components/empty-card">
+              EmptyCard Component Documentation
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

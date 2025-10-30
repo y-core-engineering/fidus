@@ -165,7 +165,7 @@ export const Toast = React.forwardRef<
 Toast.displayName = 'Toast';
 
 // Toast Viewport for positioning
-const viewportVariants = cva('fixed z-[100] flex max-h-screen w-full flex-col gap-2 p-4', {
+const viewportVariants = cva('fixed z-[300] flex max-h-screen w-full flex-col gap-2 p-4', {
   variants: {
     position: {
       'top-right': 'top-0 right-0 items-end',

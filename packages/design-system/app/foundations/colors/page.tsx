@@ -10,7 +10,7 @@ export default function ColorsPage() {
     variable: string;
     description: string;
   }) => (
-    <div className="border border-border rounded-lg p-4 space-y-2">
+    <div className="border border-border rounded-lg p-md space-y-sm">
       <div
         className="h-24 rounded-md border border-border"
         style={{ backgroundColor: `hsl(var(${variable}))` }}
@@ -37,7 +37,7 @@ export default function ColorsPage() {
         Our brand colors establish Fidus's identity and should be used consistently
         across all applications.
       </p>
-      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
         <ColorSwatch
           name="Primary (Gold)"
           variable="--color-primary"
@@ -55,7 +55,7 @@ export default function ColorsPage() {
         Trust colors communicate privacy and data handling to users. They indicate
         where and how data is processed.
       </p>
-      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
         <ColorSwatch
           name="Local Processing"
           variable="--color-trust-local"
@@ -82,7 +82,7 @@ export default function ColorsPage() {
       <p>
         Semantic colors convey meaning and state across the interface.
       </p>
-      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
         <ColorSwatch
           name="Success"
           variable="--color-success"
@@ -109,7 +109,7 @@ export default function ColorsPage() {
       <p>
         Urgency colors help users prioritize tasks and notifications.
       </p>
-      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
         <ColorSwatch
           name="Urgent"
           variable="--color-urgent"
@@ -137,7 +137,7 @@ export default function ColorsPage() {
         Neutral colors form the foundation of the interface, providing backgrounds,
         borders, and text colors.
       </p>
-      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
         <ColorSwatch
           name="Background"
           variable="--color-background"
