@@ -128,22 +128,22 @@ export default function AIDrivenUIPage() {
           // 1. Show user message IMMEDIATELY (before LLM thinking)
           setVisibleMessages(1);
 
-          // 2. LLM thinks for 2300ms (hidden 300ms + steps 0-4 over 2000ms)
-          // 3. After LLM completes, show typing indicator and response
+          // 2. Show typing indicator immediately after user message (LLM is thinking)
           setTimeout(() => {
             setShowTyping(true);
+          }, 200);
 
-            // Then show assistant response after typing
-            setTimeout(() => {
-              setShowTyping(false);
-              setVisibleMessages(2);
+          // 3. LLM thinks for ~2500ms (300ms + 2000ms steps + 200ms buffer)
+          // 4. After LLM completes, hide typing and show response
+          setTimeout(() => {
+            setShowTyping(false);
+            setVisibleMessages(2);
 
-              // Show widget after response
-              if (nextScene.chat.widget) {
-                setTimeout(() => setShowWidget(true), 500);
-              }
-            }, 800);
-          }, 2300); // Wait for LLM animation to complete (300ms delay + 2000ms steps)
+            // Show widget after response
+            if (nextScene.chat.widget) {
+              setTimeout(() => setShowWidget(true), 500);
+            }
+          }, 2700); // Typing visible during entire LLM process
         } else if (nextScene.card) {
           // For cards (Signal/Event), LLM thinking happens first
           // Card is rendered when llmStep >= 5 (Rendering Complete)
