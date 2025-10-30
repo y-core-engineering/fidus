@@ -1,6 +1,7 @@
 'use client';
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { Link } from '@fidus/ui';
 
 export default function TypographyTokensPage() {
@@ -357,6 +358,15 @@ export default function TypographyTokensPage() {
           </div>
         </div>
       </div>
+
+      <TokenInspector
+        tokens={[
+          ...fontFamilies.map(f => ({ name: f.name, value: f.value, variable: f.variable })),
+          ...fontSizes.map(f => ({ name: f.name, value: f.value, variable: f.variable })),
+          ...lineHeights.map(l => ({ name: l.name, value: l.value, variable: l.variable })),
+        ]}
+        type="typography"
+      />
 
       <h2>Related Tokens</h2>
       <div className="not-prose my-lg">

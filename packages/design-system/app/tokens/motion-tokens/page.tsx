@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { Link, Stack, Button } from '@fidus/ui';
 
 export default function MotionTokensPage() {
@@ -447,6 +448,14 @@ export default function MotionTokensPage() {
   transition: width var(--duration-normal), left var(--duration-normal);
 }`}</code>
       </pre>
+
+      <TokenInspector
+        tokens={[
+          ...durationTokens.map(d => ({ name: d.name, value: d.value, variable: d.variable })),
+          ...easingTokens.map(e => ({ name: e.name, value: e.value, variable: e.variable })),
+        ]}
+        type="motion"
+      />
 
       <h2>Related Tokens</h2>
       <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">

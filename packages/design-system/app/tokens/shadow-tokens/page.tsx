@@ -1,6 +1,7 @@
 'use client';
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { Link } from '@fidus/ui';
 
 export default function ShadowTokensPage() {
@@ -393,6 +394,14 @@ export default function ShadowTokensPage() {
           of interactive states or important content.
         </p>
       </div>
+
+      <TokenInspector
+        tokens={[
+          ...shadowTokens.map(s => ({ name: s.name, value: s.value, variable: s.variable })),
+          ...zIndexTokens.map(z => ({ name: z.name, value: z.value, variable: z.variable })),
+        ]}
+        type="shadow"
+      />
 
       <h2>Related Tokens</h2>
       <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">

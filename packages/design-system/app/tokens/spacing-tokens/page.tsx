@@ -1,6 +1,7 @@
 'use client';
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { Link } from '@fidus/ui';
 
 export default function SpacingTokensPage() {
@@ -356,6 +357,80 @@ export default function SpacingTokensPage() {
           </div>
         </div>
       </div>
+
+      <h2>Grid System Integration</h2>
+      <p>
+        Spacing tokens integrate with the Grid component from @fidus/ui for responsive layouts.
+        Use semantic gap tokens for consistent grid spacing across breakpoints.
+      </p>
+
+      <h3>Grid with Spacing Tokens</h3>
+      <div className="not-prose my-lg space-y-lg">
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: xs (4px)</p>
+          <div className="grid grid-cols-3 gap-xs p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: sm (8px)</p>
+          <div className="grid grid-cols-3 gap-sm p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: md (16px)</p>
+          <div className="grid grid-cols-3 gap-md p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: lg (24px)</p>
+          <div className="grid grid-cols-3 gap-lg p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+      </div>
+
+      <h3>Responsive Grid Example</h3>
+      <pre className="not-prose"><code>{`<Grid columns={{ sm: 1, md: 2, lg: 3 }} gap="md">
+  <Card>Item 1</Card>
+  <Card>Item 2</Card>
+  <Card>Item 3</Card>
+</Grid>
+
+// Renders as:
+// Mobile: 1 column, 16px gap
+// Tablet: 2 columns, 16px gap
+// Desktop: 3 columns, 16px gap`}</code></pre>
+
+      <h3>Grid Guidelines</h3>
+      <ul>
+        <li>Use <code>gap-md</code> (16px) as default grid gap for most layouts</li>
+        <li>Use <code>gap-sm</code> (8px) for compact card grids or dense data displays</li>
+        <li>Use <code>gap-lg</code> (24px) for spacious content-heavy layouts</li>
+        <li>Combine with responsive columns for adaptive layouts</li>
+        <li>Avoid mixing multiple gap sizes within the same grid</li>
+      </ul>
+
+      <TokenInspector
+        tokens={[
+          ...spacingTokens.map(s => ({ name: s.name, value: s.value, variable: s.variable })),
+          ...radiusTokens.map(r => ({ name: r.name, value: r.value, variable: r.variable })),
+        ]}
+        type="spacing"
+      />
 
       <h2>Related Tokens</h2>
       <div className="not-prose my-lg">

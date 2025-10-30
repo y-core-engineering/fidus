@@ -1,6 +1,7 @@
 'use client';
 
 import { ColorSwatch } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { Link, Stack, Button } from '@fidus/ui';
 
 export default function ColorTokensPage() {
@@ -322,6 +323,17 @@ export default function ColorTokensPage() {
           <p className="text-sm">An error occurred while processing your request.</p>
         </div>
       </div>
+
+      <TokenInspector
+        tokens={[
+          ...brandColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...trustColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...semanticColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...urgencyColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...neutralColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+        ]}
+        type="color"
+      />
 
       <h2>Related Tokens</h2>
       <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
