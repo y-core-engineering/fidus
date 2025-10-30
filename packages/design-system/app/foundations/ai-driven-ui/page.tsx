@@ -302,7 +302,7 @@ export default function AIDrivenUIPage() {
 
               {/* Render Chat with progressive animation */}
               {current.chat && (
-                <div className="space-y-3">
+                <div className="space-y-3 mt-20">
                   {/* User message - appears first */}
                   {visibleMessages >= 1 && (
                     <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
