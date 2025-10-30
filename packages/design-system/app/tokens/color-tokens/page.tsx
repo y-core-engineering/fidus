@@ -132,8 +132,8 @@ export default function ColorTokensPage() {
       <p>
         Colors should always be referenced via CSS variables, never hardcoded as hex values:
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ CORRECT: Use CSS variables */
+      <div className="not-prose my-lg">
+        <ComponentPreview code={`/* ✅ CORRECT: Use CSS variables */
 .button {
   background-color: hsl(var(--color-primary));
   color: hsl(var(--color-primary-foreground));
@@ -143,22 +143,35 @@ export default function ColorTokensPage() {
 .button {
   background-color: #FFD700;
   color: #000000;
-}`}</code>
-      </pre>
+}`}>
+          <div className="p-md bg-muted rounded-md">
+            <p className="text-xs text-muted-foreground">CSS code example</p>
+          </div>
+        </ComponentPreview>
+      </div>
 
       <h3>Tailwind CSS Classes</h3>
       <p>
         Tailwind utility classes are preconfigured to use these color tokens:
       </p>
-      <pre className="not-prose">
-        <code>{`<button className="bg-primary text-primary-foreground hover:bg-primary-hover">
+      <div className="not-prose my-lg">
+        <ComponentPreview code={`<button className="bg-primary text-primary-foreground hover:bg-primary-hover">
   Primary Button
 </button>
 
 <div className="bg-muted text-muted-foreground border border-border">
   Muted Card
-</div>`}</code>
-      </pre>
+</div>`}>
+          <div className="space-y-md">
+            <button className="bg-primary text-primary-foreground hover:bg-primary-hover px-md py-sm rounded-md transition-colors">
+              Primary Button
+            </button>
+            <div className="bg-muted text-muted-foreground border border-border p-md rounded-md">
+              Muted Card
+            </div>
+          </div>
+        </ComponentPreview>
+      </div>
 
       <h2>Dark Mode</h2>
       <p>
@@ -180,12 +193,26 @@ export default function ColorTokensPage() {
       </div>
 
       <h2>Accessibility</h2>
-      <ul>
-        <li>All color combinations meet WCAG 2.1 AA contrast requirements (4.5:1 for text)</li>
-        <li>Color is never the only indicator - text labels accompany colored elements</li>
-        <li>Trust colors are distinguishable for users with color blindness</li>
-        <li>Focus indicators use sufficient contrast for keyboard navigation</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>All color combinations meet WCAG 2.1 AA contrast requirements (4.5:1 for text)</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Color is never the only indicator - text labels accompany colored elements</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Trust colors are distinguishable for users with color blindness</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Focus indicators use sufficient contrast for keyboard navigation</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Usage Examples in Context</h2>
       <p>
