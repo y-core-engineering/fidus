@@ -3,6 +3,7 @@
 import { ColorSwatch } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { CodeBlock } from '../../../components/helpers/code-block';
 import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
 import { useState, useEffect } from 'react';
 import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
@@ -134,7 +135,9 @@ export default function ColorTokensPage() {
         Colors should always be referenced via CSS variables, never hardcoded as hex values:
       </p>
       <div className="not-prose my-lg">
-        <ComponentPreview code={`/* ✅ CORRECT: Use CSS variables */
+        <CodeBlock
+          language="css"
+          code={`/* ✅ CORRECT: Use CSS variables */
 .button {
   background-color: hsl(var(--color-primary));
   color: hsl(var(--color-primary-foreground));
@@ -144,11 +147,8 @@ export default function ColorTokensPage() {
 .button {
   background-color: #FFD700;
   color: #000000;
-}`}>
-          <div className="p-md bg-muted rounded-md">
-            <p className="text-xs text-muted-foreground">CSS code example</p>
-          </div>
-        </ComponentPreview>
+}`}
+        />
       </div>
 
       <h3>Tailwind CSS Classes</h3>
@@ -179,18 +179,19 @@ export default function ColorTokensPage() {
         Neutral colors automatically adapt in dark mode. Brand, semantic, and urgency colors
         remain consistent across themes for recognition and consistency.
       </p>
-      <div className="not-prose bg-muted p-md rounded-md">
-        <p className="text-sm text-muted-foreground mb-xs">Dark mode overrides:</p>
-        <pre className="text-xs">
-          <code>{`.dark {
+      <div className="not-prose my-lg">
+        <p className="text-sm text-muted-foreground mb-sm">Dark mode overrides:</p>
+        <CodeBlock
+          language="css"
+          code={`.dark {
   --color-background: 0 0% 9%;     /* #171717 */
   --color-foreground: 0 0% 98%;    /* #FAFAFA */
   --color-muted: 0 0% 15%;         /* #262626 */
   --color-muted-foreground: 0 0% 64%; /* #A3A3A3 */
   --color-border: 0 0% 18%;        /* #2E2E2E */
   --color-input-bg: 0 0% 11%;      /* #1C1C1C */
-}`}</code>
-        </pre>
+}`}
+        />
       </div>
 
       <h2>Accessibility</h2>
@@ -229,14 +230,17 @@ export default function ColorTokensPage() {
           <Button variant="destructive">Destructive</Button>
         </Stack>
       </div>
-      <pre className="not-prose mt-md">
-        <code>{`<Stack direction="horizontal" spacing="sm">
+      <div className="not-prose mt-md">
+        <CodeBlock
+          language="tsx"
+          code={`<Stack direction="horizontal" spacing="sm">
   <Button variant="primary">Primary</Button>
   <Button variant="secondary">Secondary</Button>
   <Button variant="tertiary">Tertiary</Button>
   <Button variant="destructive">Destructive</Button>
-</Stack>`}</code>
-      </pre>
+</Stack>`}
+        />
+      </div>
 
       <h3>Trust Badges</h3>
       <div className="not-prose my-lg">
@@ -251,6 +255,22 @@ export default function ColorTokensPage() {
             Encrypted
           </div>
         </Stack>
+      </div>
+      <div className="not-prose mt-md">
+        <CodeBlock
+          language="tsx"
+          code={`<Stack direction="horizontal" spacing="sm">
+  <div className="px-sm py-xs bg-trust-local/10 text-trust-local border border-trust-local rounded-md text-xs font-semibold">
+    Local Processing
+  </div>
+  <div className="px-sm py-xs bg-trust-cloud/10 text-trust-cloud border border-trust-cloud rounded-md text-xs font-semibold">
+    Cloud Processing
+  </div>
+  <div className="px-sm py-xs bg-trust-encrypted/10 text-trust-encrypted border border-trust-encrypted rounded-md text-xs font-semibold">
+    Encrypted
+  </div>
+</Stack>`}
+        />
       </div>
 
       <h3>Semantic Alerts</h3>
@@ -267,6 +287,25 @@ export default function ColorTokensPage() {
           <p className="text-sm text-error font-semibold mb-xs">Error</p>
           <p className="text-sm">An error occurred while processing your request.</p>
         </div>
+      </div>
+      <div className="not-prose mt-md">
+        <CodeBlock
+          language="tsx"
+          code={`<div className="p-md bg-success/10 border-l-4 border-success rounded-md">
+  <p className="text-sm text-success font-semibold mb-xs">Success</p>
+  <p className="text-sm">Your changes have been saved successfully.</p>
+</div>
+
+<div className="p-md bg-warning/10 border-l-4 border-warning rounded-md">
+  <p className="text-sm text-warning font-semibold mb-xs">Warning</p>
+  <p className="text-sm">Please review your input before continuing.</p>
+</div>
+
+<div className="p-md bg-error/10 border-l-4 border-error rounded-md">
+  <p className="text-sm text-error font-semibold mb-xs">Error</p>
+  <p className="text-sm">An error occurred while processing your request.</p>
+</div>`}
+        />
       </div>
 
       <h2>All Color Tokens</h2>
