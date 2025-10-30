@@ -512,7 +512,7 @@ export default function AIDrivenUIPage() {
                                         <p className="text-lg font-bold text-primary">{msg.widget.data.price}</p>
                                         <div className="flex gap-2">
                                           {msg.widget.data.actions?.map((action: string, actionIdx: number) => (
-                                            <Button key={actionIdx} size="sm">
+                                            <Button key={actionIdx} variant="secondary" size="sm">
                                               {action}
                                             </Button>
                                           ))}
@@ -707,9 +707,9 @@ export default function AIDrivenUIPage() {
                                 <p className="text-lg font-bold text-primary">{widget.data.price}</p>
                                 <div className="flex gap-2">
                                   {widget.data.actions?.map((action: string, idx: number) => (
-                                    <button key={idx} className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                    <Button key={idx} variant="secondary" size="sm">
                                       {action}
-                                    </button>
+                                    </Button>
                                   ))}
                                 </div>
                               </div>
@@ -732,9 +732,9 @@ export default function AIDrivenUIPage() {
                                   </div>
                                 ))}
                               </div>
-                              <button className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                              <Button className="w-full">
                                 {widget.data.action}
-                              </button>
+                              </Button>
                             </div>
                           )}
 
@@ -745,9 +745,9 @@ export default function AIDrivenUIPage() {
                               <p className="text-sm font-semibold mb-3">{widget.data.question}</p>
                               <div className="grid grid-cols-2 gap-2">
                                 {widget.data.options?.map((option: string, idx: number) => (
-                                  <button key={idx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
+                                  <Button key={idx} variant="tertiary" size="sm">
                                     {option}
-                                  </button>
+                                  </Button>
                                 ))}
                               </div>
                             </div>
