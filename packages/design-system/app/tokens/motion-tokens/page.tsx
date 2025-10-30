@@ -220,8 +220,10 @@ export default function MotionTokensPage() {
       <p>
         Always use motion tokens for consistent animation timing:
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ CORRECT: Use motion tokens */
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`/* ✅ CORRECT: Use motion tokens */
 .button {
   transition: background-color var(--duration-fast) var(--easing-standard);
 }
@@ -237,12 +239,15 @@ export default function MotionTokensPage() {
 
 .modal {
   animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Tailwind CSS Classes</h3>
-      <pre className="not-prose">
-        <code>{`<div className="transition-colors duration-fast ease-standard">
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="tsx"
+          code={`<div className="transition-colors duration-fast ease-standard">
   Fast color transition
 </div>
 
@@ -252,14 +257,17 @@ export default function MotionTokensPage() {
 
 <div className="animate-in slide-in-from-bottom duration-slow">
   Slow entrance animation
-</div>`}</code>
-      </pre>
+</div>`}
+        />
+      </div>
 
       <h2>Common Animation Patterns</h2>
 
       <h3>Fade In</h3>
-      <pre className="not-prose">
-        <code>{`@keyframes fadeIn {
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`@keyframes fadeIn {
   from {
     opacity: 0;
   }
@@ -270,12 +278,15 @@ export default function MotionTokensPage() {
 
 .fade-in {
   animation: fadeIn var(--duration-normal) var(--easing-standard);
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Slide In</h3>
-      <pre className="not-prose">
-        <code>{`@keyframes slideIn {
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`@keyframes slideIn {
   from {
     transform: translateY(16px);
     opacity: 0;
@@ -288,12 +299,15 @@ export default function MotionTokensPage() {
 
 .slide-in {
   animation: slideIn var(--duration-normal) var(--easing-decelerate);
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Scale In</h3>
-      <pre className="not-prose">
-        <code>{`@keyframes scaleIn {
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`@keyframes scaleIn {
   from {
     transform: scale(0.95);
     opacity: 0;
@@ -306,104 +320,156 @@ export default function MotionTokensPage() {
 
 .scale-in {
   animation: scaleIn var(--duration-normal) var(--easing-standard);
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h2>Component Guidelines</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Interaction</th>
-            <th>Duration</th>
-            <th>Easing</th>
-            <th>Example</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Hover state</td>
-            <td>fast</td>
-            <td>standard</td>
-            <td>Button background color</td>
-          </tr>
-          <tr>
-            <td>Focus state</td>
-            <td>fast</td>
-            <td>standard</td>
-            <td>Input border highlight</td>
-          </tr>
-          <tr>
-            <td>Toggle switch</td>
-            <td>normal</td>
-            <td>standard</td>
-            <td>Checkbox check animation</td>
-          </tr>
-          <tr>
-            <td>Dropdown open</td>
-            <td>normal</td>
-            <td>decelerate</td>
-            <td>Menu sliding down</td>
-          </tr>
-          <tr>
-            <td>Modal enter</td>
-            <td>normal</td>
-            <td>decelerate</td>
-            <td>Dialog fade and scale in</td>
-          </tr>
-          <tr>
-            <td>Modal exit</td>
-            <td>fast</td>
-            <td>accelerate</td>
-            <td>Dialog fade and scale out</td>
-          </tr>
-          <tr>
-            <td>Page transition</td>
-            <td>slow</td>
-            <td>standard</td>
-            <td>Route change animation</td>
-          </tr>
-          <tr>
-            <td>Toast appear</td>
-            <td>normal</td>
-            <td>decelerate</td>
-            <td>Notification slide in</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="not-prose my-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Interaction</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Easing</TableHead>
+              <TableHead>Example</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell>Hover state</TableCell>
+              <TableCell className="font-mono text-muted-foreground">fast</TableCell>
+              <TableCell className="font-mono text-muted-foreground">standard</TableCell>
+              <TableCell>Button background color</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Focus state</TableCell>
+              <TableCell className="font-mono text-muted-foreground">fast</TableCell>
+              <TableCell className="font-mono text-muted-foreground">standard</TableCell>
+              <TableCell>Input border highlight</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Toggle switch</TableCell>
+              <TableCell className="font-mono text-muted-foreground">normal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">standard</TableCell>
+              <TableCell>Checkbox check animation</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Dropdown open</TableCell>
+              <TableCell className="font-mono text-muted-foreground">normal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">decelerate</TableCell>
+              <TableCell>Menu sliding down</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Modal enter</TableCell>
+              <TableCell className="font-mono text-muted-foreground">normal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">decelerate</TableCell>
+              <TableCell>Dialog fade and scale in</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Modal exit</TableCell>
+              <TableCell className="font-mono text-muted-foreground">fast</TableCell>
+              <TableCell className="font-mono text-muted-foreground">accelerate</TableCell>
+              <TableCell>Dialog fade and scale out</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Page transition</TableCell>
+              <TableCell className="font-mono text-muted-foreground">slow</TableCell>
+              <TableCell className="font-mono text-muted-foreground">standard</TableCell>
+              <TableCell>Route change animation</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Toast appear</TableCell>
+              <TableCell className="font-mono text-muted-foreground">normal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">decelerate</TableCell>
+              <TableCell>Notification slide in</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
 
       <h2>Best Practices</h2>
-      <ul>
-        <li>Default to <code>duration-normal</code> (250ms) for most animations</li>
-        <li>Use <code>duration-fast</code> (150ms) for micro-interactions like hover states</li>
-        <li>Use <code>duration-slow</code> (350ms) sparingly for complex transitions</li>
-        <li>Use <code>easing-standard</code> for most animations</li>
-        <li>Use <code>easing-decelerate</code> for elements entering the screen</li>
-        <li>Use <code>easing-accelerate</code> for elements exiting the screen</li>
-        <li>Avoid animations longer than 500ms - they feel sluggish</li>
-        <li>Respect <code>prefers-reduced-motion</code> for accessibility</li>
-        <li>Don't animate layout properties (width, height) - use transforms instead</li>
-        <li>Keep animations purposeful - not just decorative</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Default to <code>duration-normal</code> (250ms) for most animations</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>duration-fast</code> (150ms) for micro-interactions like hover states</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>duration-slow</code> (350ms) sparingly for complex transitions</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>easing-standard</code> for most animations</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>easing-decelerate</code> for elements entering the screen</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>easing-accelerate</code> for elements exiting the screen</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Avoid animations longer than 500ms - they feel sluggish</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Respect <code>prefers-reduced-motion</code> for accessibility</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Don't animate layout properties (width, height) - use transforms instead</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Keep animations purposeful - not just decorative</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Accessibility</h2>
       <p>
         Always respect user motion preferences:
       </p>
-      <pre className="not-prose">
-        <code>{`@media (prefers-reduced-motion: reduce) {
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`@media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}`}</code>
-      </pre>
-      <ul>
-        <li>Users can disable animations in their OS settings</li>
-        <li>Motion can trigger vestibular disorders - always provide static alternatives</li>
-        <li>Animations should enhance, not obstruct functionality</li>
-        <li>Loading animations are exempt from motion reduction (they convey state)</li>
-      </ul>
+}`}
+        />
+      </div>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Users can disable animations in their OS settings</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Motion can trigger vestibular disorders - always provide static alternatives</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Animations should enhance, not obstruct functionality</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Loading animations are exempt from motion reduction (they convey state)</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Animation Principles</h2>
       <p>
@@ -441,8 +507,10 @@ export default function MotionTokensPage() {
         layout, and paint - an expensive operation that causes jank. Transforms and opacity changes
         are handled by the GPU compositor, ensuring smooth 60fps animations even on lower-end devices.
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ GOOD: GPU-accelerated */
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`/* ✅ GOOD: GPU-accelerated */
 .element {
   transform: translateX(100px);
   opacity: 0;
@@ -454,8 +522,9 @@ export default function MotionTokensPage() {
   width: 200px;
   left: 100px;
   transition: width var(--duration-normal), left var(--duration-normal);
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <TokenInspector
         tokens={[
