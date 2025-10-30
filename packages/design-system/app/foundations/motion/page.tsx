@@ -202,11 +202,11 @@ easing: ease-in-out`}
       <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
         <h3 className="text-base font-semibold mb-md">Swipe Behavior</h3>
         <ol className="text-sm space-y-sm">
-          <li>1. User starts swipe - card follows finger in real-time</li>
-          <li>2. If swipe distance &gt; 50px - trigger dismiss animation</li>
-          <li>3. Card slides out completely (250ms ease-in)</li>
-          <li>4. onDismiss callback is fired</li>
-          <li>5. If swipe &lt; 50px - card springs back (150ms ease-out)</li>
+          <li>User starts swipe - card follows finger in real-time</li>
+          <li>If swipe distance &gt; 50px - trigger dismiss animation</li>
+          <li>Card slides out completely (250ms ease-in)</li>
+          <li>onDismiss callback is fired</li>
+          <li>If swipe &lt; 50px - card springs back (150ms ease-out)</li>
         </ol>
       </div>
 

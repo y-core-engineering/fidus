@@ -43,11 +43,11 @@ export default function AIDrivenUIPage() {
       <div className="bg-muted/30 border border-border rounded-lg p-6 my-6">
         <h4 className="text-sm font-semibold mb-4">Context-Driven UI Flow</h4>
         <ol className="text-sm space-y-2">
-          <li>1. User provides context (query, action, or time-based trigger)</li>
-          <li>2. LLM analyzes: intent, urgency, data complexity, user history</li>
-          <li>3. LLM decides optimal UI form: Card, Form, Chat, Widget, or Wizard</li>
-          <li>4. UI is rendered with appropriate content and actions</li>
-          <li>5. User interacts or dismisses (swipe/X button)</li>
+          <li>User provides context (query, action, or time-based trigger)</li>
+          <li>LLM analyzes: intent, urgency, data complexity, user history</li>
+          <li>LLM decides optimal UI form: Card, Form, Chat, Widget, or Wizard</li>
+          <li>UI is rendered with appropriate content and actions</li>
+          <li>User interacts or dismisses (swipe/X button)</li>
         </ol>
       </div>
 
