@@ -23,6 +23,7 @@ import {
   Cloud,
   Link as LinkIcon,
 } from 'lucide-react';
+import { Link } from '@fidus/ui';
 
 export default function IconsPage() {
   const domainIcons = [
@@ -318,25 +319,45 @@ export default function IconsPage() {
       </div>
 
       <h2>Resources</h2>
-
-      <ul>
-        <li>
-          <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer">
-            Lucide Icon Library
-          </a>
-          - Browse all available icons
-        </li>
-        <li>
-          <a
-            href="https://lucide.dev/guide/packages/lucide-react"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Lucide React Documentation
-          </a>
-          - Installation and usage
-        </li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://lucide.dev"
+              external
+              showIcon
+            >
+              Lucide Icon Library - Browse all 1,000+ available icons
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://lucide.dev/guide/packages/lucide-react"
+              external
+              showIcon
+            >
+              Lucide React Documentation - Installation and usage guide
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.npmjs.com/package/lucide-react"
+              external
+              showIcon
+            >
+              NPM Package - Download lucide-react icon package
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide - How to install Fidus Design System
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
