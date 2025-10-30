@@ -199,31 +199,42 @@ export default function AIDrivenUIPage() {
               ref={scrollContainerRef}
               className="absolute inset-0 pt-24 pb-20 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             >
-              <div className="mb-4">
-                <div className="inline-flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-muted-foreground">{current.context}</span>
-                </div>
-              </div>
+              {/* Dashboard view for Card scenes */}
+              {current.card && (
+                <div className="space-y-4">
+                  {/* Dashboard Header */}
+                  <div>
+                    <h2 className="text-lg font-bold mb-1">Good morning</h2>
+                    <p className="text-xs text-muted-foreground">Here are your opportunities</p>
+                  </div>
 
-              {/* Render OpportunityCard ONLY after LLM thinking completes */}
-              {current.card && llmStep >= 5 && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <OpportunityCard
-                    title={current.card.title}
-                    urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
-                    context="AI-Generated"
-                    primaryAction={{
-                      label: current.card.primary,
-                      onClick: () => {}
-                    }}
-                    secondaryAction={{
-                      label: current.card.secondary,
-                      onClick: () => {}
-                    }}
-                  >
-                    <p className="text-sm">{current.card.content}</p>
-                  </OpportunityCard>
+                  {/* Opportunity Surface - Card appears after LLM thinking */}
+                  {llmStep >= 5 && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <OpportunityCard
+                        title={current.card.title}
+                        urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
+                        context="AI-Generated"
+                        primaryAction={{
+                          label: current.card.primary,
+                          onClick: () => {}
+                        }}
+                        secondaryAction={{
+                          label: current.card.secondary,
+                          onClick: () => {}
+                        }}
+                      >
+                        <p className="text-sm">{current.card.content}</p>
+                      </OpportunityCard>
+                    </div>
+                  )}
+
+                  {/* Empty state before LLM completes */}
+                  {llmStep < 5 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <p className="text-sm">Loading opportunities...</p>
+                    </div>
+                  )}
                 </div>
               )}
 
