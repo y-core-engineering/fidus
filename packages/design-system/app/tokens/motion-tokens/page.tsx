@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
+import { CodeBlock } from '../../../components/helpers/code-block';
+import { Link, Stack, Button, ProgressBar, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@fidus/ui';
 import { getAllTokens } from '../../../components/helpers/get-tokens';
 
 const tokenMetadata: Record<string, { description: string; subcategory: string }> = {
