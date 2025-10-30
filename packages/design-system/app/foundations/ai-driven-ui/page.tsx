@@ -112,26 +112,29 @@ export default function AIDrivenUIPage() {
         const nextScene = TIMELINE[nextIndex];
 
         if (nextScene.chat) {
-          // Wait for LLM processing to complete (2000ms), then show UI response
-          setTimeout(() => {
-            // Show user message first
-            setVisibleMessages(1);
+          // 1. Show user message IMMEDIATELY (before LLM thinking)
+          setVisibleMessages(1);
 
-            // Show typing indicator
+          // 2. LLM thinks for 2000ms (Steps 0-4 appear during this time)
+          // 3. After LLM completes, show typing indicator and response
+          setTimeout(() => {
+            setShowTyping(true);
+
+            // Then show assistant response after typing
             setTimeout(() => {
-              setShowTyping(true);
-              // Then show assistant response
-              setTimeout(() => {
-                setShowTyping(false);
-                setVisibleMessages(2);
-                // Show widget after response
+              setShowTyping(false);
+              setVisibleMessages(2);
+
+              // Show widget after response
+              if (nextScene.chat.widget) {
                 setTimeout(() => setShowWidget(true), 500);
-              }, 800);
-            }, 300);
+              }
+            }, 800);
           }, 2000); // Wait for LLM animation to complete
         } else if (nextScene.card) {
-          // For cards, wait for LLM processing then show card
-          // Card is already rendered, so no additional animation needed
+          // For cards (Signal/Event), LLM thinking happens first
+          // Card is rendered when llmStep >= 5 (Rendering Complete)
+          // No additional animation needed - card is always visible
         }
       }, 500);
     }, 8000); // 8 seconds per scene
@@ -190,23 +193,25 @@ export default function AIDrivenUIPage() {
                 </div>
               </div>
 
-              {/* Render OpportunityCard if current scene has one */}
-              {current.card && (
-                <OpportunityCard
-                  title={current.card.title}
-                  urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
-                  context="AI-Generated"
-                  primaryAction={{
-                    label: current.card.primary,
-                    onClick: () => {}
-                  }}
-                  secondaryAction={{
-                    label: current.card.secondary,
-                    onClick: () => {}
-                  }}
-                >
-                  <p className="text-sm">{current.card.content}</p>
-                </OpportunityCard>
+              {/* Render OpportunityCard ONLY after LLM thinking completes */}
+              {current.card && llmStep >= 5 && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <OpportunityCard
+                    title={current.card.title}
+                    urgency={current.card.type as 'urgent' | 'important' | 'normal' | 'low'}
+                    context="AI-Generated"
+                    primaryAction={{
+                      label: current.card.primary,
+                      onClick: () => {}
+                    }}
+                    secondaryAction={{
+                      label: current.card.secondary,
+                      onClick: () => {}
+                    }}
+                  >
+                    <p className="text-sm">{current.card.content}</p>
+                  </OpportunityCard>
+                </div>
               )}
 
               {/* Render Chat with progressive animation */}
