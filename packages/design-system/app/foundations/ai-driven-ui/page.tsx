@@ -3,59 +3,101 @@
 import { OpportunityCard } from '@fidus/ui';
 import { useState, useEffect, useRef } from 'react';
 
-// Timeline data - different moments throughout the day
+// Timeline data - complex scenarios showing different UI forms
 const TIMELINE = [
+  // Scenario 1: Multi-turn conversation with follow-up questions
   {
-    time: '6:30',
+    time: '8:15',
     period: 'AM',
-    title: 'Wake Up',
-    icon: '🌅',
-    context: 'Meeting at 9:00 AM, no alarm set',
-    inputSource: 'Signal',
-    inputDetail: 'Calendar event without alarm',
-    card: {
-      type: 'urgent',
-      title: 'No Alarm Set',
-      content: 'Client meeting at 9:00 AM (5km away). Raining — add 5 min travel time.',
-      primary: 'Set Alarm',
-      secondary: 'Reschedule'
+    title: 'Morning',
+    icon: '☕',
+    context: 'User asks about weekend plans',
+    inputSource: 'User Request',
+    inputDetail: 'Complex query requiring clarification',
+    chat: {
+      query: 'Help me plan a weekend trip to Munich',
+      response: 'I found 3 options: 1) Stay near Marienplatz (€180/night), 2) Schwabing district (€120/night), or 3) Near Olympic Park (€95/night). Which area interests you?',
+      widget: null
     }
   },
+  // Scenario 2: Proactive card based on pattern detection
   {
-    time: '7:45',
+    time: '9:30',
     period: 'AM',
-    title: 'Breakfast',
-    icon: '☕',
-    context: 'User asks: "What is today?"',
+    title: 'Commute',
+    icon: '🚗',
+    context: 'Recurring Friday coffee expense detected',
+    inputSource: 'Signal',
+    inputDetail: 'Pattern recognition: Weekly expense at same location',
+    card: {
+      type: 'normal',
+      title: 'Recurring Expense Detected',
+      content: 'You spend €4.50 at Café Central every Friday. Create a recurring budget entry?',
+      primary: 'Add to Budget',
+      secondary: 'Ignore'
+    }
+  },
+  // Scenario 3: Form-based interaction with embedded widget
+  {
+    time: '2:00',
+    period: 'PM',
+    title: 'Afternoon',
+    icon: '✈️',
+    context: 'User books flight after trip planning',
     inputSource: 'User Request',
-    inputDetail: 'Text query via chat interface',
+    inputDetail: 'Structured data entry via dynamic form',
     chat: {
-      query: 'What is today?',
-      response: 'You have 3 meetings today. Here is your schedule:',
+      query: 'Book the 10:30 AM flight to Munich on Friday',
+      response: 'Found Lufthansa LH2134 (10:30 AM, €89). Shall I book it?',
       widget: {
-        type: 'calendar',
-        events: [
-          { time: '9:00 AM', title: 'Client Meeting', location: 'Office' },
-          { time: '1:00 PM', title: 'Team Sync', location: 'Video call' },
-          { time: '4:00 PM', title: 'Project Review', location: 'Conference room' }
-        ]
+        type: 'flight-card',
+        data: {
+          airline: 'Lufthansa LH2134',
+          departure: '10:30 AM',
+          arrival: '11:45 AM',
+          price: '€89',
+          actions: ['Book Now', 'Compare Prices']
+        }
       }
     }
   },
+  // Scenario 4: Budget threshold with contextual actions
   {
-    time: '12:30',
+    time: '6:45',
     period: 'PM',
-    title: 'Lunch',
-    icon: '💰',
-    context: 'Food budget 95% (€475/€500)',
+    title: 'Evening',
+    icon: '🍕',
+    context: 'Dining budget at 92%, weekend ahead',
     inputSource: 'Event',
-    inputDetail: 'BudgetThresholdExceeded event',
+    inputDetail: 'BudgetThresholdWarning + ContextualTiming',
     card: {
       type: 'important',
-      title: 'Budget Alert',
-      content: 'You have spent €475 of €500 (95%) with 3 days remaining.',
-      primary: 'View Transactions',
-      secondary: 'Adjust Budget'
+      title: 'Weekend Budget Watch',
+      content: 'Dining budget: €368/€400 (92%). You have €32 left for Fri-Sun. Plan accordingly?',
+      primary: 'View Meals',
+      secondary: 'Adjust'
+    }
+  },
+  // Scenario 5: Ambiguous query requiring wizard
+  {
+    time: '7:20',
+    period: 'PM',
+    title: 'Evening',
+    icon: '📅',
+    context: 'User wants to schedule something complex',
+    inputSource: 'User Request',
+    inputDetail: 'Ambiguous intent → Multi-step wizard',
+    chat: {
+      query: 'Schedule team meeting next week',
+      response: 'I need a few details: 1) Which day works best? 2) Morning or afternoon? 3) How long?',
+      widget: {
+        type: 'wizard-step-1',
+        data: {
+          step: '1 of 3',
+          question: 'Which day?',
+          options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        }
+      }
     }
   }
 ];
@@ -295,17 +337,43 @@ export default function AIDrivenUIPage() {
                   {/* Widget appears after response */}
                   {current.chat.widget && showWidget && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <div className="bg-card border border-border rounded-lg p-3 space-y-2">
-                        {current.chat.widget.events?.map((event, idx) => (
-                          <div key={idx} className="flex items-start gap-2 text-xs">
-                            <span className="text-muted-foreground w-16">{event.time}</span>
+                      {/* Flight Card Widget */}
+                      {current.chat.widget.type === 'flight-card' && current.chat.widget.data && 'airline' in current.chat.widget.data && (
+                        <div className="bg-card border border-border rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-xl">✈️</span>
                             <div>
-                              <p className="font-medium">{event.title}</p>
-                              <p className="text-muted-foreground">{event.location}</p>
+                              <p className="text-sm font-semibold">{current.chat.widget.data.airline}</p>
+                              <p className="text-xs text-muted-foreground">{current.chat.widget.data.departure} → {current.chat.widget.data.arrival}</p>
                             </div>
                           </div>
-                        ))}
-                      </div>
+                          <div className="flex items-center justify-between">
+                            <p className="text-lg font-bold text-primary">{current.chat.widget.data.price}</p>
+                            <div className="flex gap-2">
+                              {current.chat.widget.data.actions?.map((action: string, idx: number) => (
+                                <button key={idx} className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                  {action}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Wizard Widget */}
+                      {current.chat.widget.type === 'wizard-step-1' && current.chat.widget.data && 'step' in current.chat.widget.data && (
+                        <div className="bg-card border border-border rounded-lg p-4">
+                          <p className="text-xs text-muted-foreground mb-2">{current.chat.widget.data.step}</p>
+                          <p className="text-sm font-semibold mb-3">{current.chat.widget.data.question}</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {current.chat.widget.data.options?.map((option: string, idx: number) => (
+                              <button key={idx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
+                                {option}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
