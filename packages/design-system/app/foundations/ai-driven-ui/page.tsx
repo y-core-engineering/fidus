@@ -1,6 +1,13 @@
 'use client';
 
-import { OpportunityCard } from '@fidus/ui';
+import {
+  OpportunityCard,
+  Button,
+  DetailCard,
+  TextInput,
+  Alert,
+  Badge,
+} from '@fidus/ui';
 import { useState, useEffect, useRef } from 'react';
 
 // Timeline data - complex scenarios showing different UI forms
@@ -505,9 +512,9 @@ export default function AIDrivenUIPage() {
                                         <p className="text-lg font-bold text-primary">{msg.widget.data.price}</p>
                                         <div className="flex gap-2">
                                           {msg.widget.data.actions?.map((action: string, actionIdx: number) => (
-                                            <button key={actionIdx} className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90">
+                                            <Button key={actionIdx} size="sm">
                                               {action}
-                                            </button>
+                                            </Button>
                                           ))}
                                         </div>
                                       </div>
@@ -550,16 +557,12 @@ export default function AIDrivenUIPage() {
                                           </div>
                                         ))}
                                       </div>
-                                      <button
-                                        className={`w-full px-4 py-2 text-sm font-medium rounded transition-all ${
-                                          filledFields >= (msg.widget.data.fields?.length || 0)
-                                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                            : 'bg-muted text-muted-foreground cursor-not-allowed'
-                                        }`}
+                                      <Button
+                                        className="w-full"
                                         disabled={filledFields < (msg.widget.data.fields?.length || 0)}
                                       >
                                         {msg.widget.data.action}
-                                      </button>
+                                      </Button>
                                     </div>
                                   )}
 
@@ -570,9 +573,9 @@ export default function AIDrivenUIPage() {
                                       <p className="text-sm font-semibold mb-3">{msg.widget.data.question}</p>
                                       <div className="grid grid-cols-2 gap-2">
                                         {msg.widget.data.options?.map((option: string, optionIdx: number) => (
-                                          <button key={optionIdx} className="px-3 py-2 text-xs font-medium border border-border rounded hover:bg-muted">
+                                          <Button key={optionIdx} variant="tertiary" size="sm">
                                             {option}
-                                          </button>
+                                          </Button>
                                         ))}
                                       </div>
                                     </div>
@@ -583,12 +586,12 @@ export default function AIDrivenUIPage() {
                                     <div className="bg-card border border-border rounded-lg p-4">
                                       <div className="space-y-2">
                                         {msg.widget.data.options?.map((option: string, optionIdx: number) => (
-                                          <button key={optionIdx} className="w-full px-4 py-3 text-sm font-medium border-2 border-border rounded-lg hover:border-primary hover:bg-primary/5 flex items-center justify-between">
+                                          <Button key={optionIdx} variant="tertiary" className="w-full justify-between">
                                             <span>{option}</span>
                                             {option === 'Apple Pay' && <span className="text-lg"></span>}
                                             {option === 'Credit Card' && <span className="text-lg">💳</span>}
                                             {option === 'PayPal' && <span className="text-lg">🅿️</span>}
-                                          </button>
+                                          </Button>
                                         ))}
                                       </div>
                                     </div>
@@ -596,27 +599,22 @@ export default function AIDrivenUIPage() {
 
                                   {/* Booking Confirmation Widget */}
                                   {msg.widget.type === 'booking-confirmation' && msg.widget.data && 'status' in msg.widget.data && 'hotel' in msg.widget.data && (
-                                    <div className="bg-success/10 border border-success/20 rounded-lg p-4">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-2xl">✓</span>
-                                        <p className="text-sm font-bold text-success">{msg.widget.data.title}</p>
-                                      </div>
+                                    <Alert variant="success" title={msg.widget.data.title}>
                                       <p className="text-sm font-semibold mb-2">{msg.widget.data.hotel}</p>
                                       <div className="space-y-1">
                                         {msg.widget.data.details?.map((detail: string, detailIdx: number) => (
-                                          <p key={detailIdx} className="text-xs text-muted-foreground flex items-center gap-2">
-                                            <span className="text-success">•</span>
+                                          <p key={detailIdx} className="text-xs">
                                             {detail}
                                           </p>
                                         ))}
                                       </div>
                                       {'swipeable' in msg.widget.data && msg.widget.data.swipeable && (
-                                        <div className="mt-3 pt-3 border-t border-success/20 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                                        <div className="mt-3 pt-3 border-t border-green-200 flex items-center justify-center gap-2 text-xs">
                                           <span>👆</span>
                                           <span>Swipe to dismiss</span>
                                         </div>
                                       )}
-                                    </div>
+                                    </Alert>
                                   )}
 
                                   {/* Confirmation Widget */}
