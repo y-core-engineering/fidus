@@ -2,49 +2,58 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link } from '@fidus/ui';
+import { CodeBlock } from '../../../components/helpers/code-block';
+import { Link, ProgressBar, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens } from '../../../components/helpers/get-tokens';
+
+const tokenMetadata: Record<string, { description: string; subcategory: string }> = {
+  '--shadow-sm': { description: 'Subtle elevation for hover states', subcategory: 'shadow' },
+  '--shadow-md': { description: 'Standard elevation for cards and dropdowns', subcategory: 'shadow' },
+  '--shadow-lg': { description: 'High elevation for modals and popovers', subcategory: 'shadow' },
+  '--shadow-xl': { description: 'Maximum elevation for overlays and sheets', subcategory: 'shadow' },
+  '--z-base': { description: 'Default stacking level', subcategory: 'zIndex' },
+  '--z-dropdown': { description: 'Dropdown menus and select options', subcategory: 'zIndex' },
+  '--z-sticky': { description: 'Sticky headers and navigation', subcategory: 'zIndex' },
+  '--z-modal': { description: 'Modal dialogs and overlays', subcategory: 'zIndex' },
+  '--z-popover': { description: 'Popovers and tooltips', subcategory: 'zIndex' },
+  '--z-tooltip': { description: 'Tooltips (highest level)', subcategory: 'zIndex' },
+};
 
 export default function ShadowTokensPage() {
-  const shadowTokens = [
-    {
-      name: 'Small Shadow',
-      variable: '--shadow-sm',
-      value: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-      description: 'Subtle elevation for hover states',
-    },
-    {
-      name: 'Medium Shadow',
-      variable: '--shadow-md',
-      value: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-      description: 'Standard elevation for cards and dropdowns',
-    },
-    {
-      name: 'Large Shadow',
-      variable: '--shadow-lg',
-      value: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-      description: 'High elevation for modals and popovers',
-    },
-    {
-      name: 'Extra Large Shadow',
-      variable: '--shadow-xl',
-      value: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-      description: 'Maximum elevation for overlays and sheets',
-    },
-  ];
+  const [allTokens, setAllTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const zIndexTokens = [
-    {
-      name: 'Base',
-      variable: '--z-base',
-      value: '0',
-      description: 'Default stacking level',
-    },
-    {
-      name: 'Dropdown',
-      variable: '--z-dropdown',
-      value: '100',
-      description: 'Dropdown menus and select options',
-    },
+  useEffect(() => {
+    setIsLoading(true);
+    const shadowTokensData = getAllTokens().filter(t => t.category === 'shadow');
+    const zIndexTokensData = getAllTokens().filter(t => t.category === 'zIndex');
+    const combined = [...shadowTokensData, ...zIndexTokensData].map(token => ({
+      ...token,
+      description: tokenMetadata[token.variable]?.description || '',
+    }));
+    setAllTokens(combined);
+    setIsLoading(false);
+  }, []);
+
+  const shadowTokens = allTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'shadow');
+  const zIndexTokens = allTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'zIndex');
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Shadow & Z-Index Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading shadow tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const zIndexTokensOld = [
     {
       name: 'Sticky',
       variable: '--z-sticky',
@@ -83,7 +92,7 @@ export default function ShadowTokensPage() {
       <p>
         Four-level shadow system from subtle to prominent, based on Material Design elevation principles.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {shadowTokens.map((shadow) => (
           <TokenDisplay
             key={shadow.variable}
@@ -111,7 +120,7 @@ export default function ShadowTokensPage() {
       </div>
 
       <h3>Shadow Examples</h3>
-      <div className="not-prose mb-8">
+      <div className="not-prose mb-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <p className="text-sm text-muted-foreground mb-4">Small Shadow</p>
@@ -152,7 +161,7 @@ export default function ShadowTokensPage() {
       <p>
         Organized z-index values to prevent stacking conflicts. Higher values appear above lower values.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {zIndexTokens.map((zIndex) => (
           <TokenDisplay
             key={zIndex.variable}
@@ -165,7 +174,7 @@ export default function ShadowTokensPage() {
       </div>
 
       <h3>Z-Index Visualization</h3>
-      <div className="not-prose mb-8">
+      <div className="not-prose mb-2xl">
         <div className="relative h-64 bg-muted rounded-lg p-4 overflow-hidden">
           <div
             className="absolute bottom-4 left-4 w-32 h-32 bg-background border-2 border-border rounded-md flex items-center justify-center text-sm font-semibold"
@@ -207,8 +216,10 @@ export default function ShadowTokensPage() {
       <p>
         Always use shadow and z-index tokens for consistent elevation:
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ CORRECT: Use shadow tokens */
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`/* ✅ CORRECT: Use shadow tokens */
 .card {
   box-shadow: var(--shadow-md);
 }
@@ -226,102 +237,151 @@ export default function ShadowTokensPage() {
 .modal {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Tailwind CSS Classes</h3>
-      <pre className="not-prose">
-        <code>{`<div className="shadow-sm">Subtle elevation</div>
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="tsx"
+          code={`<div className="shadow-sm">Subtle elevation</div>
 <div className="shadow-md">Standard card</div>
 <div className="shadow-lg">Modal dialog</div>
 <div className="shadow-xl">Drawer overlay</div>
 
 <div className="z-dropdown">Dropdown menu</div>
-<div className="z-modal">Modal overlay</div>`}</code>
-      </pre>
+<div className="z-modal">Modal overlay</div>`}
+        />
+      </div>
 
       <h2>Component Guidelines</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Component</th>
-            <th>Shadow</th>
-            <th>Z-Index</th>
-            <th>Context</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Card</td>
-            <td>sm-md</td>
-            <td>base</td>
-            <td>Resting state</td>
-          </tr>
-          <tr>
-            <td>Button (hover)</td>
-            <td>sm</td>
-            <td>base</td>
-            <td>Interactive feedback</td>
-          </tr>
-          <tr>
-            <td>Dropdown</td>
-            <td>md-lg</td>
-            <td>dropdown</td>
-            <td>Menu overlay</td>
-          </tr>
-          <tr>
-            <td>Sticky Header</td>
-            <td>sm</td>
-            <td>sticky</td>
-            <td>Fixed navigation</td>
-          </tr>
-          <tr>
-            <td>Modal</td>
-            <td>lg-xl</td>
-            <td>modal</td>
-            <td>Dialog overlay</td>
-          </tr>
-          <tr>
-            <td>Popover</td>
-            <td>lg</td>
-            <td>popover</td>
-            <td>Context menu</td>
-          </tr>
-          <tr>
-            <td>Tooltip</td>
-            <td>md</td>
-            <td>tooltip</td>
-            <td>Hover hint</td>
-          </tr>
-          <tr>
-            <td>Drawer</td>
-            <td>xl</td>
-            <td>modal</td>
-            <td>Side sheet</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="not-prose my-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Component</TableHead>
+              <TableHead>Shadow</TableHead>
+              <TableHead>Z-Index</TableHead>
+              <TableHead>Context</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell>Card</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm-md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">base</TableCell>
+              <TableCell>Resting state</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Button (hover)</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm</TableCell>
+              <TableCell className="font-mono text-muted-foreground">base</TableCell>
+              <TableCell>Interactive feedback</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Dropdown</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md-lg</TableCell>
+              <TableCell className="font-mono text-muted-foreground">dropdown</TableCell>
+              <TableCell>Menu overlay</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Sticky Header</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sticky</TableCell>
+              <TableCell>Fixed navigation</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Modal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg-xl</TableCell>
+              <TableCell className="font-mono text-muted-foreground">modal</TableCell>
+              <TableCell>Dialog overlay</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Popover</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg</TableCell>
+              <TableCell className="font-mono text-muted-foreground">popover</TableCell>
+              <TableCell>Context menu</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Tooltip</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">tooltip</TableCell>
+              <TableCell>Hover hint</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Drawer</TableCell>
+              <TableCell className="font-mono text-muted-foreground">xl</TableCell>
+              <TableCell className="font-mono text-muted-foreground">modal</TableCell>
+              <TableCell>Side sheet</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
 
       <h2>Best Practices</h2>
-      <ul>
-        <li>Use shadows to reinforce visual hierarchy, not just decoration</li>
-        <li>Default to <code>shadow-md</code> for most elevated surfaces</li>
-        <li>Use <code>shadow-sm</code> for subtle hover states and transitions</li>
-        <li>Use <code>shadow-lg</code> or <code>shadow-xl</code> for overlays that need clear separation</li>
-        <li>Don't stack multiple large shadows - use one prominent shadow per layer</li>
-        <li>Combine shadow with z-index for proper layering</li>
-        <li>Increase shadow size for interactive elements on hover/focus</li>
-        <li>Use consistent z-index values - don't create arbitrary layers</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use shadows to reinforce visual hierarchy, not just decoration</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Default to <code>shadow-md</code> for most elevated surfaces</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>shadow-sm</code> for subtle hover states and transitions</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>shadow-lg</code> or <code>shadow-xl</code> for overlays that need clear separation</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Don't stack multiple large shadows - use one prominent shadow per layer</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Combine shadow with z-index for proper layering</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Increase shadow size for interactive elements on hover/focus</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use consistent z-index values - don't create arbitrary layers</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Accessibility</h2>
-      <ul>
-        <li>Shadows provide visual affordance but don't rely on them alone</li>
-        <li>Ensure sufficient color contrast regardless of shadow presence</li>
-        <li>Use focus indicators in addition to hover shadows</li>
-        <li>Z-index layers don't affect keyboard navigation order</li>
-        <li>Modal and overlay z-index should trap focus appropriately</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Shadows provide visual affordance but don't rely on them alone</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Ensure sufficient color contrast regardless of shadow presence</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use focus indicators in addition to hover shadows</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Z-index layers don't affect keyboard navigation order</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Modal and overlay z-index should trap focus appropriately</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Dark Mode</h2>
       <p>

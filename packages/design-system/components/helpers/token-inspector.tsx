@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Button, Stack, TextInput } from '@fidus/ui';
 import { Search, Check, Copy } from 'lucide-react';
+import { CodeBlock } from './code-block';
 
 interface TokenInspectorProps {
   tokens: Array<{
@@ -219,22 +220,25 @@ export function TokenInspector({ tokens, type }: TokenInspectorProps) {
         </div>
       )}
 
-      {/* Code View - Original Preview */}
+      {/* Code View - Syntax Highlighted */}
       {view === 'code' && (
-        <pre className="bg-background p-md rounded-md text-xs overflow-x-auto mb-md max-h-96 overflow-y-auto border border-border">
-          <code>
-            {format === 'json'
-              ? JSON.stringify(
-                  filteredTokens.reduce((acc, token) => {
-                    acc[token.name] = token.value;
-                    return acc;
-                  }, {} as Record<string, string>),
-                  null,
-                  2
-                )
-              : `:root {\n${filteredTokens.map(t => `  ${t.variable}: ${t.value};`).join('\n')}\n}`}
-          </code>
-        </pre>
+        <div className="mb-md max-h-96 overflow-y-auto">
+          <CodeBlock
+            language={format === 'json' ? 'json' : 'css'}
+            code={
+              format === 'json'
+                ? JSON.stringify(
+                    filteredTokens.reduce((acc, token) => {
+                      acc[token.name] = token.value;
+                      return acc;
+                    }, {} as Record<string, string>),
+                    null,
+                    2
+                  )
+                : `:root {\n${filteredTokens.map(t => `  ${t.variable}: ${t.value};`).join('\n')}\n}`
+            }
+          />
+        </div>
       )}
 
       {/* Action Buttons */}

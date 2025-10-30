@@ -2,53 +2,35 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link } from '@fidus/ui';
+import { CodeBlock } from '../../../components/helpers/code-block';
+import { Link, ProgressBar, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens } from '../../../components/helpers/get-tokens';
 
 export default function SpacingTokensPage() {
-  const spacingTokens = [
-    {
-      name: 'Extra Small',
-      variable: '--spacing-xs',
-      value: '0.25rem (4px)',
-      size: '4px',
-    },
-    {
-      name: 'Small',
-      variable: '--spacing-sm',
-      value: '0.5rem (8px)',
-      size: '8px',
-    },
-    {
-      name: 'Medium',
-      variable: '--spacing-md',
-      value: '1rem (16px)',
-      size: '16px',
-    },
-    {
-      name: 'Large',
-      variable: '--spacing-lg',
-      value: '1.5rem (24px)',
-      size: '24px',
-    },
-    {
-      name: 'Extra Large',
-      variable: '--spacing-xl',
-      value: '2rem (32px)',
-      size: '32px',
-    },
-    {
-      name: '2X Large',
-      variable: '--spacing-2xl',
-      value: '3rem (48px)',
-      size: '48px',
-    },
-    {
-      name: '3X Large',
-      variable: '--spacing-3xl',
-      value: '4rem (64px)',
-      size: '64px',
-    },
-  ];
+  const [spacingTokens, setSpacingTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const tokens = getAllTokens().filter(t => t.category === 'spacing');
+    setSpacingTokens(tokens);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Spacing Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading spacing tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const radiusTokens = [
     {
@@ -96,7 +78,7 @@ export default function SpacingTokensPage() {
         Our spacing scale follows a progressive scale that doubles at each step after the base unit,
         ensuring visual rhythm and consistency.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {spacingTokens.map((token) => (
           <TokenDisplay
             key={token.variable}
@@ -119,7 +101,7 @@ export default function SpacingTokensPage() {
       <h2>Visual Examples</h2>
 
       <h3>Padding Examples</h3>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <div className="border border-border rounded-md p-xs bg-muted">
           <div className="bg-primary rounded-sm h-8 flex items-center justify-center text-xs text-primary-foreground">
             padding-xs (4px)
@@ -143,9 +125,9 @@ export default function SpacingTokensPage() {
       </div>
 
       <h3>Gap Examples</h3>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <div>
-          <p className="text-sm text-muted-foreground mb-2">gap-sm (8px)</p>
+          <p className="text-sm text-muted-foreground mb-xs">gap-sm (8px)</p>
           <div className="flex gap-sm">
             <div className="w-12 h-12 bg-primary rounded-md" />
             <div className="w-12 h-12 bg-primary rounded-md" />
@@ -153,7 +135,7 @@ export default function SpacingTokensPage() {
           </div>
         </div>
         <div>
-          <p className="text-sm text-muted-foreground mb-2">gap-md (16px)</p>
+          <p className="text-sm text-muted-foreground mb-xs">gap-md (16px)</p>
           <div className="flex gap-md">
             <div className="w-12 h-12 bg-primary rounded-md" />
             <div className="w-12 h-12 bg-primary rounded-md" />
@@ -161,7 +143,7 @@ export default function SpacingTokensPage() {
           </div>
         </div>
         <div>
-          <p className="text-sm text-muted-foreground mb-2">gap-lg (24px)</p>
+          <p className="text-sm text-muted-foreground mb-xs">gap-lg (24px)</p>
           <div className="flex gap-lg">
             <div className="w-12 h-12 bg-primary rounded-md" />
             <div className="w-12 h-12 bg-primary rounded-md" />
@@ -174,7 +156,7 @@ export default function SpacingTokensPage() {
       <p>
         Standard border radius values for rounded corners. Most components use medium radius by default.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {radiusTokens.map((token) => (
           <TokenDisplay
             key={token.variable}
@@ -201,8 +183,10 @@ export default function SpacingTokensPage() {
       <p>
         Always use spacing tokens instead of hardcoded pixel values:
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ CORRECT: Use spacing tokens */
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`/* ✅ CORRECT: Use spacing tokens */
 .card {
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
@@ -216,15 +200,18 @@ export default function SpacingTokensPage() {
   margin-bottom: 24px;
   gap: 8px;
   border-radius: 12px;
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Tailwind CSS Classes</h3>
       <p>
         Tailwind utility classes are preconfigured to use these spacing tokens:
       </p>
-      <pre className="not-prose">
-        <code>{`<div className="p-md mb-lg gap-sm rounded-lg">
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="tsx"
+          code={`<div className="p-md mb-lg gap-sm rounded-lg">
   Content with standard spacing
 </div>
 
@@ -232,63 +219,89 @@ export default function SpacingTokensPage() {
   <div>Item 1</div>
   <div>Item 2</div>
   <div>Item 3</div>
-</div>`}</code>
-      </pre>
+</div>`}
+        />
+      </div>
 
       <h2>Best Practices</h2>
-      <ul>
-        <li>Use the spacing scale consistently - avoid custom values</li>
-        <li>Default to <code>spacing-md</code> (16px) for most padding and margins</li>
-        <li>Use <code>spacing-sm</code> (8px) for tight spacing within components</li>
-        <li>Use <code>spacing-lg</code> (24px) or larger for section spacing</li>
-        <li>Default to <code>radius-md</code> (8px) for most components</li>
-        <li>Use <code>radius-lg</code> (12px) for cards and larger surfaces</li>
-        <li>Use <code>radius-full</code> for circular elements (avatars, pills)</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use the spacing scale consistently - avoid custom values</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Default to <code>spacing-md</code> (16px) for most padding and margins</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>spacing-sm</code> (8px) for tight spacing within components</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>spacing-lg</code> (24px) or larger for section spacing</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Default to <code>radius-md</code> (8px) for most components</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>radius-lg</code> (12px) for cards and larger surfaces</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>radius-full</code> for circular elements (avatars, pills)</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Component Guidelines</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Component</th>
-            <th>Padding</th>
-            <th>Gap</th>
-            <th>Radius</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Button</td>
-            <td>sm-md</td>
-            <td>sm</td>
-            <td>md</td>
-          </tr>
-          <tr>
-            <td>Card</td>
-            <td>md-lg</td>
-            <td>md</td>
-            <td>lg</td>
-          </tr>
-          <tr>
-            <td>Input</td>
-            <td>sm-md</td>
-            <td>-</td>
-            <td>md</td>
-          </tr>
-          <tr>
-            <td>Modal</td>
-            <td>lg-xl</td>
-            <td>md</td>
-            <td>lg</td>
-          </tr>
-          <tr>
-            <td>Badge</td>
-            <td>xs-sm</td>
-            <td>xs</td>
-            <td>sm</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="not-prose my-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Component</TableHead>
+              <TableHead>Padding</TableHead>
+              <TableHead>Gap</TableHead>
+              <TableHead>Radius</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell>Button</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm-md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Card</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md-lg</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Input</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm-md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">-</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Modal</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg-xl</TableCell>
+              <TableCell className="font-mono text-muted-foreground">md</TableCell>
+              <TableCell className="font-mono text-muted-foreground">lg</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Badge</TableCell>
+              <TableCell className="font-mono text-muted-foreground">xs-sm</TableCell>
+              <TableCell className="font-mono text-muted-foreground">xs</TableCell>
+              <TableCell className="font-mono text-muted-foreground">sm</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
 
       <h2>When to Use Which Spacing</h2>
       <p>
@@ -404,7 +417,10 @@ export default function SpacingTokensPage() {
       </div>
 
       <h3>Responsive Grid Example</h3>
-      <pre className="not-prose"><code>{`<Grid columns={{ sm: 1, md: 2, lg: 3 }} gap="md">
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="tsx"
+          code={`<Grid columns={{ sm: 1, md: 2, lg: 3 }} gap="md">
   <Card>Item 1</Card>
   <Card>Item 2</Card>
   <Card>Item 3</Card>
@@ -413,16 +429,35 @@ export default function SpacingTokensPage() {
 // Renders as:
 // Mobile: 1 column, 16px gap
 // Tablet: 2 columns, 16px gap
-// Desktop: 3 columns, 16px gap`}</code></pre>
+// Desktop: 3 columns, 16px gap`}
+        />
+      </div>
 
       <h3>Grid Guidelines</h3>
-      <ul>
-        <li>Use <code>gap-md</code> (16px) as default grid gap for most layouts</li>
-        <li>Use <code>gap-sm</code> (8px) for compact card grids or dense data displays</li>
-        <li>Use <code>gap-lg</code> (24px) for spacious content-heavy layouts</li>
-        <li>Combine with responsive columns for adaptive layouts</li>
-        <li>Avoid mixing multiple gap sizes within the same grid</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>gap-md</code> (16px) as default grid gap for most layouts</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>gap-sm</code> (8px) for compact card grids or dense data displays</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>gap-lg</code> (24px) for spacious content-heavy layouts</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Combine with responsive columns for adaptive layouts</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Avoid mixing multiple gap sizes within the same grid</span>
+          </li>
+        </ul>
+      </div>
 
       <TokenInspector
         tokens={[

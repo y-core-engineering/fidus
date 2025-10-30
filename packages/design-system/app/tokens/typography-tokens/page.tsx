@@ -2,95 +2,60 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link } from '@fidus/ui';
+import { CodeBlock } from '../../../components/helpers/code-block';
+import { Link, ProgressBar } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
+
+// Token metadata for descriptions (values come from CSS at runtime)
+const tokenMetadata: Record<string, { description: string; subcategory: string; example?: string }> = {
+  '--font-sans': { description: 'Primary font for UI and body text', subcategory: 'family' },
+  '--font-mono': { description: 'Font for code blocks and technical content', subcategory: 'family' },
+  '--font-size-xs': { description: 'Extra small text - captions, labels', subcategory: 'size', example: '0.75rem (12px)' },
+  '--font-size-sm': { description: 'Small text - secondary content, metadata', subcategory: 'size', example: '0.875rem (14px)' },
+  '--font-size-md': { description: 'Medium text - body text, default size', subcategory: 'size', example: '1rem (16px)' },
+  '--font-size-lg': { description: 'Large text - emphasized content', subcategory: 'size', example: '1.125rem (18px)' },
+  '--font-size-xl': { description: 'Extra large text - subheadings', subcategory: 'size', example: '1.25rem (20px)' },
+  '--font-size-2xl': { description: '2X large text - section headings', subcategory: 'size', example: '1.5rem (24px)' },
+  '--font-size-3xl': { description: '3X large text - page titles', subcategory: 'size', example: '1.875rem (30px)' },
+  '--font-size-4xl': { description: '4X large text - hero headings', subcategory: 'size', example: '2.25rem (36px)' },
+  '--line-height-tight': { description: 'For headings and short text', subcategory: 'lineHeight' },
+  '--line-height-normal': { description: 'Default line height for body text', subcategory: 'lineHeight' },
+  '--line-height-relaxed': { description: 'For long-form content', subcategory: 'lineHeight' },
+};
 
 export default function TypographyTokensPage() {
-  const fontFamilies = [
-    {
-      name: 'Sans Serif',
-      variable: '--font-sans',
-      value: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      description: 'Primary font for UI and body text',
-    },
-    {
-      name: 'Monospace',
-      variable: '--font-mono',
-      value: "'Fira Code', 'Monaco', 'Courier New', monospace",
-      description: 'Font for code blocks and technical content',
-    },
-  ];
+  const [allTypographyTokens, setAllTypographyTokens] = useState<DesignToken[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fontSizes = [
-    {
-      name: 'Extra Small',
-      variable: '--font-size-xs',
-      value: '0.75rem (12px)',
-      example: 'Extra small text - captions, labels',
-    },
-    {
-      name: 'Small',
-      variable: '--font-size-sm',
-      value: '0.875rem (14px)',
-      example: 'Small text - secondary content, metadata',
-    },
-    {
-      name: 'Medium',
-      variable: '--font-size-md',
-      value: '1rem (16px)',
-      example: 'Medium text - body text, default size',
-    },
-    {
-      name: 'Large',
-      variable: '--font-size-lg',
-      value: '1.125rem (18px)',
-      example: 'Large text - emphasized content',
-    },
-    {
-      name: 'Extra Large',
-      variable: '--font-size-xl',
-      value: '1.25rem (20px)',
-      example: 'Extra large text - subheadings',
-    },
-    {
-      name: '2X Large',
-      variable: '--font-size-2xl',
-      value: '1.5rem (24px)',
-      example: '2X large text - section headings',
-    },
-    {
-      name: '3X Large',
-      variable: '--font-size-3xl',
-      value: '1.875rem (30px)',
-      example: '3X large text - page titles',
-    },
-    {
-      name: '4X Large',
-      variable: '--font-size-4xl',
-      value: '2.25rem (36px)',
-      example: '4X large text - hero headings',
-    },
-  ];
+  useEffect(() => {
+    setIsLoading(true);
+    const tokens = getAllTokens().filter(t => t.category === 'typography');
+    const tokensWithDescriptions = tokens.map(token => ({
+      ...token,
+      description: tokenMetadata[token.variable]?.description || '',
+    }));
+    setAllTypographyTokens(tokensWithDescriptions);
+    setIsLoading(false);
+  }, []);
 
-  const lineHeights = [
-    {
-      name: 'Tight',
-      variable: '--line-height-tight',
-      value: '1.25',
-      description: 'For headings and short text',
-    },
-    {
-      name: 'Normal',
-      variable: '--line-height-normal',
-      value: '1.5',
-      description: 'Default line height for body text',
-    },
-    {
-      name: 'Relaxed',
-      variable: '--line-height-relaxed',
-      value: '1.75',
-      description: 'For long-form content',
-    },
-  ];
+  const fontFamilies = allTypographyTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'family');
+  const fontSizes = allTypographyTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'size');
+  const lineHeights = allTypographyTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'lineHeight');
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Typography Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading typography tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
@@ -101,7 +66,7 @@ export default function TypographyTokensPage() {
       </p>
 
       <h2>Font Families</h2>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {fontFamilies.map((font) => (
           <TokenDisplay
             key={font.variable}
@@ -127,15 +92,15 @@ export default function TypographyTokensPage() {
       </div>
 
       <h3>Font Family Examples</h3>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <div className="p-md bg-muted rounded-lg">
-          <p className="font-sans text-lg mb-2">
+          <p className="font-sans text-lg mb-xs">
             The quick brown fox jumps over the lazy dog.
           </p>
           <p className="text-sm text-muted-foreground">Inter (Sans Serif) - Primary UI font</p>
         </div>
         <div className="p-md bg-muted rounded-lg">
-          <p className="font-mono text-lg mb-2">
+          <p className="font-mono text-lg mb-xs">
             The quick brown fox jumps over the lazy dog.
           </p>
           <p className="text-sm text-muted-foreground">Fira Code (Monospace) - Code font</p>
@@ -146,7 +111,7 @@ export default function TypographyTokensPage() {
       <p>
         Type scale based on a modular scale for consistent visual hierarchy. Base size is 16px (1rem).
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {fontSizes.map((size) => (
           <TokenDisplay
             key={size.variable}
@@ -183,7 +148,7 @@ export default function TypographyTokensPage() {
       </div>
 
       <h3>Type Scale Examples</h3>
-      <div className="not-prose mb-8 space-y-2">
+      <div className="not-prose mb-2xl space-y-xs">
         <p className="text-xs">Extra Small (12px) - Captions and fine print</p>
         <p className="text-sm">Small (14px) - Secondary content and metadata</p>
         <p className="text-md">Medium (16px) - Body text and default size</p>
@@ -198,7 +163,7 @@ export default function TypographyTokensPage() {
       <p>
         Line height tokens for optimal readability at different text sizes and contexts.
       </p>
-      <div className="not-prose space-y-4 mb-8">
+      <div className="not-prose space-y-md mb-2xl">
         {lineHeights.map((lineHeight) => (
           <TokenDisplay
             key={lineHeight.variable}
@@ -211,10 +176,10 @@ export default function TypographyTokensPage() {
       </div>
 
       <h3>Line Height Examples</h3>
-      <div className="not-prose mb-8 space-y-6">
+      <div className="not-prose mb-2xl space-y-6">
         <div className="p-md bg-muted rounded-lg">
           <p
-            className="text-md mb-2"
+            className="text-md mb-xs"
             style={{ lineHeight: 'var(--line-height-tight)' }}
           >
             Tight line height (1.25) - Perfect for headings where lines are close together for
@@ -224,7 +189,7 @@ export default function TypographyTokensPage() {
         </div>
         <div className="p-md bg-muted rounded-lg">
           <p
-            className="text-md mb-2"
+            className="text-md mb-xs"
             style={{ lineHeight: 'var(--line-height-normal)' }}
           >
             Normal line height (1.5) - Standard for body text, balancing readability with
@@ -234,7 +199,7 @@ export default function TypographyTokensPage() {
         </div>
         <div className="p-md bg-muted rounded-lg">
           <p
-            className="text-md mb-2"
+            className="text-md mb-xs"
             style={{ lineHeight: 'var(--line-height-relaxed)' }}
           >
             Relaxed line height (1.75) - Generous spacing for long-form content like articles
@@ -249,7 +214,7 @@ export default function TypographyTokensPage() {
         Predefined heading styles with font size, weight, and line height. All headings use
         semibold weight (600) and tight tracking for visual impact.
       </p>
-      <div className="not-prose mb-8 space-y-4">
+      <div className="not-prose mb-2xl space-y-md">
         <h1 className="text-4xl font-semibold">Heading 1 (36px)</h1>
         <h2 className="text-3xl font-semibold">Heading 2 (30px)</h2>
         <h3 className="text-2xl font-semibold">Heading 3 (24px)</h3>
@@ -262,8 +227,10 @@ export default function TypographyTokensPage() {
       <p>
         Always use typography tokens instead of hardcoded values:
       </p>
-      <pre className="not-prose">
-        <code>{`/* ✅ CORRECT: Use typography tokens */
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="css"
+          code={`/* ✅ CORRECT: Use typography tokens */
 .heading {
   font-family: var(--font-sans);
   font-size: var(--font-size-3xl);
@@ -281,37 +248,84 @@ export default function TypographyTokensPage() {
   font-family: 'Inter', sans-serif;
   font-size: 30px;
   line-height: 1.25;
-}`}</code>
-      </pre>
+}`}
+        />
+      </div>
 
       <h3>Tailwind CSS Classes</h3>
-      <pre className="not-prose">
-        <code>{`<h1 className="text-4xl font-semibold">Hero Heading</h1>
+      <div className="not-prose my-lg">
+        <CodeBlock
+          language="tsx"
+          code={`<h1 className="text-4xl font-semibold">Hero Heading</h1>
 <h2 className="text-3xl font-semibold">Section Heading</h2>
 <p className="text-md leading-normal">Body text paragraph</p>
-<code className="font-mono text-sm">Code snippet</code>`}</code>
-      </pre>
+<code className="font-mono text-sm">Code snippet</code>`}
+        />
+      </div>
 
       <h2>Best Practices</h2>
-      <ul>
-        <li>Use <code>font-sans</code> for all UI text and body content</li>
-        <li>Use <code>font-mono</code> only for code, technical data, and numeric values</li>
-        <li>Default to <code>font-size-md</code> (16px) for body text</li>
-        <li>Use <code>line-height-normal</code> (1.5) for most body text</li>
-        <li>Use <code>line-height-tight</code> (1.25) for headings</li>
-        <li>Use <code>line-height-relaxed</code> (1.75) for long-form content</li>
-        <li>Maintain consistent hierarchy - don't skip heading levels</li>
-        <li>Limit line length to 60-75 characters for optimal readability</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>font-sans</code> for all UI text and body content</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>font-mono</code> only for code, technical data, and numeric values</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Default to <code>font-size-md</code> (16px) for body text</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>line-height-normal</code> (1.5) for most body text</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>line-height-tight</code> (1.25) for headings</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Use <code>line-height-relaxed</code> (1.75) for long-form content</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Maintain consistent hierarchy - don't skip heading levels</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Limit line length to 60-75 characters for optimal readability</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Accessibility</h2>
-      <ul>
-        <li>Base font size is 16px for comfortable reading across devices</li>
-        <li>All text sizes are in rem units for user font-size preference support</li>
-        <li>Sufficient contrast ratios maintained for all text sizes</li>
-        <li>Line heights ensure comfortable reading for users with dyslexia</li>
-        <li>Font weights provide clear visual hierarchy for screen readers</li>
-      </ul>
+      <div className="not-prose my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Base font size is 16px for comfortable reading across devices</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>All text sizes are in rem units for user font-size preference support</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Sufficient contrast ratios maintained for all text sizes</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Line heights ensure comfortable reading for users with dyslexia</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Font weights provide clear visual hierarchy for screen readers</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Line Height Rationale</h2>
       <p>
