@@ -1,7 +1,7 @@
 'use client';
 
 import { OpportunityCard } from '@fidus/ui';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Timeline data - different moments throughout the day
 const TIMELINE = [
@@ -56,16 +56,58 @@ const TIMELINE = [
 
 export default function AIDrivenUIPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showTyping, setShowTyping] = useState(false);
+  const [visibleMessages, setVisibleMessages] = useState(0);
+  const [showWidget, setShowWidget] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const current = TIMELINE[currentIndex];
 
-  // Auto-advance through timeline - continuous loop
+  // Auto-scroll to bottom when new messages appear
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [visibleMessages, showWidget, showTyping]);
+
+  // Auto-advance through timeline with progressive animations
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % TIMELINE.length);
-    }, 6000); // 6 seconds per scene
+      // Reset animation states
+      setShowTyping(false);
+      setVisibleMessages(0);
+      setShowWidget(false);
+
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % TIMELINE.length);
+
+        // Trigger progressive animations for chat scenes
+        const nextIndex = (currentIndex + 1) % TIMELINE.length;
+        const nextScene = TIMELINE[nextIndex];
+
+        if (nextScene.chat) {
+          // Show user message first
+          setTimeout(() => setVisibleMessages(1), 300);
+
+          // Show typing indicator
+          setTimeout(() => {
+            setShowTyping(true);
+            // Then show assistant response
+            setTimeout(() => {
+              setShowTyping(false);
+              setVisibleMessages(2);
+              // Show widget after response
+              setTimeout(() => setShowWidget(true), 500);
+            }, 800);
+          }, 1200);
+        }
+      }, 500);
+    }, 8000); // 8 seconds per scene
 
     return () => clearInterval(timer);
-  }, []);
+  }, [currentIndex]);
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
@@ -104,8 +146,11 @@ export default function AIDrivenUIPage() {
               </div>
             </div>
 
-            {/* Content Area */}
-            <div className="absolute inset-0 pt-24 pb-20 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {/* Content Area with auto-scroll */}
+            <div
+              ref={scrollContainerRef}
+              className="absolute inset-0 pt-24 pb-20 px-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            >
               <div className="mb-4">
                 <div className="inline-flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -132,30 +177,54 @@ export default function AIDrivenUIPage() {
                 </OpportunityCard>
               )}
 
-              {/* Render Chat widget if current scene has one */}
+              {/* Render Chat with progressive animation */}
               {current.chat && (
                 <div className="space-y-3">
-                  <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%]">
-                      <p className="text-sm">{current.chat.query}</p>
+                  {/* User message - appears first */}
+                  {visibleMessages >= 1 && (
+                    <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%]">
+                        <p className="text-sm">{current.chat.query}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex justify-start">
-                    <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
-                      <p className="text-sm">{current.chat.response}</p>
-                    </div>
-                  </div>
-                  {current.chat.widget && (
-                    <div className="bg-card border border-border rounded-lg p-3 space-y-2">
-                      {current.chat.widget.events?.map((event, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs">
-                          <span className="text-muted-foreground w-16">{event.time}</span>
-                          <div>
-                            <p className="font-medium">{event.title}</p>
-                            <p className="text-muted-foreground">{event.location}</p>
-                          </div>
+                  )}
+
+                  {/* Typing indicator */}
+                  {showTyping && (
+                    <div className="flex justify-start animate-in fade-in duration-200">
+                      <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                        <div className="flex gap-1">
+                          <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
-                      ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Assistant response - appears after typing */}
+                  {visibleMessages >= 2 && (
+                    <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                        <p className="text-sm">{current.chat.response}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Widget appears after response */}
+                  {current.chat.widget && showWidget && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <div className="bg-card border border-border rounded-lg p-3 space-y-2">
+                        {current.chat.widget.events?.map((event, idx) => (
+                          <div key={idx} className="flex items-start gap-2 text-xs">
+                            <span className="text-muted-foreground w-16">{event.time}</span>
+                            <div>
+                              <p className="font-medium">{event.title}</p>
+                              <p className="text-muted-foreground">{event.location}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
