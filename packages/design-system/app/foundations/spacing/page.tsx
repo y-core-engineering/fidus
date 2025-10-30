@@ -64,7 +64,7 @@ export default function SpacingPage() {
             <code className="text-sm">padding: var(--spacing-xs)</code>
           </div>
           <div style={{ padding: 'var(--spacing-xs)' }} className="bg-muted/10">
-            <div className="bg-primary/20 border border-primary rounded">
+            <div className="bg-primary/20 border border-primary rounded-md">
               XS Padding (4px)
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function SpacingPage() {
             <code className="text-sm">padding: var(--spacing-md)</code>
           </div>
           <div style={{ padding: 'var(--spacing-md)' }} className="bg-muted/10">
-            <div className="bg-primary/20 border border-primary rounded">
+            <div className="bg-primary/20 border border-primary rounded-md">
               MD Padding (16px)
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function SpacingPage() {
             <code className="text-sm">padding: var(--spacing-xl)</code>
           </div>
           <div style={{ padding: 'var(--spacing-xl)' }} className="bg-muted/10">
-            <div className="bg-primary/20 border border-primary rounded">
+            <div className="bg-primary/20 border border-primary rounded-md">
               XL Padding (32px)
             </div>
           </div>

@@ -134,10 +134,10 @@ export default function PrivacyUXPage() {
           🔒 This data stays on your device and is never shared.
         </p>
         <div className="flex gap-xs">
-          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded">
+          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md">
             Save
           </button>
-          <button className="px-3 py-1.5 text-sm border border-border rounded">Cancel</button>
+          <button className="px-3 py-1.5 text-sm border border-border rounded-md">Cancel</button>
         </div>
       </div>
 
@@ -176,10 +176,10 @@ export default function PrivacyUXPage() {
           <li>✗ Access to other Google services</li>
         </ul>
         <div className="flex gap-xs">
-          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded">
+          <button className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md">
             Allow Access
           </button>
-          <button className="px-3 py-1.5 text-sm border border-border rounded">Deny</button>
+          <button className="px-3 py-1.5 text-sm border border-border rounded-md">Deny</button>
         </div>
       </div>
 
@@ -223,7 +223,7 @@ export default function PrivacyUXPage() {
             <p className="text-sm font-medium">Calendar Sync</p>
             <p className="text-xs text-muted-foreground">Sync with Google Calendar</p>
           </div>
-          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded">
+          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md">
             Enabled
           </button>
         </div>
@@ -233,7 +233,7 @@ export default function PrivacyUXPage() {
             <p className="text-sm font-medium">Budget Alerts</p>
             <p className="text-xs text-muted-foreground">Proactive spending notifications</p>
           </div>
-          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded">
+          <button className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md">
             Enabled
           </button>
         </div>
@@ -243,7 +243,7 @@ export default function PrivacyUXPage() {
             <p className="text-sm font-medium">Cloud Backup</p>
             <p className="text-xs text-muted-foreground">Encrypted backup to cloud</p>
           </div>
-          <button className="px-3 py-1 text-xs border border-border rounded">Disabled</button>
+          <button className="px-3 py-1 text-xs border border-border rounded-md">Disabled</button>
         </div>
       </div>
 
@@ -251,10 +251,10 @@ export default function PrivacyUXPage() {
       <p>Users can export or delete all data at any time:</p>
 
       <div className="flex gap-sm my-lg">
-        <button className="px-4 py-2 text-sm border border-border rounded">
+        <button className="px-4 py-2 text-sm border border-border rounded-md">
           Export All Data
         </button>
-        <button className="px-4 py-2 text-sm border border-error text-error rounded">
+        <button className="px-4 py-2 text-sm border border-error text-error rounded-md">
           Delete All Data
         </button>
       </div>

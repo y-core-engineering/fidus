@@ -341,19 +341,19 @@ export default function ResponsiveDesignPage() {
         <div className="border border-border rounded-lg p-lg bg-card">
           <h4 className="text-base font-semibold mb-md">📱 Mobile Phones (Portrait)</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPhone SE (2022)</span>
               <code className="text-xs">375 × 667</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPhone 14 Pro</span>
               <code className="text-xs">393 × 852</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>Samsung Galaxy S23</span>
               <code className="text-xs">360 × 780</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>Google Pixel 7</span>
               <code className="text-xs">412 × 915</code>
             </div>
@@ -363,11 +363,11 @@ export default function ResponsiveDesignPage() {
         <div className="border border-border rounded-lg p-lg bg-card">
           <h4 className="text-base font-semibold mb-md">📱 Mobile Phones (Landscape)</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPhone 14 Pro (landscape)</span>
               <code className="text-xs">852 × 393</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>Samsung Galaxy S23 (landscape)</span>
               <code className="text-xs">780 × 360</code>
             </div>
@@ -377,19 +377,19 @@ export default function ResponsiveDesignPage() {
         <div className="border border-border rounded-lg p-lg bg-card">
           <h4 className="text-base font-semibold mb-md">💻 Tablets</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPad Mini (portrait)</span>
               <code className="text-xs">768 × 1024</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPad Air (portrait)</span>
               <code className="text-xs">820 × 1180</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPad Pro 11&quot; (portrait)</span>
               <code className="text-xs">834 × 1194</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>iPad Pro 12.9&quot; (landscape)</span>
               <code className="text-xs">1366 × 1024</code>
             </div>
@@ -399,19 +399,19 @@ export default function ResponsiveDesignPage() {
         <div className="border border-border rounded-lg p-lg bg-card">
           <h4 className="text-base font-semibold mb-md">🖥️ Desktop & Laptop</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>MacBook Air 13&quot;</span>
               <code className="text-xs">1280 × 832</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>MacBook Pro 14&quot;</span>
               <code className="text-xs">1512 × 982</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>Full HD Monitor</span>
               <code className="text-xs">1920 × 1080</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded">
+            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
               <span>4K Monitor</span>
               <code className="text-xs">3840 × 2160</code>
             </div>

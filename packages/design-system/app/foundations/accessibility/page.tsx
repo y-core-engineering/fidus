@@ -672,7 +672,7 @@ export default function AccessibilityPage() {
               <strong>Usage:</strong> Open DevTools → Axe DevTools tab → &quot;Scan All of My
               Page&quot;
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded p-sm">
+            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Automated full-page scans</li>
@@ -705,7 +705,7 @@ export default function AccessibilityPage() {
             <p>
               <strong>Usage:</strong> Enter URL or use extension to scan current page
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded p-sm">
+            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Visual feedback with icons on page</li>
@@ -729,7 +729,7 @@ export default function AccessibilityPage() {
             <p>
               <strong>Usage:</strong> Select &quot;Accessibility&quot; category → Generate report
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded p-sm">
+            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Comprehensive accessibility score (0-100)</li>
@@ -753,7 +753,7 @@ export default function AccessibilityPage() {
             <p>
               <strong>Usage:</strong> <code className="text-xs">pa11y-ci --sitemap https://your-site.com/sitemap.xml</code>
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded p-sm">
+            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Test multiple URLs automatically</li>
