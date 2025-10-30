@@ -2,49 +2,57 @@
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link } from '@fidus/ui';
+import { Link, ProgressBar } from '@fidus/ui';
+import { useState, useEffect } from 'react';
+import { getAllTokens } from '../../../components/helpers/get-tokens';
+
+const tokenMetadata: Record<string, { description: string; subcategory: string }> = {
+  '--shadow-sm': { description: 'Subtle elevation for hover states', subcategory: 'shadow' },
+  '--shadow-md': { description: 'Standard elevation for cards and dropdowns', subcategory: 'shadow' },
+  '--shadow-lg': { description: 'High elevation for modals and popovers', subcategory: 'shadow' },
+  '--shadow-xl': { description: 'Maximum elevation for overlays and sheets', subcategory: 'shadow' },
+  '--z-base': { description: 'Default stacking level', subcategory: 'zIndex' },
+  '--z-dropdown': { description: 'Dropdown menus and select options', subcategory: 'zIndex' },
+  '--z-sticky': { description: 'Sticky headers and navigation', subcategory: 'zIndex' },
+  '--z-modal': { description: 'Modal dialogs and overlays', subcategory: 'zIndex' },
+  '--z-popover': { description: 'Popovers and tooltips', subcategory: 'zIndex' },
+  '--z-tooltip': { description: 'Tooltips (highest level)', subcategory: 'zIndex' },
+};
 
 export default function ShadowTokensPage() {
-  const shadowTokens = [
-    {
-      name: 'Small Shadow',
-      variable: '--shadow-sm',
-      value: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-      description: 'Subtle elevation for hover states',
-    },
-    {
-      name: 'Medium Shadow',
-      variable: '--shadow-md',
-      value: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-      description: 'Standard elevation for cards and dropdowns',
-    },
-    {
-      name: 'Large Shadow',
-      variable: '--shadow-lg',
-      value: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-      description: 'High elevation for modals and popovers',
-    },
-    {
-      name: 'Extra Large Shadow',
-      variable: '--shadow-xl',
-      value: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-      description: 'Maximum elevation for overlays and sheets',
-    },
-  ];
+  const [allTokens, setAllTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const zIndexTokens = [
-    {
-      name: 'Base',
-      variable: '--z-base',
-      value: '0',
-      description: 'Default stacking level',
-    },
-    {
-      name: 'Dropdown',
-      variable: '--z-dropdown',
-      value: '100',
-      description: 'Dropdown menus and select options',
-    },
+  useEffect(() => {
+    setIsLoading(true);
+    const shadowTokensData = getAllTokens().filter(t => t.category === 'shadow');
+    const zIndexTokensData = getAllTokens().filter(t => t.category === 'zIndex');
+    const combined = [...shadowTokensData, ...zIndexTokensData].map(token => ({
+      ...token,
+      description: tokenMetadata[token.variable]?.description || '',
+    }));
+    setAllTokens(combined);
+    setIsLoading(false);
+  }, []);
+
+  const shadowTokens = allTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'shadow');
+  const zIndexTokens = allTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'zIndex');
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Shadow & Z-Index Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading shadow tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const zIndexTokensOld = [
     {
       name: 'Sticky',
       variable: '--z-sticky',

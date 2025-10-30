@@ -1,49 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
-import { Link, Stack, Button } from '@fidus/ui';
+import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
+import { getAllTokens } from '../../../components/helpers/get-tokens';
+
+const tokenMetadata: Record<string, { description: string; subcategory: string }> = {
+  '--duration-fast': { description: 'Quick transitions for hover states and small UI changes', subcategory: 'duration' },
+  '--duration-normal': { description: 'Standard duration for most transitions and animations', subcategory: 'duration' },
+  '--duration-slow': { description: 'Slower transitions for complex animations and page changes', subcategory: 'duration' },
+  '--easing-standard': { description: 'Balanced easing for most animations', subcategory: 'easing' },
+  '--easing-decelerate': { description: 'Slow out - for elements entering the screen', subcategory: 'easing' },
+  '--easing-accelerate': { description: 'Slow in - for elements leaving the screen', subcategory: 'easing' },
+};
 
 export default function MotionTokensPage() {
   const [isAnimating1, setIsAnimating1] = useState(false);
   const [isAnimating2, setIsAnimating2] = useState(false);
   const [isAnimating3, setIsAnimating3] = useState(false);
+  const [allMotionTokens, setAllMotionTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const durationTokens = [
-    {
-      name: 'Fast',
-      variable: '--duration-fast',
-      value: '150ms',
-      description: 'Quick transitions for hover states and small UI changes',
-    },
-    {
-      name: 'Normal',
-      variable: '--duration-normal',
-      value: '250ms',
-      description: 'Standard duration for most transitions and animations',
-    },
-    {
-      name: 'Slow',
-      variable: '--duration-slow',
-      value: '350ms',
-      description: 'Slower transitions for complex animations and page changes',
-    },
-  ];
+  useEffect(() => {
+    setIsLoading(true);
+    const tokens = getAllTokens().filter(t => t.category === 'motion');
+    const tokensWithDescriptions = tokens.map(token => ({
+      ...token,
+      description: tokenMetadata[token.variable]?.description || '',
+    }));
+    setAllMotionTokens(tokensWithDescriptions);
+    setIsLoading(false);
+  }, []);
 
-  const easingTokens = [
-    {
-      name: 'Standard',
-      variable: '--easing-standard',
-      value: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-      description: 'Balanced easing for most animations',
-    },
-    {
-      name: 'Decelerate',
-      variable: '--easing-decelerate',
-      value: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
-      description: 'Slow out - for elements entering the screen',
-    },
+  const durationTokens = allMotionTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'duration');
+  const easingTokens = allMotionTokens.filter(t => tokenMetadata[t.variable]?.subcategory === 'easing');
+
+  if (isLoading) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <h1>Motion Tokens</h1>
+        <div className="rounded-lg border border-border bg-card p-lg my-lg">
+          <div className="space-y-sm py-xl">
+            <p className="text-sm text-muted-foreground text-center">Loading motion tokens...</p>
+            <ProgressBar indeterminate variant="primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const easingTokensOld = [
     {
       name: 'Accelerate',
       variable: '--easing-accelerate',
