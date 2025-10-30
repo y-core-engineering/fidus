@@ -202,12 +202,6 @@ export default function AIDrivenUIPage() {
               {/* Dashboard view for Card scenes */}
               {current.card && (
                 <div className="space-y-4">
-                  {/* Dashboard Header */}
-                  <div>
-                    <h2 className="text-lg font-bold mb-1">Good morning</h2>
-                    <p className="text-xs text-muted-foreground">Your day at a glance</p>
-                  </div>
-
                   {/* Quick Stats */}
                   <div className="grid grid-cols-3 gap-2">
                     <div className="bg-muted/50 rounded-lg p-2.5 border border-border">
