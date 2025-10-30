@@ -137,6 +137,7 @@ const navigation: NavItem[] = [
   {
     title: 'Tokens',
     items: [
+      { title: 'Overview', href: '/tokens' },
       { title: 'Colors', href: '/tokens/color-tokens' },
       { title: 'Typography', href: '/tokens/typography-tokens' },
       { title: 'Spacing', href: '/tokens/spacing-tokens' },
