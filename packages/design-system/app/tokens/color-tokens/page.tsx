@@ -2,6 +2,7 @@
 
 import { ColorSwatch } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
+import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
 import { useState, useEffect } from 'react';
 import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
