@@ -271,7 +271,7 @@ export default function ErrorStatesPage() {
               <Button variant="secondary" onClick={() => setShowErrorModal(false)}>
                 Go Back
               </Button>
-              <Button variant="error" onClick={() => setShowErrorModal(false)}>
+              <Button variant="destructive" onClick={() => setShowErrorModal(false)}>
                 Discard Changes
               </Button>
             </Stack>

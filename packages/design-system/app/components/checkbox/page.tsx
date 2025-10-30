@@ -74,13 +74,13 @@ export default function CheckboxPage() {
         code={`<Checkbox
   label="Accept terms and conditions"
   checked={checked}
-  onChange={(e) => setChecked(e.target.checked)}
+  onChange={(checked) => setChecked(checked)}
 />`}
       >
         <Checkbox
           label="Accept terms and conditions"
           checked={checked}
-          onChange={(e) => setChecked(e.target.checked)}
+          onChange={(checked) => setChecked(checked)}
         />
       </ComponentPreview>
 
@@ -110,7 +110,7 @@ export default function CheckboxPage() {
   label="Select all items"
   checked={indeterminate}
   indeterminate={indeterminate}
-  onChange={(e) => setIndeterminate(e.target.checked)}
+  onChange={(checked) => setIndeterminate(checked)}
   helperText="Some items are selected"
 />`}
       >
@@ -118,7 +118,7 @@ export default function CheckboxPage() {
           label="Select all items"
           checked={indeterminate}
           indeterminate={indeterminate}
-          onChange={(e) => setIndeterminate(e.target.checked)}
+          onChange={(checked) => setIndeterminate(checked)}
           helperText="Some items are selected"
         />
       </ComponentPreview>
@@ -157,25 +157,25 @@ export default function CheckboxPage() {
     <Checkbox
       label="Newsletter"
       checked={preferences.newsletter}
-      onChange={(e) => setPreferences({ ...preferences, newsletter: e.target.checked })}
+      onChange={(checked) => setPreferences({ ...preferences, newsletter: checked })}
       helperText="Weekly updates about new features"
     />
     <Checkbox
       label="Notifications"
       checked={preferences.notifications}
-      onChange={(e) => setPreferences({ ...preferences, notifications: e.target.checked })}
+      onChange={(checked) => setPreferences({ ...preferences, notifications: checked })}
       helperText="Get notified about important events"
     />
     <Checkbox
       label="Product Updates"
       checked={preferences.updates}
-      onChange={(e) => setPreferences({ ...preferences, updates: e.target.checked })}
+      onChange={(checked) => setPreferences({ ...preferences, updates: checked })}
       helperText="Monthly product updates and announcements"
     />
     <Checkbox
       label="Marketing"
       checked={preferences.marketing}
-      onChange={(e) => setPreferences({ ...preferences, marketing: e.target.checked })}
+      onChange={(checked) => setPreferences({ ...preferences, marketing: checked })}
       helperText="Promotional offers and discounts"
     />
   </Stack>
@@ -187,25 +187,25 @@ export default function CheckboxPage() {
             <Checkbox
               label="Newsletter"
               checked={preferences.newsletter}
-              onChange={(e) => setPreferences({ ...preferences, newsletter: e.target.checked })}
+              onChange={(checked) => setPreferences({ ...preferences, newsletter: checked })}
               helperText="Weekly updates about new features"
             />
             <Checkbox
               label="Notifications"
               checked={preferences.notifications}
-              onChange={(e) => setPreferences({ ...preferences, notifications: e.target.checked })}
+              onChange={(checked) => setPreferences({ ...preferences, notifications: checked })}
               helperText="Get notified about important events"
             />
             <Checkbox
               label="Product Updates"
               checked={preferences.updates}
-              onChange={(e) => setPreferences({ ...preferences, updates: e.target.checked })}
+              onChange={(checked) => setPreferences({ ...preferences, updates: checked })}
               helperText="Monthly product updates and announcements"
             />
             <Checkbox
               label="Marketing"
               checked={preferences.marketing}
-              onChange={(e) => setPreferences({ ...preferences, marketing: e.target.checked })}
+              onChange={(checked) => setPreferences({ ...preferences, marketing: checked })}
               helperText="Promotional offers and discounts"
             />
           </Stack>

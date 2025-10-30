@@ -191,13 +191,13 @@ const categories = [
                       />
                     </div>
 
-                    <Button variant="secondary" fullWidth>
+                    <Button variant="secondary" className="w-full">
                       Change Password
                     </Button>
 
                     <div className="border-t border-border pt-md mt-md">
                       <h3 className="font-semibold text-error mb-sm">Danger Zone</h3>
-                      <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
+                      <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
                         Delete Account
                       </Button>
                     </div>
@@ -246,7 +246,7 @@ const categories = [
                       />
                     </div>
 
-                    <Button variant="primary" fullWidth>
+                    <Button variant="primary" className="w-full">
                       View Privacy Report
                     </Button>
                   </div>
@@ -373,9 +373,9 @@ const categories = [
                         Download all your data in JSON, CSV, or PDF format.
                       </p>
                       <Stack direction="horizontal" spacing="sm">
-                        <Button variant="secondary" size="small">Export as JSON</Button>
-                        <Button variant="secondary" size="small">Export as CSV</Button>
-                        <Button variant="secondary" size="small">Export as PDF</Button>
+                        <Button variant="secondary" size="sm">Export as JSON</Button>
+                        <Button variant="secondary" size="sm">Export as CSV</Button>
+                        <Button variant="secondary" size="sm">Export as PDF</Button>
                       </Stack>
                     </div>
 
@@ -426,7 +426,7 @@ const categories = [
               <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                 Cancel
               </Button>
-              <Button variant="danger">
+              <Button variant="destructive">
                 Delete My Account
               </Button>
             </Stack>

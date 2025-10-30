@@ -1,6 +1,8 @@
 'use client';
 
 import { ColorSwatch } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
+import { Link, Stack, Button } from '@fidus/ui';
 
 export default function ColorTokensPage() {
   const brandColors = [
@@ -162,7 +164,7 @@ export default function ColorTokensPage() {
       <p>
         Core brand colors including the signature Fidus gold and neutral black and white.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
         {brandColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -173,7 +175,7 @@ export default function ColorTokensPage() {
         Colors indicating privacy levels and data processing locations. Used in Privacy Badges
         to communicate transparency to users.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
         {trustColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -183,7 +185,7 @@ export default function ColorTokensPage() {
       <p>
         Standard semantic colors for feedback, alerts, and status indicators.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
         {semanticColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -193,7 +195,7 @@ export default function ColorTokensPage() {
       <p>
         Colors used to indicate urgency levels in OpportunityCards and priority indicators.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
         {urgencyColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -203,7 +205,7 @@ export default function ColorTokensPage() {
       <p>
         Foundation colors for backgrounds, text, and surfaces. These adapt in dark mode.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md not-prose mb-8">
         {neutralColors.map((color) => (
           <ColorSwatch key={color.variable} {...color} />
         ))}
@@ -246,7 +248,7 @@ export default function ColorTokensPage() {
         Neutral colors automatically adapt in dark mode. Brand, semantic, and urgency colors
         remain consistent across themes for recognition and consistency.
       </p>
-      <div className="not-prose bg-muted p-4 rounded-lg">
+      <div className="not-prose bg-muted p-md rounded-md">
         <p className="text-sm text-muted-foreground mb-2">Dark mode overrides:</p>
         <pre className="text-xs">
           <code>{`.dark {
@@ -267,6 +269,143 @@ export default function ColorTokensPage() {
         <li>Trust colors are distinguishable for users with color blindness</li>
         <li>Focus indicators use sufficient contrast for keyboard navigation</li>
       </ul>
+
+      <h2>Usage Examples in Context</h2>
+      <p>
+        Practical examples showing how color tokens work together in real components:
+      </p>
+
+      <h3>Button States</h3>
+      <div className="not-prose my-lg">
+        <Stack direction="horizontal" spacing="sm">
+          <Button variant="primary">Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="tertiary">Tertiary</Button>
+          <Button variant="destructive">Destructive</Button>
+        </Stack>
+      </div>
+      <pre className="not-prose mt-md">
+        <code>{`<Stack direction="horizontal" spacing="sm">
+  <Button variant="primary">Primary</Button>
+  <Button variant="secondary">Secondary</Button>
+  <Button variant="outline">Outline</Button>
+  <Button variant="ghost">Ghost</Button>
+</Stack>`}</code>
+      </pre>
+
+      <h3>Trust Badges</h3>
+      <div className="not-prose my-lg">
+        <Stack direction="horizontal" spacing="sm">
+          <div className="px-sm py-xs bg-trust-local/10 text-trust-local border border-trust-local rounded-md text-xs font-semibold">
+            Local Processing
+          </div>
+          <div className="px-sm py-xs bg-trust-cloud/10 text-trust-cloud border border-trust-cloud rounded-md text-xs font-semibold">
+            Cloud Processing
+          </div>
+          <div className="px-sm py-xs bg-trust-encrypted/10 text-trust-encrypted border border-trust-encrypted rounded-md text-xs font-semibold">
+            Encrypted
+          </div>
+        </Stack>
+      </div>
+
+      <h3>Semantic Alerts</h3>
+      <div className="not-prose my-lg space-y-md">
+        <div className="p-md bg-success/10 border-l-4 border-success rounded-md">
+          <p className="text-sm text-success font-semibold mb-xs">Success</p>
+          <p className="text-sm">Your changes have been saved successfully.</p>
+        </div>
+        <div className="p-md bg-warning/10 border-l-4 border-warning rounded-md">
+          <p className="text-sm text-warning font-semibold mb-xs">Warning</p>
+          <p className="text-sm">Please review your input before continuing.</p>
+        </div>
+        <div className="p-md bg-error/10 border-l-4 border-error rounded-md">
+          <p className="text-sm text-error font-semibold mb-xs">Error</p>
+          <p className="text-sm">An error occurred while processing your request.</p>
+        </div>
+      </div>
+
+      <TokenInspector
+        tokens={[
+          ...brandColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...trustColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...semanticColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...urgencyColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+          ...neutralColors.map(c => ({ name: c.name, value: c.value, variable: c.variable })),
+        ]}
+        type="color"
+      />
+
+      <h2>Related Tokens</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/tokens/typography-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Typography Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Font sizes and text colors</p>
+        </Link>
+        <Link
+          href="/tokens/spacing-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Spacing Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Padding and margins for colored elements</p>
+        </Link>
+        <Link
+          href="/tokens/shadow-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Shadow Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Elevation that enhances color depth</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/design-system/app/tokens/color-tokens/page.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html"
+              external
+              showIcon
+            >
+              WCAG Contrast Requirements
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://webaim.org/resources/contrastchecker/"
+              external
+              showIcon
+            >
+              WebAIM Contrast Checker
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

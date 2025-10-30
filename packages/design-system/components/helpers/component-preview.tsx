@@ -3,17 +3,20 @@
 import { useState } from 'react';
 import { Copy, Check, Code2 } from 'lucide-react';
 import { IconButton } from '@fidus/ui';
+import { CodeBlock } from './code-block';
 
 interface ComponentPreviewProps {
   children: React.ReactNode;
   code?: string;
   showCode?: boolean;
+  language?: string;
 }
 
 export function ComponentPreview({
   children,
   code,
   showCode = false,
+  language = 'tsx',
 }: ComponentPreviewProps) {
   const [copied, setCopied] = useState(false);
   const [isCodeVisible, setIsCodeVisible] = useState(showCode);
@@ -65,10 +68,8 @@ export function ComponentPreview({
 
           {/* Code Block */}
           {isCodeVisible && code && (
-            <div className="border-t border-border">
-              <pre className="p-4 overflow-x-auto bg-muted/50 text-sm">
-                <code className="font-mono">{code}</code>
-              </pre>
+            <div className="border-t border-border bg-muted/50">
+              <CodeBlock code={code} language={language} />
             </div>
           )}
         </div>

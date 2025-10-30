@@ -11,7 +11,7 @@ export const AlertPropsSchema = z.object({
   variant: z.enum(['success', 'error', 'warning', 'info']).default('info'),
   dismissible: z.boolean().default(false),
   title: z.string().optional(),
-  description: z.string(),
+  children: z.any(),
   actions: z.array(z.object({ label: z.string(), onClick: z.function() })).optional(),
   onDismiss: z.function().optional(),
 });
@@ -82,7 +82,7 @@ export interface AlertAction {
 
 export interface AlertComponentProps extends VariantProps<typeof alertVariants> {
   title?: string;
-  description: string;
+  children: React.ReactNode;
   dismissible?: boolean;
   onDismiss?: () => void;
   actions?: AlertAction[];
@@ -90,7 +90,7 @@ export interface AlertComponentProps extends VariantProps<typeof alertVariants> 
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertComponentProps>(
-  ({ variant = 'info', title, description, dismissible = false, onDismiss, actions, className, ...props }, ref) => {
+  ({ variant = 'info', title, children, dismissible = false, onDismiss, actions, className, ...props }, ref) => {
     const [isVisible, setIsVisible] = React.useState(true);
     const Icon = iconMap[variant || 'info'];
 
@@ -110,8 +110,8 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertComponentProps>(
               {title}
             </h5>
           )}
-          <div className="text-sm [&_p]:leading-relaxed" data-test-id="alert-description">
-            {description}
+          <div className="text-sm [&_p]:leading-relaxed" data-test-id="alert-content">
+            {children}
           </div>
           {actions && actions.length > 0 && (
             <div className="mt-3 flex gap-2" data-test-id="alert-actions">

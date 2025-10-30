@@ -1,6 +1,8 @@
 'use client';
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
+import { Link } from '@fidus/ui';
 
 export default function SpacingTokensPage() {
   const spacingTokens = [
@@ -287,6 +289,230 @@ export default function SpacingTokensPage() {
           </tr>
         </tbody>
       </table>
+
+      <h2>When to Use Which Spacing</h2>
+      <p>
+        Choosing the right spacing token depends on the context and visual hierarchy:
+      </p>
+      <div className="not-prose my-lg">
+        <div className="space-y-md">
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Extra Small (4px)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Icon gaps, tight inline elements
+            </p>
+            <p className="text-sm">
+              The smallest spacing unit is perfect for very tight layouts where elements need to be
+              visually grouped. Use it for gaps between icons and text, spacing within badges, or
+              between closely related inline elements like chips.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Small (8px)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Component internal spacing, button padding
+            </p>
+            <p className="text-sm">
+              Small spacing provides breathing room within components without making them feel bloated.
+              It's ideal for button padding, input field padding, and gaps between form elements in
+              compact layouts.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Medium (16px)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Default spacing, card padding
+            </p>
+            <p className="text-sm">
+              Medium is the workhorse of the spacing system. It's the default choice for most padding,
+              margins, and gaps. Use it for card content padding, spacing between sections, and as the
+              standard gap in flex or grid layouts.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Large (24px)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Section spacing, large card padding
+            </p>
+            <p className="text-sm">
+              Large spacing creates clear visual separation between major sections of content. Use it
+              for spacing between different content areas, padding in larger cards or modals, and to
+              create breathing room around important elements.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Extra Large and Above (32px+)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Page-level spacing, hero sections
+            </p>
+            <p className="text-sm">
+              Extra large spacing tokens are reserved for page-level layouts and hero sections where
+              you need significant whitespace. Use them for margins around page containers, spacing
+              between major page sections, and generous padding in hero components or full-width banners.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h2>Grid System Integration</h2>
+      <p>
+        Spacing tokens integrate with the Grid component from @fidus/ui for responsive layouts.
+        Use semantic gap tokens for consistent grid spacing across breakpoints.
+      </p>
+
+      <h3>Grid with Spacing Tokens</h3>
+      <div className="not-prose my-lg space-y-lg">
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: xs (4px)</p>
+          <div className="grid grid-cols-3 gap-xs p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: sm (8px)</p>
+          <div className="grid grid-cols-3 gap-sm p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: md (16px)</p>
+          <div className="grid grid-cols-3 gap-md p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-sm">Gap: lg (24px)</p>
+          <div className="grid grid-cols-3 gap-lg p-md bg-muted rounded-md">
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+            <div className="p-sm bg-primary rounded-sm h-16" />
+          </div>
+        </div>
+      </div>
+
+      <h3>Responsive Grid Example</h3>
+      <pre className="not-prose"><code>{`<Grid columns={{ sm: 1, md: 2, lg: 3 }} gap="md">
+  <Card>Item 1</Card>
+  <Card>Item 2</Card>
+  <Card>Item 3</Card>
+</Grid>
+
+// Renders as:
+// Mobile: 1 column, 16px gap
+// Tablet: 2 columns, 16px gap
+// Desktop: 3 columns, 16px gap`}</code></pre>
+
+      <h3>Grid Guidelines</h3>
+      <ul>
+        <li>Use <code>gap-md</code> (16px) as default grid gap for most layouts</li>
+        <li>Use <code>gap-sm</code> (8px) for compact card grids or dense data displays</li>
+        <li>Use <code>gap-lg</code> (24px) for spacious content-heavy layouts</li>
+        <li>Combine with responsive columns for adaptive layouts</li>
+        <li>Avoid mixing multiple gap sizes within the same grid</li>
+      </ul>
+
+      <TokenInspector
+        tokens={[
+          ...spacingTokens.map(s => ({ name: s.name, value: s.value, variable: s.variable })),
+          ...radiusTokens.map(r => ({ name: r.name, value: r.value, variable: r.variable })),
+        ]}
+        type="spacing"
+      />
+
+      <h2>Related Tokens</h2>
+      <div className="not-prose my-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
+          <Link
+            href="/tokens/color-tokens"
+            className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+          >
+            <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+              Color Tokens
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Border and background colors for spaced elements
+            </p>
+          </Link>
+
+          <Link
+            href="/tokens/typography-tokens"
+            className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+          >
+            <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+              Typography Tokens
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Line heights and text spacing
+            </p>
+          </Link>
+
+          <Link
+            href="/tokens/shadow-tokens"
+            className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+          >
+            <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+              Shadow Tokens
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Elevation that works with spacing
+            </p>
+          </Link>
+        </div>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/tree/main/packages/design-system/app/tokens/spacing-tokens"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/WCAG21/Understanding/spacing.html"
+              external
+              showIcon
+            >
+              WCAG Spacing Guidelines
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://material.io/design/layout/spacing-methods.html"
+              external
+              showIcon
+            >
+              Material Design Spacing Best Practices
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

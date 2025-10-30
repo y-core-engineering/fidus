@@ -1,6 +1,8 @@
 'use client';
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
+import { Link } from '@fidus/ui';
 
 export default function ShadowTokensPage() {
   const shadowTokens = [
@@ -326,6 +328,152 @@ export default function ShadowTokensPage() {
         Shadow values remain the same in dark mode, but may appear more subtle against
         dark backgrounds. The shadow opacity automatically adapts for consistency.
       </p>
+
+      <h2>When to Use Which Elevation</h2>
+      <p>
+        Choosing the right shadow level depends on the component's visual hierarchy and interaction model:
+      </p>
+      <div className="not-prose my-lg">
+        <div className="space-y-md">
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Small Shadow (sm)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Hover states, subtle card lift on interaction
+            </p>
+            <p className="text-sm">
+              Small shadows provide just enough elevation to indicate interactivity without being
+              distracting. Perfect for hover effects on buttons, links, and cards where you want to
+              signal that an element is clickable without creating visual noise.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Medium Shadow (md)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Resting cards, dropdown menus, standard elevation
+            </p>
+            <p className="text-sm">
+              Medium shadows are the workhorse of the elevation system. They create clear separation
+              from the background without being too heavy. Use them for cards in their default state,
+              dropdown menus, and other floating UI elements that need to stand out from the page.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Large Shadow (lg)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Modals, important popovers, floating panels
+            </p>
+            <p className="text-sm">
+              Large shadows create significant separation between layers, making it clear that a
+              component sits above the rest of the UI. Essential for modal dialogs and important
+              contextual overlays where you need to grab the user's attention and create focus.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Extra Large Shadow (xl)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Use for:</strong> Full-screen overlays, drawers, maximum separation
+            </p>
+            <p className="text-sm">
+              Extra large shadows are reserved for the highest level of elevation. Use them sparingly
+              for full-screen overlays, side drawers, and other UI elements that need to appear
+              completely detached from the page. This level of shadow creates the strongest sense of
+              depth and hierarchy.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="not-prose p-md bg-muted/30 border-l-4 border-warning rounded-md my-lg">
+        <p className="text-sm text-warning font-semibold mb-xs">Accessibility Note</p>
+        <p className="text-sm">
+          Shadows should NOT convey meaning alone. Always use borders, text labels, or color for
+          critical information. Shadows enhance visual hierarchy but must not be the only indicator
+          of interactive states or important content.
+        </p>
+      </div>
+
+      <TokenInspector
+        tokens={[
+          ...shadowTokens.map(s => ({ name: s.name, value: s.value, variable: s.variable })),
+          ...zIndexTokens.map(z => ({ name: z.name, value: z.value, variable: z.variable })),
+        ]}
+        type="shadow"
+      />
+
+      <h2>Related Tokens</h2>
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+        <Link
+          href="/tokens/color-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Color Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Shadow colors and opacity values</p>
+        </Link>
+        <Link
+          href="/tokens/spacing-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Spacing Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Padding and margins for elevated elements</p>
+        </Link>
+        <Link
+          href="/tokens/motion-tokens"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Motion Tokens
+          </h3>
+          <p className="text-sm text-muted-foreground">Animation timing for shadow transitions</p>
+        </Link>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/blob/main/packages/design-system/app/tokens/shadow-tokens/page.tsx"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://material.io/design/environment/elevation.html"
+              external
+              showIcon
+            >
+              Material Design Elevation Guidelines
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html"
+              external
+              showIcon
+            >
+              Shadow Accessibility Considerations
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

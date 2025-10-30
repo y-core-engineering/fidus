@@ -56,7 +56,7 @@ function BudgetWidget({ category = 'Food', spent = 450, limit = 500, currency = 
           </div>
           <ProgressBar
             value={percentage}
-            variant={isNearLimit ? 'error' : isWarning ? 'warning' : 'default'}
+            variant={isNearLimit ? 'error' : isWarning ? 'warning' : undefined}
             size="sm"
           />
           <div className="flex justify-between text-sm text-muted-foreground">
@@ -65,7 +65,7 @@ function BudgetWidget({ category = 'Food', spent = 450, limit = 500, currency = 
           </div>
           <div className="flex justify-between text-sm font-medium">
             <span>Remaining</span>
-            <Badge variant={remaining < 50 ? 'destructive' : 'success'}>
+            <Badge variant={remaining < 50 ? 'error' : 'success'}>
               {remaining} {currency}
             </Badge>
           </div>
@@ -73,7 +73,7 @@ function BudgetWidget({ category = 'Food', spent = 450, limit = 500, currency = 
 
         <Stack direction="horizontal" spacing="sm">
           <Button size="sm" variant="secondary">View Details</Button>
-          <Button size="sm" variant="outline">Adjust Budget</Button>
+          <Button size="sm" variant="tertiary">Adjust Budget</Button>
         </Stack>
       </Stack>
     </div>
@@ -106,7 +106,8 @@ function BudgetForm({ category = '', amount = 0 }: any) {
 
         <TextInput
           label="Start Date"
-          type="date"
+          type="text"
+          placeholder="YYYY-MM-DD"
         />
 
         <Stack direction="horizontal" spacing="sm">
@@ -126,7 +127,7 @@ function BudgetWizard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Budget Creation Wizard</h3>
-            <Badge variant="secondary">Step {step} of 3</Badge>
+            <Badge variant="info">Step {step} of 3</Badge>
           </div>
           <ProgressBar value={(step / 3) * 100} size="sm" />
         </div>
@@ -179,7 +180,7 @@ function CalendarDayWidget() {
         <Stack direction="vertical" spacing="sm">
           {appointments.map((apt, idx) => (
             <div key={idx} className="flex items-start gap-3 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
-              <Badge variant="secondary" className="min-w-[50px]">{apt.time}</Badge>
+              <Badge variant="normal" className="min-w-[50px]">{apt.time}</Badge>
               <Stack direction="vertical" spacing="xs" className="flex-1">
                 <div className="font-medium text-sm">{apt.title}</div>
                 <div className="text-xs text-muted-foreground">{apt.duration}</div>
@@ -190,7 +191,7 @@ function CalendarDayWidget() {
 
         <Stack direction="horizontal" spacing="sm">
           <Button size="sm">Add Appointment</Button>
-          <Button size="sm" variant="outline">View Week</Button>
+          <Button size="sm" variant="tertiary">View Week</Button>
         </Stack>
       </Stack>
     </div>
@@ -210,8 +211,8 @@ function ConversationalResponse({ message }: any) {
           </div>
         </div>
         <Stack direction="horizontal" spacing="sm">
-          <Button size="sm" variant="outline">Ask follow-up</Button>
-          <Button size="sm" variant="outline">Show details</Button>
+          <Button size="sm" variant="tertiary">Ask follow-up</Button>
+          <Button size="sm" variant="tertiary">Show details</Button>
         </Stack>
       </Stack>
     </div>
@@ -220,7 +221,7 @@ function ConversationalResponse({ message }: any) {
 
 function TextResponse({ message }: any) {
   return (
-    <Alert variant="info" description={message} />
+    <Alert variant="info">{message}</Alert>
   );
 }
 
@@ -890,7 +891,7 @@ export default function UIDecisionLayerPage() {
                     )}
                   </span>
                 </h4>
-                {RenderedComponent && <RenderedComponent {...(activeDecision.props || {})} />}
+                {RenderedComponent && <RenderedComponent {...(activeDecision?.props || {})} />}
               </div>
             </div>
           )}
@@ -958,7 +959,7 @@ export default function UIDecisionLayerPage() {
                                   <td className="py-2 pr-4">{experimentalExpertise}/10</td>
                                   <td className="py-2 pr-4">{scores.factors.expertise.weight}</td>
                                   <td className="py-2 text-right">
-                                    <Badge variant={scores.factors.expertise.score > 30 ? 'success' : 'secondary'}>
+                                    <Badge variant={scores.factors.expertise.score > 30 ? 'success' : 'normal'}>
                                       +{scores.factors.expertise.score}
                                     </Badge>
                                   </td>
@@ -968,7 +969,7 @@ export default function UIDecisionLayerPage() {
                                   <td className="py-2 pr-4">{experimentalTimeOfDay}:00</td>
                                   <td className="py-2 pr-4">{scores.factors.timeOfDay.weight}</td>
                                   <td className="py-2 text-right">
-                                    <Badge variant={scores.factors.timeOfDay.score > 0 ? 'success' : 'destructive'}>
+                                    <Badge variant={scores.factors.timeOfDay.score > 0 ? 'success' : 'error'}>
                                       {scores.factors.timeOfDay.score > 0 ? '+' : ''}{scores.factors.timeOfDay.score}
                                     </Badge>
                                   </td>
@@ -1099,10 +1100,9 @@ export default function UIDecisionLayerPage() {
 
                             {experimentalDecision && experimentalDecision.uiForm !== decision.uiForm && (
                               <div className="space-y-2">
-                                <Alert
-                                  variant="success"
-                                  description={`Decision Changed! With this context, the optimal UI form is now ${experimentalDecision.uiForm} (${(experimentalDecision.confidence * 100).toFixed(0)}% confidence)`}
-                                />
+                                <Alert variant="success">
+                                  Decision Changed! With this context, the optimal UI form is now {experimentalDecision.uiForm} ({(experimentalDecision.confidence * 100).toFixed(0)}% confidence)
+                                </Alert>
                                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                                   <div className="text-sm">
                                     <strong className="text-primary">Why this changed:</strong>
@@ -1113,7 +1113,7 @@ export default function UIDecisionLayerPage() {
                             )}
 
                             <Button
-                              variant="outline"
+                              variant="tertiary"
                               size="sm"
                               onClick={() => {
                                 setExperimentalTimeOfDay(timeOfDay);
@@ -1142,7 +1142,7 @@ export default function UIDecisionLayerPage() {
                     )}
                   </span>
                 </h4>
-                {RenderedComponent && <RenderedComponent {...(activeDecision.props || {})} />}
+                {RenderedComponent && <RenderedComponent {...(activeDecision?.props || {})} />}
               </div>
             </div>
           )}

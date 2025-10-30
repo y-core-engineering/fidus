@@ -74,12 +74,12 @@ export default function ToggleSwitchPage() {
       <ComponentPreview code={`<ToggleSwitch
   label="Enable feature"
   checked={enabled}
-  onChange={(e) => setEnabled(e.target.checked)}
+  onChange={(checked) => setEnabled(checked)}
 />`}>
         <ToggleSwitch
           label="Enable feature"
           checked={enabled}
-          onChange={(e) => setEnabled(e.target.checked)}
+          onChange={(checked) => setEnabled(checked)}
         />
       </ComponentPreview>
 
@@ -100,19 +100,19 @@ export default function ToggleSwitchPage() {
     label="Small size"
     size="sm"
     checked={notifications}
-    onChange={(e) => setNotifications(e.target.checked)}
+    onChange={(checked) => setNotifications(checked)}
   />
   <ToggleSwitch
     label="Medium size (default)"
     size="md"
     checked={notifications}
-    onChange={(e) => setNotifications(e.target.checked)}
+    onChange={(checked) => setNotifications(checked)}
   />
   <ToggleSwitch
     label="Large size"
     size="lg"
     checked={notifications}
-    onChange={(e) => setNotifications(e.target.checked)}
+    onChange={(checked) => setNotifications(checked)}
   />
 </Stack>`}>
         <Stack direction="vertical" spacing="lg">
@@ -120,19 +120,19 @@ export default function ToggleSwitchPage() {
             label="Small size"
             size="sm"
             checked={notifications}
-            onChange={(e) => setNotifications(e.target.checked)}
+            onChange={(checked) => setNotifications(checked)}
           />
           <ToggleSwitch
             label="Medium size (default)"
             size="md"
             checked={notifications}
-            onChange={(e) => setNotifications(e.target.checked)}
+            onChange={(checked) => setNotifications(checked)}
           />
           <ToggleSwitch
             label="Large size"
             size="lg"
             checked={notifications}
-            onChange={(e) => setNotifications(e.target.checked)}
+            onChange={(checked) => setNotifications(checked)}
           />
         </Stack>
       </ComponentPreview>
@@ -143,13 +143,13 @@ export default function ToggleSwitchPage() {
     label="Label on left"
     labelPosition="left"
     checked={darkMode}
-    onChange={(e) => setDarkMode(e.target.checked)}
+    onChange={(checked) => setDarkMode(checked)}
   />
   <ToggleSwitch
     label="Label on right (default)"
     labelPosition="right"
     checked={darkMode}
-    onChange={(e) => setDarkMode(e.target.checked)}
+    onChange={(checked) => setDarkMode(checked)}
   />
 </Stack>`}>
         <Stack direction="vertical" spacing="lg">
@@ -157,13 +157,13 @@ export default function ToggleSwitchPage() {
             label="Label on left"
             labelPosition="left"
             checked={darkMode}
-            onChange={(e) => setDarkMode(e.target.checked)}
+            onChange={(checked) => setDarkMode(checked)}
           />
           <ToggleSwitch
             label="Label on right (default)"
             labelPosition="right"
             checked={darkMode}
-            onChange={(e) => setDarkMode(e.target.checked)}
+            onChange={(checked) => setDarkMode(checked)}
           />
         </Stack>
       </ComponentPreview>
@@ -173,13 +173,13 @@ export default function ToggleSwitchPage() {
   label="Dark mode"
   helperText="Switch to dark theme for better nighttime viewing"
   checked={darkMode}
-  onChange={(e) => setDarkMode(e.target.checked)}
+  onChange={(checked) => setDarkMode(checked)}
 />`}>
         <ToggleSwitch
           label="Dark mode"
           helperText="Switch to dark theme for better nighttime viewing"
           checked={darkMode}
-          onChange={(e) => setDarkMode(e.target.checked)}
+          onChange={(checked) => setDarkMode(checked)}
         />
       </ComponentPreview>
 

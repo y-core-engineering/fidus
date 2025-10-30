@@ -13,7 +13,7 @@ import { z } from 'zod';
 interface ComponentMetadata {
   name: string;
   category: 'Actions' | 'Layout' | 'Data Display' | 'Cards' | 'Forms' | 'Feedback' | 'Overlays' | 'Navigation';
-  component: React.ComponentType<unknown>;
+  component: React.ComponentType<any>;
   propsSchema: z.ZodObject<z.ZodRawShape>;
   defaultProps: Record<string, unknown>;
   description: string;
@@ -595,7 +595,7 @@ export default function PlaygroundPage() {
             <h2 className="text-2xl font-bold mb-2">{selectedComponent.name}</h2>
             <p className="text-sm text-muted-foreground mb-3">{selectedComponent.description}</p>
             <div className="flex items-center gap-2">
-              <FidusUI.Badge variant="secondary" size="sm">
+              <FidusUI.Badge variant="info" size="sm">
                 {selectedComponent.category}
               </FidusUI.Badge>
             </div>

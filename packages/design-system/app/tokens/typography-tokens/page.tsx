@@ -1,6 +1,8 @@
 'use client';
 
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
+import { TokenInspector } from '../../../components/helpers/token-inspector';
+import { Link } from '@fidus/ui';
 
 export default function TypographyTokensPage() {
   const fontFamilies = [
@@ -310,6 +312,143 @@ export default function TypographyTokensPage() {
         <li>Line heights ensure comfortable reading for users with dyslexia</li>
         <li>Font weights provide clear visual hierarchy for screen readers</li>
       </ul>
+
+      <h2>Line Height Rationale</h2>
+      <p>
+        Our line height values are carefully chosen for specific purposes:
+      </p>
+      <div className="not-prose my-lg">
+        <div className="space-y-md">
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Tight (1.25)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Why:</strong> Reduces vertical space for compact headings
+            </p>
+            <p className="text-sm">
+              Tight line height keeps multi-line headings visually cohesive by minimizing the gap
+              between lines. This creates a more unified visual block and prevents headings from
+              appearing too spaced out, which is especially important for large display text.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Normal (1.5)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Why:</strong> Optimal readability, WCAG AA compliant
+            </p>
+            <p className="text-sm">
+              A line height of 1.5 (or 150%) is the standard recommendation from WCAG for body text.
+              It provides enough vertical space for comfortable reading without making paragraphs feel
+              too loose or disconnected. This is the sweet spot for most UI text and ensures
+              accessibility compliance.
+            </p>
+          </div>
+
+          <div className="p-md bg-muted rounded-lg">
+            <h3 className="font-semibold mb-xs">Relaxed (1.75)</h3>
+            <p className="text-sm text-muted-foreground mb-xs">
+              <strong>Why:</strong> Aids dyslexic readers, improves long-form reading
+            </p>
+            <p className="text-sm">
+              Generous line spacing improves readability for users with dyslexia by reducing visual
+              crowding and making it easier to track lines. The extra vertical space also reduces eye
+              strain during extended reading sessions, making it ideal for documentation, articles,
+              and long-form content.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <TokenInspector
+        tokens={[
+          ...fontFamilies.map(f => ({ name: f.name, value: f.value, variable: f.variable })),
+          ...fontSizes.map(f => ({ name: f.name, value: f.value, variable: f.variable })),
+          ...lineHeights.map(l => ({ name: l.name, value: l.value, variable: l.variable })),
+        ]}
+        type="typography"
+      />
+
+      <h2>Related Tokens</h2>
+      <div className="not-prose my-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
+          <Link
+            href="/tokens/color-tokens"
+            className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+          >
+            <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+              Color Tokens
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Text colors and contrast ratios for typography
+            </p>
+          </Link>
+
+          <Link
+            href="/tokens/spacing-tokens"
+            className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+          >
+            <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+              Spacing Tokens
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Margins and padding for text layout
+            </p>
+          </Link>
+
+          <Link
+            href="/tokens/motion-tokens"
+            className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+          >
+            <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+              Motion Tokens
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Animation timing for animated text effects
+            </p>
+          </Link>
+        </div>
+      </div>
+
+      <h2>Resources</h2>
+      <div className="not-prose my-lg">
+        <ul className="space-y-md">
+          <li>
+            <Link
+              variant="standalone"
+              href="https://github.com/y-core-engineering/fidus/tree/main/packages/design-system/app/tokens/typography-tokens"
+              external
+              showIcon
+            >
+              View source on GitHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://www.w3.org/WAI/WCAG21/Understanding/text-spacing.html"
+              external
+              showIcon
+            >
+              WCAG Text Spacing Guidelines
+            </Link>
+          </li>
+          <li>
+            <Link
+              variant="standalone"
+              href="https://material.io/design/typography/the-type-system.html"
+              external
+              showIcon
+            >
+              Material Design Typography Best Practices
+            </Link>
+          </li>
+          <li>
+            <Link variant="standalone" href="/getting-started/for-developers">
+              Installation guide
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

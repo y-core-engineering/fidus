@@ -155,7 +155,7 @@ const progress = (currentStep / totalSteps) * 100;
                     <span>Outlook Calendar</span>
                   </Button>
                 </div>
-                <Button variant="ghost" size="small">
+                <Button variant="tertiary" size="sm">
                   Skip for now
                 </Button>
               </div>
@@ -176,7 +176,7 @@ const progress = (currentStep / totalSteps) * 100;
                 <Stack direction="vertical" spacing="sm">
                   <Button variant="secondary">Connect Bank Account</Button>
                   <Button variant="secondary">Manual Entry</Button>
-                  <Button variant="ghost" size="small">Skip for now</Button>
+                  <Button variant="tertiary" size="sm">Skip for now</Button>
                 </Stack>
               </div>
             )}
@@ -196,9 +196,9 @@ const progress = (currentStep / totalSteps) * 100;
                   <div>
                     <label className="text-sm font-medium mb-xs block">Theme</label>
                     <Stack direction="horizontal" spacing="sm">
-                      <Button variant="secondary" size="small">Light</Button>
-                      <Button variant="secondary" size="small">Dark</Button>
-                      <Button variant="primary" size="small">Auto</Button>
+                      <Button variant="secondary" size="sm">Light</Button>
+                      <Button variant="secondary" size="sm">Dark</Button>
+                      <Button variant="primary" size="sm">Auto</Button>
                     </Stack>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ const progress = (currentStep / totalSteps) * 100;
                     <p className="text-sm text-muted-foreground">Notifications enabled, Auto theme</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="small">Edit settings</Button>
+                <Button variant="tertiary" size="sm">Edit settings</Button>
               </div>
             )}
 
