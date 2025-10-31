@@ -9,6 +9,7 @@ import {
   Badge,
 } from '@fidus/ui';
 import { useState, useEffect, useRef } from 'react';
+import { CodeBlock } from '../../../components/helpers/code-block';
 
 // Timeline data - complex scenarios showing different UI forms
 const TIMELINE = [
@@ -1777,10 +1778,11 @@ export default function AIDrivenUIPage() {
           available UI components, their use cases, and required props.
         </p>
 
-        <div className="bg-muted/50 border border-border rounded-lg p-md mb-lg">
+        <div className="mb-lg">
           <div className="text-xs font-mono mb-sm text-muted-foreground">Example: Component Registry Entry</div>
-          <pre className="text-xs overflow-x-auto">
-{`{
+          <CodeBlock
+            language="json"
+            code={`{
   "componentName": "OpportunityCard",
   "description": "Proactive card for time-sensitive opportunities",
   "whenToUse": [
@@ -1799,14 +1801,15 @@ export default function AIDrivenUIPage() {
     "Travel reminder: Flight tomorrow at 9am, no hotel booked"
   ]
 }`}
-          </pre>
+          />
         </div>
 
         <h3 className="text-lg font-semibold mb-md">Example: LLM Prompt with Context</h3>
-        <div className="bg-muted/50 border border-border rounded-lg p-md mb-lg">
+        <div className="mb-lg">
           <div className="text-xs font-mono mb-sm text-muted-foreground">System Prompt to LLM</div>
-          <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
-{`You are the UI Decision Layer for Fidus, a privacy-first AI assistant.
+          <CodeBlock
+            language="markdown"
+            code={`You are the UI Decision Layer for Fidus, a privacy-first AI assistant.
 
 TASK: Analyze the user query and context, then decide which UI form to render.
 
@@ -1836,14 +1839,15 @@ DECISION CRITERIA:
 - Context: Does context suggest specific UI form?
 
 Respond with structured JSON UI decision.`}
-          </pre>
+          />
         </div>
 
         <h3 className="text-lg font-semibold mb-md">Example: LLM Response (Structured JSON)</h3>
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md mb-lg">
+        <div className="mb-lg">
           <div className="text-xs font-mono mb-sm text-muted-foreground">LLM Output</div>
-          <pre className="text-xs overflow-x-auto">
-{`{
+          <CodeBlock
+            language="json"
+            code={`{
   "uiDecision": {
     "reasoning": "User is at 95% of budget with only 3 days left, AND has checked budget 3 times today, indicating concern. This is urgent and actionable. OpportunityCard is best fit.",
 
@@ -1871,7 +1875,7 @@ Respond with structured JSON UI decision.`}
     "alternativeConsidered": "BudgetWidget was considered, but OpportunityCard better conveys urgency and provides immediate actions."
   }
 }`}
-          </pre>
+          />
         </div>
 
         <h3 className="text-lg font-semibold mb-md">Key Architecture Principles</h3>
@@ -2228,84 +2232,80 @@ Respond with structured JSON UI decision.`}
 
         <h3 className="text-lg font-semibold mb-md">Do&apos;s and Don&apos;ts</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-          <div className="border-l-4 border-success pl-md">
-            <h4 className="text-sm font-semibold mb-sm text-success">✅ DO</h4>
-            <ul className="text-xs space-y-2">
-              <li>
-                <strong>Let the LLM decide</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Provide context and Component Registry, let LLM choose UI form based on reasoning.
+        <div className="not-prose grid md:grid-cols-2 gap-lg">
+          {/* Do's */}
+          <div className="border-2 border-success rounded-lg p-lg">
+            <h4 className="text-lg font-semibold text-success mb-md flex items-center gap-sm">
+              <span className="text-2xl">✓</span> Do
+            </h4>
+            <ul className="space-y-md text-sm">
+              <li className="flex gap-sm">
+                <span className="text-success shrink-0">•</span>
+                <span>
+                  <strong>Let the LLM decide:</strong> Provide context and Component Registry, let LLM choose UI form based on reasoning.
                 </span>
               </li>
-              <li>
-                <strong>Use structured outputs</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Validate LLM responses with Zod schemas to ensure type-safe component rendering.
+              <li className="flex gap-sm">
+                <span className="text-success shrink-0">•</span>
+                <span>
+                  <strong>Use structured outputs:</strong> Validate LLM responses with Zod schemas to ensure type-safe component rendering.
                 </span>
               </li>
-              <li>
-                <strong>Document components thoroughly</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Component Registry is LLM&apos;s knowledge base—clear docs = better decisions.
+              <li className="flex gap-sm">
+                <span className="text-success shrink-0">•</span>
+                <span>
+                  <strong>Document components thoroughly:</strong> Component Registry is LLM&apos;s knowledge base—clear docs = better decisions.
                 </span>
               </li>
-              <li>
-                <strong>Test context variations</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Test same query with different contexts to verify adaptive behavior.
+              <li className="flex gap-sm">
+                <span className="text-success shrink-0">•</span>
+                <span>
+                  <strong>Test context variations:</strong> Test same query with different contexts to verify adaptive behavior.
                 </span>
               </li>
-              <li>
-                <strong>Track LLM reasoning</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Log reasoning field from UI decisions for debugging and improving prompts.
+              <li className="flex gap-sm">
+                <span className="text-success shrink-0">•</span>
+                <span>
+                  <strong>Track LLM reasoning:</strong> Log reasoning field from UI decisions for debugging and improving prompts.
                 </span>
               </li>
             </ul>
           </div>
 
-          <div className="border-l-4 border-error pl-md">
-            <h4 className="text-sm font-semibold mb-sm text-error">❌ DON&apos;T</h4>
-            <ul className="text-xs space-y-2">
-              <li>
-                <strong>Hardcode UI logic</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Avoid <code>if (morning) show weather</code>—let LLM decide based on full context.
+          {/* Don'ts */}
+          <div className="border-2 border-error rounded-lg p-lg">
+            <h4 className="text-lg font-semibold text-error mb-md flex items-center gap-sm">
+              <span className="text-2xl">✗</span> Don&apos;t
+            </h4>
+            <ul className="space-y-md text-sm">
+              <li className="flex gap-sm">
+                <span className="text-error shrink-0">•</span>
+                <span>
+                  <strong>Hardcode UI logic:</strong> Avoid <code className="text-xs">if (morning) show weather</code>—let LLM decide based on full context.
                 </span>
               </li>
-              <li>
-                <strong>Skip Component Registry</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  LLM can&apos;t choose components it doesn&apos;t know about via RAG.
+              <li className="flex gap-sm">
+                <span className="text-error shrink-0">•</span>
+                <span>
+                  <strong>Skip Component Registry:</strong> LLM can&apos;t choose components it doesn&apos;t know about via RAG.
                 </span>
               </li>
-              <li>
-                <strong>Use auto-hide timers</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  User controls dismissal—never <code>setTimeout(hide, 3000)</code>.
+              <li className="flex gap-sm">
+                <span className="text-error shrink-0">•</span>
+                <span>
+                  <strong>Use auto-hide timers:</strong> User controls dismissal—never <code className="text-xs">setTimeout(hide, 3000)</code>.
                 </span>
               </li>
-              <li>
-                <strong>Create fixed screens</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  No CalendarScreen.tsx—create CalendarWidget.tsx that appears contextually.
+              <li className="flex gap-sm">
+                <span className="text-error shrink-0">•</span>
+                <span>
+                  <strong>Create fixed screens:</strong> No <code className="text-xs">CalendarScreen.tsx</code>—create <code className="text-xs">CalendarWidget.tsx</code> that appears contextually.
                 </span>
               </li>
-              <li>
-                <strong>Ignore reasoning field</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  LLM reasoning helps debug bad decisions and improve prompts over time.
+              <li className="flex gap-sm">
+                <span className="text-error shrink-0">•</span>
+                <span>
+                  <strong>Ignore reasoning field:</strong> LLM reasoning helps debug bad decisions and improve prompts over time.
                 </span>
               </li>
             </ul>
