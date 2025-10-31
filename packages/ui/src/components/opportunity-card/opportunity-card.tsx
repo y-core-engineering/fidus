@@ -82,28 +82,43 @@ export const OpportunityCard = React.forwardRef<HTMLDivElement, OpportunityCardP
 
     const [isDismissing, setIsDismissing] = React.useState(false);
     const [touchStart, setTouchStart] = React.useState<number | null>(null);
-    const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
+    const [swipeOffset, setSwipeOffset] = React.useState(0);
+    const [isSwiping, setIsSwiping] = React.useState(false);
 
     const minSwipeDistance = 50;
 
     const handleTouchStart = (e: React.TouchEvent) => {
-      setTouchEnd(null);
       setTouchStart(e.targetTouches[0].clientX);
+      setIsSwiping(true);
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
-      setTouchEnd(e.targetTouches[0].clientX);
+      if (!touchStart || !isSwiping) return;
+
+      const currentTouch = e.targetTouches[0].clientX;
+      const diff = currentTouch - touchStart;
+
+      // Only allow horizontal swipes (left or right)
+      setSwipeOffset(diff);
     };
 
     const handleTouchEnd = () => {
-      if (!touchStart || !touchEnd) return;
+      if (!touchStart || !isSwiping) {
+        setIsSwiping(false);
+        setSwipeOffset(0);
+        return;
+      }
 
-      const distance = touchStart - touchEnd;
-      const isLeftSwipe = distance > minSwipeDistance;
-      const isRightSwipe = distance < -minSwipeDistance;
+      const absOffset = Math.abs(swipeOffset);
 
-      if (isLeftSwipe || isRightSwipe) {
+      if (absOffset > minSwipeDistance) {
+        // Swipe distance exceeded - dismiss the card
         handleDismiss();
+      } else {
+        // Swipe distance too small - spring back
+        setSwipeOffset(0);
+        setIsSwiping(false);
+        setTouchStart(null);
       }
     };
 
@@ -127,6 +142,10 @@ export const OpportunityCard = React.forwardRef<HTMLDivElement, OpportunityCardP
           isDismissing && 'opacity-0 translate-x-full',
           className
         )}
+        style={{
+          transform: isSwiping && !isDismissing ? `translateX(${swipeOffset}px)` : undefined,
+          transition: isSwiping ? 'none' : 'all 150ms ease-out',
+        }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

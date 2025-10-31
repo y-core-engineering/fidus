@@ -2,6 +2,7 @@
 
 import { Button, Link } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { CodeBlock } from '../../../components/helpers/code-block';
 import { useState } from 'react';
 
 export default function AccessibilityPage() {
@@ -24,7 +25,7 @@ export default function AccessibilityPage() {
       </p>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
-        <div className="border border-border rounded-lg p-md bg-card">
+        <div className="bg-muted rounded-lg p-md">
           <h3 className="text-base font-semibold mb-sm">Perceivable</h3>
           <p className="text-sm">
             Information presented in ways users can perceive (text alternatives, captions, color
@@ -32,7 +33,7 @@ export default function AccessibilityPage() {
           </p>
         </div>
 
-        <div className="border border-border rounded-lg p-md bg-card">
+        <div className="bg-muted rounded-lg p-md">
           <h3 className="text-base font-semibold mb-sm">Operable</h3>
           <p className="text-sm">
             Interface components operable by everyone (keyboard navigation, sufficient time, no
@@ -40,14 +41,14 @@ export default function AccessibilityPage() {
           </p>
         </div>
 
-        <div className="border border-border rounded-lg p-md bg-card">
+        <div className="bg-muted rounded-lg p-md">
           <h3 className="text-base font-semibold mb-sm">Understandable</h3>
           <p className="text-sm">
             Information and operation understandable (readable, predictable, input assistance)
           </p>
         </div>
 
-        <div className="border border-border rounded-lg p-md bg-card">
+        <div className="bg-muted rounded-lg p-md">
           <h3 className="text-base font-semibold mb-sm">Robust</h3>
           <p className="text-sm">
             Content robust enough to work with assistive technologies (valid HTML, ARIA)
@@ -86,7 +87,7 @@ export default function AccessibilityPage() {
       </div>
 
       <h3>Testing Contrast</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
+      <div className="bg-muted rounded-lg p-md my-md">
         <p className="text-sm mb-sm">
           <strong>Tools:</strong>
         </p>
@@ -234,14 +235,15 @@ export default function AccessibilityPage() {
       <h3>Focus Indicators</h3>
       <p>All focusable elements have visible focus indicators:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`/* Global focus styles */
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="css"
+          code={`/* Global focus styles */
 *:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }`}
-        </pre>
+        />
       </div>
 
       <h2>Screen Reader Support</h2>
@@ -252,8 +254,9 @@ export default function AccessibilityPage() {
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
         <div className="border border-success/20 bg-success/5 rounded-lg p-md">
           <h4 className="text-sm font-semibold text-success mb-sm">✓ Good</h4>
-          <pre className="text-xs">
-            {`<button onClick={...}>
+          <CodeBlock
+            language="tsx"
+            code={`<button onClick={...}>
   Submit
 </button>
 
@@ -262,13 +265,14 @@ export default function AccessibilityPage() {
     Dashboard
   </a>
 </nav>`}
-          </pre>
+          />
         </div>
 
         <div className="border border-error/20 bg-error/5 rounded-lg p-md">
           <h4 className="text-sm font-semibold text-error mb-sm">✗ Bad</h4>
-          <pre className="text-xs">
-            {`<div onClick={...}>
+          <CodeBlock
+            language="tsx"
+            code={`<div onClick={...}>
   Submit
 </div>
 
@@ -277,16 +281,17 @@ export default function AccessibilityPage() {
     Dashboard
   </div>
 </div>`}
-          </pre>
+          />
         </div>
       </div>
 
       <h3>ARIA Labels</h3>
       <p>Provide labels for elements when visual text isn&apos;t sufficient:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Icon-only button
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Icon-only button
 <button aria-label="Close card">
   <X className="h-4 w-4" />
 </button>
@@ -297,7 +302,7 @@ export default function AccessibilityPage() {
 // Form input
 <label htmlFor="email">Email</label>
 <input id="email" type="email" aria-required="true" />`}
-        </pre>
+        />
       </div>
 
       <h3>ARIA Roles & States</h3>
@@ -336,7 +341,7 @@ export default function AccessibilityPage() {
       </p>
 
       <div className="not-prose space-y-lg my-lg">
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">VoiceOver (macOS/iOS)</h4>
           <div className="space-y-sm text-sm">
             <p>
@@ -371,7 +376,7 @@ export default function AccessibilityPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">NVDA (Windows - Free)</h4>
           <div className="space-y-sm text-sm">
             <p>
@@ -417,7 +422,7 @@ export default function AccessibilityPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">JAWS (Windows - Commercial)</h4>
           <div className="space-y-sm text-sm">
             <p>
@@ -480,7 +485,7 @@ export default function AccessibilityPage() {
 
       <p>All interactive elements meet minimum touch target size:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-lg my-lg">
+      <div className="bg-muted rounded-lg p-lg my-lg">
         <h3 className="text-base font-semibold mb-md">Minimum Size: 44x44 pixels</h3>
         <p className="text-sm mb-sm">Applies to:</p>
         <ul className="text-sm space-y-xs">
@@ -496,9 +501,10 @@ export default function AccessibilityPage() {
       <h2>Forms & Input</h2>
 
       <h3>Labels & Descriptions</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<label htmlFor="username">Username</label>
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<label htmlFor="username">Username</label>
 <input
   id="username"
   type="text"
@@ -508,13 +514,14 @@ export default function AccessibilityPage() {
 <span id="username-hint">
   Must be 3-20 characters
 </span>`}
-        </pre>
+        />
       </div>
 
       <h3>Error Messages</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<input
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<input
   id="email"
   type="email"
   aria-invalid="true"
@@ -523,7 +530,7 @@ export default function AccessibilityPage() {
 <span id="email-error" role="alert">
   Please enter a valid email address
 </span>`}
-        </pre>
+        />
       </div>
 
       <h2>Reduced Motion</h2>
@@ -533,9 +540,10 @@ export default function AccessibilityPage() {
         instant state changes:
       </p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`@media (prefers-reduced-motion: reduce) {
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="css"
+          code={`@media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -545,7 +553,7 @@ export default function AccessibilityPage() {
 
 // In Tailwind
 <div className="transition-all motion-reduce:transition-none">`}
-        </pre>
+        />
       </div>
 
       <h2>Accessibility Testing Checklist</h2>
@@ -659,7 +667,7 @@ export default function AccessibilityPage() {
       </p>
 
       <div className="not-prose space-y-md my-lg">
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h3 className="text-base font-semibold mb-sm">axe DevTools (Browser Extension)</h3>
           <p className="text-sm text-muted-foreground mb-md">
             Industry-standard accessibility testing tool available for Chrome, Firefox, and Edge
@@ -672,7 +680,7 @@ export default function AccessibilityPage() {
               <strong>Usage:</strong> Open DevTools → Axe DevTools tab → &quot;Scan All of My
               Page&quot;
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
+            <div className="mt-md bg-muted border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Automated full-page scans</li>
@@ -684,7 +692,7 @@ export default function AccessibilityPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h3 className="text-base font-semibold mb-sm">WAVE (Web Accessibility Evaluation Tool)</h3>
           <p className="text-sm text-muted-foreground mb-md">
             Visual accessibility testing tool by WebAIM
@@ -705,7 +713,7 @@ export default function AccessibilityPage() {
             <p>
               <strong>Usage:</strong> Enter URL or use extension to scan current page
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
+            <div className="mt-md bg-muted border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Visual feedback with icons on page</li>
@@ -717,7 +725,7 @@ export default function AccessibilityPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h3 className="text-base font-semibold mb-sm">Lighthouse (Chrome DevTools)</h3>
           <p className="text-sm text-muted-foreground mb-md">
             Built-in accessibility auditing in Chrome DevTools
@@ -729,7 +737,7 @@ export default function AccessibilityPage() {
             <p>
               <strong>Usage:</strong> Select &quot;Accessibility&quot; category → Generate report
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
+            <div className="mt-md bg-muted border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Comprehensive accessibility score (0-100)</li>
@@ -741,7 +749,7 @@ export default function AccessibilityPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h3 className="text-base font-semibold mb-sm">Pa11y CI (Automated Testing)</h3>
           <p className="text-sm text-muted-foreground mb-md">
             Command-line tool for accessibility testing in CI/CD pipelines
@@ -753,7 +761,7 @@ export default function AccessibilityPage() {
             <p>
               <strong>Usage:</strong> <code className="text-xs">pa11y-ci --sitemap https://your-site.com/sitemap.xml</code>
             </p>
-            <div className="mt-md bg-muted/30 border border-border rounded-md p-sm">
+            <div className="mt-md bg-muted border border-border rounded-md p-sm">
               <p className="text-xs font-medium mb-xs">Features:</p>
               <ul className="space-y-xs text-xs">
                 <li>• Test multiple URLs automatically</li>

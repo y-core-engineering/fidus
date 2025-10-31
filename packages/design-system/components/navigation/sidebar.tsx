@@ -30,6 +30,10 @@ const navigation: NavItem[] = [
     items: [
       { title: 'AI-Driven UI', href: '/foundations/ai-driven-ui' },
       { title: 'Privacy & UX', href: '/foundations/privacy-ux' },
+      { title: 'Colors', href: '/foundations/colors' },
+      { title: 'Typography', href: '/foundations/typography' },
+      { title: 'Spacing', href: '/foundations/spacing' },
+      { title: 'Motion', href: '/foundations/motion' },
       { title: 'Icons', href: '/foundations/icons' },
       { title: 'Accessibility', href: '/foundations/accessibility' },
       { title: 'Responsive Design', href: '/foundations/responsive-design' },

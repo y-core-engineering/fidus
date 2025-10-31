@@ -24,6 +24,7 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 import { Link, Stack } from '@fidus/ui';
+import { CodeBlock } from '../../../components/helpers/code-block';
 
 export default function IconsPage() {
   const domainIcons = [
@@ -78,15 +79,34 @@ export default function IconsPage() {
       <h2>Icon Library</h2>
       <p>
         We use <strong>Lucide React</strong> - a community-maintained fork of Feather Icons with
-        over 1,000+ icons. Benefits:
+        over 1,000+ icons.
       </p>
-      <ul>
-        <li>Consistent design language</li>
-        <li>Tree-shakeable (only import icons you use)</li>
-        <li>Fully accessible with proper ARIA attributes</li>
-        <li>Customizable size, color, and stroke width</li>
-        <li>React components (not SVG sprites)</li>
-      </ul>
+
+      <div className="not-prose bg-muted rounded-lg p-lg my-lg">
+        <h3 className="text-base font-semibold mb-md">Benefits</h3>
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Consistent design language across all icons</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Tree-shakeable (only import icons you use)</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Fully accessible with proper ARIA attributes</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Customizable size, color, and stroke width</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>React components (not SVG sprites)</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Domain Icons</h2>
       <p>Each Fidus domain has a representative icon used in cards, navigation, and badges:</p>
@@ -252,9 +272,10 @@ export default function IconsPage() {
       <h2>Usage Examples</h2>
 
       <h3>In Buttons</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`import { Calendar } from 'lucide-react';
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`import { Calendar } from 'lucide-react';
 import { Button, Stack } from '@fidus/ui';
 
 <Button>
@@ -263,13 +284,14 @@ import { Button, Stack } from '@fidus/ui';
     <span>Add Event</span>
   </Stack>
 </Button>`}
-        </pre>
+        />
       </div>
 
       <h3>In Card Headers</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`import { DollarSign } from 'lucide-react';
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`import { DollarSign } from 'lucide-react';
 
 <OpportunityCard
   title="Budget Alert"
@@ -278,13 +300,14 @@ import { Button, Stack } from '@fidus/ui';
 >
   Card content...
 </OpportunityCard>`}
-        </pre>
+        />
       </div>
 
       <h3>As Status Indicators</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`import { Lock, Cloud, Link } from 'lucide-react';
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`import { Lock, Cloud, Link } from 'lucide-react';
 
 // Privacy badge with icon
 <Badge>
@@ -294,7 +317,7 @@ import { Button, Stack } from '@fidus/ui';
 // Connection status
 <Cloud className="h-4 w-4 text-success" />
 <Link className="h-4 w-4 text-muted-foreground" />`}
-        </pre>
+        />
       </div>
 
       <h2>Customization</h2>
@@ -321,50 +344,60 @@ import { Button, Stack } from '@fidus/ui';
 
       <h2>Best Practices</h2>
 
-      <ul>
-        <li>
-          <strong>Consistent Sizing:</strong> Use the standard size scale (h-3, h-4, h-5, h-6)
-        </li>
-        <li>
-          <strong>Semantic Usage:</strong> Choose icons that clearly represent their function
-        </li>
-        <li>
-          <strong>Color Contrast:</strong> Ensure icons meet WCAG 2.1 AA contrast ratios
-        </li>
-        <li>
-          <strong>Avoid Icon-Only Buttons:</strong> Include text labels for clarity
-        </li>
-        <li>
-          <strong>Tree-Shaking:</strong> Import only the icons you need
-        </li>
-        <li>
-          <strong>Accessibility:</strong> Add aria-label when icon is the only content
-        </li>
-      </ul>
+      <div className="not-prose bg-muted rounded-lg p-lg my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Consistent Sizing:</strong> Use the standard size scale (h-3, h-4, h-5, h-6)</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Semantic Usage:</strong> Choose icons that clearly represent their function</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Color Contrast:</strong> Ensure icons meet WCAG 2.1 AA contrast ratios</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Avoid Icon-Only Buttons:</strong> Include text labels for clarity</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Tree-Shaking:</strong> Import only the icons you need</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Accessibility:</strong> Add aria-label when icon is the only content</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Accessibility</h2>
 
       <h3>Decorative Icons</h3>
       <p>Icons that accompany text don&apos;t need additional labels:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<Button>
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<Button>
   <Stack direction="horizontal" spacing="sm" align="center">
     <Calendar className="h-4 w-4" />
     <span>Add Event</span>  {/* Text provides context */}
   </Stack>
 </Button>`}
-        </pre>
+        />
       </div>
 
       <h3>Standalone Icons</h3>
       <p>Icons without text need aria-label:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<button aria-label="Close">
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<button aria-label="Close">
   <X className="h-4 w-4" />
 </button>`}
-        </pre>
+        />
       </div>
 
       <h2>Resources</h2>

@@ -2,6 +2,7 @@
 
 import { Button, Link, Stack } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
+import { CodeBlock } from '../../../components/helpers/code-block';
 import { useState } from 'react';
 
 export default function ResponsiveDesignPage() {
@@ -68,9 +69,10 @@ export default function ResponsiveDesignPage() {
         core experience works everywhere.
       </p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Mobile first (no prefix)
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Mobile first (no prefix)
 <div className="p-md text-sm">
 
 // Then enhance for larger screens
@@ -78,7 +80,7 @@ export default function ResponsiveDesignPage() {
 
 // Grid: 1 column mobile, 2 tablet, 3 desktop
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">`}
-        </pre>
+        />
       </div>
 
       <h2>Interactive Responsive Demo</h2>
@@ -152,9 +154,10 @@ export default function ResponsiveDesignPage() {
       <h3>Grid Layout</h3>
       <p>Automatic responsive columns:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Grid component with auto-responsive columns
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Grid component with auto-responsive columns
 <Grid cols="3">  // 1 col mobile, 2 tablet, 3 desktop
   <Card>...</Card>
   <Card>...</Card>
@@ -163,15 +166,16 @@ export default function ResponsiveDesignPage() {
 
 // Manual control
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">`}
-        </pre>
+        />
       </div>
 
       <h3>Stack Direction</h3>
       <p>Change layout orientation at breakpoints:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Vertical on mobile, horizontal on tablet+
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Vertical on mobile, horizontal on tablet+
 <Stack
   direction="vertical"
   className="md:flex-row"
@@ -179,27 +183,29 @@ export default function ResponsiveDesignPage() {
   <Button>Primary</Button>
   <Button>Secondary</Button>
 </Stack>`}
-        </pre>
+        />
       </div>
 
       <h3>Container Max-Width</h3>
       <p>Content containers adapt to screen size:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<Container size="lg">  // max-w-6xl
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<Container size="lg">  // max-w-6xl
   // Automatically adds padding and centers
   <OpportunityCard>...</OpportunityCard>
 </Container>`}
-        </pre>
+        />
       </div>
 
       <h3>Visibility Classes</h3>
       <p>Show/hide elements at specific breakpoints:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Hidden on mobile, visible on md+
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Hidden on mobile, visible on md+
 <div className="hidden md:block">
   Desktop navigation
 </div>
@@ -208,7 +214,7 @@ export default function ResponsiveDesignPage() {
 <button className="md:hidden">
   Mobile menu
 </button>`}
-        </pre>
+        />
       </div>
 
       <h2>Typography Scale</h2>
@@ -239,14 +245,15 @@ export default function ResponsiveDesignPage() {
 
       <p>Padding and margins adjust at breakpoints:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Tighter spacing mobile, more generous desktop
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Tighter spacing mobile, more generous desktop
 <div className="p-md md:p-lg lg:p-xl">
 
 // Gap between elements
 <Stack spacing="sm" className="md:gap-md lg:gap-lg">`}
-        </pre>
+        />
       </div>
 
       <h2>Component Adaptations</h2>
@@ -296,25 +303,27 @@ export default function ResponsiveDesignPage() {
       <h3>Touch Targets</h3>
       <p>Minimum 44x44px for touch interfaces:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Ensure adequate spacing for touch
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Ensure adequate spacing for touch
 <button className="min-h-[44px] min-w-[44px] p-sm">
   <Icon className="h-5 w-5" />
 </button>`}
-        </pre>
+        />
       </div>
 
       <h3>Hover States</h3>
       <p>Only apply hover styles on devices that support hover:</p>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`// Hover only on devices with hover capability
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`// Hover only on devices with hover capability
 <button className="hover:bg-primary/90 active:bg-primary/80">
   // active state for touch devices
 </button>`}
-        </pre>
+        />
       </div>
 
       <h2>Testing Responsive Design</h2>
@@ -338,80 +347,80 @@ export default function ResponsiveDesignPage() {
       </p>
 
       <div className="not-prose space-y-md my-lg">
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">📱 Mobile Phones (Portrait)</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPhone SE (2022)</span>
               <code className="text-xs">375 × 667</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPhone 14 Pro</span>
               <code className="text-xs">393 × 852</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>Samsung Galaxy S23</span>
               <code className="text-xs">360 × 780</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>Google Pixel 7</span>
               <code className="text-xs">412 × 915</code>
             </div>
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">📱 Mobile Phones (Landscape)</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPhone 14 Pro (landscape)</span>
               <code className="text-xs">852 × 393</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>Samsung Galaxy S23 (landscape)</span>
               <code className="text-xs">780 × 360</code>
             </div>
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">💻 Tablets</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPad Mini (portrait)</span>
               <code className="text-xs">768 × 1024</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPad Air (portrait)</span>
               <code className="text-xs">820 × 1180</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPad Pro 11&quot; (portrait)</span>
               <code className="text-xs">834 × 1194</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>iPad Pro 12.9&quot; (landscape)</span>
               <code className="text-xs">1366 × 1024</code>
             </div>
           </div>
         </div>
 
-        <div className="border border-border rounded-lg p-lg bg-card">
+        <div className="border border-border rounded-lg p-lg bg-muted">
           <h4 className="text-base font-semibold mb-md">🖥️ Desktop & Laptop</h4>
           <div className="space-y-sm text-sm">
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>MacBook Air 13&quot;</span>
               <code className="text-xs">1280 × 832</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>MacBook Pro 14&quot;</span>
               <code className="text-xs">1512 × 982</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>Full HD Monitor</span>
               <code className="text-xs">1920 × 1080</code>
             </div>
-            <div className="flex items-center justify-between p-sm bg-muted/30 rounded-md">
+            <div className="flex items-center justify-between p-sm bg-muted rounded-md">
               <span>4K Monitor</span>
               <code className="text-xs">3840 × 2160</code>
             </div>
@@ -569,9 +578,10 @@ export default function ResponsiveDesignPage() {
 
       <h2>Example: Responsive Card Grid</h2>
 
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<Container size="lg" className="py-md md:py-lg lg:py-xl">
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<Container size="lg" className="py-md md:py-lg lg:py-xl">
   <Grid
     cols="3"  // Auto: 1 mobile, 2 tablet, 3 desktop
     gap="md"  // Responsive gap sizes
@@ -588,7 +598,7 @@ export default function ResponsiveDesignPage() {
     ))}
   </Grid>
 </Container>`}
-        </pre>
+        />
       </div>
 
       <h2>Related Components</h2>

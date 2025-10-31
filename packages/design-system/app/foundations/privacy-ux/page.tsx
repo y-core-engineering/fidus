@@ -261,69 +261,169 @@ export default function PrivacyUXPage() {
 
       <h2>Trust-Building Patterns</h2>
 
-      <h3>1. Progressive Disclosure</h3>
-      <ul>
-        <li>Start with minimal permissions</li>
-        <li>Request additional access only when needed</li>
-        <li>Explain "why" before asking</li>
-      </ul>
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">1. Progressive Disclosure</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Start with minimal permissions</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Request additional access only when needed</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Explain "why" before asking</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>2. Contextual Privacy Info</h3>
-      <ul>
-        <li>Show privacy details when relevant</li>
-        <li>Tooltip on privacy badges explaining details</li>
-        <li>Link to full privacy policy</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">2. Contextual Privacy Info</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Show privacy details when relevant</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Tooltip on privacy badges explaining details</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Link to full privacy policy</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>3. Visual Indicators</h3>
-      <ul>
-        <li>Lock icon for encrypted data</li>
-        <li>Cloud icon for synced data</li>
-        <li>External link icon for third-party services</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">3. Visual Indicators</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Lock icon for encrypted data</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Cloud icon for synced data</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>External link icon for third-party services</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>4. User Empowerment</h3>
-      <ul>
-        <li>Easy disconnect from services</li>
-        <li>One-click data export</li>
-        <li>Clear data deletion process</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">4. User Empowerment</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Easy disconnect from services</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>One-click data export</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Clear data deletion process</span>
+            </li>
+          </ul>
+        </div>
+      </div>
 
       <h2>Multi-Tenancy Privacy</h2>
 
       <p>Each tenant (user) has complete data isolation:</p>
 
-      <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
-        <h3 className="text-base font-semibold mb-sm">Tenant Isolation Guarantees</h3>
+      <div className="not-prose bg-muted rounded-lg p-lg my-lg">
+        <h3 className="text-base font-semibold mb-md">Tenant Isolation Guarantees</h3>
         <ul className="space-y-sm text-sm">
-          <li>✓ Data is never shared between tenants</li>
-          <li>✓ Each tenant has separate encryption keys</li>
-          <li>✓ API requests are tenant-scoped</li>
-          <li>✓ Database queries are tenant-filtered</li>
-          <li>✓ No cross-tenant AI analysis</li>
+          <li className="flex gap-sm">
+            <span className="text-success shrink-0">✓</span>
+            <span>Data is never shared between tenants</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-success shrink-0">✓</span>
+            <span>Each tenant has separate encryption keys</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-success shrink-0">✓</span>
+          <span>API requests are tenant-scoped</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-success shrink-0">✓</span>
+            <span>Database queries are tenant-filtered</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-success shrink-0">✓</span>
+            <span>No cross-tenant AI analysis</span>
+          </li>
         </ul>
       </div>
 
       <h2>Implementation Guidelines</h2>
 
-      <h3>For Developers</h3>
-      <ul>
-        <li>Always include privacy badge on data-displaying components</li>
-        <li>Use appropriate badge type (Local, Cloud, External, AI)</li>
-        <li>Implement tenant-scoped queries in all APIs</li>
-        <li>Add permission checks before data access</li>
-        <li>Log all data access for audit trail</li>
-        <li>Support data export in machine-readable format</li>
-      </ul>
+      <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">For Developers</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Always include privacy badge on data-displaying components</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use appropriate badge type (Local, Cloud, External, AI)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Implement tenant-scoped queries in all APIs</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Add permission checks before data access</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Log all data access for audit trail</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Support data export in machine-readable format</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>For Designers</h3>
-      <ul>
-        <li>Include privacy badge in mockups</li>
-        <li>Design permission requests with clear explanations</li>
-        <li>Show data flow visually when relevant</li>
-        <li>Make privacy settings easily discoverable</li>
-        <li>Use consistent iconography for privacy indicators</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">For Designers</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Include privacy badge in mockups</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Design permission requests with clear explanations</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Show data flow visually when relevant</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Make privacy settings easily discoverable</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use consistent iconography for privacy indicators</span>
+            </li>
+          </ul>
+        </div>
+      </div>
 
       <h2>Key Takeaways</h2>
 
