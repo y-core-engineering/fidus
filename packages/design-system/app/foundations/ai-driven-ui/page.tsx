@@ -1808,7 +1808,7 @@ export default function AIDrivenUIPage() {
         <div className="mb-lg">
           <div className="text-xs font-mono mb-sm text-muted-foreground">System Prompt to LLM</div>
           <CodeBlock
-            language="markdown"
+            language="typescript"
             code={`You are the UI Decision Layer for Fidus, a privacy-first AI assistant.
 
 TASK: Analyze the user query and context, then decide which UI form to render.
