@@ -1,5 +1,7 @@
 'use client';
 
+import { CodeBlock } from '../../../components/helpers/code-block';
+
 export default function SpacingPage() {
   const SpacingExample = ({
     name,
@@ -177,9 +179,10 @@ export default function SpacingPage() {
       <p>
         When using Tailwind CSS, spacing values are available through standard utilities:
       </p>
-      <div className="not-prose bg-muted/30 rounded-lg p-md my-md">
-        <pre className="text-sm">
-          <code>{`<!-- Padding -->
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<!-- Padding -->
 <div className="p-xs">4px padding</div>
 <div className="p-md">16px padding</div>
 <div className="px-lg py-md">24px horizontal, 16px vertical</div>
@@ -190,8 +193,8 @@ export default function SpacingPage() {
 
 <!-- Gap (for flexbox/grid) -->
 <div className="flex gap-md">16px gap</div>
-<div className="grid gap-lg">24px gap</div>`}</code>
-        </pre>
+<div className="grid gap-lg">24px gap</div>`}
+        />
       </div>
 
       <h3>Accessibility</h3>

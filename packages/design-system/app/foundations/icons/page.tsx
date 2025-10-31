@@ -24,6 +24,7 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 import { Link, Stack } from '@fidus/ui';
+import { CodeBlock } from '../../../components/helpers/code-block';
 
 export default function IconsPage() {
   const domainIcons = [
@@ -252,9 +253,10 @@ export default function IconsPage() {
       <h2>Usage Examples</h2>
 
       <h3>In Buttons</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`import { Calendar } from 'lucide-react';
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`import { Calendar } from 'lucide-react';
 import { Button, Stack } from '@fidus/ui';
 
 <Button>
@@ -263,13 +265,14 @@ import { Button, Stack } from '@fidus/ui';
     <span>Add Event</span>
   </Stack>
 </Button>`}
-        </pre>
+        />
       </div>
 
       <h3>In Card Headers</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`import { DollarSign } from 'lucide-react';
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`import { DollarSign } from 'lucide-react';
 
 <OpportunityCard
   title="Budget Alert"
@@ -278,13 +281,14 @@ import { Button, Stack } from '@fidus/ui';
 >
   Card content...
 </OpportunityCard>`}
-        </pre>
+        />
       </div>
 
       <h3>As Status Indicators</h3>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`import { Lock, Cloud, Link } from 'lucide-react';
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`import { Lock, Cloud, Link } from 'lucide-react';
 
 // Privacy badge with icon
 <Badge>
@@ -294,7 +298,7 @@ import { Button, Stack } from '@fidus/ui';
 // Connection status
 <Cloud className="h-4 w-4 text-success" />
 <Link className="h-4 w-4 text-muted-foreground" />`}
-        </pre>
+        />
       </div>
 
       <h2>Customization</h2>
@@ -346,25 +350,27 @@ import { Button, Stack } from '@fidus/ui';
 
       <h3>Decorative Icons</h3>
       <p>Icons that accompany text don&apos;t need additional labels:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<Button>
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<Button>
   <Stack direction="horizontal" spacing="sm" align="center">
     <Calendar className="h-4 w-4" />
     <span>Add Event</span>  {/* Text provides context */}
   </Stack>
 </Button>`}
-        </pre>
+        />
       </div>
 
       <h3>Standalone Icons</h3>
       <p>Icons without text need aria-label:</p>
-      <div className="bg-muted/30 border border-border rounded-lg p-md my-md">
-        <pre className="text-xs">
-          {`<button aria-label="Close">
+      <div className="not-prose my-md">
+        <CodeBlock
+          language="tsx"
+          code={`<button aria-label="Close">
   <X className="h-4 w-4" />
 </button>`}
-        </pre>
+        />
       </div>
 
       <h2>Resources</h2>
