@@ -1902,6 +1902,417 @@ Respond with structured JSON UI decision.`}
         </div>
       </div>
 
+      {/* Key Examples Collection */}
+      <h2 className="mb-md">Key Examples: See AI-Driven UI in Action</h2>
+      <p className="lead mb-lg">
+        These are the most impactful examples that demonstrate the paradigm shift from traditional to AI-driven UI.
+        Each example shows how the same user intent produces different interfaces based on context.
+      </p>
+
+      <div className="not-prose mb-xl">
+        <div className="grid grid-cols-1 gap-md">
+          {/* Example 1: Morning with Fidus */}
+          <div className="border-2 border-primary/20 rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="flex items-start gap-md">
+              <div className="text-3xl">🌅</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold mb-sm">1. A Morning with Fidus — Interactive Phone Demo</h3>
+                <p className="text-sm text-muted-foreground mb-md">
+                  Watch a realistic morning scenario where Fidus adapts its UI based on time, context, and user activity.
+                  The phone demo cycles through multiple scenarios automatically, showing budget queries, calendar conflicts,
+                  travel bookings, and proactive suggestions—all rendered differently based on context.
+                </p>
+                <div className="bg-muted/50 rounded-md p-sm text-xs mb-md">
+                  <strong>What you&apos;ll see:</strong>
+                  <ul className="mt-2 space-y-1 ml-md">
+                    <li>• Same query (&quot;Show budget&quot;) → different UIs (text vs urgent card)</li>
+                    <li>• Flight cards with primary/secondary button hierarchy</li>
+                    <li>• Form filling animation with progressive field reveal</li>
+                    <li>• Booking confirmation with swipeable dismissal</li>
+                    <li>• Dashboard showing the completed booking</li>
+                  </ul>
+                </div>
+                <a
+                  href="#walkthrough-phone-demo"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  <span>↑ Scroll to Interactive Demo</span>
+                  <span>↑</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Example 2: Context-Driven Rendering */}
+          <div className="border-2 border-primary/20 rounded-lg p-lg bg-gradient-to-br from-info/5 to-transparent">
+            <div className="flex items-start gap-md">
+              <div className="text-3xl">🎯</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold mb-sm">2. Context-Driven UI Rendering Pattern</h3>
+                <p className="text-sm text-muted-foreground mb-md">
+                  The foundation of AI-driven UI: the LLM analyzes context signals (time, urgency, data complexity, user expertise)
+                  and dynamically selects the UI form. See the budget query example showing text response vs OpportunityCard
+                  based on budget status and timing.
+                </p>
+                <div className="bg-muted/50 rounded-md p-sm text-xs mb-md">
+                  <strong>Key insight:</strong> The same user query produces completely different UIs:
+                  <ul className="mt-2 space-y-1 ml-md">
+                    <li>• Mid-month, 66% spent → Simple text: &quot;You&apos;re on track!&quot;</li>
+                    <li>• End-month, 95% spent → Urgent card with actions and breakdown</li>
+                  </ul>
+                </div>
+                <a
+                  href="#pattern-1-context-driven"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  <span>↓ Jump to Pattern #1</span>
+                  <span>↓</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Example 3: Adaptive Form Complexity */}
+          <div className="border-2 border-primary/20 rounded-lg p-lg bg-gradient-to-br from-success/5 to-transparent">
+            <div className="flex items-start gap-md">
+              <div className="text-3xl">📝</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold mb-sm">3. Adaptive Form Complexity Pattern</h3>
+                <p className="text-sm text-muted-foreground mb-md">
+                  Forms adapt to user expertise and intent clarity. Expert users with complete parameters get quick pre-filled forms,
+                  while beginners with vague requests get conversational wizards. The budget creation example shows both extremes.
+                </p>
+                <div className="bg-muted/50 rounded-md p-sm text-xs mb-md">
+                  <strong>The contrast:</strong>
+                  <ul className="mt-2 space-y-1 ml-md">
+                    <li>• Expert: &quot;Create food budget 500 EUR monthly&quot; → Quick form, one click</li>
+                    <li>• Beginner: &quot;I want to save money&quot; → Guided conversation with options</li>
+                  </ul>
+                </div>
+                <a
+                  href="#pattern-3-adaptive-forms"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  <span>↓ Jump to Pattern #3</span>
+                  <span>↓</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Example 4: UI Decision Matrix */}
+          <div className="border-2 border-primary/20 rounded-lg p-lg bg-gradient-to-br from-warning/5 to-transparent">
+            <div className="flex items-start gap-md">
+              <div className="text-3xl">🧠</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold mb-sm">4. UI Form Decision Matrix — LLM Decision Mapping</h3>
+                <p className="text-sm text-muted-foreground mb-md">
+                  A comprehensive table showing 10 real-world scenarios where user query + context signals + user level
+                  map to specific UI forms. This matrix illustrates the complexity of context-aware UI decisions and emphasizes
+                  that these are examples, not deterministic rules.
+                </p>
+                <div className="bg-muted/50 rounded-md p-sm text-xs mb-md">
+                  <strong>Why it matters:</strong> Shows that AI-driven UI decisions consider multiple factors simultaneously—
+                  not just one rule like &quot;if morning then show weather.&quot; The LLM weighs urgency, user level, data complexity,
+                  and context to choose the optimal UI form.
+                </div>
+                <a
+                  href="#decision-matrix"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  <span>↓ Jump to Decision Matrix</span>
+                  <span>↓</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-info/10 border border-info/20 rounded-lg p-md mt-lg text-sm">
+          <div className="flex gap-2 items-start">
+            <span className="text-info text-lg">💡</span>
+            <div>
+              <strong>Pro tip:</strong> Start with the Interactive Phone Demo to see the paradigm in action,
+              then dive into specific patterns to understand the underlying principles. The Decision Matrix
+              ties everything together with concrete examples.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Implementation Architecture */}
+      <h2 className="mb-md">Implementation Architecture</h2>
+      <p className="lead mb-lg">
+        How do you actually build an AI-driven UI system? This section provides developer guidance on designing,
+        implementing, and extending the context-adaptive interface architecture.
+      </p>
+
+      <div className="not-prose mb-xl">
+        <h3 className="text-lg font-semibold mb-md">What Gets Designed & Built</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h4 className="text-sm font-semibold mb-sm text-primary">1. Component Registry</h4>
+            <p className="text-xs text-muted-foreground mb-sm">
+              A structured knowledge base (JSON/YAML) documenting all available UI components:
+            </p>
+            <ul className="text-xs space-y-1 ml-md">
+              <li>• Component name and description</li>
+              <li>• When to use (conditions)</li>
+              <li>• Required props and types</li>
+              <li>• Example scenarios</li>
+              <li>• Visual examples (screenshots)</li>
+            </ul>
+            <div className="mt-sm text-xs font-mono bg-muted/50 p-2 rounded">
+              /registry/components/
+              <br />
+              ├─ OpportunityCard.json
+              <br />
+              ├─ BudgetWidget.json
+              <br />
+              └─ DetailCard.json
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h4 className="text-sm font-semibold mb-sm text-primary">2. Domain Context Schemas</h4>
+            <p className="text-xs text-muted-foreground mb-sm">
+              TypeScript/Zod schemas defining context structure for each domain:
+            </p>
+            <ul className="text-xs space-y-1 ml-md">
+              <li>• User state (expertise level, preferences)</li>
+              <li>• Domain data (budget, calendar, travel)</li>
+              <li>• Temporal context (time, location)</li>
+              <li>• Recent activity history</li>
+              <li>• Device and platform info</li>
+            </ul>
+            <div className="mt-sm text-xs font-mono bg-muted/50 p-2 rounded">
+              /schemas/context/
+              <br />
+              ├─ BudgetContext.ts
+              <br />
+              ├─ CalendarContext.ts
+              <br />
+              └─ UserContext.ts
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h4 className="text-sm font-semibold mb-sm text-primary">3. UI Decision Prompts</h4>
+            <p className="text-xs text-muted-foreground mb-sm">
+              System prompts for the LLM that include:
+            </p>
+            <ul className="text-xs space-y-1 ml-md">
+              <li>• Role definition (UI Decision Layer)</li>
+              <li>• Decision criteria (urgency, complexity, etc.)</li>
+              <li>• Component Registry reference (RAG)</li>
+              <li>• Output format (structured JSON schema)</li>
+              <li>• Examples of good decisions</li>
+            </ul>
+            <div className="mt-sm text-xs font-mono bg-muted/50 p-2 rounded">
+              /prompts/
+              <br />
+              ├─ ui-decision-layer.md
+              <br />
+              └─ component-registry-rag.md
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h4 className="text-sm font-semibold mb-sm text-primary">4. Response Templates</h4>
+            <p className="text-xs text-muted-foreground mb-sm">
+              Zod schemas for LLM response validation:
+            </p>
+            <ul className="text-xs space-y-1 ml-md">
+              <li>• UI decision structure</li>
+              <li>• Component name (enum)</li>
+              <li>• Props (typed by component)</li>
+              <li>• Reasoning field (explainability)</li>
+              <li>• Alternatives considered</li>
+            </ul>
+            <div className="mt-sm text-xs font-mono bg-muted/50 p-2 rounded">
+              /schemas/responses/
+              <br />
+              ├─ UIDecisionSchema.ts
+              <br />
+              └─ ComponentPropsSchema.ts
+            </div>
+          </div>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Where to Work in the Codebase</h3>
+
+        <div className="bg-muted/30 border border-border rounded-lg p-md mb-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-md text-xs">
+            <div>
+              <div className="font-semibold mb-2 text-sm">🎯 Supervisors (Backend)</div>
+              <div className="font-mono bg-background p-2 rounded mb-2">
+                packages/api/fidus/domain/
+                <br />
+                └─ orchestration/
+              </div>
+              <div className="text-muted-foreground">
+                Orchestration supervisor receives user query, gathers context, calls UI Decision Layer (LLM),
+                returns structured UI response.
+              </div>
+            </div>
+
+            <div>
+              <div className="font-semibold mb-2 text-sm">🤖 Agents (LLM Layer)</div>
+              <div className="font-mono bg-background p-2 rounded mb-2">
+                packages/api/fidus/agents/
+                <br />
+                └─ ui_decision_agent.py
+              </div>
+              <div className="text-muted-foreground">
+                LLM agent that receives context + Component Registry (RAG), applies decision criteria,
+                returns structured JSON with component + props.
+              </div>
+            </div>
+
+            <div>
+              <div className="font-semibold mb-2 text-sm">🎨 UI Components (Frontend)</div>
+              <div className="font-mono bg-background p-2 rounded mb-2">
+                packages/web/components/
+                <br />
+                └─ dynamic-renderer.tsx
+              </div>
+              <div className="text-muted-foreground">
+                Dynamic renderer receives UI decision JSON, validates props, renders the selected
+                component with pre-filled data.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Adding New UI Components</h3>
+
+        <div className="border-l-4 border-primary pl-md mb-lg bg-primary/5 p-md rounded-r-lg">
+          <ol className="text-sm space-y-md">
+            <li>
+              <strong>1. Build the Component</strong>
+              <div className="text-xs text-muted-foreground mt-1">
+                Create React component in <code className="font-mono">packages/web/components/</code> or
+                add to <code className="font-mono">@fidus/ui</code> if reusable.
+              </div>
+            </li>
+            <li>
+              <strong>2. Document in Component Registry</strong>
+              <div className="text-xs text-muted-foreground mt-1">
+                Create JSON entry with: name, description, whenToUse, requiredProps, examples.
+                This becomes RAG knowledge for the LLM.
+              </div>
+            </li>
+            <li>
+              <strong>3. Add to Dynamic Renderer</strong>
+              <div className="text-xs text-muted-foreground mt-1">
+                Update <code className="font-mono">DynamicRenderer.tsx</code> to handle new component name
+                and validate its props with Zod schema.
+              </div>
+            </li>
+            <li>
+              <strong>4. Test with Context Variations</strong>
+              <div className="text-xs text-muted-foreground mt-1">
+                Write tests that provide different contexts to UI Decision Layer and verify it selects
+                the new component when appropriate.
+              </div>
+            </li>
+            <li>
+              <strong>5. Update Documentation</strong>
+              <div className="text-xs text-muted-foreground mt-1">
+                Add example to this page under relevant pattern section, showing when LLM would choose this component.
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Do&apos;s and Don&apos;ts</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <div className="border-l-4 border-success pl-md">
+            <h4 className="text-sm font-semibold mb-sm text-success">✅ DO</h4>
+            <ul className="text-xs space-y-2">
+              <li>
+                <strong>Let the LLM decide</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  Provide context and Component Registry, let LLM choose UI form based on reasoning.
+                </span>
+              </li>
+              <li>
+                <strong>Use structured outputs</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  Validate LLM responses with Zod schemas to ensure type-safe component rendering.
+                </span>
+              </li>
+              <li>
+                <strong>Document components thoroughly</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  Component Registry is LLM&apos;s knowledge base—clear docs = better decisions.
+                </span>
+              </li>
+              <li>
+                <strong>Test context variations</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  Test same query with different contexts to verify adaptive behavior.
+                </span>
+              </li>
+              <li>
+                <strong>Track LLM reasoning</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  Log reasoning field from UI decisions for debugging and improving prompts.
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="border-l-4 border-error pl-md">
+            <h4 className="text-sm font-semibold mb-sm text-error">❌ DON&apos;T</h4>
+            <ul className="text-xs space-y-2">
+              <li>
+                <strong>Hardcode UI logic</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  Avoid <code>if (morning) show weather</code>—let LLM decide based on full context.
+                </span>
+              </li>
+              <li>
+                <strong>Skip Component Registry</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  LLM can&apos;t choose components it doesn&apos;t know about via RAG.
+                </span>
+              </li>
+              <li>
+                <strong>Use auto-hide timers</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  User controls dismissal—never <code>setTimeout(hide, 3000)</code>.
+                </span>
+              </li>
+              <li>
+                <strong>Create fixed screens</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  No CalendarScreen.tsx—create CalendarWidget.tsx that appears contextually.
+                </span>
+              </li>
+              <li>
+                <strong>Ignore reasoning field</strong>
+                <br />
+                <span className="text-muted-foreground">
+                  LLM reasoning helps debug bad decisions and improve prompts over time.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <h2>Core Principle: Context-Driven UI Rendering</h2>
 
       <h3>Example: "Show my budget"</h3>
