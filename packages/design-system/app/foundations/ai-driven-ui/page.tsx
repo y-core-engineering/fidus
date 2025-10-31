@@ -2147,22 +2147,35 @@ Respond with structured JSON UI decision.`}
         <h3 className="text-lg font-semibold mb-md">Where to Work in the Codebase</h3>
 
         <div className="bg-muted/30 border border-border rounded-lg p-md mb-lg">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-md text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-md text-xs">
             <div>
-              <div className="font-semibold mb-2 text-sm">🎯 Supervisors (Backend)</div>
+              <div className="font-semibold mb-2 text-sm">🎯 Core Supervisor (Orchestration)</div>
               <div className="font-mono bg-background p-2 rounded mb-2">
                 packages/api/fidus/domain/
                 <br />
                 └─ orchestration/
               </div>
               <div className="text-muted-foreground">
-                Orchestration supervisor receives user query, gathers context, calls UI Decision Layer (LLM),
-                returns structured UI response.
+                Orchestration supervisor (core, built-in) receives user query, gathers context, calls UI Decision Layer (LLM),
+                and returns structured UI response with component + props.
               </div>
             </div>
 
             <div>
-              <div className="font-semibold mb-2 text-sm">🤖 Agents (LLM Layer)</div>
+              <div className="font-semibold mb-2 text-sm">🔌 External Domain Supervisors (MCP)</div>
+              <div className="font-mono bg-background p-2 rounded mb-2">
+                External MCP Servers
+                <br />
+                (added by admin at runtime)
+              </div>
+              <div className="text-muted-foreground">
+                Domain supervisors (Calendar, Finance, Travel, etc.) are external MCP servers.
+                Admin adds/removes them at runtime via MCP plugin system—not hardcoded in core.
+              </div>
+            </div>
+
+            <div>
+              <div className="font-semibold mb-2 text-sm">🤖 UI Decision Agent (LLM Layer)</div>
               <div className="font-mono bg-background p-2 rounded mb-2">
                 packages/api/fidus/agents/
                 <br />
@@ -2175,7 +2188,7 @@ Respond with structured JSON UI decision.`}
             </div>
 
             <div>
-              <div className="font-semibold mb-2 text-sm">🎨 UI Components (Frontend)</div>
+              <div className="font-semibold mb-2 text-sm">🎨 Dynamic UI Renderer (Frontend)</div>
               <div className="font-mono bg-background p-2 rounded mb-2">
                 packages/web/components/
                 <br />
@@ -2185,6 +2198,17 @@ Respond with structured JSON UI decision.`}
                 Dynamic renderer receives UI decision JSON, validates props, renders the selected
                 component with pre-filled data.
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-info/10 border border-info/20 rounded-lg p-md mb-lg text-sm">
+          <div className="flex gap-2 items-start">
+            <span className="text-info text-lg">💡</span>
+            <div>
+              <strong>Core vs. External Architecture:</strong> Fidus has a minimal core (Orchestration + Proactivity supervisors)
+              and external domain supervisors (Calendar, Finance, Travel) that are MCP servers added dynamically by admins.
+              This allows extending Fidus with new domains without modifying core code.
             </div>
           </div>
         </div>
