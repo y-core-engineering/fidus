@@ -372,11 +372,41 @@ export default function AIDrivenUIPage() {
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
-      <h1>AI-Driven UI Paradigm</h1>
-      <p className="lead">
-        Fidus implements a fundamentally different UI paradigm. Instead of fixed screens and predetermined flows,
-        the LLM dynamically decides what interface to present based on context, creating situational UI that adapts
-        to each moment.
+      {/* Hero Section */}
+      <div className="not-prose mb-xl">
+        <h1 className="text-4xl md:text-5xl font-bold mb-md">AI-Driven UI Paradigm</h1>
+        <p className="text-xl md:text-2xl text-muted-foreground mb-lg max-w-3xl">
+          Fidus doesn't have fixed screens or predetermined flows. Instead, an LLM analyzes context in real-time
+          and dynamically decides what interface to render—creating situational UI that adapts to each moment.
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-md mb-lg">
+          <div className="p-md border border-border rounded-lg">
+            <h3 className="text-lg font-semibold mb-sm">No Fixed Screens</h3>
+            <p className="text-sm text-muted-foreground">
+              The same user query can produce different UIs based on context, time, location, and user expertise.
+            </p>
+          </div>
+          <div className="p-md border border-border rounded-lg">
+            <h3 className="text-lg font-semibold mb-sm">LLM Decides UI Form</h3>
+            <p className="text-sm text-muted-foreground">
+              Chat, form, widget, wizard—the LLM chooses the best interface pattern for each situation.
+            </p>
+          </div>
+          <div className="p-md border border-border rounded-lg">
+            <h3 className="text-lg font-semibold mb-sm">Context-Adaptive</h3>
+            <p className="text-sm text-muted-foreground">
+              UI complexity adapts to user expertise, urgency, available time, and current activity.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Walkthrough: "Ein Morgen mit Fidus" */}
+      <h2 className="mb-md">A Morning with Fidus</h2>
+      <p className="lead mb-lg">
+        Watch how the same AI assistant dynamically adapts its interface throughout the day based on context,
+        user input, and real-time signals—without any fixed screens or predetermined flows.
       </p>
 
       {/* Mobile Phone Demo with Two-Column Layout */}
