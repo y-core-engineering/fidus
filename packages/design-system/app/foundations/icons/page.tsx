@@ -79,15 +79,34 @@ export default function IconsPage() {
       <h2>Icon Library</h2>
       <p>
         We use <strong>Lucide React</strong> - a community-maintained fork of Feather Icons with
-        over 1,000+ icons. Benefits:
+        over 1,000+ icons.
       </p>
-      <ul>
-        <li>Consistent design language</li>
-        <li>Tree-shakeable (only import icons you use)</li>
-        <li>Fully accessible with proper ARIA attributes</li>
-        <li>Customizable size, color, and stroke width</li>
-        <li>React components (not SVG sprites)</li>
-      </ul>
+
+      <div className="not-prose bg-muted rounded-lg p-lg my-lg">
+        <h3 className="text-base font-semibold mb-md">Benefits</h3>
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Consistent design language across all icons</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Tree-shakeable (only import icons you use)</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Fully accessible with proper ARIA attributes</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>Customizable size, color, and stroke width</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span>React components (not SVG sprites)</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Domain Icons</h2>
       <p>Each Fidus domain has a representative icon used in cards, navigation, and badges:</p>
@@ -325,26 +344,34 @@ import { Button, Stack } from '@fidus/ui';
 
       <h2>Best Practices</h2>
 
-      <ul>
-        <li>
-          <strong>Consistent Sizing:</strong> Use the standard size scale (h-3, h-4, h-5, h-6)
-        </li>
-        <li>
-          <strong>Semantic Usage:</strong> Choose icons that clearly represent their function
-        </li>
-        <li>
-          <strong>Color Contrast:</strong> Ensure icons meet WCAG 2.1 AA contrast ratios
-        </li>
-        <li>
-          <strong>Avoid Icon-Only Buttons:</strong> Include text labels for clarity
-        </li>
-        <li>
-          <strong>Tree-Shaking:</strong> Import only the icons you need
-        </li>
-        <li>
-          <strong>Accessibility:</strong> Add aria-label when icon is the only content
-        </li>
-      </ul>
+      <div className="not-prose bg-muted rounded-lg p-lg my-lg">
+        <ul className="space-y-sm text-sm">
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Consistent Sizing:</strong> Use the standard size scale (h-3, h-4, h-5, h-6)</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Semantic Usage:</strong> Choose icons that clearly represent their function</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Color Contrast:</strong> Ensure icons meet WCAG 2.1 AA contrast ratios</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Avoid Icon-Only Buttons:</strong> Include text labels for clarity</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Tree-Shaking:</strong> Import only the icons you need</span>
+          </li>
+          <li className="flex gap-sm">
+            <span className="text-muted-foreground shrink-0">•</span>
+            <span><strong>Accessibility:</strong> Add aria-label when icon is the only content</span>
+          </li>
+        </ul>
+      </div>
 
       <h2>Accessibility</h2>
 
