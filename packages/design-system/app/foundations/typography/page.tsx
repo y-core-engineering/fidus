@@ -169,29 +169,74 @@ export default function TypographyPage() {
       </div>
 
       <h2>Usage Guidelines</h2>
-      <h3>Hierarchy</h3>
-      <ul>
-        <li>Use larger sizes (2XL-5XL) for page titles and major headings</li>
-        <li>Use XL-LG for section headings</li>
-        <li>Use MD (base) for body text</li>
-        <li>Use SM-XS for secondary information and captions</li>
-      </ul>
 
-      <h3>Readability</h3>
-      <ul>
-        <li>Keep line length between 45-75 characters for optimal readability</li>
-        <li>Use normal or relaxed line height for body text</li>
-        <li>Ensure sufficient contrast between text and background (4.5:1 minimum)</li>
-        <li>Avoid using all caps for long passages</li>
-      </ul>
+      <div className="not-prose space-y-lg my-lg">
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">Hierarchy</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use larger sizes (2XL-5XL) for page titles and major headings</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use XL-LG for section headings</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use MD (base) for body text</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use SM-XS for secondary information and captions</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>Accessibility</h3>
-      <ul>
-        <li>Body text should be at least 16px (1rem) for comfortable reading</li>
-        <li>Use font weight to establish hierarchy, not just size</li>
-        <li>Ensure text can be resized up to 200% without loss of functionality</li>
-        <li>Avoid using italics for long passages as they reduce readability</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">Readability</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Keep line length between 45-75 characters for optimal readability</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use normal or relaxed line height for body text</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Ensure sufficient contrast between text and background (4.5:1 minimum)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Avoid using all caps for long passages</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Body text should be at least 16px (1rem) for comfortable reading</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use font weight to establish hierarchy, not just size</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Ensure text can be resized up to 200% without loss of functionality</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Avoid using italics for long passages as they reduce readability</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
