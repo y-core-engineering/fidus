@@ -144,45 +144,71 @@ export default function SpacingPage() {
 
       <h2>Usage Guidelines</h2>
 
-      <h3>When to use each size</h3>
-      <ul>
-        <li>
-          <strong>XS (4px):</strong> Tight spacing within components, icon margins, badge gaps
-        </li>
-        <li>
-          <strong>SM (8px):</strong> Small component padding, compact lists, inline elements
-        </li>
-        <li>
-          <strong>MD (16px):</strong> Default component padding, standard gaps between related elements
-        </li>
-        <li>
-          <strong>LG (24px):</strong> Spacing between component groups, card padding
-        </li>
-        <li>
-          <strong>XL (32px):</strong> Section padding, spacing between major content blocks
-        </li>
-        <li>
-          <strong>2XL-5XL (40px-80px):</strong> Page margins, hero sections, major layout divisions
-        </li>
-      </ul>
+      <div className="not-prose space-y-lg my-lg">
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">When to use each size</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>XS (4px):</strong> Tight spacing within components, icon margins, badge gaps</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>SM (8px):</strong> Small component padding, compact lists, inline elements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>MD (16px):</strong> Default component padding, standard gaps between related elements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>LG (24px):</strong> Spacing between component groups, card padding</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>XL (32px):</strong> Section padding, spacing between major content blocks</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span><strong>2XL-5XL (40px-80px):</strong> Page margins, hero sections, major layout divisions</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>Best Practices</h3>
-      <ul>
-        <li>Use spacing scale values instead of arbitrary numbers</li>
-        <li>Maintain consistent spacing patterns throughout the interface</li>
-        <li>Use larger spacing to create visual hierarchy and grouping</li>
-        <li>Consider touch target sizes (minimum 44x44px) for interactive elements</li>
-        <li>Test spacing at different viewport sizes and zoom levels</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">Best Practices</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use spacing scale values instead of arbitrary numbers</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Maintain consistent spacing patterns throughout the interface</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use larger spacing to create visual hierarchy and grouping</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Consider touch target sizes (minimum 44x44px) for interactive elements</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Test spacing at different viewport sizes and zoom levels</span>
+            </li>
+          </ul>
+        </div>
 
-      <h3>Tailwind Utilities</h3>
-      <p>
-        When using Tailwind CSS, spacing values are available through standard utilities:
-      </p>
-      <div className="not-prose my-md">
-        <CodeBlock
-          language="tsx"
-          code={`<!-- Padding -->
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">Tailwind Utilities</h3>
+          <p className="text-sm text-muted-foreground mb-md">
+            When using Tailwind CSS, spacing values are available through standard utilities:
+          </p>
+          <CodeBlock
+            language="tsx"
+            code={`<!-- Padding -->
 <div className="p-xs">4px padding</div>
 <div className="p-md">16px padding</div>
 <div className="px-lg py-md">24px horizontal, 16px vertical</div>
@@ -194,16 +220,31 @@ export default function SpacingPage() {
 <!-- Gap (for flexbox/grid) -->
 <div className="flex gap-md">16px gap</div>
 <div className="grid gap-lg">24px gap</div>`}
-        />
-      </div>
+          />
+        </div>
 
-      <h3>Accessibility</h3>
-      <ul>
-        <li>Ensure interactive elements have sufficient padding for touch targets (min 44x44px)</li>
-        <li>Use spacing to create clear visual groups for screen reader users</li>
-        <li>Spacing scales proportionally with user font size preferences (rem units)</li>
-        <li>Maintain consistent spacing patterns to help users build mental models</li>
-      </ul>
+        <div className="bg-muted rounded-lg p-lg">
+          <h3 className="text-base font-semibold mb-md">Accessibility</h3>
+          <ul className="space-y-sm text-sm">
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Ensure interactive elements have sufficient padding for touch targets (min 44x44px)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Use spacing to create clear visual groups for screen reader users</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Spacing scales proportionally with user font size preferences (rem units)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Maintain consistent spacing patterns to help users build mental models</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
