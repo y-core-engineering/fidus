@@ -1557,6 +1557,351 @@ export default function AIDrivenUIPage() {
         </div>
       </div>
 
+      {/* UI Form Decision Matrix */}
+      <h2 className="mb-md">UI Form Decision Matrix</h2>
+      <p className="lead mb-lg">
+        The LLM chooses UI form based on multiple context signals. This matrix shows typical mappings,
+        but remember: these are examples, not rules. The LLM weighs all factors dynamically.
+      </p>
+
+      <div className="not-prose mb-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b-2 border-border">
+                <th className="text-left p-sm bg-muted/30 font-semibold">User Query</th>
+                <th className="text-left p-sm bg-muted/30 font-semibold">Context Signals</th>
+                <th className="text-left p-sm bg-muted/30 font-semibold">User Level</th>
+                <th className="text-left p-sm bg-primary/10 font-semibold">LLM Decision → UI Form</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Show my budget&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Mid-month</div>
+                  <div>• 66% spent</div>
+                  <div>• On track</div>
+                </td>
+                <td className="p-sm align-top">Any</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Text Response</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    &quot;Your October budget: 660 EUR of 1000 EUR (66%). You&apos;re on track!&quot;
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Show my budget&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• End of month</div>
+                  <div>• 95% spent</div>
+                  <div>• 3 days left</div>
+                </td>
+                <td className="p-sm align-top">Any</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>OpportunityCard</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Visual card with urgency indicator, progress bar, category breakdown, actions
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Create food budget 500 EUR monthly&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Complete intent</div>
+                  <div>• All params present</div>
+                </td>
+                <td className="p-sm align-top">Expert</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Quick Form (pre-filled)</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Form with all fields pre-filled from query, one-click submit
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;I want to save money&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Vague intent</div>
+                  <div>• Missing params</div>
+                </td>
+                <td className="p-sm align-top">Beginner</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Conversational Wizard</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Step-by-step guided conversation with option buttons
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Schedule dentist&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Previous visits exist</div>
+                  <div>• Calendar available</div>
+                </td>
+                <td className="p-sm align-top">Intermediate</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Form with Smart Suggestions</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Form with location from history, duration from past visits, suggested time slots
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Show my transactions&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• No specific query</div>
+                  <div>• Large dataset</div>
+                </td>
+                <td className="p-sm align-top">Any</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Widget with Dynamic Filters</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Transaction list with LLM-suggested filters (This Month, Large Amounts, Uncategorized)
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Why is my food budget high?&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Specific category</div>
+                  <div>• Analysis needed</div>
+                </td>
+                <td className="p-sm align-top">Any</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Widget with Context Filters</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Transaction widget pre-filtered to Food category, Last 7 Days, Top Merchants
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Plan trip to Paris&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Multi-step task</div>
+                  <div>• Many decisions</div>
+                </td>
+                <td className="p-sm align-top">Beginner</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Multi-Step Wizard</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Dates → Flights → Hotels → Activities (step-by-step with confirmations)
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-sm align-top">&quot;Book Paris Apr 5-12&quot;</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Clear params</div>
+                  <div>• Multi-step task</div>
+                </td>
+                <td className="p-sm align-top">Expert</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Inline Widget Sequence</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Flight options → Hotel options → Quick actions (Book All, Compare)
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td className="p-sm align-top">(No query - Morning 7am)</td>
+                <td className="p-sm align-top text-xs">
+                  <div>• Time: 7:00 AM</div>
+                  <div>• Workday</div>
+                  <div>• Commute pattern</div>
+                </td>
+                <td className="p-sm align-top">Any</td>
+                <td className="p-sm align-top bg-primary/5">
+                  <strong>Proactive Card</strong>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Today&apos;s Overview: Weather, first meeting, traffic, budget reminder
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="bg-warning/10 border border-warning/20 rounded-lg p-md mt-lg text-sm">
+          <div className="flex gap-2 items-start">
+            <span className="text-warning text-lg">⚠️</span>
+            <div>
+              <strong>Important:</strong> This matrix shows typical examples, not deterministic rules.
+              The LLM considers ALL context signals simultaneously and may choose different UI forms
+              based on factors not shown here (user preferences, recent history, device type, etc.).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* UI Decision Layer Architecture */}
+      <h2 className="mb-md">UI Decision Layer Architecture</h2>
+      <p className="lead mb-lg">
+        The LLM-based UI Decision Layer is the brain of Fidus&apos;s adaptive interface. It receives context,
+        consults the Component Registry via RAG, and returns structured UI decisions—NOT hardcoded rules.
+      </p>
+
+      <div className="not-prose mb-xl">
+        <h3 className="text-lg font-semibold mb-md">How It Works</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-md mb-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <div className="text-2xl mb-sm">1️⃣</div>
+            <h4 className="text-sm font-semibold mb-sm">Context Gathering</h4>
+            <p className="text-xs text-muted-foreground">
+              System collects: user query, time, location, calendar state, budget status, user expertise level, device type, recent interactions
+            </p>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <div className="text-2xl mb-sm">2️⃣</div>
+            <h4 className="text-sm font-semibold mb-sm">LLM + RAG Decision</h4>
+            <p className="text-xs text-muted-foreground">
+              LLM receives context + Component Registry (via RAG). It analyzes signals and selects optimal UI form from available components
+            </p>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <div className="text-2xl mb-sm">3️⃣</div>
+            <h4 className="text-sm font-semibold mb-sm">Structured Response</h4>
+            <p className="text-xs text-muted-foreground">
+              LLM returns JSON schema with UI form type, component name, pre-filled data, and rendering instructions
+            </p>
+          </div>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Component Registry (RAG Knowledge Base)</h3>
+        <p className="text-sm mb-md">
+          The Component Registry is a structured knowledge base that the LLM queries via RAG to understand
+          available UI components, their use cases, and required props.
+        </p>
+
+        <div className="bg-muted/50 border border-border rounded-lg p-md mb-lg">
+          <div className="text-xs font-mono mb-sm text-muted-foreground">Example: Component Registry Entry</div>
+          <pre className="text-xs overflow-x-auto">
+{`{
+  "componentName": "OpportunityCard",
+  "description": "Proactive card for time-sensitive opportunities",
+  "whenToUse": [
+    "Urgent alerts (budget exceeded, calendar conflict)",
+    "Time-sensitive suggestions (flight soon, no hotel)",
+    "Pattern-based recommendations (recurring expense detected)"
+  ],
+  "requiredProps": {
+    "urgency": "urgent | important | normal",
+    "title": "string",
+    "description": "string",
+    "actions": "Array<{ label: string, action: string }>"
+  },
+  "examples": [
+    "Budget alert: 95% spent, 3 days left in month",
+    "Travel reminder: Flight tomorrow at 9am, no hotel booked"
+  ]
+}`}
+          </pre>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Example: LLM Prompt with Context</h3>
+        <div className="bg-muted/50 border border-border rounded-lg p-md mb-lg">
+          <div className="text-xs font-mono mb-sm text-muted-foreground">System Prompt to LLM</div>
+          <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
+{`You are the UI Decision Layer for Fidus, a privacy-first AI assistant.
+
+TASK: Analyze the user query and context, then decide which UI form to render.
+
+CONTEXT:
+- User Query: "Show my budget"
+- Time: 2024-10-28 14:30 (Monday afternoon, work hours)
+- User Level: Intermediate (used Fidus for 3 months)
+- Budget Status:
+  - Category: Food & Dining
+  - Limit: 1000 EUR/month
+  - Spent: 950 EUR (95%)
+  - Days Left: 3
+  - Trend: 15% over average daily spending
+- Device: Mobile (iPhone)
+- Recent Activity: User checked budget 3 times today
+
+AVAILABLE COMPONENTS (from Component Registry):
+1. Text Response - Simple text answer
+2. OpportunityCard - Urgent/proactive alerts with actions
+3. BudgetWidget - Visual budget display with chart
+4. DetailCard - Detailed breakdown with sections
+
+DECISION CRITERIA:
+- Urgency: Is this time-sensitive?
+- Data Complexity: Simple vs complex data?
+- User Expertise: Beginner (explain) vs Expert (concise)?
+- Context: Does context suggest specific UI form?
+
+Respond with structured JSON UI decision.`}
+          </pre>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Example: LLM Response (Structured JSON)</h3>
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md mb-lg">
+          <div className="text-xs font-mono mb-sm text-muted-foreground">LLM Output</div>
+          <pre className="text-xs overflow-x-auto">
+{`{
+  "uiDecision": {
+    "reasoning": "User is at 95% of budget with only 3 days left, AND has checked budget 3 times today, indicating concern. This is urgent and actionable. OpportunityCard is best fit.",
+
+    "selectedComponent": "OpportunityCard",
+
+    "props": {
+      "urgency": "urgent",
+      "title": "Budget Alert: Food & Dining",
+      "description": "You've spent 950 EUR of 1000 EUR (95%). Only 3 days left in October.",
+      "visualData": {
+        "progress": 95,
+        "breakdown": [
+          { "category": "Restaurants", "amount": 450, "percentage": 47 },
+          { "category": "Groceries", "amount": 350, "percentage": 37 },
+          { "category": "Coffee/Snacks", "amount": 150, "percentage": 16 }
+        ]
+      },
+      "actions": [
+        { "label": "View Transactions", "action": "navigate:transactions?category=food", "variant": "primary" },
+        { "label": "Adjust Budget", "action": "navigate:budget/edit", "variant": "secondary" }
+      ],
+      "dismissible": true
+    },
+
+    "alternativeConsidered": "BudgetWidget was considered, but OpportunityCard better conveys urgency and provides immediate actions."
+  }
+}`}
+          </pre>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-md">Key Architecture Principles</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <div className="border-l-4 border-primary pl-md">
+            <h4 className="text-sm font-semibold mb-sm">✅ What the LLM Does</h4>
+            <ul className="text-xs space-y-1">
+              <li>• Analyzes ALL context signals simultaneously</li>
+              <li>• Queries Component Registry via RAG</li>
+              <li>• Reasons about urgency, complexity, user level</li>
+              <li>• Selects optimal component from registry</li>
+              <li>• Pre-fills props with context data</li>
+              <li>• Provides reasoning for decision (explainability)</li>
+            </ul>
+          </div>
+
+          <div className="border-l-4 border-error pl-md">
+            <h4 className="text-sm font-semibold mb-sm">❌ What the LLM Does NOT Do</h4>
+            <ul className="text-xs space-y-1">
+              <li>• Follow hardcoded if/else rules</li>
+              <li>• Use predetermined time-based triggers</li>
+              <li>• Ignore context in favor of defaults</li>
+              <li>• Generate UI components from scratch</li>
+              <li>• Make decisions without Component Registry</li>
+              <li>• Skip reasoning/explainability</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <h2>Core Principle: Context-Driven UI Rendering</h2>
 
       <h3>Example: "Show my budget"</h3>
