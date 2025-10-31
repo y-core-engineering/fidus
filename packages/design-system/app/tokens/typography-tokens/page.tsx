@@ -31,11 +31,7 @@ export default function TypographyTokensPage() {
   useEffect(() => {
     setIsLoading(true);
     const tokens = getAllTokens().filter(t => t.category === 'typography');
-    const tokensWithDescriptions = tokens.map(token => ({
-      ...token,
-      description: tokenMetadata[token.variable]?.description || '',
-    }));
-    setAllTypographyTokens(tokensWithDescriptions);
+    setAllTypographyTokens(tokens);
     setIsLoading(false);
   }, []);
 
@@ -73,7 +69,7 @@ export default function TypographyTokensPage() {
             name={font.name}
             variable={font.variable}
             value={font.value}
-            description={font.description}
+            description={tokenMetadata[font.variable]?.description || ''}
             preview={
               <span
                 className="text-2xl"
@@ -118,7 +114,7 @@ export default function TypographyTokensPage() {
             name={size.name}
             variable={size.variable}
             value={size.value}
-            description={size.example}
+            description={tokenMetadata[size.variable]?.example || tokenMetadata[size.variable]?.description || ''}
             preview={
               <span
                 style={{
@@ -170,7 +166,7 @@ export default function TypographyTokensPage() {
             name={lineHeight.name}
             variable={lineHeight.variable}
             value={lineHeight.value}
-            description={lineHeight.description}
+            description={tokenMetadata[lineHeight.variable]?.description || ''}
           />
         ))}
       </div>
