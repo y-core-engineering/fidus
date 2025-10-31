@@ -1005,67 +1005,557 @@ export default function AIDrivenUIPage() {
         </p>
       </div>
 
-      <h2>The Paradigm Shift</h2>
-
-      <h3>Traditional UI (What Fidus Is NOT)</h3>
-      <p>Traditional applications have:</p>
-      <ul>
-        <li>
-          <strong>Rigid Structure:</strong> User must navigate to "Calendar Screen" even for quick
-          check
-        </li>
-        <li>
-          <strong>Static Content:</strong> Dashboard shows same widgets regardless of context
-        </li>
-        <li>
-          <strong>Predetermined Flows:</strong> App dictates "Step 1, Step 2, Step 3"
-        </li>
-        <li>
-          <strong>User Must Seek:</strong> User navigates to features instead of features coming to
-          user
-        </li>
-        <li>
-          <strong>Hardcoded Logic:</strong> "Morning = show weather" coded in JavaScript
-        </li>
-      </ul>
-
-      <h3>AI-Driven UI (What Fidus IS)</h3>
-      <p>
-        The LLM analyzes user context and decides the optimal UI form. The same user intent can
-        result in different interfaces based on situation.
+      {/* Traditional vs AI-Driven Comparison */}
+      <h2 className="mb-md">Traditional vs AI-Driven UI</h2>
+      <p className="lead mb-lg">
+        Understanding the fundamental difference between predetermined interfaces and context-adaptive UI.
       </p>
 
-      <div className="not-prose bg-muted/30 border border-border rounded-lg p-lg my-lg">
-        <h4 className="text-sm font-semibold mb-md">Context-Driven UI Flow</h4>
-        <ol className="text-sm space-y-sm">
-          <li>User provides context (query, action, or time-based trigger)</li>
-          <li>LLM analyzes: intent, urgency, data complexity, user history</li>
-          <li>LLM decides optimal UI form: Card, Form, Chat, Widget, or Wizard</li>
-          <li>UI is rendered with appropriate content and actions</li>
-          <li>User interacts or dismisses (swipe/X button)</li>
-        </ol>
+      <div className="not-prose mb-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b-2 border-border">
+                <th className="text-left p-md bg-muted/30 font-semibold">Aspect</th>
+                <th className="text-left p-md bg-muted/30 font-semibold">Traditional UI</th>
+                <th className="text-left p-md bg-primary/10 font-semibold">AI-Driven UI (Fidus)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">Navigation</td>
+                <td className="p-md text-sm">Fixed screens, user navigates to features</td>
+                <td className="p-md text-sm bg-primary/5">No fixed screens, features surface contextually</td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">UI Decisions</td>
+                <td className="p-md text-sm">Hardcoded in JavaScript: if morning → show weather</td>
+                <td className="p-md text-sm bg-primary/5">LLM analyzes context and decides UI form</td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">Form Complexity</td>
+                <td className="p-md text-sm">Same form for all users (expert and beginner)</td>
+                <td className="p-md text-sm bg-primary/5">Adaptive: chat for beginners, quick form for experts</td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">Dashboard</td>
+                <td className="p-md text-sm">Static widgets, same for everyone</td>
+                <td className="p-md text-sm bg-primary/5">Opportunity Surface with dynamic, context-relevant cards</td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">User Control</td>
+                <td className="p-md text-sm">Auto-hide notifications after X seconds</td>
+                <td className="p-md text-sm bg-primary/5">User dismisses (swipe/X), no auto-hide</td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">Response Format</td>
+                <td className="p-md text-sm">Predetermined: "Create Budget" always shows form</td>
+                <td className="p-md text-sm bg-primary/5">Context-dependent: text, form, widget, or wizard</td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-md font-medium">Proactivity</td>
+                <td className="p-md text-sm">Rule-based: if Friday 7am → show coffee budget alert</td>
+                <td className="p-md text-sm bg-primary/5">Signal-based: LLM detects patterns and suggests</td>
+              </tr>
+              <tr>
+                <td className="p-md font-medium">Extensibility</td>
+                <td className="p-md text-sm">New UI requires code changes and deployment</td>
+                <td className="p-md text-sm bg-primary/5">New components added to registry, LLM learns via RAG</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <p>
-        <strong>Advantages:</strong>
+      {/* New UI Patterns Section */}
+      <h2 className="mb-md">New UI Patterns in AI-Driven Systems</h2>
+      <p className="lead mb-lg">
+        Fidus introduces 8 novel interaction patterns that emerge from context-aware, LLM-driven UI decisions.
+        These patterns are fundamentally different from traditional UI paradigms.
       </p>
-      <ul>
-        <li>
-          <strong>Contextually Adaptive:</strong> Interface changes based on situation
-        </li>
-        <li>
-          <strong>LLM-Orchestrated:</strong> AI decides optimal UI form (form vs. chat vs. widget)
-        </li>
-        <li>
-          <strong>Nothing Predetermined:</strong> Same query can render differently based on context
-        </li>
-        <li>
-          <strong>User Empowered:</strong> User dismisses cards (swipe/X), no auto-hide
-        </li>
-        <li>
-          <strong>Intelligent Surfacing:</strong> Opportunities appear when relevant
-        </li>
-      </ul>
+
+      {/* Pattern 1: Context-Driven UI Rendering */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">1. Context-Driven UI Rendering</h3>
+          <p className="text-muted-foreground mb-md">
+            The LLM analyzes context (time, user history, data complexity, urgency) and dynamically selects
+            the UI form—text response, widget, form, or wizard—at runtime. The same query produces different UIs in different contexts.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Example: "Show my budget"</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Context 1: Stable Mid-Month</h5>
+            <p className="text-sm text-muted-foreground mb-sm">
+              User has stable spending, mid-month, no concerns
+            </p>
+            <div className="bg-muted/50 rounded-md p-sm text-xs">
+              <strong>LLM Decision:</strong> Simple text response
+              <br />
+              <br />
+              &quot;Your October budget: 660 EUR spent of 1000 EUR (66%). You&apos;re on track!&quot;
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Context 2: Near Limit, End-Month</h5>
+            <p className="text-sm text-muted-foreground mb-sm">User is at 95% of budget, 3 days left in month</p>
+            <div className="bg-muted/50 rounded-md p-sm text-xs">
+              <strong>LLM Decision:</strong> OpportunityCard with urgency indicator
+              <br />
+              <br />
+              Shows visual progress bar, breakdown by category, and action buttons: &quot;View Transactions&quot;,
+              &quot;Adjust Budget&quot;
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For all user queries where multiple UI forms are possible. Let the LLM decide based on:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>Urgency:</strong> High urgency → OpportunityCard with visual emphasis</li>
+            <li>• <strong>Data complexity:</strong> Large datasets → Interactive widgets</li>
+            <li>• <strong>User expertise:</strong> Beginner → Conversational flow, Expert → Quick form</li>
+            <li>• <strong>Time context:</strong> Morning vs evening affects UI presentation</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 2: Contextual Opportunity Surfacing */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">2. Contextual Opportunity Surfacing (Proactive Cards)</h3>
+          <p className="text-muted-foreground mb-md">
+            The system proactively detects opportunities based on signals (calendar events, budget thresholds, weather patterns)
+            and surfaces relevant, dismissible cards on the Opportunity Surface (Dashboard). No fixed widgets—only context-relevant cards.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Examples of Opportunity Cards</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <Badge variant="urgent" className="mb-sm">Urgent</Badge>
+            <h5 className="text-sm font-semibold mb-sm">Budget Alert</h5>
+            <p className="text-xs text-muted-foreground mb-sm">
+              Detected: 95% of food budget spent, 3 days left in month
+            </p>
+            <div className="flex gap-2 mt-sm">
+              <Button variant="primary" size="sm">View Details</Button>
+              <Button variant="secondary" size="sm">Dismiss</Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <Badge variant="info" className="mb-sm">Suggestion</Badge>
+            <h5 className="text-sm font-semibold mb-sm">Travel Booking</h5>
+            <p className="text-xs text-muted-foreground mb-sm">
+              You have a flight to Berlin tomorrow, but no hotel booked
+            </p>
+            <div className="flex gap-2 mt-sm">
+              <Button variant="primary" size="sm">Find Hotels</Button>
+              <Button variant="secondary" size="sm">Dismiss</Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <Badge variant="normal" className="mb-sm">Pattern Detected</Badge>
+            <h5 className="text-sm font-semibold mb-sm">Recurring Expense</h5>
+            <p className="text-xs text-muted-foreground mb-sm">
+              Coffee purchases every Monday at 9am—create recurring budget?
+            </p>
+            <div className="flex gap-2 mt-sm">
+              <Button variant="primary" size="sm">Create Budget</Button>
+              <Button variant="secondary" size="sm">Dismiss</Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For proactive suggestions that are contextually relevant right now. Key characteristics:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>User controls dismissal:</strong> Swipe or X button, never auto-hide timers</li>
+            <li>• <strong>Signal-based:</strong> Triggered by data signals, not hardcoded rules</li>
+            <li>• <strong>Urgency levels:</strong> Urgent (red), Suggestion (blue), Pattern (neutral)</li>
+            <li>• <strong>Actionable:</strong> Always include 1-2 action buttons for immediate response</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 3: Adaptive Form Complexity */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">3. Adaptive Form Complexity</h3>
+          <p className="text-muted-foreground mb-md">
+            Instead of one-size-fits-all forms, the LLM adapts form complexity based on user expertise and intent clarity.
+            Expert users with clear intent get quick forms; beginners get conversational wizards.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Example: Budget Creation</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Expert User, Clear Intent</h5>
+            <p className="text-sm text-muted-foreground mb-sm">
+              Query: &quot;Create food budget 500 EUR monthly&quot;
+            </p>
+            <div className="bg-muted/50 rounded-md p-sm text-xs space-y-2">
+              <div><strong>LLM Decision:</strong> Quick form with pre-filled values</div>
+              <div className="space-y-1 pt-2">
+                <div className="flex justify-between"><span>Category:</span><span>Food ✓</span></div>
+                <div className="flex justify-between"><span>Amount:</span><span>500 EUR ✓</span></div>
+                <div className="flex justify-between"><span>Period:</span><span>Monthly ✓</span></div>
+              </div>
+              <Button variant="primary" size="sm" className="w-full mt-2">Create Budget</Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Beginner User, Unclear Intent</h5>
+            <p className="text-sm text-muted-foreground mb-sm">
+              Query: &quot;I want to save money&quot;
+            </p>
+            <div className="bg-muted/50 rounded-md p-sm text-xs space-y-2">
+              <div><strong>LLM Decision:</strong> Conversational wizard</div>
+              <div className="pt-2 space-y-2">
+                <div className="bg-background p-2 rounded">
+                  <strong>Assistant:</strong> I can help! What area would you like to budget for?
+                </div>
+                <div className="flex gap-1 flex-wrap">
+                  <Button variant="tertiary" size="sm">Food</Button>
+                  <Button variant="tertiary" size="sm">Transport</Button>
+                  <Button variant="tertiary" size="sm">Entertainment</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For any data input task. LLM analyzes:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>User expertise:</strong> Track past interactions to classify as beginner/intermediate/expert</li>
+            <li>• <strong>Intent clarity:</strong> Parse query for completeness (all fields vs partial)</li>
+            <li>• <strong>Task complexity:</strong> Simple tasks → form, complex → wizard, ambiguous → chat</li>
+            <li>• <strong>User preference:</strong> Learn if user prefers forms vs conversation over time</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 4: Dynamic Search & Filtering */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">4. Dynamic Search & Filtering (Context-Based Filters)</h3>
+          <p className="text-muted-foreground mb-md">
+            Instead of showing all possible filter options upfront, the LLM suggests relevant filters based on context,
+            query intent, and data distribution. Filters adapt to what&apos;s actually useful right now.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Example: Transaction Search</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Query: &quot;Show my transactions&quot;</h5>
+            <p className="text-sm text-muted-foreground mb-sm">
+              No specific context
+            </p>
+            <div className="bg-muted/50 rounded-md p-sm text-xs">
+              <strong>LLM Suggested Filters:</strong>
+              <div className="flex gap-2 mt-2 flex-wrap">
+                <Badge variant="normal">This Month</Badge>
+                <Badge variant="normal">Large Amounts (&gt;100 EUR)</Badge>
+                <Badge variant="normal">Uncategorized</Badge>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Query: &quot;Why is my food budget high?&quot;</h5>
+            <p className="text-sm text-muted-foreground mb-sm">
+              Specific category context
+            </p>
+            <div className="bg-muted/50 rounded-md p-sm text-xs">
+              <strong>LLM Suggested Filters:</strong>
+              <div className="flex gap-2 mt-2 flex-wrap">
+                <Badge variant="normal">Food Category</Badge>
+                <Badge variant="normal">Last 7 Days</Badge>
+                <Badge variant="normal">Top Merchants</Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For search, filtering, and data exploration interfaces. LLM considers:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>Query context:</strong> Extract category, time, amount hints from user query</li>
+            <li>• <strong>Data distribution:</strong> Suggest filters that actually narrow results meaningfully</li>
+            <li>• <strong>User patterns:</strong> Learn frequently-used filter combinations</li>
+            <li>• <strong>Progressive disclosure:</strong> Show 3-4 relevant filters first, &quot;More filters&quot; for rest</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 5: Generated Form Inputs */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">5. Generated Form Inputs (LLM-Suggested Fields)</h3>
+          <p className="text-muted-foreground mb-md">
+            The LLM analyzes user intent and suggests not just form fields, but also pre-filled values, smart defaults,
+            and contextually-relevant field options based on history and patterns.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Example: Appointment Creation</h4>
+
+        <div className="border border-border rounded-lg p-md bg-card my-lg max-w-xl mx-auto">
+          <h5 className="text-sm font-semibold mb-sm">Query: &quot;Schedule dentist appointment&quot;</h5>
+          <div className="bg-muted/50 rounded-md p-md text-xs space-y-3">
+            <div>
+              <strong>LLM-Generated Form:</strong>
+            </div>
+            <div className="space-y-2 pt-2">
+              <div>
+                <div className="text-muted-foreground mb-1">Title:</div>
+                <div className="bg-background p-2 rounded border border-border">
+                  Dentist Appointment <span className="text-muted-foreground">(suggested)</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-muted-foreground mb-1">Location:</div>
+                <div className="bg-background p-2 rounded border border-border">
+                  Dr. Schmidt Dental, Main St 42 <span className="text-muted-foreground">(from history)</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-muted-foreground mb-1">Duration:</div>
+                <div className="flex gap-2">
+                  <Button variant="tertiary" size="sm">30 min</Button>
+                  <Button variant="primary" size="sm">60 min</Button>
+                  <Button variant="tertiary" size="sm">90 min</Button>
+                </div>
+                <div className="text-muted-foreground mt-1">(Based on past dentist appointments)</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground mb-1">Suggested Times:</div>
+                <div className="flex gap-2 flex-wrap">
+                  <Badge variant="normal">Tomorrow 10:00</Badge>
+                  <Badge variant="normal">Friday 14:00</Badge>
+                  <Badge variant="normal">Next Monday 9:00</Badge>
+                </div>
+                <div className="text-muted-foreground mt-1">(Considering your calendar and dentist hours)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For forms where historical data or context can improve input accuracy:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>Repeat actions:</strong> Pre-fill based on previous similar entries</li>
+            <li>• <strong>Smart defaults:</strong> Analyze patterns (e.g., dentist appointments usually 60 min)</li>
+            <li>• <strong>Option generation:</strong> Create relevant options from calendar, contacts, locations</li>
+            <li>• <strong>Validation:</strong> LLM can catch inconsistencies (e.g., appointment duration vs type)</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 6: Smart Action Buttons */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">6. Smart Action Buttons (Generated from Context)</h3>
+          <p className="text-muted-foreground mb-md">
+            Action buttons aren&apos;t hardcoded—the LLM generates contextually relevant actions based on data state,
+            user permissions, and current context. Same data entity shows different actions in different situations.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Example: Calendar Event Actions</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Context: Upcoming Event (2 hours away)</h5>
+            <div className="bg-muted/50 rounded-md p-sm text-xs mb-3">
+              <div className="font-semibold mb-1">Team Meeting</div>
+              <div className="text-muted-foreground">Today 14:00 - 15:00</div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="primary" size="sm">Join Now</Button>
+              <Button variant="secondary" size="sm">Get Directions</Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Context: Past Event (completed yesterday)</h5>
+            <div className="bg-muted/50 rounded-md p-sm text-xs mb-3">
+              <div className="font-semibold mb-1">Team Meeting</div>
+              <div className="text-muted-foreground">Yesterday 14:00 - 15:00</div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="primary" size="sm">Add Notes</Button>
+              <Button variant="secondary" size="sm">Schedule Follow-up</Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For any data display where actions depend on state and context:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>Time-dependent:</strong> Past events → review actions, upcoming → preparation actions</li>
+            <li>• <strong>State-dependent:</strong> Pending budget → approve/reject, exceeded → adjust/view details</li>
+            <li>• <strong>Permission-aware:</strong> Only show actions user has permission to execute</li>
+            <li>• <strong>Context-specific:</strong> On mobile → &quot;Get Directions&quot;, on desktop → &quot;Open in Maps&quot;</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 7: Progressive Disclosure */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">7. Progressive Disclosure (Based on User Expertise)</h3>
+          <p className="text-muted-foreground mb-md">
+            Information and options are revealed progressively based on user expertise level and interaction patterns.
+            Beginners see simplified views; experts see advanced options immediately.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Example: Budget Configuration</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Beginner View</h5>
+            <div className="bg-muted/50 rounded-md p-md text-xs space-y-3">
+              <div>
+                <div className="font-semibold mb-2">Essential Settings</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span>Monthly Limit:</span>
+                    <span className="font-mono">1000 EUR</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Category:</span>
+                    <span>Food & Dining</span>
+                  </div>
+                </div>
+              </div>
+              <Button variant="secondary" size="sm" className="w-full">Show More Options</Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <h5 className="text-sm font-semibold mb-sm">Expert View</h5>
+            <div className="bg-muted/50 rounded-md p-md text-xs space-y-3">
+              <div>
+                <div className="font-semibold mb-2">All Settings</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span>Monthly Limit:</span>
+                    <span className="font-mono">1000 EUR</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Category:</span>
+                    <span>Food & Dining</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Alert Threshold:</span>
+                    <span>80%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Rollover:</span>
+                    <span>Enabled</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Auto-categorization:</span>
+                    <span>ML-based</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For configuration screens and data-heavy displays:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>User classification:</strong> Track feature usage to classify beginner/intermediate/expert</li>
+            <li>• <strong>Essential first:</strong> Always show 3-5 most important options immediately</li>
+            <li>• <strong>Contextual expansion:</strong> &quot;Show Advanced&quot; only appears if relevant</li>
+            <li>• <strong>Learn preferences:</strong> If user always expands, start showing advanced by default</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Pattern 8: Temporal UI */}
+      <div className="not-prose mb-xl">
+        <div className="border-l-4 border-primary pl-md mb-lg">
+          <h3 className="text-xl font-bold mb-sm">8. Temporal UI (Time-Sensitive Elements)</h3>
+          <p className="text-muted-foreground mb-md">
+            UI elements that appear, transform, or disappear based on time context. Not rule-based (&quot;every morning show X&quot;),
+            but LLM-driven relevance decisions that consider time as one of many signals.
+          </p>
+        </div>
+
+        <h4 className="text-base font-semibold mb-sm">Examples of Time-Context UI Changes</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-md my-lg">
+          <div className="border border-border rounded-lg p-md bg-card">
+            <Badge variant="info" className="mb-sm">Morning (7-9 AM)</Badge>
+            <h5 className="text-sm font-semibold mb-sm">Today&apos;s Overview Card</h5>
+            <div className="bg-muted/50 rounded-md p-sm text-xs space-y-2">
+              <div><strong>Might include:</strong></div>
+              <ul className="space-y-1 ml-md">
+                <li>• Weather for commute</li>
+                <li>• First appointment time</li>
+                <li>• Traffic conditions</li>
+                <li>• Breakfast budget reminder</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <Badge variant="info" className="mb-sm">Work Hours (9-5 PM)</Badge>
+            <h5 className="text-sm font-semibold mb-sm">Focus Mode Active</h5>
+            <div className="bg-muted/50 rounded-md p-sm text-xs space-y-2">
+              <div><strong>Might include:</strong></div>
+              <ul className="space-y-1 ml-md">
+                <li>• Next meeting countdown</li>
+                <li>• Urgent tasks only</li>
+                <li>• Minimal notifications</li>
+                <li>• Quick expense logging</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-md bg-card">
+            <Badge variant="info" className="mb-sm">Evening (6-10 PM)</Badge>
+            <h5 className="text-sm font-semibold mb-sm">Reflection & Planning</h5>
+            <div className="bg-muted/50 rounded-md p-sm text-xs space-y-2">
+              <div><strong>Might include:</strong></div>
+              <ul className="space-y-1 ml-md">
+                <li>• Today&apos;s spending summary</li>
+                <li>• Tomorrow&apos;s agenda</li>
+                <li>• Uncategorized transactions</li>
+                <li>• Meal planning suggestions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-md text-sm">
+          <strong>When to use:</strong> For dashboard and opportunity surfacing, NOT fixed schedules:
+          <ul className="mt-sm space-y-1 ml-md">
+            <li>• <strong>LLM decides relevance:</strong> Time is ONE signal, not the only signal</li>
+            <li>• <strong>User patterns matter:</strong> Night owl users don&apos;t get morning cards at 7am</li>
+            <li>• <strong>Override capability:</strong> User can always request any information regardless of time</li>
+            <li>• <strong>Examples not rules:</strong> Document as &quot;might show&quot; not &quot;always shows&quot;</li>
+          </ul>
+        </div>
+      </div>
 
       <h2>Core Principle: Context-Driven UI Rendering</h2>
 
