@@ -414,7 +414,7 @@ export default function AIDrivenUIPage() {
       <div className="not-prose my-lg md:my-xl">
         <div className="grid md:grid-cols-[380px_1fr] gap-8 items-start">
           {/* Left: Mobile Phone */}
-          <div className="mx-auto w-[380px] max-w-full shrink-0">
+          <div className="mx-auto w-full max-w-[90%] md:w-[380px] md:max-w-full shrink-0">
             <div className="relative bg-gradient-to-br from-primary/5 via-background to-muted/20 rounded-[2.5rem] overflow-hidden border-8 border-foreground/20 shadow-2xl h-[780px]">
             {/* Mobile Notch */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-foreground/90 rounded-b-2xl z-30" />
