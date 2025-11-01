@@ -57,35 +57,66 @@ function App() {
 }
 ```
 
-### Import Styles
-
-Import the CSS variables in your app:
-
-```tsx
-// In your root component or _app.tsx
-import '@fidus/ui/dist/styles.css';
-```
-
-Or if using Next.js:
-
-```tsx
-// app/layout.tsx or pages/_app.tsx
-import '@fidus/ui/dist/styles.css';
-```
-
 ## Available Components
 
+### Action Components
 - **Button** - Primary, secondary, tertiary, and destructive variants
-- **Card** - Container with header, content, and footer
-- **Input** - Text input with validation
-- **Select** - Dropdown select with search
+- **Link** - Styled navigation links
+- **IconButton** - Icon-only button
+- **ButtonGroup** - Grouped button layout
+
+### Layout Components
+- **Container** - Responsive container with max-width
+- **Grid** - CSS Grid layout component
+- **Stack** - Vertical/horizontal stack layout
+- **Divider** - Visual separator
+
+### Data Display Components
+- **Table** - Data table with sorting and filtering
+- **List** - Styled list component
+- **Badge** - Status badges and labels
+- **Chip** - Tag/chip component
+- **Avatar** - User avatar component
+
+### Card Components
+- **OpportunityCard** - Contextual opportunity display
+- **DetailCard** - Detailed information card
+- **EmptyCard** - Empty state card
+
+### Form Components (Basic)
+- **TextInput** - Text input field
+- **TextArea** - Multi-line text input
+- **Checkbox** - Checkbox input
+- **RadioButton** - Radio button input
+- **ToggleSwitch** - Toggle switch
+
+### Form Components (Advanced)
+- **Select** - Dropdown select
+- **DatePicker** - Date selection
+- **TimePicker** - Time selection
+- **FileUpload** - File upload component
+
+### Feedback Components
 - **Toast** - Notification system
-- **Dialog** - Modal dialogs
-- **Dropdown Menu** - Contextual menus
-- **Progress** - Progress indicators
-- **Tabs** - Tabbed interfaces
+- **Modal** - Modal dialogs
+- **Alert** - Alert messages
+- **Banner** - Page-level banners
+- **ProgressBar** - Progress indicators
+- **Spinner** - Loading spinner
+- **Skeleton** - Loading skeleton
+
+### Overlay Components
+- **Dropdown** - Dropdown menus
+- **Popover** - Popover component
 - **Tooltip** - Contextual tooltips
-- **Calendar** - Date picker with range support
+- **Drawer** - Slide-out drawer
+
+### Navigation Components
+- **Tabs** - Tabbed interfaces
+- **Breadcrumbs** - Breadcrumb navigation
+- **Pagination** - Pagination component
+- **Header** - Page header
+- **Sidebar** - Navigation sidebar
 
 ## Component Examples
 
@@ -107,35 +138,6 @@ import { Button } from '@fidus/ui';
 
 // States
 <Button disabled>Disabled</Button>
-<Button loading>Loading...</Button>
-```
-
-### Card
-
-```tsx
-import { Card, CardHeader, CardTitle, CardContent } from '@fidus/ui';
-
-<Card>
-  <CardHeader>
-    <CardTitle>Card Title</CardTitle>
-  </CardHeader>
-  <CardContent>
-    Card content goes here
-  </CardContent>
-</Card>
-```
-
-### Input
-
-```tsx
-import { Input } from '@fidus/ui';
-
-<Input
-  type="text"
-  placeholder="Enter your name"
-  value={value}
-  onChange={(e) => setValue(e.target.value)}
-/>
 ```
 
 ### Toast
@@ -164,6 +166,24 @@ function YourComponent() {
     </Button>
   );
 }
+```
+
+### Table
+
+```tsx
+import { Table } from '@fidus/ui';
+
+const data = [
+  { id: 1, name: 'John Doe', email: 'john@example.com' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'email', header: 'Email' },
+];
+
+<Table data={data} columns={columns} />
 ```
 
 ## Theming
@@ -201,23 +221,6 @@ const CustomButton: React.FC<ButtonProps> = (props) => {
 };
 ```
 
-## Validation with Zod
-
-Components include Zod schemas for runtime validation:
-
-```tsx
-import { ButtonPropsSchema } from '@fidus/ui';
-
-const props = {
-  variant: 'primary',
-  size: 'md',
-  children: 'Click Me'
-};
-
-// Validate props at runtime
-const validatedProps = ButtonPropsSchema.parse(props);
-```
-
 ## Accessibility
 
 All components follow WCAG 2.1 AA guidelines:
@@ -235,23 +238,14 @@ All components follow WCAG 2.1 AA guidelines:
 - Safari (last 2 versions)
 - Edge (last 2 versions)
 
-## Documentation
-
-Full documentation and interactive examples: [https://design.fidus.world](https://design.fidus.world)
-
 ## License
 
 This project is licensed under the Sustainable Use License. See [LICENSE.md](../../LICENSE.md) for details.
-
-## Contributing
-
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guidelines.
 
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/y-core-engineering/fidus/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/y-core-engineering/fidus/discussions)
-- **Discord**: [Join our Discord](https://discord.gg/fidus)
 
 ## Changelog
 
