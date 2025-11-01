@@ -148,7 +148,20 @@ export function SearchDialog({
       />
 
       {/* Dialog */}
-      <div className="fixed left-1/2 top-[20%] z-50 w-full max-w-2xl -translate-x-1/2 rounded-lg border border-border bg-background shadow-lg">
+      <div
+        role="dialog"
+        aria-labelledby="search-dialog-title"
+        aria-describedby="search-dialog-description"
+        className="fixed left-1/2 top-[20%] z-50 w-full max-w-2xl -translate-x-1/2 rounded-lg border border-border bg-background shadow-lg"
+      >
+        {/* Visually hidden title for screen readers */}
+        <h2 id="search-dialog-title" className="sr-only">
+          Search Design System
+        </h2>
+        <p id="search-dialog-description" className="sr-only">
+          Search for components, patterns, and documentation in the Fidus Design System
+        </p>
+
         {/* Search Input */}
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <Search className="h-5 w-5 text-muted-foreground" />
