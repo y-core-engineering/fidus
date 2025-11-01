@@ -102,25 +102,25 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertComponentProps>(
     if (!isVisible) return null;
 
     return (
-      <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} data-test-id="alert" {...props}>
-        <Icon className={cn(alertIconVariants({ variant }))} data-test-id="alert-icon" />
+      <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} data-testid="alert" {...props}>
+        <Icon className={cn(alertIconVariants({ variant }))} data-testid="alert-icon" />
         <div className="flex-1">
           {title && (
-            <h5 className="mb-1 font-semibold leading-none tracking-tight" data-test-id="alert-title">
+            <h5 className="mb-1 font-semibold leading-none tracking-tight" data-testid="alert-title">
               {title}
             </h5>
           )}
-          <div className="text-sm [&_p]:leading-relaxed" data-test-id="alert-content">
+          <div className="text-sm [&_p]:leading-relaxed" data-testid="alert-content">
             {children}
           </div>
           {actions && actions.length > 0 && (
-            <div className="mt-3 flex gap-2" data-test-id="alert-actions">
+            <div className="mt-3 flex gap-2" data-testid="alert-actions">
               {actions.map((action, index) => (
                 <button
                   key={index}
                   onClick={action.onClick}
                   className={cn(alertActionVariants({ variant }))}
-                  data-test-id={`alert-action-${index}`}
+                  data-testid={`alert-action-${index}`}
                 >
                   {action.label}
                 </button>
@@ -132,7 +132,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertComponentProps>(
           <button
             onClick={handleDismiss}
             className="absolute right-2 top-2 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2"
-            data-test-id="alert-dismiss"
+            data-testid="alert-dismiss"
             aria-label="Dismiss alert"
           >
             <X className="h-4 w-4" />

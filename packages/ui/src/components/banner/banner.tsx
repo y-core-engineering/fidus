@@ -116,18 +116,18 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerComponentProps>(
         ref={ref}
         role="banner"
         className={cn(bannerVariants({ variant, sticky }), className)}
-        data-test-id="banner"
+        data-testid="banner"
         {...props}
       >
-        <Icon className={cn(bannerIconVariants({ variant }))} data-test-id="banner-icon" />
-        <div className="flex-1 text-left" data-test-id="banner-message">
+        <Icon className={cn(bannerIconVariants({ variant }))} data-testid="banner-icon" />
+        <div className="flex-1 text-left" data-testid="banner-message">
           {message}
         </div>
         {actionLabel && onAction && (
           <button
             onClick={onAction}
             className={cn(bannerActionVariants({ variant }))}
-            data-test-id="banner-action"
+            data-testid="banner-action"
           >
             {actionLabel}
           </button>
@@ -136,7 +136,7 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerComponentProps>(
           <button
             onClick={handleDismiss}
             className="ml-2 rounded-md p-1 opacity-80 transition-opacity hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2"
-            data-test-id="banner-dismiss"
+            data-testid="banner-dismiss"
             aria-label="Dismiss banner"
           >
             <X className="h-4 w-4" />

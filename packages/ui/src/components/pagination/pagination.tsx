@@ -131,7 +131,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
         role="navigation"
         aria-label="pagination"
         className={cn('flex flex-col sm:flex-row items-center justify-between gap-4', className)}
-        data-test-id="pagination"
+        data-testid="pagination"
         {...props}
       >
         <div className={cn(paginationVariants({ size }))}>
@@ -141,7 +141,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               disabled={currentPage === 1}
               className={cn(pageButtonVariants({ variant, size }))}
               aria-label="Go to first page"
-              data-test-id="pagination-first"
+              data-testid="pagination-first"
             >
               <ChevronsLeft className="w-4 h-4" />
             </button>
@@ -152,7 +152,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             disabled={currentPage === 1}
             className={cn(pageButtonVariants({ variant, size }))}
             aria-label="Go to previous page"
-            data-test-id="pagination-previous"
+            data-testid="pagination-previous"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -162,7 +162,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               <span
                 key={`ellipsis-${index}`}
                 className={cn(pageButtonVariants({ variant, size }), 'cursor-default')}
-                data-test-id={`pagination-ellipsis-${index}`}
+                data-testid={`pagination-ellipsis-${index}`}
               >
                 <MoreHorizontal className="w-4 h-4" />
               </span>
@@ -174,7 +174,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
                 className={cn(pageButtonVariants({ variant, size, active: pageNumber === currentPage }))}
                 aria-label={`Go to page ${pageNumber}`}
                 aria-current={pageNumber === currentPage ? 'page' : undefined}
-                data-test-id={`pagination-page-${pageNumber}`}
+                data-testid={`pagination-page-${pageNumber}`}
               >
                 {pageNumber}
               </button>
@@ -186,7 +186,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             disabled={currentPage === totalPages}
             className={cn(pageButtonVariants({ variant, size }))}
             aria-label="Go to next page"
-            data-test-id="pagination-next"
+            data-testid="pagination-next"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -197,7 +197,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               disabled={currentPage === totalPages}
               className={cn(pageButtonVariants({ variant, size }))}
               aria-label="Go to last page"
-              data-test-id="pagination-last"
+              data-testid="pagination-last"
             >
               <ChevronsRight className="w-4 h-4" />
             </button>
@@ -205,7 +205,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
         </div>
 
         {pageSize && onPageSizeChange && (
-          <div className="flex items-center gap-2" data-test-id="pagination-page-size">
+          <div className="flex items-center gap-2" data-testid="pagination-page-size">
             <label htmlFor="page-size" className="text-sm text-muted-foreground">
               Items per page:
             </label>
@@ -214,7 +214,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               value={pageSize}
               onChange={handlePageSizeChange}
               className="h-8 px-2 text-sm border border-border rounded-md bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              data-test-id="pagination-page-size-select"
+              data-testid="pagination-page-size-select"
             >
               {pageSizeOptions.map((option) => (
                 <option key={option} value={option}>

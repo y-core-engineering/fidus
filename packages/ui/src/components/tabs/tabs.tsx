@@ -118,7 +118,7 @@ export const TabsRoot = React.forwardRef<
     ref={ref}
     orientation={orientation}
     className={cn('w-full', className)}
-    data-test-id="tabs-root"
+    data-testid="tabs-root"
     {...props}
   />
 ));
@@ -141,7 +141,7 @@ export const TabsList = React.forwardRef<
     <RadixTabs.List
       ref={ref}
       className={cn(tabsListVariants({ variant, orientation, fullWidth, className }))}
-      data-test-id="tabs-list"
+      data-testid="tabs-list"
       {...props}
     />
   )
@@ -155,7 +155,7 @@ export const TabsTrigger = React.forwardRef<
   <RadixTabs.Trigger
     ref={ref}
     className={cn(tabsTriggerVariants({ variant, size, className }))}
-    data-test-id={`tabs-trigger-${props.value}`}
+    data-testid={`tabs-trigger-${props.value}`}
     {...props}
   />
 ));
@@ -168,7 +168,7 @@ export const TabsContent = React.forwardRef<
   <RadixTabs.Content
     ref={ref}
     className={cn(tabsContentVariants({ className }))}
-    data-test-id={`tabs-content-${props.value}`}
+    data-testid={`tabs-content-${props.value}`}
     {...props}
   />
 ));

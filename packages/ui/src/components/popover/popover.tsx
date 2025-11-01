@@ -60,14 +60,14 @@ export const PopoverContent = React.forwardRef<
       sideOffset={sideOffset}
       side={side}
       className={cn(popoverContentVariants(), className)}
-      data-test-id="popover-content"
+      data-testid="popover-content"
       {...props}
     >
       {props.children}
       {showArrow && (
         <PopoverPrimitive.Arrow
           className={cn(popoverArrowVariants({ side }))}
-          data-test-id="popover-arrow"
+          data-testid="popover-arrow"
         />
       )}
     </PopoverPrimitive.Content>

@@ -78,7 +78,7 @@ export const ModalContent = React.forwardRef<
   ) => {
     return (
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className={cn(modalOverlayVariants())} data-test-id="modal-overlay" />
+        <DialogPrimitive.Overlay className={cn(modalOverlayVariants())} data-testid="modal-overlay" />
         <DialogPrimitive.Content
           ref={ref}
           onEscapeKeyDown={(e) => {
@@ -92,14 +92,14 @@ export const ModalContent = React.forwardRef<
             }
           }}
           className={cn(modalContentVariants({ size }), className)}
-          data-test-id="modal-content"
+          data-testid="modal-content"
           {...props}
         >
           {children}
           {dismissible && (
             <DialogPrimitive.Close
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:pointer-events-none"
-              data-test-id="modal-close"
+              data-testid="modal-close"
             >
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -120,7 +120,7 @@ export interface ModalHeaderProps {
 
 export const ModalHeader: React.FC<ModalHeaderProps> = ({ children, className }) => {
   return (
-    <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} data-test-id="modal-header">
+    <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} data-testid="modal-header">
       {children}
     </div>
   );
@@ -139,7 +139,7 @@ export const ModalTitle = React.forwardRef<
     <DialogPrimitive.Title
       ref={ref}
       className={cn('text-lg font-semibold leading-none tracking-tight', className)}
-      data-test-id="modal-title"
+      data-testid="modal-title"
       {...props}
     >
       {children}
@@ -162,7 +162,7 @@ export const ModalDescription = React.forwardRef<
     <DialogPrimitive.Description
       ref={ref}
       className={cn('text-sm text-gray-600', className)}
-      data-test-id="modal-description"
+      data-testid="modal-description"
       {...props}
     >
       {children}
@@ -179,7 +179,7 @@ export interface ModalBodyProps {
 
 export const ModalBody: React.FC<ModalBodyProps> = ({ children, className }) => {
   return (
-    <div className={cn('py-4', className)} data-test-id="modal-body">
+    <div className={cn('py-4', className)} data-testid="modal-body">
       {children}
     </div>
   );
@@ -192,7 +192,7 @@ export interface ModalFooterProps {
 
 export const ModalFooter: React.FC<ModalFooterProps> = ({ children, className }) => {
   return (
-    <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} data-test-id="modal-footer">
+    <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} data-testid="modal-footer">
       {children}
     </div>
   );

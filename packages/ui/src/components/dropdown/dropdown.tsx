@@ -80,7 +80,7 @@ export const DropdownContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(dropdownContentVariants(), className)}
-      data-test-id="dropdown-content"
+      data-testid="dropdown-content"
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -101,7 +101,7 @@ export const DropdownItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(dropdownItemVariants({ variant }), className)}
-    data-test-id="dropdown-item"
+    data-testid="dropdown-item"
     {...props}
   >
     {icon && <span className="mr-2 h-4 w-4">{icon}</span>}
@@ -125,12 +125,12 @@ export const DropdownCheckboxItem = React.forwardRef<
       className
     )}
     checked={checked}
-    data-test-id="dropdown-checkbox-item"
+    data-testid="dropdown-checkbox-item"
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" data-test-id="dropdown-checkbox-indicator" />
+        <Check className="h-4 w-4" data-testid="dropdown-checkbox-indicator" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -152,12 +152,12 @@ export const DropdownRadioItem = React.forwardRef<
       'relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-gray-100 focus:text-gray-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
-    data-test-id="dropdown-radio-item"
+    data-testid="dropdown-radio-item"
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <div className="h-2 w-2 rounded-full bg-current" data-test-id="dropdown-radio-indicator" />
+        <div className="h-2 w-2 rounded-full bg-current" data-testid="dropdown-radio-indicator" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -176,7 +176,7 @@ export const DropdownLabel = React.forwardRef<
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn('px-2 py-1.5 text-sm font-semibold', className)}
-    data-test-id="dropdown-label"
+    data-testid="dropdown-label"
     {...props}
   />
 ));
@@ -190,7 +190,7 @@ export const DropdownSeparator = React.forwardRef<
   <DropdownMenuPrimitive.Separator
     ref={ref}
     className={cn('-mx-1 my-1 h-px bg-gray-200', className)}
-    data-test-id="dropdown-separator"
+    data-testid="dropdown-separator"
     {...props}
   />
 ));
@@ -210,7 +210,7 @@ export const DropdownSubTrigger = React.forwardRef<
       'flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-gray-100 data-[state=open]:bg-gray-100',
       className
     )}
-    data-test-id="dropdown-sub-trigger"
+    data-testid="dropdown-sub-trigger"
     {...props}
   >
     {children}
@@ -233,7 +233,7 @@ export const DropdownSubContent = React.forwardRef<
       'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-white p-1 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
       className
     )}
-    data-test-id="dropdown-sub-content"
+    data-testid="dropdown-sub-content"
     {...props}
   />
 ));

@@ -101,12 +101,12 @@ export const ProgressBar = React.forwardRef<
     const percentage = displayValue !== undefined ? Math.round(displayValue) : 0;
 
     return (
-      <div className={cn('w-full', className)} data-test-id="progress-bar-container">
+      <div className={cn('w-full', className)} data-testid="progress-bar-container">
         {(showLabel || showPercentage) && (
-          <div className={cn(progressBarLabelVariants({ variant }))} data-test-id="progress-bar-label-container">
-            {showLabel && label && <span data-test-id="progress-bar-label">{label}</span>}
+          <div className={cn(progressBarLabelVariants({ variant }))} data-testid="progress-bar-label-container">
+            {showLabel && label && <span data-testid="progress-bar-label">{label}</span>}
             {showPercentage && !indeterminate && (
-              <span data-test-id="progress-bar-percentage">{percentage}%</span>
+              <span data-testid="progress-bar-percentage">{percentage}%</span>
             )}
           </div>
         )}
@@ -114,7 +114,7 @@ export const ProgressBar = React.forwardRef<
           ref={ref}
           value={displayValue}
           className={cn(progressBarRootVariants({ size }))}
-          data-test-id="progress-bar-root"
+          data-testid="progress-bar-root"
           {...props}
         >
           <ProgressPrimitive.Indicator
@@ -126,7 +126,7 @@ export const ProgressBar = React.forwardRef<
                     transform: `translateX(-${100 - (displayValue || 0)}%)`,
                   }
             }
-            data-test-id="progress-bar-indicator"
+            data-testid="progress-bar-indicator"
           />
         </ProgressPrimitive.Root>
       </div>
@@ -184,7 +184,7 @@ export const CircularProgress = React.forwardRef<HTMLDivElement, CircularProgres
     };
 
     return (
-      <div ref={ref} className={cn(circularProgressVariants({ size }), className)} data-test-id="circular-progress">
+      <div ref={ref} className={cn(circularProgressVariants({ size }), className)} data-testid="circular-progress">
         <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 100 100">
           {/* Background circle */}
           <circle
@@ -194,7 +194,7 @@ export const CircularProgress = React.forwardRef<HTMLDivElement, CircularProgres
             r="45"
             cx="50"
             cy="50"
-            data-test-id="circular-progress-background"
+            data-testid="circular-progress-background"
           />
           {/* Progress circle */}
           <circle
@@ -211,13 +211,13 @@ export const CircularProgress = React.forwardRef<HTMLDivElement, CircularProgres
             r="45"
             cx="50"
             cy="50"
-            data-test-id="circular-progress-indicator"
+            data-testid="circular-progress-indicator"
           />
         </svg>
         {showPercentage && !indeterminate && (
           <span
             className={cn('absolute font-semibold text-gray-900', textSizeMap[size || 'md'])}
-            data-test-id="circular-progress-percentage"
+            data-testid="circular-progress-percentage"
           >
             {Math.round(value)}%
           </span>
