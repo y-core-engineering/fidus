@@ -4,7 +4,6 @@
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "regions": ["fra1", "iad1"],
   "headers": [
     {
       "source": "/(.*)",
