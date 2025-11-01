@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+### Patch Changes
+
+- 7196ba6: Improve README documentation with component table
+
+  Reorganized component list into structured tables with descriptions for better readability and discoverability. Each component now has a clear description of its purpose and functionality.
+
 All notable changes to `@fidus/ui` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -8,36 +16,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - None
 
 ### Changed
+
 - None
 
 ### Deprecated
+
 - None
 
 ### Removed
+
 - None
 
 ### Fixed
+
 - None
 
 ### Security
+
 - None
 
 ## [1.0.1] - 2025-01-01
 
 ### Fixed
+
 - Corrected README.md documentation with accurate component list (41 components)
 - Removed false information from README.md (non-existent Discord link, CSS imports, documentation links)
 - Fixed GitHub Actions workflow permissions for GitHub Release creation
 
 ### Changed
+
 - Updated workflow to use `contents: write` permission for automated releases
 
 ## [1.0.0] - 2025-01-01
 
 ### Added
+
 - Initial component library setup
 - Button component with variants (primary, secondary, tertiary, destructive)
 - Card component
@@ -61,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-01-01
 
 ### Added
+
 - Initial release of @fidus/ui component library
 - Core components based on Radix UI primitives
 - Design tokens and CSS variables
