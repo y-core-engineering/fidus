@@ -261,8 +261,8 @@ export default function AIDrivenUIPage() {
       setTimeout(() => setLlmStep(5), 1250);
     } else if (isMultiTurnDialog) {
       // Multi-turn dialog: LLM steps are handled per assistant message
-      // Just hide the LLM steps initially
-      setLlmStep(-1);
+      // Don't set llmStep here - let the message loop handle it
+      // (Setting it to -1 here would override the first assistant message animation)
     }
   }, [currentIndex, current.chat, current.card]);
 
@@ -275,19 +275,40 @@ export default function AIDrivenUIPage() {
       let currentDelay = 0;
 
       messages.forEach((msg, idx) => {
-        setTimeout(() => {
-          setVisibleMessageIndex(idx + 1);
+        // For user messages: show immediately and hide LLM process
+        if (msg.type === 'user') {
+          setTimeout(() => {
+            setVisibleMessageIndex(idx + 1);
+            setLlmStep(-1); // Hide LLM process when user is typing
+          }, currentDelay);
+        }
 
-          // Show typing indicator before assistant responses
-          if (msg.type === 'assistant' && idx < messages.length) {
-            setTimeout(() => setShowTyping(true), 100);
-            setTimeout(() => {
-              setShowTyping(false);
-            }, 1700);
-          }
+        // For assistant messages: show LLM process FIRST, then show message
+        if (msg.type === 'assistant') {
+          // Start LLM process animation BEFORE showing the message
+          setTimeout(() => {
+            setLlmStep(-1); // Reset first
+          }, currentDelay);
+
+          setTimeout(() => {
+            setShowTyping(true);
+            setLlmStep(0); // Thinking
+          }, currentDelay + 100);
+
+          setTimeout(() => setLlmStep(1), currentDelay + 400);   // Input Source
+          setTimeout(() => setLlmStep(2), currentDelay + 700);   // Context Analysis
+          setTimeout(() => setLlmStep(3), currentDelay + 1000);  // Intent Detection
+          setTimeout(() => setLlmStep(4), currentDelay + 1300);  // UI Form Selection
+          setTimeout(() => setLlmStep(5), currentDelay + 1600);  // Complete
+
+          // Hide typing and show message after LLM completes
+          setTimeout(() => {
+            setShowTyping(false);
+            setVisibleMessageIndex(idx + 1);
+          }, currentDelay + 1700);
 
           // Check if this message has a booking-form widget - trigger field filling animation
-          if (msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form' && msg.widget.data && 'fields' in msg.widget.data) {
+          if (msg.widget && msg.widget.type === 'booking-form' && msg.widget.data && 'fields' in msg.widget.data) {
             const fields = msg.widget.data.fields as string[];
             const numFields = fields.length;
 
@@ -303,9 +324,9 @@ export default function AIDrivenUIPage() {
                   }, 600);
                 }, fieldIdx * 800);
               }
-            }, 500);
+            }, currentDelay + 1700 + 500);
           }
-        }, currentDelay);
+        }
 
         const hasBookingForm = msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form';
         const formFillingTime = hasBookingForm && msg.widget && msg.widget.data && 'fields' in msg.widget.data
