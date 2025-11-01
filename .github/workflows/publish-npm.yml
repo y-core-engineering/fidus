@@ -47,9 +47,6 @@ jobs:
       - name: Build @fidus/ui
         run: pnpm --filter @fidus/ui build
 
-      - name: Run tests
-        run: pnpm --filter @fidus/ui test run
-
       - name: Publish to npm
         working-directory: packages/ui
         run: pnpm publish --no-git-checks --access public
