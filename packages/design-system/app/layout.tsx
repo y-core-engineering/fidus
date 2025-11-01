@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
 import '../styles/globals.css';
 import { LayoutClient } from '../components/layout-client';
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <LayoutClient>{children}</LayoutClient>
+        <Analytics />
       </body>
     </html>
   );
