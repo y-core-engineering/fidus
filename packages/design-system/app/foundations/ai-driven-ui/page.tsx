@@ -347,44 +347,44 @@ export default function AIDrivenUIPage() {
             let currentDelay = 0;
 
             messages.forEach((msg, idx) => {
-              setTimeout(() => {
-                setVisibleMessageIndex(idx + 1);
+              // For user messages: show immediately and hide LLM process
+              if (msg.type === 'user') {
+                setTimeout(() => {
+                  setVisibleMessageIndex(idx + 1);
+                  setLlmStep(-1); // Hide LLM process when user is typing
+                }, currentDelay);
+              }
 
-                // For user messages: hide LLM process (user is typing)
-                if (msg.type === 'user') {
-                  setLlmStep(-1);
-                }
-
-                // Show typing indicator AND LLM process steps before assistant responses
-                if (msg.type === 'assistant' && idx < messages.length) {
-                  // Start LLM process animation
+              // For assistant messages: show LLM process FIRST, then show message
+              if (msg.type === 'assistant') {
+                // Start LLM process animation BEFORE showing the message
+                setTimeout(() => {
                   setLlmStep(-1); // Reset first
+                }, currentDelay);
 
-                  // Show "thinking..." indicator immediately
-                  setTimeout(() => {
-                    setShowTyping(true);
-                    setLlmStep(0);
-                  }, 100);
+                setTimeout(() => {
+                  setShowTyping(true);
+                  setLlmStep(0); // Thinking
+                }, currentDelay + 100);
 
-                  // Show LLM process steps (faster timing for multi-turn dialogs)
-                  setTimeout(() => setLlmStep(1), 400);
-                  setTimeout(() => setLlmStep(2), 700);
-                  setTimeout(() => setLlmStep(3), 1000);
-                  setTimeout(() => setLlmStep(4), 1300);
-                  setTimeout(() => setLlmStep(5), 1600);
+                setTimeout(() => setLlmStep(1), currentDelay + 400);   // Input Source
+                setTimeout(() => setLlmStep(2), currentDelay + 700);   // Context Analysis
+                setTimeout(() => setLlmStep(3), currentDelay + 1000);  // Intent Detection
+                setTimeout(() => setLlmStep(4), currentDelay + 1300);  // UI Form Selection
+                setTimeout(() => setLlmStep(5), currentDelay + 1600);  // Complete
 
-                  // Hide typing indicator after LLM completes
-                  setTimeout(() => {
-                    setShowTyping(false);
-                  }, 1700);
-                }
+                // Hide typing and show message after LLM completes
+                setTimeout(() => {
+                  setShowTyping(false);
+                  setVisibleMessageIndex(idx + 1);
+                }, currentDelay + 1700);
 
                 // Check if this message has a booking-form widget - trigger field filling animation
-                if (msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form' && msg.widget.data && 'fields' in msg.widget.data) {
+                if (msg.widget && msg.widget.type === 'booking-form' && msg.widget.data && 'fields' in msg.widget.data) {
                   const fields = msg.widget.data.fields as string[];
                   const numFields = fields.length;
 
-                  // Start filling fields after widget appears (add 500ms delay)
+                  // Start filling fields after assistant message appears (1700ms LLM + 500ms delay)
                   setTimeout(() => {
                     setFilledFields(0);
 
@@ -399,9 +399,9 @@ export default function AIDrivenUIPage() {
                         }, 600);
                       }, fieldIdx * 800); // 800ms per field (600ms typing + 200ms gap)
                     }
-                  }, 500);
+                  }, currentDelay + 1700 + 500);
                 }
-              }, currentDelay);
+              }
 
               // Timing between messages:
               // - User message appears immediately
