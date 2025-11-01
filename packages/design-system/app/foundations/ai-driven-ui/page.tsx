@@ -258,6 +258,61 @@ export default function AIDrivenUIPage() {
     }
   }, [currentIndex, current.chat]);
 
+  // Initial load animation - trigger message animation for first scenario
+  useEffect(() => {
+    const initialScene = TIMELINE[0];
+
+    if (initialScene.chat && initialScene.chat.messages) {
+      const messages = initialScene.chat.messages;
+      let currentDelay = 0;
+
+      messages.forEach((msg, idx) => {
+        setTimeout(() => {
+          setVisibleMessageIndex(idx + 1);
+
+          // Show typing indicator before assistant responses
+          if (msg.type === 'assistant' && idx < messages.length) {
+            setTimeout(() => setShowTyping(true), 100);
+            setTimeout(() => {
+              setShowTyping(false);
+            }, 1700);
+          }
+
+          // Check if this message has a booking-form widget - trigger field filling animation
+          if (msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form' && msg.widget.data && 'fields' in msg.widget.data) {
+            const fields = msg.widget.data.fields as string[];
+            const numFields = fields.length;
+
+            setTimeout(() => {
+              setFilledFields(0);
+
+              for (let fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+                setTimeout(() => {
+                  setIsFormFilling(true);
+                  setTimeout(() => {
+                    setFilledFields(fieldIdx + 1);
+                    setIsFormFilling(false);
+                  }, 600);
+                }, fieldIdx * 800);
+              }
+            }, 500);
+          }
+        }, currentDelay);
+
+        const hasBookingForm = msg.type === 'assistant' && msg.widget && msg.widget.type === 'booking-form';
+        const formFillingTime = hasBookingForm && msg.widget && msg.widget.data && 'fields' in msg.widget.data
+          ? ((msg.widget.data.fields as string[]).length * 800 + 1000)
+          : 0;
+
+        if (msg.type === 'user') {
+          currentDelay += 200;
+        } else {
+          currentDelay += 2000 + formFillingTime;
+        }
+      });
+    }
+  }, []); // Empty dependency array - only run on initial mount
+
   // Auto-advance through timeline with progressive animations
   useEffect(() => {
     const timer = setInterval(() => {
