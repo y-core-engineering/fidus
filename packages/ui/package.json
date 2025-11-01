@@ -5,16 +5,36 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "author": "Fidus Community",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/y-core-engineering/fidus.git",
+    "directory": "packages/ui"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "design-system",
+    "fidus",
+    "radix-ui",
+    "accessibility"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./components/*": {
+      "types": "./dist/components/*/index.d.ts",
       "import": "./dist/components/*/index.mjs",
-      "require": "./dist/components/*/index.js",
-      "types": "./dist/components/*/index.d.ts"
+      "require": "./dist/components/*/index.js"
     }
   },
   "files": [
