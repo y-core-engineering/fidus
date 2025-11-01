@@ -4,11 +4,11 @@ export default defineConfig({
   entry: ['src/index.ts'],
   format: ['cjs', 'esm'],
   dts: true,
-  splitting: true,
+  splitting: false, // Disable code splitting to avoid module resolution issues
   sourcemap: true,
   clean: true,
   external: ['react', 'react-dom'],
-  treeshake: true,
+  bundle: true, // Explicitly bundle all non-external dependencies
   esbuildOptions(options) {
     options.banner = {
       js: '"use client";',
