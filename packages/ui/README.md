@@ -60,63 +60,90 @@ function App() {
 ## Available Components
 
 ### Action Components
-- **Button** - Primary, secondary, tertiary, and destructive variants
-- **Link** - Styled navigation links
-- **IconButton** - Icon-only button
-- **ButtonGroup** - Grouped button layout
+
+| Component | Description |
+|-----------|-------------|
+| **Button** | Primary, secondary, tertiary, and destructive button variants |
+| **Link** | Styled navigation links with hover states |
+| **IconButton** | Icon-only button for compact actions |
+| **ButtonGroup** | Grouped button layout for related actions |
 
 ### Layout Components
-- **Container** - Responsive container with max-width
-- **Grid** - CSS Grid layout component
-- **Stack** - Vertical/horizontal stack layout
-- **Divider** - Visual separator
+
+| Component | Description |
+|-----------|-------------|
+| **Container** | Responsive container with configurable max-width |
+| **Grid** | CSS Grid layout component with responsive columns |
+| **Stack** | Vertical or horizontal stack layout with spacing control |
+| **Divider** | Visual separator line (horizontal or vertical) |
 
 ### Data Display Components
-- **Table** - Data table with sorting and filtering
-- **List** - Styled list component
-- **Badge** - Status badges and labels
-- **Chip** - Tag/chip component
-- **Avatar** - User avatar component
+
+| Component | Description |
+|-----------|-------------|
+| **Table** | Data table with sorting, filtering, and pagination |
+| **List** | Styled list component with variants |
+| **Badge** | Status badges and labels for categorization |
+| **Chip** | Tag/chip component for selections and filters |
+| **Avatar** | User avatar with fallback initials |
 
 ### Card Components
-- **OpportunityCard** - Contextual opportunity display
-- **DetailCard** - Detailed information card
-- **EmptyCard** - Empty state card
+
+| Component | Description |
+|-----------|-------------|
+| **OpportunityCard** | Contextual opportunity display with actions |
+| **DetailCard** | Detailed information card with sections |
+| **EmptyCard** | Empty state card with call-to-action |
 
 ### Form Components (Basic)
-- **TextInput** - Text input field
-- **TextArea** - Multi-line text input
-- **Checkbox** - Checkbox input
-- **RadioButton** - Radio button input
-- **ToggleSwitch** - Toggle switch
+
+| Component | Description |
+|-----------|-------------|
+| **TextInput** | Single-line text input with validation states |
+| **TextArea** | Multi-line text input with auto-resize |
+| **Checkbox** | Checkbox input with indeterminate state |
+| **RadioButton** | Radio button for mutually exclusive options |
+| **ToggleSwitch** | Toggle switch for on/off states |
 
 ### Form Components (Advanced)
-- **Select** - Dropdown select
-- **DatePicker** - Date selection
-- **TimePicker** - Time selection
-- **FileUpload** - File upload component
+
+| Component | Description |
+|-----------|-------------|
+| **Select** | Dropdown select with search and multi-select |
+| **DatePicker** | Date selection with calendar interface |
+| **TimePicker** | Time selection with 12/24 hour format |
+| **FileUpload** | File upload with drag-and-drop support |
 
 ### Feedback Components
-- **Toast** - Notification system
-- **Modal** - Modal dialogs
-- **Alert** - Alert messages
-- **Banner** - Page-level banners
-- **ProgressBar** - Progress indicators
-- **Spinner** - Loading spinner
-- **Skeleton** - Loading skeleton
+
+| Component | Description |
+|-----------|-------------|
+| **Toast** | Notification system with auto-dismiss |
+| **Modal** | Modal dialogs with overlay and focus management |
+| **Alert** | Alert messages for info, success, warning, error |
+| **Banner** | Page-level banners for important announcements |
+| **ProgressBar** | Progress indicators for long-running operations |
+| **Spinner** | Loading spinner with size variants |
+| **Skeleton** | Loading skeleton for content placeholders |
 
 ### Overlay Components
-- **Dropdown** - Dropdown menus
-- **Popover** - Popover component
-- **Tooltip** - Contextual tooltips
-- **Drawer** - Slide-out drawer
+
+| Component | Description |
+|-----------|-------------|
+| **Dropdown** | Dropdown menus with keyboard navigation |
+| **Popover** | Popover component with positioning |
+| **Tooltip** | Contextual tooltips on hover or focus |
+| **Drawer** | Slide-out drawer from any edge |
 
 ### Navigation Components
-- **Tabs** - Tabbed interfaces
-- **Breadcrumbs** - Breadcrumb navigation
-- **Pagination** - Pagination component
-- **Header** - Page header
-- **Sidebar** - Navigation sidebar
+
+| Component | Description |
+|-----------|-------------|
+| **Tabs** | Tabbed interfaces with keyboard navigation |
+| **Breadcrumbs** | Breadcrumb navigation for hierarchical pages |
+| **Pagination** | Pagination component for data sets |
+| **Header** | Page header with logo and navigation |
+| **Sidebar** | Collapsible navigation sidebar |
 
 ## Component Examples
 
