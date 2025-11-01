@@ -177,7 +177,7 @@ const navigation: NavItem[] = [
   },
 ];
 
-function NavSection({ item }: { item: NavItem }) {
+function NavSection({ item, onLinkClick }: { item: NavItem; onLinkClick?: () => void }) {
   const pathname = usePathname();
 
   // Check if any child item is active (recursively)
@@ -214,7 +214,7 @@ function NavSection({ item }: { item: NavItem }) {
         {isOpen && (
           <div className="mt-1 space-y-1 pl-3">
             {item.items.map((subItem) => (
-              <NavItem key={subItem.href || subItem.title} item={subItem} />
+              <NavItem key={subItem.href || subItem.title} item={subItem} onLinkClick={onLinkClick} />
             ))}
           </div>
         )}
@@ -222,16 +222,16 @@ function NavSection({ item }: { item: NavItem }) {
     );
   }
 
-  return <NavItem item={item} />;
+  return <NavItem item={item} onLinkClick={onLinkClick} />;
 }
 
-function NavItem({ item }: { item: NavItem }) {
+function NavItem({ item, onLinkClick }: { item: NavItem; onLinkClick?: () => void }) {
   const pathname = usePathname();
   const isActive = pathname === item.href;
 
   // If item has sub-items, render as a nested section
   if (item.items) {
-    return <NavSection item={item} />;
+    return <NavSection item={item} onLinkClick={onLinkClick} />;
   }
 
   // If no href and no items, skip
@@ -240,6 +240,7 @@ function NavItem({ item }: { item: NavItem }) {
   return (
     <Link
       href={item.href}
+      onClick={onLinkClick}
       className={`block px-3 py-2 text-sm rounded-md transition-colors no-underline ${
         isActive
           ? 'bg-primary text-black font-bold'
@@ -251,7 +252,7 @@ function NavItem({ item }: { item: NavItem }) {
   );
 }
 
-export function Sidebar({ isOpen }: { isOpen?: boolean }) {
+export function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
   return (
     <aside
       className={`fixed top-16 left-0 z-sidebar h-[calc(100vh-4rem)] w-64 border-r border-border bg-background overflow-y-auto transition-transform lg:translate-x-0 ${
@@ -260,7 +261,7 @@ export function Sidebar({ isOpen }: { isOpen?: boolean }) {
     >
       <nav className="p-4">
         {navigation.map((item) => (
-          <NavSection key={item.title} item={item} />
+          <NavSection key={item.title} item={item} onLinkClick={onClose} />
         ))}
       </nav>
     </aside>
