@@ -15,7 +15,7 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
         onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
         onSearchClick={() => setIsSearchOpen(true)}
       />
-      <Sidebar isOpen={isSidebarOpen} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <SearchDialog
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
