@@ -23,7 +23,7 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
       />
 
       {/* Main content area with proper spacing for sidebar */}
-      <main className="lg:pl-64 pt-16">
+      <main className="lg:pl-64 pt-0 md:pt-16">
         <div className="container mx-auto px-4 py-8">{children}</div>
       </main>
 
