@@ -25,6 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - None
 
+## [1.0.1] - 2025-01-01
+
+### Fixed
+- Corrected README.md documentation with accurate component list (41 components)
+- Removed false information from README.md (non-existent Discord link, CSS imports, documentation links)
+- Fixed GitHub Actions workflow permissions for GitHub Release creation
+
+### Changed
+- Updated workflow to use `contents: write` permission for automated releases
+
 ## [1.0.0] - 2025-01-01
 
 ### Added
