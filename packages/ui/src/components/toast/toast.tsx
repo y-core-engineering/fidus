@@ -119,21 +119,21 @@ export const Toast = React.forwardRef<
         onOpenChange={onOpenChange}
         duration={duration}
         className={cn(toastVariants({ variant }))}
-        data-test-id="toast"
+        data-testid="toast"
         {...props}
       >
-        <Icon className={cn(toastIconVariants({ variant }))} data-test-id="toast-icon" />
+        <Icon className={cn(toastIconVariants({ variant }))} data-testid="toast-icon" />
         <div className="flex flex-1 flex-col gap-1">
           <ToastPrimitive.Title
             className="text-sm font-semibold leading-none"
-            data-test-id="toast-title"
+            data-testid="toast-title"
           >
             {title}
           </ToastPrimitive.Title>
           {description && (
             <ToastPrimitive.Description
               className="text-sm opacity-90"
-              data-test-id="toast-description"
+              data-testid="toast-description"
             >
               {description}
             </ToastPrimitive.Description>
@@ -143,7 +143,7 @@ export const Toast = React.forwardRef<
               altText={actionLabel}
               onClick={onAction}
               className={cn(toastActionVariants({ variant }), 'mt-2 self-start')}
-              data-test-id="toast-action"
+              data-testid="toast-action"
             >
               {actionLabel}
             </ToastPrimitive.Action>
@@ -152,7 +152,7 @@ export const Toast = React.forwardRef<
         {dismissible && (
           <ToastPrimitive.Close
             className="absolute right-2 top-2 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2"
-            data-test-id="toast-close"
+            data-testid="toast-close"
           >
             <X className="h-4 w-4" />
           </ToastPrimitive.Close>
@@ -190,7 +190,7 @@ export const ToastViewport = React.forwardRef<
   <ToastPrimitive.Viewport
     ref={ref}
     className={cn(viewportVariants({ position }))}
-    data-test-id="toast-viewport"
+    data-testid="toast-viewport"
     {...props}
   />
 ));

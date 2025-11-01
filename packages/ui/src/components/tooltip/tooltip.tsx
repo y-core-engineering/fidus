@@ -47,14 +47,14 @@ export const TooltipContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(tooltipContentVariants(), className)}
-      data-test-id="tooltip-content"
+      data-testid="tooltip-content"
       {...props}
     >
       {props.children}
       {showArrow && (
         <TooltipPrimitive.Arrow
           className={cn(tooltipArrowVariants())}
-          data-test-id="tooltip-arrow"
+          data-testid="tooltip-arrow"
         />
       )}
     </TooltipPrimitive.Content>

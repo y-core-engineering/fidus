@@ -57,7 +57,7 @@ export const DrawerOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(drawerOverlayVariants(), className)}
-    data-test-id="drawer-overlay"
+    data-testid="drawer-overlay"
     {...props}
   />
 ));
@@ -79,14 +79,14 @@ export const DrawerContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(drawerContentVariants({ side }), className)}
-      data-test-id="drawer-content"
+      data-testid="drawer-content"
       {...props}
     >
       {children}
       {dismissible && (
         <DialogPrimitive.Close
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:pointer-events-none"
-          data-test-id="drawer-close"
+          data-testid="drawer-close"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
@@ -105,7 +105,7 @@ export interface DrawerHeaderProps {
 
 export const DrawerHeader: React.FC<DrawerHeaderProps> = ({ children, className }) => {
   return (
-    <div className={cn('flex flex-col space-y-1.5 text-left', className)} data-test-id="drawer-header">
+    <div className={cn('flex flex-col space-y-1.5 text-left', className)} data-testid="drawer-header">
       {children}
     </div>
   );
@@ -124,7 +124,7 @@ export const DrawerTitle = React.forwardRef<
     <DialogPrimitive.Title
       ref={ref}
       className={cn('text-lg font-semibold leading-none tracking-tight', className)}
-      data-test-id="drawer-title"
+      data-testid="drawer-title"
       {...props}
     >
       {children}
@@ -147,7 +147,7 @@ export const DrawerDescription = React.forwardRef<
     <DialogPrimitive.Description
       ref={ref}
       className={cn('text-sm text-gray-600', className)}
-      data-test-id="drawer-description"
+      data-testid="drawer-description"
       {...props}
     >
       {children}
@@ -164,7 +164,7 @@ export interface DrawerBodyProps {
 
 export const DrawerBody: React.FC<DrawerBodyProps> = ({ children, className }) => {
   return (
-    <div className={cn('flex-1 overflow-y-auto', className)} data-test-id="drawer-body">
+    <div className={cn('flex-1 overflow-y-auto', className)} data-testid="drawer-body">
       {children}
     </div>
   );
@@ -179,7 +179,7 @@ export const DrawerFooter: React.FC<DrawerFooterProps> = ({ children, className 
   return (
     <div
       className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
-      data-test-id="drawer-footer"
+      data-testid="drawer-footer"
     >
       {children}
     </div>

@@ -126,7 +126,7 @@ export const SidebarRoot = React.forwardRef<HTMLElement, SidebarProps>(
     <aside
       ref={ref}
       className={cn(sidebarVariants({ position, width, collapsed, className }))}
-      data-test-id="sidebar-root"
+      data-testid="sidebar-root"
       role="navigation"
       aria-label="sidebar navigation"
       {...props}
@@ -158,17 +158,17 @@ export const SidebarSection = React.forwardRef<
     <div
       ref={ref}
       className={cn(sidebarSectionVariants({ collapsible: section.collapsible }), className)}
-      data-test-id={`sidebar-section-${section.id}`}
+      data-testid={`sidebar-section-${section.id}`}
     >
       {section.title && !collapsed && (
         <div
           className={cn(sidebarSectionHeaderVariants({ collapsible: section.collapsible }))}
           onClick={toggleCollapse}
-          data-test-id={`sidebar-section-header-${section.id}`}
+          data-testid={`sidebar-section-header-${section.id}`}
         >
           <span>{section.title}</span>
           {section.collapsible && (
-            <span data-test-id={`sidebar-section-toggle-${section.id}`}>
+            <span data-testid={`sidebar-section-toggle-${section.id}`}>
               {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </span>
           )}
@@ -222,7 +222,7 @@ export const SidebarItem = React.forwardRef<
           href={item.href}
           className={itemClass}
           aria-current={item.active ? 'page' : undefined}
-          data-test-id={`sidebar-item-${item.id}`}
+          data-testid={`sidebar-item-${item.id}`}
           title={collapsed ? item.label : undefined}
         >
           {Content}
@@ -232,7 +232,7 @@ export const SidebarItem = React.forwardRef<
           ref={ref as React.Ref<HTMLDivElement>}
           className={itemClass}
           onClick={hasChildren ? toggleExpand : undefined}
-          data-test-id={`sidebar-item-${item.id}`}
+          data-testid={`sidebar-item-${item.id}`}
           title={collapsed ? item.label : undefined}
         >
           {Content}

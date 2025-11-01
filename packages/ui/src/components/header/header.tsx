@@ -149,26 +149,26 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
       <header
         ref={ref}
         className={cn(headerVariants({ size, sticky, transparent, className }))}
-        data-test-id="header"
+        data-testid="header"
         {...props}
       >
-        <div className={cn(headerContainerVariants({ size }))} data-test-id="header-container">
+        <div className={cn(headerContainerVariants({ size }))} data-testid="header-container">
           {/* Logo */}
           {logo && (
             <a
               href={logo.href || '/'}
               className={cn(logoVariants({ size }))}
-              data-test-id="header-logo"
+              data-testid="header-logo"
             >
               {logo.image && (
                 <img
                   src={logo.image}
                   alt={logo.text || 'Logo'}
                   className="h-8 w-auto"
-                  data-test-id="header-logo-image"
+                  data-testid="header-logo-image"
                 />
               )}
-              {logo.text && <span data-test-id="header-logo-text">{logo.text}</span>}
+              {logo.text && <span data-testid="header-logo-text">{logo.text}</span>}
             </a>
           )}
 
@@ -177,7 +177,7 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
             <nav
               className="hidden md:flex items-center gap-1"
               role="navigation"
-              data-test-id="header-nav"
+              data-testid="header-nav"
             >
               {items.map((item, index) => (
                 <a
@@ -185,7 +185,7 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                   href={item.href}
                   className={cn(navItemVariants({ size, active: item.active }))}
                   aria-current={item.active ? 'page' : undefined}
-                  data-test-id={`header-nav-item-${index}`}
+                  data-testid={`header-nav-item-${index}`}
                 >
                   {item.icon && <span className="inline-flex">{item.icon}</span>}
                   <span>{item.label}</span>
@@ -199,7 +199,7 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
 
           {/* Actions */}
           {actions && (
-            <div className="flex items-center gap-2" data-test-id="header-actions">
+            <div className="flex items-center gap-2" data-testid="header-actions">
               {actions}
             </div>
           )}
@@ -210,7 +210,7 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
               onClick={onMobileMenuClick}
               className={cn(mobileMenuButtonVariants({ size }))}
               aria-label="Open mobile menu"
-              data-test-id="header-mobile-menu-button"
+              data-testid="header-mobile-menu-button"
             >
               <Menu className="h-5 w-5" />
             </button>

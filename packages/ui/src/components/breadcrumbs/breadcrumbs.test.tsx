@@ -31,7 +31,7 @@ describe('Breadcrumbs', () => {
 
     it('should render breadcrumbs with icons', () => {
       const itemsWithIcon = [
-        { label: 'Home', href: '/', icon: <Home data-test-id="home-icon" /> },
+        { label: 'Home', href: '/', icon: <Home data-testid="home-icon" /> },
         { label: 'Products', href: '/products' },
       ];
 

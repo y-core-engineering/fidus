@@ -105,7 +105,7 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
         ref={ref}
         aria-label="breadcrumb"
         className={cn(breadcrumbsVariants({ size, className }))}
-        data-test-id="breadcrumbs"
+        data-testid="breadcrumbs"
         {...props}
       >
         <ol className="flex items-center flex-wrap gap-inherit">
@@ -131,21 +131,21 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
                 {item.href && !isLast && !isEllipsis ? (
                   <a
                     href={item.href}
-                    data-test-id={`breadcrumb-item-${index}`}
+                    data-testid={`breadcrumb-item-${index}`}
                     className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
                   >
                     {ItemContent}
                   </a>
                 ) : (
                   <span
-                    data-test-id={`breadcrumb-item-${index}`}
+                    data-testid={`breadcrumb-item-${index}`}
                     aria-current={isLast ? 'page' : undefined}
                   >
                     {ItemContent}
                   </span>
                 )}
                 {!isLast && (
-                  <span data-test-id={`breadcrumb-separator-${index}`}>
+                  <span data-testid={`breadcrumb-separator-${index}`}>
                     {getSeparatorIcon(separator, size)}
                   </span>
                 )}

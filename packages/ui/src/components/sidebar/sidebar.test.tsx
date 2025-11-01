@@ -6,8 +6,8 @@ import { Home, Settings } from 'lucide-react';
 
 describe('Sidebar', () => {
   const mockItems = [
-    { id: '1', label: 'Home', href: '/', active: true, icon: <Home data-test-id="home-icon" /> },
-    { id: '2', label: 'Settings', href: '/settings', icon: <Settings data-test-id="settings-icon" /> },
+    { id: '1', label: 'Home', href: '/', active: true, icon: <Home data-testid="home-icon" /> },
+    { id: '2', label: 'Settings', href: '/settings', icon: <Settings data-testid="settings-icon" /> },
     { id: '3', label: 'Profile', href: '/profile' },
   ];
 

@@ -95,8 +95,8 @@ describe('Header', () => {
 
     it('should render navigation items with icons', () => {
       const itemsWithIcons = [
-        { label: 'Search', href: '/search', icon: <Search data-test-id="search-icon" /> },
-        { label: 'Profile', href: '/profile', icon: <User data-test-id="user-icon" /> },
+        { label: 'Search', href: '/search', icon: <Search data-testid="search-icon" /> },
+        { label: 'Profile', href: '/profile', icon: <User data-testid="user-icon" /> },
       ];
 
       render(<Header items={itemsWithIcons} />);
@@ -123,8 +123,8 @@ describe('Header', () => {
     it('should render action buttons', () => {
       const actions = (
         <>
-          <button data-test-id="search-button">Search</button>
-          <button data-test-id="user-button">User</button>
+          <button data-testid="search-button">Search</button>
+          <button data-testid="user-button">User</button>
         </>
       );
 
@@ -288,8 +288,8 @@ describe('Header', () => {
 
       const actions = (
         <>
-          <button data-test-id="search-button">Search</button>
-          <button data-test-id="user-button">User</button>
+          <button data-testid="search-button">Search</button>
+          <button data-testid="user-button">User</button>
         </>
       );
 
