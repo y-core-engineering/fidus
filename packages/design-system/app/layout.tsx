@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import '../styles/globals.css';
 import { LayoutClient } from '../components/layout-client';
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans antialiased">
         <LayoutClient>{children}</LayoutClient>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
