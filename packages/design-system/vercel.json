@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd ../.. && pnpm install && pnpm --filter @fidus/ui build && cd packages/design-system && pnpm build",
+  "buildCommand": "cd ../.. && pnpm --filter @fidus/ui build && cd packages/design-system && pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "cd ../.. && pnpm install",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "regions": ["fra1", "iad1"],
