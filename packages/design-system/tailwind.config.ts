@@ -83,6 +83,8 @@ const config: Config = {
         base: 'var(--z-base)',
         dropdown: 'var(--z-dropdown)',
         sticky: 'var(--z-sticky)',
+        overlay: 'var(--z-overlay)',
+        sidebar: 'var(--z-sidebar)',
         modal: 'var(--z-modal)',
         popover: 'var(--z-popover)',
         tooltip: 'var(--z-tooltip)',
