@@ -41,9 +41,9 @@ const buttonVariants = cva(
           'bg-error text-white hover:bg-error/90 shadow-sm',
       },
       size: {
-        sm: 'h-8 px-3 text-sm',
-        md: 'h-10 px-4 text-md',
-        lg: 'h-12 px-6 text-lg',
+        sm: 'h-8 px-2 sm:px-3 text-xs leading-tight line-clamp-1',
+        md: 'h-10 px-3 sm:px-4 text-xs sm:text-sm leading-tight line-clamp-2',
+        lg: 'h-12 px-4 sm:px-6 text-sm sm:text-md leading-tight line-clamp-2',
       },
     },
     defaultVariants: {
