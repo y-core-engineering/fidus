@@ -232,7 +232,11 @@ export default function AIDrivenUIPage() {
   useEffect(() => {
     // For chat scenes: wait for user message to appear first
     // For card scenes: start thinking immediately
-    if (current.chat) {
+    // NOTE: Multi-turn dialogs handle their own LLM steps in the message animation loop
+    const isMultiTurnDialog = current.chat && 'messages' in current.chat;
+
+    if (current.chat && !isMultiTurnDialog) {
+      // Single-turn dialog (old format) - show LLM steps once
       // Start hidden
       setLlmStep(-1);
 
@@ -245,7 +249,7 @@ export default function AIDrivenUIPage() {
       setTimeout(() => setLlmStep(3), 1100);
       setTimeout(() => setLlmStep(4), 1400);
       setTimeout(() => setLlmStep(5), 1700);
-    } else {
+    } else if (current.card) {
       // For cards: start thinking immediately with indicator
       setLlmStep(0);
 
@@ -255,8 +259,12 @@ export default function AIDrivenUIPage() {
       setTimeout(() => setLlmStep(3), 750);
       setTimeout(() => setLlmStep(4), 1000);
       setTimeout(() => setLlmStep(5), 1250);
+    } else if (isMultiTurnDialog) {
+      // Multi-turn dialog: LLM steps are handled per assistant message
+      // Just hide the LLM steps initially
+      setLlmStep(-1);
     }
-  }, [currentIndex, current.chat]);
+  }, [currentIndex, current.chat, current.card]);
 
   // Initial load animation - trigger message animation for first scenario
   useEffect(() => {
@@ -342,10 +350,30 @@ export default function AIDrivenUIPage() {
               setTimeout(() => {
                 setVisibleMessageIndex(idx + 1);
 
-                // Show typing indicator before assistant responses
+                // For user messages: hide LLM process (user is typing)
+                if (msg.type === 'user') {
+                  setLlmStep(-1);
+                }
+
+                // Show typing indicator AND LLM process steps before assistant responses
                 if (msg.type === 'assistant' && idx < messages.length) {
-                  setTimeout(() => setShowTyping(true), 100);
-                  // LLM thinking time before showing assistant response (faster)
+                  // Start LLM process animation
+                  setLlmStep(-1); // Reset first
+
+                  // Show "thinking..." indicator immediately
+                  setTimeout(() => {
+                    setShowTyping(true);
+                    setLlmStep(0);
+                  }, 100);
+
+                  // Show LLM process steps (faster timing for multi-turn dialogs)
+                  setTimeout(() => setLlmStep(1), 400);
+                  setTimeout(() => setLlmStep(2), 700);
+                  setTimeout(() => setLlmStep(3), 1000);
+                  setTimeout(() => setLlmStep(4), 1300);
+                  setTimeout(() => setLlmStep(5), 1600);
+
+                  // Hide typing indicator after LLM completes
                   setTimeout(() => {
                     setShowTyping(false);
                   }, 1700);
