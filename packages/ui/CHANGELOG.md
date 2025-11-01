@@ -8,21 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial component library setup
-- Button component with variants (primary, secondary, tertiary, destructive)
-- Card component
-- Input component
-- Select component
-- Toast component
-- Dialog component
-- Dropdown Menu component
-- Progress component
-- Tabs component
-- Tooltip component
-- Calendar component with date-fns integration
-- Responsive design with mobile-first approach
-- Zod validation schemas for component props
-- Comprehensive TypeScript types
+- None
 
 ### Changed
 - None
@@ -38,6 +24,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - None
+
+## [1.0.0] - 2025-01-01
+
+### Added
+- Initial component library setup
+- Button component with variants (primary, secondary, tertiary, destructive)
+- Card component
+- Input component
+- Select component
+- Toast component
+- Dialog component
+- Dropdown Menu component
+- Progress component
+- Tabs component
+- Tooltip component
+- Calendar component with date-fns integration
+- Responsive design with mobile-first approach
+- Zod validation schemas for component props
+- Comprehensive TypeScript types
+- npm package publishing infrastructure
+- GitHub Actions workflow for automated publishing
+- README with usage examples and documentation
+- CHANGELOG with version management guidelines
 
 ## [0.1.0] - 2025-01-01
 
