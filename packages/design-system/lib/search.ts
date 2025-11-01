@@ -1,3 +1,6 @@
+/**
+ * Search functionality for the Fidus Design System
+ */
 import FlexSearch from 'flexsearch';
 
 export interface SearchResult {
