@@ -11,7 +11,7 @@ import {
   getRecentSearches,
   clearRecentSearches,
   type SearchResult,
-} from '@/lib/search';
+} from '@/utils/search';
 
 export function SearchDialog({
   isOpen: externalIsOpen,
