@@ -236,25 +236,25 @@ export default function AIDrivenUIPage() {
       // Start hidden
       setLlmStep(-1);
 
-      // Show "thinking..." indicator IMMEDIATELY after user message appears (300ms)
-      setTimeout(() => setLlmStep(0), 300);
+      // Show "thinking..." indicator IMMEDIATELY after user message appears (200ms)
+      setTimeout(() => setLlmStep(0), 200);
 
-      // Then show steps (thinking indicator visible for 500ms before first step)
-      setTimeout(() => setLlmStep(1), 800);
-      setTimeout(() => setLlmStep(2), 1200);
-      setTimeout(() => setLlmStep(3), 1600);
-      setTimeout(() => setLlmStep(4), 2000);
-      setTimeout(() => setLlmStep(5), 2400);
+      // Then show steps faster (300ms between steps instead of 400ms)
+      setTimeout(() => setLlmStep(1), 500);
+      setTimeout(() => setLlmStep(2), 800);
+      setTimeout(() => setLlmStep(3), 1100);
+      setTimeout(() => setLlmStep(4), 1400);
+      setTimeout(() => setLlmStep(5), 1700);
     } else {
       // For cards: start thinking immediately with indicator
       setLlmStep(0);
 
-      // Thinking indicator visible for 500ms before first step
-      setTimeout(() => setLlmStep(1), 500);
-      setTimeout(() => setLlmStep(2), 900);
-      setTimeout(() => setLlmStep(3), 1300);
-      setTimeout(() => setLlmStep(4), 1700);
-      setTimeout(() => setLlmStep(5), 2100);
+      // Faster steps for card scenes (250ms between steps)
+      setTimeout(() => setLlmStep(1), 250);
+      setTimeout(() => setLlmStep(2), 500);
+      setTimeout(() => setLlmStep(3), 750);
+      setTimeout(() => setLlmStep(4), 1000);
+      setTimeout(() => setLlmStep(5), 1250);
     }
   }, [currentIndex, current.chat]);
 
@@ -290,10 +290,10 @@ export default function AIDrivenUIPage() {
                 // Show typing indicator before assistant responses
                 if (msg.type === 'assistant' && idx < messages.length) {
                   setTimeout(() => setShowTyping(true), 100);
-                  // LLM thinking time before showing assistant response
+                  // LLM thinking time before showing assistant response (faster)
                   setTimeout(() => {
                     setShowTyping(false);
-                  }, 2500);
+                  }, 1700);
                 }
 
                 // Check if this message has a booking-form widget - trigger field filling animation
@@ -323,7 +323,7 @@ export default function AIDrivenUIPage() {
               // Timing between messages:
               // - User message appears immediately
               // - Then typing indicator (100ms)
-              // - Then LLM thinks (2500ms)
+              // - Then LLM thinks (1700ms, faster)
               // - Then assistant response appears
               // - Then pause before next user message (1000ms)
               // - For booking forms, add extra time for field filling animation
@@ -335,7 +335,7 @@ export default function AIDrivenUIPage() {
               if (msg.type === 'user') {
                 currentDelay += 200; // Quick delay after user message
               } else {
-                currentDelay += 2800 + formFillingTime; // LLM thinking time + typing indicator + form filling
+                currentDelay += 2000 + formFillingTime; // LLM thinking time (1700ms) + typing indicator (100ms) + buffer (200ms) + form filling
               }
             });
           } else {
@@ -348,7 +348,7 @@ export default function AIDrivenUIPage() {
               setShowTyping(true);
             }, 200);
 
-            // 3. LLM thinks for ~2500ms (300ms + 2000ms steps + 200ms buffer)
+            // 3. LLM thinks for ~1700ms (faster animation)
             // 4. After LLM completes, hide typing and show response
             setTimeout(() => {
               setShowTyping(false);
@@ -358,7 +358,7 @@ export default function AIDrivenUIPage() {
               if ('widget' in nextScene.chat && nextScene.chat.widget) {
                 setTimeout(() => setShowWidget(true), 500);
               }
-            }, 2700); // Typing visible during entire LLM process
+            }, 1900); // Typing visible during entire LLM process
           }
         } else if (nextScene.card) {
           // For cards (Signal/Event), LLM thinking happens first
@@ -403,8 +403,8 @@ export default function AIDrivenUIPage() {
         </div>
       </div>
 
-      {/* Walkthrough: "Ein Morgen mit Fidus" */}
-      <h2 className="mb-md">A Morning with Fidus</h2>
+      {/* Walkthrough: "A Day with Fidus" */}
+      <h2 className="mb-md">A Day with Fidus</h2>
       <p className="lead mb-lg">
         Watch how the same AI assistant dynamically adapts its interface throughout the day based on context,
         user input, and real-time signals—without any fixed screens or predetermined flows.
@@ -1915,14 +1915,14 @@ Respond with structured JSON UI decision.`}
 
       <div className="not-prose mb-xl">
         <div className="grid grid-cols-1 gap-md">
-          {/* Example 1: Morning with Fidus */}
+          {/* Example 1: A Day with Fidus */}
           <div className="border-2 border-primary/20 rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-start gap-md">
               <div className="text-3xl">🌅</div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold mb-sm">1. A Morning with Fidus — Interactive Phone Demo</h3>
+                <h3 className="text-lg font-bold mb-sm">1. A Day with Fidus — Interactive Phone Demo</h3>
                 <p className="text-sm text-muted-foreground mb-md">
-                  Watch a realistic morning scenario where Fidus adapts its UI based on time, context, and user activity.
+                  Watch realistic scenarios throughout a day where Fidus adapts its UI based on time, context, and user activity.
                   The phone demo cycles through multiple scenarios automatically, showing budget queries, calendar conflicts,
                   travel bookings, and proactive suggestions—all rendered differently based on context.
                 </p>
