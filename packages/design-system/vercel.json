@@ -4,6 +4,7 @@
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "outputDirectory": ".next",
+  "ignoreCommand": "bash should-build.sh",
   "headers": [
     {
       "source": "/(.*)",
