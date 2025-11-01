@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default function OverviewPage() {
   return (
     <div className="max-w-4xl">
-      <div className="mb-8">
+      <div className="mb-4 md:mb-8">
         <h1 className="text-4xl font-bold mb-4">Fidus Design System</h1>
         <p className="text-xl text-gray-600">
           A privacy-first, AI-driven component library for building contextual user experiences
