@@ -26,10 +26,10 @@ export default function OpportunityCardPage() {
       description: 'Urgency level affecting border and header styling',
     },
     {
-      name: 'privacyBadge',
-      type: 'string',
+      name: 'privacyBadges',
+      type: 'Array<{ label: string; tooltip?: string }>',
       default: 'undefined',
-      description: 'Privacy indicator text (e.g., "🔒 Local")',
+      description: 'Privacy indicator badges with optional tooltips',
     },
     {
       name: 'onClose',
@@ -89,7 +89,7 @@ export default function OpportunityCardPage() {
   title="Budget Alert"
   icon={<DollarSign className="h-5 w-5" />}
   urgency="important"
-  privacyBadge="🔒 Local"
+  privacyBadges={[{ label: "🔒 Local" }]}
   onClose={() => console.log('Closed')}
   primaryAction={{
     label: 'View Transactions',
@@ -111,7 +111,7 @@ export default function OpportunityCardPage() {
           title="Budget Alert"
           icon={<DollarSign className="h-5 w-5" />}
           urgency="important"
-          privacyBadge="🔒 Local"
+          privacyBadges={[{ label: "🔒 Local" }]}
           onClose={() => console.log('Closed')}
           primaryAction={{
             label: 'View Transactions',
@@ -207,7 +207,7 @@ export default function OpportunityCardPage() {
   title="Calendar Conflict"
   icon={<Calendar className="h-5 w-5" />}
   urgency="urgent"
-  privacyBadge="🔒 Local"
+  privacyBadges={[{ label: "🔒 Local" }]}
   onClose={() => console.log('Closed')}
   primaryAction={{
     label: 'Reschedule One',
@@ -232,7 +232,7 @@ export default function OpportunityCardPage() {
           title="Calendar Conflict"
           icon={<Calendar className="h-5 w-5" />}
           urgency="urgent"
-          privacyBadge="🔒 Local"
+          privacyBadges={[{ label: "🔒 Local" }]}
           onClose={() => console.log('Closed')}
           primaryAction={{
             label: 'Reschedule One',
@@ -260,7 +260,7 @@ export default function OpportunityCardPage() {
   title="Travel Reminder"
   icon={<Plane className="h-5 w-5" />}
   urgency="important"
-  privacyBadge="🔒 Local"
+  privacyBadges={[{ label: "🔒 Local" }]}
   onClose={() => console.log('Closed')}
   primaryAction={{
     label: 'Find Hotel',
@@ -289,7 +289,7 @@ export default function OpportunityCardPage() {
           title="Travel Reminder"
           icon={<Plane className="h-5 w-5" />}
           urgency="important"
-          privacyBadge="🔒 Local"
+          privacyBadges={[{ label: "🔒 Local" }]}
           onClose={() => console.log('Closed')}
           primaryAction={{
             label: 'Find Hotel',
@@ -321,7 +321,7 @@ export default function OpportunityCardPage() {
   title="Budget Progress"
   icon={<DollarSign className="h-5 w-5" />}
   urgency="normal"
-  privacyBadge="🔒 Local"
+  privacyBadges={[{ label: "🔒 Local" }]}
   visual={
     <div className="w-full">
       <Stack direction="horizontal" justify="between" className="text-sm mb-sm">
@@ -342,7 +342,7 @@ export default function OpportunityCardPage() {
           title="Budget Progress"
           icon={<DollarSign className="h-5 w-5" />}
           urgency="normal"
-          privacyBadge="🔒 Local"
+          privacyBadges={[{ label: "🔒 Local" }]}
           visual={
             <div className="w-full">
               <Stack direction="horizontal" justify="between" className="text-sm mb-sm">
@@ -494,7 +494,7 @@ export default function OpportunityCardPage() {
   title="Budget Alert"
   icon={<DollarSign className="h-5 w-5" />}
   urgency="important"
-  privacyBadge="🔒 Local"
+  privacyBadges={[{ label: "🔒 Local" }]}
   onClose={() => {}}
   context="Month-end approaching, spending high"
   primaryAction={{ label: 'View', onClick: () => {} }}
@@ -506,7 +506,7 @@ export default function OpportunityCardPage() {
                 title="Budget Alert"
                 icon={<DollarSign className="h-5 w-5" />}
                 urgency="important"
-                privacyBadge="🔒 Local"
+                privacyBadges={[{ label: "🔒 Local" }]}
                 onClose={() => {}}
                 context="Month-end approaching, spending high"
                 primaryAction={{ label: 'View', onClick: () => {} }}

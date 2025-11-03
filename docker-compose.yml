@@ -60,6 +60,43 @@ services:
       retries: 5
 
   # =============================================================================
+  # LLM Services
+  # =============================================================================
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: fidus-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: fidus-litellm
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    depends_on:
+      ollama:
+        condition: service_healthy
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # =============================================================================
   # Application Services
   # =============================================================================
 
@@ -81,6 +118,8 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEFAULT_LLM_PROVIDER: anthropic
+      LITELLM_URL: http://litellm:4000
+      OLLAMA_URL: http://ollama:11434
 
       # Security (CHANGE IN PRODUCTION!)
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -104,6 +143,10 @@ services:
       redis:
         condition: service_healthy
       neo4j:
+        condition: service_healthy
+      litellm:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
@@ -180,6 +223,8 @@ volumes:
   neo4j_data:
     driver: local
   neo4j_logs:
+    driver: local
+  ollama_data:
     driver: local
   api_uploads:
     driver: local
