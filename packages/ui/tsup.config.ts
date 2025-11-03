@@ -7,7 +7,12 @@ export default defineConfig({
   splitting: false, // Disable code splitting to avoid module resolution issues
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom'],
+  external: [
+    'react',
+    'react-dom',
+    'react-markdown',
+    'remark-gfm',
+  ],
   bundle: true, // Explicitly bundle all non-external dependencies
   esbuildOptions(options) {
     options.banner = {
