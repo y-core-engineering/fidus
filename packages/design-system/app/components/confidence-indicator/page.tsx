@@ -1,10 +1,9 @@
 'use client';
 
-import { ConfidenceIndicator, ChatInterface, Link, Stack, type Message } from '@fidus/ui';
+import { ConfidenceIndicator, MessageBubble, Link, Stack, type Message } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Check, X } from 'lucide-react';
-import { useState } from 'react';
 
 export default function ConfidenceIndicatorPage() {
   const props = [
@@ -43,106 +42,55 @@ export default function ConfidenceIndicatorPage() {
     },
   ];
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Hello! How can I help you today?',
-      timestamp: new Date(Date.now() - 600000),
-      avatar: { fallback: 'AI' },
-    },
-  ]);
+  const highConfidenceMessage: Message = {
+    id: '1',
+    role: 'assistant',
+    content: "I noticed you mentioned a coffee preference! I'll remember that for you.",
+    timestamp: new Date(),
+    avatar: { fallback: 'AI' },
+    suggestions: [
+      {
+        id: 'sug-1',
+        text: 'cappuccino',
+        confidence: 0.92,
+        onAccept: () => console.log('Accepted'),
+        onReject: () => console.log('Rejected'),
+      },
+    ],
+  };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const mediumConfidenceMessage: Message = {
+    id: '2',
+    role: 'assistant',
+    content: "Based on our conversation, I think you might prefer tea.",
+    timestamp: new Date(),
+    avatar: { fallback: 'AI' },
+    suggestions: [
+      {
+        id: 'sug-2',
+        text: 'green tea',
+        confidence: 0.68,
+        onAccept: () => console.log('Accepted'),
+        onReject: () => console.log('Rejected'),
+      },
+    ],
+  };
 
-  const handleSendMessage = async (content: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content,
-      timestamp: new Date(),
-      avatar: { fallback: 'You' },
-    };
-
-    setMessages(prev => [...prev, newMessage]);
-    setIsLoading(true);
-
-    // Simulate AI response with suggestions based on keywords
-    setTimeout(() => {
-      const lowerContent = content.toLowerCase();
-      const hasCoffeePreference = lowerContent.includes('cappuccino') || lowerContent.includes('coffee');
-      const hasTeaPreference = lowerContent.includes('tea') || lowerContent.includes('green tea');
-
-      let suggestions = undefined;
-      let responseText = 'I understand. Let me help you with that.';
-
-      if (hasCoffeePreference) {
-        responseText = "I noticed you mentioned a coffee preference! Would you like me to remember this?";
-        suggestions = [
-          {
-            id: 'sug-1',
-            text: 'cappuccino',
-            confidence: 0.92,
-            onAccept: () => {
-              setMessages(prev => [...prev, {
-                id: (Date.now() + 2).toString(),
-                role: 'assistant',
-                content: 'Great! I saved your cappuccino preference with 92% confidence.',
-                timestamp: new Date(),
-                avatar: { fallback: 'AI' },
-              }]);
-            },
-            onReject: () => {
-              setMessages(prev => [...prev, {
-                id: (Date.now() + 2).toString(),
-                role: 'assistant',
-                content: "No problem, I won't save that preference.",
-                timestamp: new Date(),
-                avatar: { fallback: 'AI' },
-              }]);
-            },
-          },
-        ];
-      } else if (hasTeaPreference) {
-        responseText = "I think you might prefer tea. Should I remember this?";
-        suggestions = [
-          {
-            id: 'sug-2',
-            text: 'green tea',
-            confidence: 0.68,
-            onAccept: () => {
-              setMessages(prev => [...prev, {
-                id: (Date.now() + 2).toString(),
-                role: 'assistant',
-                content: 'Saved your green tea preference with 68% confidence.',
-                timestamp: new Date(),
-                avatar: { fallback: 'AI' },
-              }]);
-            },
-            onReject: () => {
-              setMessages(prev => [...prev, {
-                id: (Date.now() + 2).toString(),
-                role: 'assistant',
-                content: "Understood, I won't save that.",
-                timestamp: new Date(),
-                avatar: { fallback: 'AI' },
-              }]);
-            },
-          },
-        ];
-      }
-
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: responseText,
-        timestamp: new Date(),
-        avatar: { fallback: 'AI' },
-        suggestions,
-      };
-      setMessages(prev => [...prev, aiResponse]);
-      setIsLoading(false);
-    }, 1000);
+  const lowConfidenceMessage: Message = {
+    id: '3',
+    role: 'assistant',
+    content: "I'm not quite sure about your breakfast preference yet.",
+    timestamp: new Date(),
+    avatar: { fallback: 'AI' },
+    suggestions: [
+      {
+        id: 'sug-3',
+        text: 'croissant',
+        confidence: 0.42,
+        onAccept: () => console.log('Accepted'),
+        onReject: () => console.log('Rejected'),
+      },
+    ],
   };
 
   return (
@@ -152,76 +100,76 @@ export default function ConfidenceIndicatorPage() {
         Visual display of ML confidence scores with color-coded badges and progress bars. Shows how certain the AI is about its predictions.
       </p>
 
-      <h2>In Context: Chat with AI Suggestions</h2>
+      <h2>In Context: Chat Messages with Suggestions</h2>
       <p>
-        The ConfidenceIndicator is most commonly used within chat interfaces to show AI confidence in detected preferences.
-        Try mentioning "cappuccino" (high confidence) or "tea" (medium confidence) in the chat below:
+        The ConfidenceIndicator is most commonly used within suggestion chips in chat messages. Each suggestion shows a confidence badge indicating how certain the AI is about the detected preference.
       </p>
 
+      <h3>High Confidence (92% - Green)</h3>
       <ComponentPreview
-        code={`import { ChatInterface, type Message } from '@fidus/ui';
-
-const [messages, setMessages] = useState<Message[]>([]);
-
-const handleSend = async (content: string) => {
-  const userMessage: Message = {
-    id: Date.now().toString(),
-    role: 'user',
-    content,
-    timestamp: new Date(),
-    avatar: { fallback: 'You' }
-  };
-
-  setMessages(prev => [...prev, userMessage]);
-
-  // AI analyzes message and returns suggestion with confidence
-  const aiResponse: Message = {
-    id: (Date.now() + 1).toString(),
-    role: 'assistant',
-    content: "I noticed a preference!",
-    timestamp: new Date(),
-    avatar: { fallback: 'AI' },
-    suggestions: [{
-      id: 'sug-1',
-      text: 'cappuccino',
-      confidence: 0.92, // ConfidenceIndicator shows 92% in green
-      onAccept: () => console.log('Saved!'),
-      onReject: () => console.log('Dismissed')
-    }]
-  };
-
-  setMessages(prev => [...prev, aiResponse]);
-};
-
-<ChatInterface
-  messages={messages}
-  onSendMessage={handleSend}
-  placeholder="Try: I love cappuccino..."
+        code={`<MessageBubble
+  id="1"
+  role="assistant"
+  content="I noticed you mentioned a coffee preference!"
+  timestamp={new Date()}
+  avatar={{ fallback: 'AI' }}
+  suggestions={[{
+    id: 'sug-1',
+    text: 'cappuccino',
+    confidence: 0.92, // Shows green badge
+    onAccept: () => console.log('Accepted'),
+    onReject: () => console.log('Rejected')
+  }]}
 />`}
       >
-        <div className="max-w-2xl">
-          <ChatInterface
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading}
-            placeholder="Try typing: I love cappuccino..."
-          />
+        <div className="max-w-lg">
+          <MessageBubble {...highConfidenceMessage} />
         </div>
       </ComponentPreview>
 
-      <p className="text-sm text-muted-foreground mt-md">
-        Notice how the confidence score changes the color of the indicator:
-      </p>
-      <ul className="text-sm text-muted-foreground space-y-sm">
-        <li className="flex gap-sm">
-          <span className="shrink-0">•</span>
-          <span><strong>"cappuccino"</strong> → 92% confidence → <strong className="text-success">Green badge</strong> (Very Confident)</span>
-        </li>
-        <li className="flex gap-sm">
-          <span className="shrink-0">•</span>
-          <span><strong>"tea"</strong> → 68% confidence → <strong className="text-info">Blue badge</strong> (Confident)</span>
-        </li>
-      </ul>
+      <h3>Medium Confidence (68% - Blue)</h3>
+      <ComponentPreview
+        code={`<MessageBubble
+  id="2"
+  role="assistant"
+  content="Based on our conversation, I think you might prefer tea."
+  timestamp={new Date()}
+  avatar={{ fallback: 'AI' }}
+  suggestions={[{
+    id: 'sug-2',
+    text: 'green tea',
+    confidence: 0.68, // Shows blue badge
+    onAccept: () => console.log('Accepted'),
+    onReject: () => console.log('Rejected')
+  }]}
+/>`}
+      >
+        <div className="max-w-lg">
+          <MessageBubble {...mediumConfidenceMessage} />
+        </div>
+      </ComponentPreview>
+
+      <h3>Low Confidence (42% - Yellow)</h3>
+      <ComponentPreview
+        code={`<MessageBubble
+  id="3"
+  role="assistant"
+  content="I'm not quite sure about your breakfast preference yet."
+  timestamp={new Date()}
+  avatar={{ fallback: 'AI' }}
+  suggestions={[{
+    id: 'sug-3',
+    text: 'croissant',
+    confidence: 0.42, // Shows yellow badge
+    onAccept: () => console.log('Accepted'),
+    onReject: () => console.log('Rejected')
+  }]}
+/>`}
+      >
+        <div className="max-w-lg">
+          <MessageBubble {...lowConfidenceMessage} />
+        </div>
+      </ComponentPreview>
 
       <h2>Variants</h2>
 
