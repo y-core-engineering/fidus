@@ -5,13 +5,17 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
 import { z } from 'zod';
 import { X } from 'lucide-react';
+import { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '../tooltip/tooltip';
 
 // Zod schema for props validation
 export const OpportunityCardPropsSchema = z.object({
   title: z.string(),
   icon: z.any().optional(),
   urgency: z.enum(['urgent', 'important', 'normal', 'low']).default('normal').optional(),
-  privacyBadge: z.string().optional(),
+  privacyBadges: z.array(z.object({
+    label: z.string(),
+    tooltip: z.string().optional(),
+  })).optional(),
   onClose: z.function().args().returns(z.void()).optional(),
   onDismiss: z.function().args().returns(z.void()).optional(),
   visual: z.any().optional(),
@@ -68,7 +72,7 @@ export const OpportunityCard = React.forwardRef<HTMLDivElement, OpportunityCardP
       title,
       icon,
       urgency = 'normal',
-      privacyBadge,
+      privacyBadges,
       onClose,
       onDismiss,
       visual,
@@ -155,10 +159,29 @@ export const OpportunityCard = React.forwardRef<HTMLDivElement, OpportunityCardP
         <div className={cn(headerVariants({ urgency }))}>
           {icon && <span className="flex-shrink-0">{icon}</span>}
           <h3 className="flex-1 text-sm font-semibold text-foreground">{title}</h3>
-          {privacyBadge && (
-            <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
-              {privacyBadge}
-            </span>
+          {privacyBadges && privacyBadges.length > 0 && (
+            <div className="flex items-center gap-1">
+              {privacyBadges.map((badge, index) => (
+                badge.tooltip ? (
+                  <TooltipProvider key={index}>
+                    <TooltipRoot delayDuration={200}>
+                      <TooltipTrigger asChild>
+                        <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded cursor-help">
+                          {badge.label}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" showArrow={true}>
+                        {badge.tooltip}
+                      </TooltipContent>
+                    </TooltipRoot>
+                  </TooltipProvider>
+                ) : (
+                  <span key={index} className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
+                    {badge.label}
+                  </span>
+                )
+              ))}
+            </div>
           )}
           {onClose && (
             <button

@@ -9,6 +9,7 @@ import { EmptyCard } from '../empty-card';
 import { Stack } from '../stack';
 import { cn } from '../../lib/cn';
 import { MessageCircle } from 'lucide-react';
+import { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '../tooltip/tooltip';
 
 export const ChatInterfacePropsSchema = z.object({
   messages: z.array(z.custom<Message>()),
@@ -21,7 +22,12 @@ export const ChatInterfacePropsSchema = z.object({
   maxHeight: z.string().optional(),
   emptyStateTitle: z.string().optional(),
   emptyStateMessage: z.string().optional(),
+  privacyBadges: z.array(z.object({
+    label: z.string(),
+    tooltip: z.string().optional(),
+  })).optional(),
   className: z.string().optional(),
+  children: z.any().optional(),
 });
 
 export type ChatInterfaceProps = z.infer<typeof ChatInterfacePropsSchema>;
@@ -64,7 +70,9 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
       maxHeight = '600px',
       emptyStateTitle = 'Start chatting',
       emptyStateMessage = 'Type a message below to start teaching Fidus Memory about your preferences.',
+      privacyBadges,
       className,
+      children,
     },
     ref
   ) => {
@@ -73,10 +81,19 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-    // Auto-scroll to bottom when new messages arrive
+    // Focus input field on mount
+    React.useEffect(() => {
+      textareaRef.current?.focus();
+    }, []);
+
+    // Auto-scroll to bottom when new messages arrive and refocus input
     React.useEffect(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isLoading]);
+      // Refocus input after scrolling
+      if (!isLoading && !isSending) {
+        textareaRef.current?.focus();
+      }
+    }, [messages, isLoading, isSending]);
 
     const handleSend = React.useCallback(async () => {
       const trimmedValue = inputValue.trim();
@@ -168,6 +185,9 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
                 </Stack>
               )}
 
+              {/* Children (e.g., OpportunityCards) */}
+              {children}
+
               {/* Scroll anchor */}
               <div ref={messagesEndRef} />
             </>
@@ -194,7 +214,31 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
             aria-label="Message input"
           />
 
-          <Stack direction="horizontal" justify="end">
+          <Stack direction="horizontal" justify="between" align="center">
+            {privacyBadges && privacyBadges.length > 0 && (
+              <div className="flex items-center gap-1">
+                {privacyBadges.map((badge, index) => (
+                  badge.tooltip ? (
+                    <TooltipProvider key={index}>
+                      <TooltipRoot delayDuration={200}>
+                        <TooltipTrigger asChild>
+                          <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded cursor-help">
+                            {badge.label}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" showArrow={true}>
+                          {badge.tooltip}
+                        </TooltipContent>
+                      </TooltipRoot>
+                    </TooltipProvider>
+                  ) : (
+                    <span key={index} className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
+                      {badge.label}
+                    </span>
+                  )
+                ))}
+              </div>
+            )}
             <Button
               onClick={handleSend}
               disabled={isSendButtonDisabled}
