@@ -1,9 +1,10 @@
 'use client';
 
-import { MessageBubble, Link, Stack, type Message } from '@fidus/ui';
+import { MessageBubble, ChatInterface, Link, Stack, type Message } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Check, X } from 'lucide-react';
+import { useState } from 'react';
 
 export default function MessageBubblePage() {
   const props = [
@@ -91,12 +92,134 @@ export default function MessageBubblePage() {
     ],
   };
 
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: 'Hello! How can I help you today?',
+      timestamp: new Date(Date.now() - 600000),
+      avatar: { fallback: 'AI' },
+    },
+  ]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSendMessage = async (content: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content,
+      timestamp: new Date(),
+      avatar: { fallback: 'You' },
+    };
+
+    setMessages(prev => [...prev, newMessage]);
+    setIsLoading(true);
+
+    // Simulate AI response with suggestions if preference detected
+    setTimeout(() => {
+      const lowerContent = content.toLowerCase();
+      const hasCoffeePreference = lowerContent.includes('cappuccino') || lowerContent.includes('coffee');
+
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: hasCoffeePreference
+          ? "I noticed you mentioned a coffee preference! I'll remember that for you."
+          : 'I understand. Let me help you with that.',
+        timestamp: new Date(),
+        avatar: { fallback: 'AI' },
+        suggestions: hasCoffeePreference ? [
+          {
+            id: 'sug-1',
+            text: 'cappuccino',
+            confidence: 0.85,
+            onAccept: () => {
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 2).toString(),
+                role: 'assistant',
+                content: 'Great! I saved your cappuccino preference.',
+                timestamp: new Date(),
+                avatar: { fallback: 'AI' },
+              }]);
+            },
+            onReject: () => {
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 2).toString(),
+                role: 'assistant',
+                content: "No problem, I won't save that preference.",
+                timestamp: new Date(),
+                avatar: { fallback: 'AI' },
+              }]);
+            },
+          },
+        ] : undefined,
+      };
+      setMessages(prev => [...prev, aiResponse]);
+      setIsLoading(false);
+    }, 1000);
+  };
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <h1>Message Bubble</h1>
       <p className="lead">
         A chat message component with role-based alignment, avatar, timestamp, and optional AI suggestion chips for learning user preferences.
       </p>
+
+      <h2>Interactive Chat Example</h2>
+      <p>Try mentioning "cappuccino" or "coffee" in your message to see AI suggestions with confidence indicators:</p>
+
+      <ComponentPreview
+        code={`import { ChatInterface, type Message } from '@fidus/ui';
+
+const [messages, setMessages] = useState<Message[]>([]);
+
+const handleSend = async (content: string) => {
+  const userMessage: Message = {
+    id: Date.now().toString(),
+    role: 'user',
+    content,
+    timestamp: new Date(),
+    avatar: { fallback: 'You' }
+  };
+
+  setMessages(prev => [...prev, userMessage]);
+
+  // AI response with suggestions
+  const aiResponse: Message = {
+    id: (Date.now() + 1).toString(),
+    role: 'assistant',
+    content: "I noticed a preference!",
+    timestamp: new Date(),
+    avatar: { fallback: 'AI' },
+    suggestions: [{
+      id: 'sug-1',
+      text: 'cappuccino',
+      confidence: 0.85,
+      onAccept: () => console.log('Saved!'),
+      onReject: () => console.log('Dismissed')
+    }]
+  };
+
+  setMessages(prev => [...prev, aiResponse]);
+};
+
+<ChatInterface
+  messages={messages}
+  onSendMessage={handleSend}
+  placeholder="Try: I love cappuccino..."
+/>`}
+      >
+        <div className="max-w-2xl">
+          <ChatInterface
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            placeholder="Try typing: I love cappuccino..."
+          />
+        </div>
+      </ComponentPreview>
 
       <h2>Roles</h2>
       <p>Messages are aligned based on their role: user messages on the right, assistant messages on the left.</p>
@@ -131,9 +254,9 @@ export default function MessageBubblePage() {
         </div>
       </ComponentPreview>
 
-      <h2>Suggestions</h2>
+      <h2>Suggestions with Confidence Indicators</h2>
       <p>
-        Assistant messages can include suggestion chips with confidence scores. Users can accept or reject these suggestions to help the AI learn their preferences.
+        Assistant messages can include suggestion chips with confidence scores. Each suggestion displays a <strong>ConfidenceIndicator</strong> showing how certain the AI is about the detected preference. Users can accept or reject these suggestions to help the AI learn their preferences.
       </p>
 
       <ComponentPreview
@@ -146,7 +269,14 @@ export default function MessageBubblePage() {
     {
       id: 'sug-1',
       text: 'cappuccino',
-      confidence: 0.85,
+      confidence: 0.85, // 85% confidence → "Very Confident" (green)
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected'),
+    },
+    {
+      id: 'sug-2',
+      text: 'morning',
+      confidence: 0.72, // 72% confidence → "Confident" (blue)
       onAccept: () => console.log('Accepted'),
       onReject: () => console.log('Rejected'),
     },
@@ -157,6 +287,28 @@ export default function MessageBubblePage() {
           <MessageBubble {...messageWithSuggestions} />
         </div>
       </ComponentPreview>
+
+      <p className="text-sm text-muted-foreground mt-md">
+        The ConfidenceIndicator inside each suggestion chip uses color-coded badges:
+      </p>
+      <ul className="text-sm text-muted-foreground space-y-sm">
+        <li className="flex gap-sm">
+          <span className="shrink-0">•</span>
+          <span><strong className="text-success">0.8 - 1.0 (Green)</strong>: Very Confident - AI is highly certain about this preference</span>
+        </li>
+        <li className="flex gap-sm">
+          <span className="shrink-0">•</span>
+          <span><strong className="text-info">0.5 - 0.8 (Blue)</strong>: Confident - AI is fairly certain</span>
+        </li>
+        <li className="flex gap-sm">
+          <span className="shrink-0">•</span>
+          <span><strong className="text-warning">0.3 - 0.5 (Yellow)</strong>: Learning - AI is still gathering information</span>
+        </li>
+        <li className="flex gap-sm">
+          <span className="shrink-0">•</span>
+          <span><strong className="text-muted-foreground">0.0 - 0.3 (Gray)</strong>: Uncertain - AI needs more context</span>
+        </li>
+      </ul>
 
       <h2>Props</h2>
       <PropsTable props={props} />
@@ -279,7 +431,7 @@ export default function MessageBubblePage() {
       </div>
 
       <h2>Related Components</h2>
-      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-3 gap-md my-lg">
+      <div className="not-prose grid sm:grid-cols-2 lg:grid-cols-4 gap-md my-lg">
         <Link
           href="/components/chat-interface"
           className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
@@ -288,7 +440,19 @@ export default function MessageBubblePage() {
             Chat Interface
           </h3>
           <p className="text-sm text-muted-foreground">
-            Complete chat layout with message list and input
+            Complete chat layout using MessageBubble
+          </p>
+        </Link>
+
+        <Link
+          href="/components/confidence-indicator"
+          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
+        >
+          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
+            Confidence Indicator
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            ML confidence scores in suggestions
           </p>
         </Link>
 
@@ -311,18 +475,6 @@ export default function MessageBubblePage() {
           </h3>
           <p className="text-sm text-muted-foreground">
             Tag component used for suggestions
-          </p>
-        </Link>
-
-        <Link
-          href="/components/confidence-indicator"
-          className="group block p-md border border-border rounded-lg hover:border-primary hover:shadow-md transition-colors duration-normal no-underline"
-        >
-          <h3 className="font-semibold mb-xs group-hover:text-primary transition-colors duration-normal">
-            Confidence Indicator
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Visual ML confidence score display
           </p>
         </Link>
       </div>

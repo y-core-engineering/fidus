@@ -87,14 +87,44 @@ export default function ChatInterfacePage() {
     setMessages(prev => [...prev, newMessage]);
     setIsLoading(true);
 
-    // Simulate AI response
+    // Simulate AI response with suggestions if preference detected
     setTimeout(() => {
+      const lowerContent = content.toLowerCase();
+      const hasCoffeePreference = lowerContent.includes('cappuccino') || lowerContent.includes('coffee');
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I understand. Let me help you with that.',
+        content: hasCoffeePreference
+          ? "I noticed you mentioned a coffee preference! I'll remember that for you."
+          : 'I understand. Let me help you with that.',
         timestamp: new Date(),
         avatar: { fallback: 'AI' },
+        suggestions: hasCoffeePreference ? [
+          {
+            id: 'sug-1',
+            text: 'cappuccino',
+            confidence: 0.85,
+            onAccept: () => {
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 2).toString(),
+                role: 'assistant',
+                content: 'Great! I saved your cappuccino preference.',
+                timestamp: new Date(),
+                avatar: { fallback: 'AI' },
+              }]);
+            },
+            onReject: () => {
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 2).toString(),
+                role: 'assistant',
+                content: 'No problem, I won\'t save that preference.',
+                timestamp: new Date(),
+                avatar: { fallback: 'AI' },
+              }]);
+            },
+          },
+        ] : undefined,
       };
       setMessages(prev => [...prev, aiResponse]);
       setIsLoading(false);
