@@ -248,6 +248,9 @@ importers:
       '@fidus/shared':
         specifier: workspace:*
         version: link:../shared
+      '@fidus/ui':
+        specifier: workspace:*
+        version: link:../ui
       axios:
         specifier: ^1.6.0
         version: 1.13.0
