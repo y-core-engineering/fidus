@@ -310,78 +310,22 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
       </div>
 
       <h2>Sizes</h2>
-      <p>The ConfidenceIndicator supports three sizes. The default size is 'md', which works well in most contexts:</p>
+      <p>The ConfidenceIndicator supports three sizes when used as a standalone component (not within MessageBubble suggestions):</p>
 
       <ComponentPreview
-        code={`<MessageBubble
-  id="msg-sizes"
-  role="assistant"
-  content="Different confidence indicator sizes in suggestions:"
-  timestamp={new Date()}
-  avatar={{ fallback: 'AI' }}
-  suggestions={[
-    {
-      id: 'sug-sm',
-      text: 'small badge',
-      confidence: 0.85,
-      size: 'sm',
-      onAccept: () => console.log('Accepted'),
-      onReject: () => console.log('Rejected')
-    },
-    {
-      id: 'sug-md',
-      text: 'medium badge (default)',
-      confidence: 0.85,
-      size: 'md',
-      onAccept: () => console.log('Accepted'),
-      onReject: () => console.log('Rejected')
-    },
-    {
-      id: 'sug-lg',
-      text: 'large badge',
-      confidence: 0.85,
-      size: 'lg',
-      onAccept: () => console.log('Accepted'),
-      onReject: () => console.log('Rejected')
-    }
-  ]}
-/>`}
+        code={`import { ConfidenceIndicator, Stack } from '@fidus/ui';
+
+<Stack direction="horizontal" spacing="md" align="center">
+  <ConfidenceIndicator confidence={0.85} size="sm" />
+  <ConfidenceIndicator confidence={0.85} size="md" />
+  <ConfidenceIndicator confidence={0.85} size="lg" />
+</Stack>`}
       >
-        <div className="max-w-lg">
-          <MessageBubble
-            id="msg-sizes"
-            role="assistant"
-            content="Different confidence indicator sizes in suggestions:"
-            timestamp={new Date()}
-            avatar={{ fallback: 'AI' }}
-            suggestions={[
-              {
-                id: 'sug-sm',
-                text: 'small badge',
-                confidence: 0.85,
-                size: 'sm',
-                onAccept: () => console.log('Accepted'),
-                onReject: () => console.log('Rejected'),
-              },
-              {
-                id: 'sug-md',
-                text: 'medium badge (default)',
-                confidence: 0.85,
-                size: 'md',
-                onAccept: () => console.log('Accepted'),
-                onReject: () => console.log('Rejected'),
-              },
-              {
-                id: 'sug-lg',
-                text: 'large badge',
-                confidence: 0.85,
-                size: 'lg',
-                onAccept: () => console.log('Accepted'),
-                onReject: () => console.log('Rejected'),
-              },
-            ]}
-          />
-        </div>
+        <Stack direction="horizontal" spacing="md" align="center">
+          <ConfidenceIndicator confidence={0.85} size="sm" />
+          <ConfidenceIndicator confidence={0.85} size="md" />
+          <ConfidenceIndicator confidence={0.85} size="lg" />
+        </Stack>
       </ComponentPreview>
 
       <h2>Props</h2>
