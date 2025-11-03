@@ -47,7 +47,7 @@ export default function ConfidenceIndicatorPage() {
     role: 'assistant',
     content: "I noticed you mentioned a coffee preference! I'll remember that for you.",
     timestamp: new Date(),
-    avatar: { fallback: 'AI' },
+    avatar: { src: '/logo.svg', fallback: 'AI' },
     suggestions: [
       {
         id: 'sug-1',
@@ -64,7 +64,7 @@ export default function ConfidenceIndicatorPage() {
     role: 'assistant',
     content: "Based on our conversation, I think you might prefer tea.",
     timestamp: new Date(),
-    avatar: { fallback: 'AI' },
+    avatar: { src: '/logo.svg', fallback: 'AI' },
     suggestions: [
       {
         id: 'sug-2',
@@ -81,7 +81,7 @@ export default function ConfidenceIndicatorPage() {
     role: 'assistant',
     content: "I'm not quite sure about your breakfast preference yet.",
     timestamp: new Date(),
-    avatar: { fallback: 'AI' },
+    avatar: { src: '/logo.svg', fallback: 'AI' },
     suggestions: [
       {
         id: 'sug-3',

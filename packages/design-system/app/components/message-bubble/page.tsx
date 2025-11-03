@@ -65,7 +65,7 @@ export default function MessageBubblePage() {
     role: 'assistant',
     content: "Got it! I'll remember that you prefer cappuccino in the morning.",
     timestamp: new Date(Date.now() - 240000), // 4 minutes ago
-    avatar: { fallback: 'AI' },
+    avatar: { src: '/logo.svg', fallback: 'AI' },
   };
 
   const messageWithSuggestions: Message = {
@@ -73,7 +73,7 @@ export default function MessageBubblePage() {
     role: 'assistant',
     content: 'Based on our conversation, I noticed some preferences.',
     timestamp: new Date(Date.now() - 60000), // 1 minute ago
-    avatar: { fallback: 'AI' },
+    avatar: { src: '/logo.svg', fallback: 'AI' },
     suggestions: [
       {
         id: 'sug-1',
@@ -98,7 +98,7 @@ export default function MessageBubblePage() {
       role: 'assistant',
       content: 'Hello! How can I help you today?',
       timestamp: new Date(Date.now() - 600000),
-      avatar: { fallback: 'AI' },
+      avatar: { src: '/logo.svg', fallback: 'AI' },
     },
   ]);
 
@@ -128,7 +128,7 @@ export default function MessageBubblePage() {
           ? "I noticed you mentioned a coffee preference! I'll remember that for you."
           : 'I understand. Let me help you with that.',
         timestamp: new Date(),
-        avatar: { fallback: 'AI' },
+        avatar: { src: '/logo.svg', fallback: 'AI' },
         suggestions: hasCoffeePreference ? [
           {
             id: 'sug-1',
@@ -140,7 +140,7 @@ export default function MessageBubblePage() {
                 role: 'assistant',
                 content: 'Great! I saved your cappuccino preference.',
                 timestamp: new Date(),
-                avatar: { fallback: 'AI' },
+                avatar: { src: '/logo.svg', fallback: 'AI' },
               }]);
             },
             onReject: () => {
@@ -149,7 +149,7 @@ export default function MessageBubblePage() {
                 role: 'assistant',
                 content: "No problem, I won't save that preference.",
                 timestamp: new Date(),
-                avatar: { fallback: 'AI' },
+                avatar: { src: '/logo.svg', fallback: 'AI' },
               }]);
             },
           },
@@ -192,7 +192,7 @@ const handleSend = async (content: string) => {
     role: 'assistant',
     content: "I noticed a preference!",
     timestamp: new Date(),
-    avatar: { fallback: 'AI' },
+    avatar: { src: '/logo.svg', fallback: 'AI' },
     suggestions: [{
       id: 'sug-1',
       text: 'cappuccino',
