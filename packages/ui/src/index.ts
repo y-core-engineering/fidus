@@ -57,5 +57,10 @@ export * from './components/pagination';
 export * from './components/header';
 export * from './components/sidebar';
 
+// Chat Components
+export * from './components/message-bubble';
+export * from './components/chat-interface';
+export * from './components/confidence-indicator';
+
 // Utilities
 export { cn } from './lib/cn';

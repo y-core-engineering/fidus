@@ -145,6 +145,14 @@ function App() {
 | **Header** | Page header with logo and navigation |
 | **Sidebar** | Collapsible navigation sidebar |
 
+### Chat Components
+
+| Component | Description |
+|-----------|-------------|
+| **MessageBubble** | Individual chat message display with role-based alignment and suggestions |
+| **ChatInterface** | Complete chat layout with message list, input, and auto-scroll |
+| **ConfidenceIndicator** | Visual ML confidence score display with color-coded progress bars |
+
 ## Component Examples
 
 ### Button
@@ -211,6 +219,93 @@ const columns = [
 ];
 
 <Table data={data} columns={columns} />
+```
+
+### ChatInterface
+
+```tsx
+import { ChatInterface, type Message } from '@fidus/ui';
+
+function ChatDemo() {
+  const [messages, setMessages] = React.useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: 'Hello! How can I help you today?',
+      timestamp: new Date(),
+      avatar: { fallback: 'AI' }
+    }
+  ]);
+
+  const handleSend = async (content: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content,
+      timestamp: new Date(),
+      avatar: { fallback: 'U' }
+    };
+    setMessages(prev => [...prev, newMessage]);
+  };
+
+  return (
+    <ChatInterface
+      messages={messages}
+      onSendMessage={handleSend}
+      placeholder="Type your message..."
+    />
+  );
+}
+```
+
+### MessageBubble
+
+```tsx
+import { MessageBubble, type Message } from '@fidus/ui';
+
+const message: Message = {
+  id: '1',
+  role: 'assistant',
+  content: 'What would you like for dinner tonight?',
+  timestamp: new Date(),
+  avatar: { fallback: 'AI' },
+  suggestions: [
+    {
+      id: 's1',
+      text: 'Italian cuisine',
+      confidence: 0.85,
+      onAccept: () => console.log('Accepted Italian'),
+      onReject: () => console.log('Rejected Italian')
+    },
+    {
+      id: 's2',
+      text: 'Thai food',
+      confidence: 0.72,
+      onAccept: () => console.log('Accepted Thai'),
+      onReject: () => console.log('Rejected Thai')
+    }
+  ]
+};
+
+<MessageBubble {...message} />
+```
+
+### ConfidenceIndicator
+
+```tsx
+import { ConfidenceIndicator } from '@fidus/ui';
+
+// Minimal variant (badge only)
+<ConfidenceIndicator confidence={0.85} variant="minimal" />
+
+// Detailed variant (progress bar + badge + label)
+<ConfidenceIndicator confidence={0.65} variant="detailed" />
+
+// With custom size
+<ConfidenceIndicator confidence={0.45} size="lg" variant="detailed" />
+
+// Without tooltip
+<ConfidenceIndicator confidence={0.9} showTooltip={false} />
 ```
 
 ## Theming

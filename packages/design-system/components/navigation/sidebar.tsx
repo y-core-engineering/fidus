@@ -121,6 +121,14 @@ const navigation: NavItem[] = [
           { title: 'Sidebar', href: '/components/sidebar' },
         ],
       },
+      {
+        title: 'Chat',
+        items: [
+          { title: 'Message Bubble', href: '/components/message-bubble' },
+          { title: 'Chat Interface', href: '/components/chat-interface' },
+          { title: 'Confidence Indicator', href: '/components/confidence-indicator' },
+        ],
+      },
     ],
   },
   {
