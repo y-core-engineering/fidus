@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- cd64b2c: Add chat UI components for Fidus Memory
+  - Added ChatInterface component with message streaming support
+  - Added MessageBubble component with privacy badges and tooltips
+  - Enhanced OpportunityCard with privacy badges array support
+  - Fixed bundling configuration for react-markdown and remark-gfm
+
 ## 1.1.0
 
 ### Minor Changes
