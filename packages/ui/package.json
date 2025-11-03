@@ -65,6 +65,8 @@
     "date-fns": "^3.3.0",
     "lucide-react": "^0.468.0",
     "react-day-picker": "^9.11.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tsup": "^8.3.0",
     "typescript": "^5.6.3",
     "zod": "^3.23.8"
