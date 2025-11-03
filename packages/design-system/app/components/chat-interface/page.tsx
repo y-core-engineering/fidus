@@ -69,7 +69,7 @@ export default function ChatInterfacePage() {
       role: 'assistant',
       content: 'Hello! How can I help you today?',
       timestamp: new Date(Date.now() - 600000),
-      avatar: { fallback: 'AI' },
+      avatar: { src: '/logo.svg', fallback: 'AI' },
     },
   ]);
 
@@ -99,7 +99,7 @@ export default function ChatInterfacePage() {
           ? "I noticed you mentioned a coffee preference! I'll remember that for you."
           : 'I understand. Let me help you with that.',
         timestamp: new Date(),
-        avatar: { fallback: 'AI' },
+        avatar: { src: '/logo.svg', fallback: 'AI' },
         suggestions: hasCoffeePreference ? [
           {
             id: 'sug-1',
@@ -111,7 +111,7 @@ export default function ChatInterfacePage() {
                 role: 'assistant',
                 content: 'Great! I saved your cappuccino preference.',
                 timestamp: new Date(),
-                avatar: { fallback: 'AI' },
+                avatar: { src: '/logo.svg', fallback: 'AI' },
               }]);
             },
             onReject: () => {
@@ -120,7 +120,7 @@ export default function ChatInterfacePage() {
                 role: 'assistant',
                 content: 'No problem, I won\'t save that preference.',
                 timestamp: new Date(),
-                avatar: { fallback: 'AI' },
+                avatar: { src: '/logo.svg', fallback: 'AI' },
               }]);
             },
           },

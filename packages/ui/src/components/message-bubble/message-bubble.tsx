@@ -6,6 +6,7 @@ import { cva } from 'class-variance-authority';
 import { Avatar } from '../avatar';
 import { Chip } from '../chip';
 import { ConfidenceIndicator } from '../confidence-indicator';
+import { Stack } from '../stack';
 import { cn } from '../../lib/cn';
 
 /**
@@ -71,21 +72,6 @@ function formatRelativeTime(date: Date): string {
   return `${diffInDays}d ago`;
 }
 
-const messageBubbleVariants = cva(
-  'flex gap-2 w-full items-start',
-  {
-    variants: {
-      role: {
-        user: 'flex-row-reverse',
-        assistant: 'flex-row',
-      },
-    },
-    defaultVariants: {
-      role: 'assistant',
-    },
-  }
-);
-
 const messageTextVariants = cva(
   'p-3 rounded-lg max-w-[80%]',
   {
@@ -139,24 +125,24 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
     const defaultFallback = isUser ? 'You' : 'AI';
 
     return (
-      <div
+      <Stack
         ref={ref}
         data-testid={`message-bubble-${id}`}
-        className={cn(messageBubbleVariants({ role }), className)}
+        direction="horizontal"
+        spacing="sm"
+        align="start"
+        className={cn(isUser && 'flex-row-reverse', 'w-full', className)}
       >
-        {/* Avatar (only for assistant) */}
-        {!isUser && (
-          <div className="flex-shrink-0">
-            <Avatar
-              src={avatar?.src}
-              fallback={avatar?.fallback || defaultFallback}
-              size="sm"
-            />
-          </div>
-        )}
+        {/* Avatar */}
+        <Avatar
+          src={avatar?.src}
+          fallback={avatar?.fallback || defaultFallback}
+          size="sm"
+          className="flex-shrink-0"
+        />
 
         {/* Content Container */}
-        <div className="flex flex-col gap-1 min-w-0">
+        <Stack direction="vertical" spacing="xs" className="min-w-0">
           {/* Message Text */}
           <div className={messageTextVariants({ role })}>
             {content}
@@ -172,11 +158,13 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
 
           {/* Suggestions (only for assistant messages) */}
           {!isUser && suggestions && suggestions.length > 0 && (
-            <div className="flex flex-col gap-2 mt-1">
+            <Stack direction="vertical" spacing="sm" className="mt-1">
               {suggestions.map((suggestion) => (
-                <div
+                <Stack
                   key={suggestion.id}
-                  className="flex items-center gap-2"
+                  direction="horizontal"
+                  spacing="sm"
+                  align="center"
                 >
                   <Chip size="sm" variant="outlined" className="flex items-center gap-1.5">
                     <span>{suggestion.text}</span>
@@ -206,23 +194,12 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
                       ✗
                     </button>
                   )}
-                </div>
+                </Stack>
               ))}
-            </div>
+            </Stack>
           )}
-        </div>
-
-        {/* Avatar (only for user) */}
-        {isUser && (
-          <div className="flex-shrink-0">
-            <Avatar
-              src={avatar?.src}
-              fallback={avatar?.fallback || defaultFallback}
-              size="sm"
-            />
-          </div>
-        )}
-      </div>
+        </Stack>
+      </Stack>
     );
   }
 );

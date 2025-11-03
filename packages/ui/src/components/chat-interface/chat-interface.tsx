@@ -6,6 +6,7 @@ import { MessageBubble, type Message } from '../message-bubble';
 import { Button } from '../button';
 import { Spinner } from '../spinner';
 import { EmptyCard } from '../empty-card';
+import { Stack } from '../stack';
 import { cn } from '../../lib/cn';
 import { MessageCircle } from 'lucide-react';
 
@@ -120,17 +121,21 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
     const isSendButtonDisabled = isDisabled || !inputValue.trim();
 
     return (
-      <div
+      <Stack
         ref={ref}
+        direction="vertical"
+        spacing="none"
         className={cn(
-          'flex flex-col bg-background border border-border rounded-lg',
+          'bg-background border border-border rounded-lg',
           className
         )}
         data-testid="chat-interface"
       >
         {/* Message List */}
-        <div
-          className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 scroll-smooth"
+        <Stack
+          direction="vertical"
+          spacing="md"
+          className="flex-1 overflow-y-auto p-md scroll-smooth"
           style={{ maxHeight }}
           data-testid="message-list"
         >
@@ -151,20 +156,31 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
 
               {/* Loading Indicator */}
               {isLoading && (
-                <div className="flex items-center gap-2 text-muted-foreground" data-testid="loading-indicator">
+                <Stack
+                  direction="horizontal"
+                  spacing="sm"
+                  align="center"
+                  className="text-muted-foreground"
+                  data-testid="loading-indicator"
+                >
                   <Spinner size="sm" />
                   <span className="text-sm">Thinking...</span>
-                </div>
+                </Stack>
               )}
 
               {/* Scroll anchor */}
               <div ref={messagesEndRef} />
             </>
           )}
-        </div>
+        </Stack>
 
         {/* Input Area */}
-        <div className="border-t border-border p-4 flex flex-col gap-2" data-testid="input-area">
+        <Stack
+          direction="vertical"
+          spacing="sm"
+          className="border-t border-border p-md"
+          data-testid="input-area"
+        >
           <textarea
             ref={textareaRef}
             value={inputValue}
@@ -173,12 +189,12 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
             placeholder={placeholder}
             disabled={isDisabled}
             rows={3}
-            className="w-full p-3 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full p-md rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="message-input"
             aria-label="Message input"
           />
 
-          <div className="flex justify-end">
+          <Stack direction="horizontal" justify="end">
             <Button
               onClick={handleSend}
               disabled={isSendButtonDisabled}
@@ -189,9 +205,9 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
             >
               Send
             </Button>
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </Stack>
+      </Stack>
     );
   }
 );

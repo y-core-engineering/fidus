@@ -151,8 +151,13 @@ describe('MessageBubble', () => {
 
       render(<MessageBubble {...messageWithSuggestions} />);
 
-      expect(screen.getByText(/cappuccino \(80%\)/)).toBeInTheDocument();
-      expect(screen.getByText(/morning \(65%\)/)).toBeInTheDocument();
+      // Check suggestion text is rendered
+      expect(screen.getByText('cappuccino')).toBeInTheDocument();
+      expect(screen.getByText('morning')).toBeInTheDocument();
+
+      // Check confidence percentages are rendered
+      expect(screen.getByText('80%')).toBeInTheDocument();
+      expect(screen.getByText('65%')).toBeInTheDocument();
     });
 
     it('should not render suggestions for user messages', () => {
