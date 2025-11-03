@@ -110,3 +110,6 @@ temp/
 # Documentation build artifacts
 docs/_build/
 site/
+
+# Prompts (local only, not for repo)
+docs/prompts/
