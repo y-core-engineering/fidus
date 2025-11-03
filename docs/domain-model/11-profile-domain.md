@@ -1824,6 +1824,184 @@ Response:
 
 ---
 
+## Preference Learning Lifecycle
+
+**Version:** 2.0 (Situational Context)
+
+The Profile domain uses an **Intelligent Hybrid Learning Approach** with three distinct modes to balance response speed, learning quality, and system intelligence.
+
+### Learning Modes Overview
+
+The system learns preferences through three complementary modes:
+
+```mermaid
+graph TD
+    A[User Interaction] --> B{Learning Mode}
+    B -->|Explicit| C[Immediate Learning]
+    B -->|Implicit| D[Deferred Learning]
+    B -->|Pattern| E[Event-Triggered Learning]
+
+    C --> F[PreferenceRecordedInSituation]
+    D --> G[Background Analysis]
+    E --> H[Pattern Recognition]
+
+    style C fill:#c8e6c9
+    style D fill:#fff9c4
+    style E fill:#e3f2fd
+```
+
+### Mode 1: Immediate Learning (Synchronous)
+
+**Trigger:** Explicit preference statements
+**Timing:** During conversation (<200ms latency)
+**Confidence:** 0.75-0.9
+**Domain Event:** `PreferenceRecordedInSituation`
+
+**Examples of Explicit Preferences:**
+- "I always drink cappuccino in the morning"
+- "I never schedule meetings before 9 AM"
+- "I prefer budget alerts via email"
+
+**Domain Logic:**
+```typescript
+// Fast detection via regex patterns
+const EXPLICIT_PATTERNS = [
+  /\b(I always|I never|I prefer|I like|I love|I hate)\b/i,
+  /\b(immer|nie|bevorzuge|mag|liebe)\b/i,  // German
+  /\b(every time|whenever)\b/i,
+];
+
+// When detected, immediately store preference
+profile.recordPreferenceInSituation(
+  domain: "calendar",
+  key: "meeting.earliest_time",
+  value: "09:00",
+  situationFactors: { day_of_week: "weekday", location: "office" },
+  confidence: 0.85  // High confidence for explicit statement
+);
+```
+
+**Emitted Event:**
+```typescript
+PreferenceRecordedInSituation {
+  profileId: "profile-123",
+  domain: "calendar",
+  key: "meeting.earliest_time",
+  value: "09:00",
+  confidence: 0.85,
+  situationId: "situation-456",
+  situationFactors: { day_of_week: "weekday", location: "office" }
+}
+```
+
+### Mode 2: Deferred Learning (Asynchronous)
+
+**Trigger:** Conversation end (10min timeout or explicit "bye")
+**Timing:** Background job (user not waiting)
+**Confidence:** 0.5-0.7 (implicit preferences)
+**Domain Event:** `PreferenceRecordedInSituation`
+
+**Examples of Implicit Preferences:**
+- User mentions "I'm at the café" 3 times → learns `preferred_work_location: "café"`
+- User books budget hotels → learns `travel.accommodation_preference: "budget"`
+- User dismisses morning notifications → learns `notification.morning_time: false`
+
+**Domain Logic:**
+```typescript
+// Triggered by ConversationTracker after 10min inactivity
+async function analyzeConversation(profileId: string, conversationHistory: Message[]) {
+  const implicitPreferences = await llmAnalyze(conversationHistory);
+
+  for (const pref of implicitPreferences) {
+    profile.recordPreferenceInSituation(
+      pref.domain,
+      pref.key,
+      pref.value,
+      pref.situationFactors,
+      0.6  // Lower confidence for inferred preference
+    );
+  }
+}
+```
+
+### Mode 3: Pattern Recognition (Event-Triggered)
+
+**Triggers:**
+1. **Message Count:** Every 20 messages → quick pattern check
+2. **Context Change:** >50% different factors → deep LLM analysis
+3. **Confidence Drift:** 3+ rejections → re-validate preference
+
+**Examples:**
+- User orders cappuccino 5x between 7-10 AM → Create habit pattern
+- User behavior changes after moving to new office → Trigger re-analysis
+- Preference rejected 3x in new context → Lower confidence or delete
+
+**Domain Logic:**
+```typescript
+// Reinforcement (user accepted suggestion)
+profile.reinforcePreference(
+  domain: "finance",
+  key: "coffee.morning_drink",
+  situationId: "situation-789"
+);
+// → confidence: 0.75 → 0.85 (max 0.95)
+// → Emits: PreferenceReinforced
+
+// Weakening (user rejected suggestion)
+profile.weakenPreference(
+  domain: "finance",
+  key: "coffee.morning_drink",
+  situationId: "situation-789"
+);
+// → confidence: 0.75 → 0.60 (min 0.0)
+// → Emits: PreferenceWeakened
+// → If confidence < 0.3, consider deletion
+```
+
+### Confidence Score Evolution
+
+**Rules:**
+
+| Action | Confidence Change | Event |
+|--------|------------------|-------|
+| Explicit statement | Set to 0.75-0.9 | `PreferenceRecordedInSituation` |
+| Implicit inference | Set to 0.5-0.7 | `PreferenceRecordedInSituation` |
+| User accepts suggestion | +0.1 (max 0.95) | `PreferenceReinforced` |
+| User rejects suggestion | -0.15 (min 0.0) | `PreferenceWeakened` |
+| Pattern detected (5+ occurrences) | +0.2 | `PreferenceReinforced` |
+| Context mismatch | -0.1 | `PreferenceWeakened` |
+
+**Deletion Threshold:** If confidence drops below 0.3 after 3+ rejections, the preference is marked for deletion (emits `PreferenceRemoved`).
+
+### Domain Events for Learning
+
+**New in v2.0:**
+
+1. **PreferenceRecordedInSituation** (replaces `PreferenceSet` for context-aware learning)
+   - Emitted when preference is learned with situational context
+   - Payload: profileId, domain, key, value, confidence, situationId, situationFactors
+
+2. **PreferenceReinforced** (new)
+   - Emitted when user accepts suggestion (positive feedback)
+   - Payload: profileId, domain, key, situationId, newConfidence, reinforcementCount
+
+3. **PreferenceWeakened** (new)
+   - Emitted when user rejects suggestion (negative feedback)
+   - Payload: profileId, domain, key, situationId, newConfidence, rejectionCount
+
+4. **SituationCaptured** (new)
+   - Emitted when new situational context is captured
+   - Payload: profileId, situationId, factors, embeddingId
+
+### Cross-Reference
+
+For detailed implementation of learning strategy, see:
+- **Architecture:** [Situational Context Architecture - Learning Strategy](../architecture/08-situational-context-architecture.md#learning-strategy)
+- **Solution:** [Situational Context Solution - Learning Strategy Implementation](../solution-architecture/14-situational-context.md#learning-strategy-implementation)
+- **Prototype:** [Fidus Memory Implementation Plan](../prototypes/fidus-memory/implementation-plan.md)
+
+---
+
 ## Repository Interfaces
 
 ### ProfileRepository

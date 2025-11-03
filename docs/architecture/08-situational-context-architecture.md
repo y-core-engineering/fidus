@@ -227,6 +227,113 @@ Preference ←→ Context ←→ Embedding
 
 ---
 
+## Learning Strategy
+
+### When Does the System Learn?
+
+The system employs an **Intelligent Hybrid Learning Approach** with three distinct modes:
+
+#### Mode 1: Immediate Learning (Synchronous)
+
+```mermaid
+graph TD
+    A[User Message] --> B[Intent Detection<br/>less than 50ms]
+    B --> C{Explicit<br/>Preference?}
+    C -->|Yes| D[Learn Immediately<br/>less than 200ms]
+    C -->|No| E[Store in History]
+    D --> F[Response]
+    E --> F
+
+    style A fill:#e3f2fd
+    style D fill:#c8e6c9
+    style F fill:#fff9c4
+```
+
+**Trigger:** Explicit preference statements (e.g., "I always drink cappuccino in the morning")
+**Timing:** During conversation (<200ms latency)
+**Method:** Regex-based intent detection + lightweight LLM call
+**Confidence:** High (0.75-0.9)
+
+#### Mode 2: Deferred Learning (Asynchronous)
+
+```mermaid
+graph TD
+    A[Conversation Ends] --> B[Background Job]
+    B --> C[Analyze Conversation]
+    C --> D[Extract Implicit Preferences]
+    C --> E[Update Confidence Scores]
+    C --> F[Detect Patterns]
+    D --> G[Store]
+    E --> G
+    F --> G
+
+    style A fill:#e3f2fd
+    style B fill:#fff9c4
+    style G fill:#c8e6c9
+```
+
+**Trigger:** Conversation end (10min timeout or explicit "bye")
+**Timing:** Background job (user not waiting)
+**Method:** Full LLM analysis of entire conversation
+**Confidence:** Medium (0.5-0.7 for implicit preferences)
+
+#### Mode 3: Pattern Recognition (Event-Triggered)
+
+```mermaid
+graph TD
+    A[Every 20 Messages] --> D[Quick Check]
+    B[Context Change > 50%] --> E[Deep Analysis]
+    C[3+ Rejections] --> F[Revalidate]
+
+    D --> G[Lightweight Patterns]
+    E --> H[LLM Analysis]
+    F --> I[Keep, Modify, or Delete]
+
+    style A fill:#e3f2fd
+    style B fill:#e3f2fd
+    style C fill:#e3f2fd
+    style G fill:#c8e6c9
+    style H fill:#c8e6c9
+    style I fill:#c8e6c9
+```
+
+**Triggers:**
+1. **Message Count:** Every 20 messages → quick pattern check
+2. **Context Change:** >50% different factors → deep LLM analysis
+3. **Confidence Drift:** 3+ rejections → re-validate preference
+
+**Examples:**
+- User orders cappuccino 5x between 7-10 AM → Create habit
+- Preference rejected 3x in new context → Trigger re-evaluation
+- Monday behavior ≠ Sunday behavior → Discover day-of-week patterns
+
+### Learning Orchestration
+
+The system uses a **LearningOrchestrator** component that:
+
+1. **Explicit Detection** - Fast regex/heuristic check (<50ms)
+   - Patterns: "I always", "I prefer", "I like", "never"
+   - Languages: English, German
+
+2. **Background Jobs** - Redis Queue (RQ) for async processing
+   - `analyze_conversation` - After conversation ends
+   - `quick_pattern_check` - Every 20 messages
+   - `deep_pattern_analysis` - On context change
+   - `revalidate_preference` - On confidence drift
+
+3. **Conversation Tracking** - 10-minute timeout detection
+   - Updates last activity timestamp
+   - Detects explicit "bye" patterns
+   - Triggers background analysis on end
+
+**Design Principles:**
+- **Fast Response:** User never waits for learning
+- **Smart Triggers:** Learn when it matters most
+- **Confidence Evolution:** Scores adjust based on feedback
+- **Context-Aware:** Different learning for different situations
+
+---
+
 ## Context-Aware Preference Retrieval
 
 ### Basic Flow

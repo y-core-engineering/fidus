@@ -882,12 +882,296 @@ logger.info(
 
 ---
 
+## Learning Strategy Implementation
+
+### When Does Learning Occur?
+
+The system uses three distinct learning modes optimized for different scenarios:
+
+#### 1. Immediate Learning (Synchronous)
+
+**Implementation:**
+
+```python
+# packages/api/fidus/memory/learning_orchestrator.py
+
+import re
+from typing import Dict, Any
+
+class LearningOrchestrator:
+    """Orchestrates context-aware learning."""
+
+    EXPLICIT_PATTERNS = [
+        r"\b(I always|I never|I prefer|I like|I love|I hate)\b",
+        r"\b(immer|nie|bevorzuge|mag|liebe)\b",  # German
+        r"\b(every time|whenever)\b",
+    ]
+
+    def _is_explicit_preference(self, message: str) -> bool:
+        """Fast regex check for explicit preferences (<50ms)."""
+        for pattern in self.EXPLICIT_PATTERNS:
+            if re.search(pattern, message, re.IGNORECASE):
+                return True
+        return False
+
+    async def on_message(self, user_id: str, message: str) -> dict:
+        """Process user message - returns immediately."""
+
+        # Fast intent check
+        if self._is_explicit_preference(message):
+            # Extract preference immediately
+            preference = await self._extract_preference(message)
+
+            # Capture current context
+            context = await self.context_service.get_current_context()
+
+            # Store with context
+            await self.preference_service.store_with_context(
+                user_id,
+                preference,
+                context,
+                confidence=0.75
+            )
+
+            response = f"Got it! I'll remember: {preference.summary}"
+        else:
+            # Normal conversation
+            response = await self._generate_response(user_id, message)
+
+        # Always store in history for later analysis
+        await self.conversation_store.append(user_id, message, response)
+
+        # Check if triggers should fire (non-blocking)
+        await self._check_triggers(user_id)
+
+        return {"response": response}
+```
+
+**Performance Target:** <200ms end-to-end latency
+**Confidence Score:** 0.75-0.9 (high confidence for explicit statements)
+
+#### 2. Deferred Learning (Asynchronous)
+
+**Implementation:**
+
+```python
+# packages/api/fidus/memory/background_jobs.py
+
+from rq import Queue
+from redis import Redis
+
+redis_conn = Redis(host='localhost', port=6379)
+job_queue = Queue('fidus-learning', connection=redis_conn)
+
+@job_queue.job(timeout=60)
+def analyze_conversation(user_id: str):
+    """Analyze conversation after it ends."""
+
+    # Get full conversation
+    conversation = get_conversation_history(user_id)
+
+    # Extract context from beginning/end
+    initial_context = extract_context_from_start(conversation[:3])
+    final_context = extract_context_from_end(conversation[-3:])
+
+    # LLM analysis for implicit preferences
+    prompt = f"""Analyze this conversation for implicit preferences:
+
+{format_conversation(conversation)}
+
+Initial context: {initial_context}
+Final context: {final_context}
+
+Find preferences that were IMPLIED but not explicitly stated.
+Return JSON array of preferences with context."""
+
+    implicit_prefs = await llm_analyze(prompt)
+
+    # Store with lower confidence
+    for pref in implicit_prefs:
+        await store_preference(
+            user_id,
+            pref['domain'],
+            pref['key'],
+            pref['value'],
+            pref['context'],
+            confidence=0.5  # Lower for implicit
+        )
+
+    # Update confidence of existing preferences
+    await update_confidence_scores(user_id, conversation)
+
+    print(f"✅ Analyzed conversation: {len(implicit_prefs)} implicit preferences")
+```
+
+**Conversation End Detection:**
+
+```python
+# packages/api/fidus/memory/conversation_tracker.py
+
+class ConversationTracker:
+    """Tracks conversation state."""
+
+    def __init__(self, timeout_minutes: int = 10):
+        self.timeout = timedelta(minutes=timeout_minutes)
+        self.active = {}  # user_id -> last_activity
+
+    async def on_message(self, user_id: str):
+        """Update activity timestamp."""
+        self.active[user_id] = datetime.now()
+
+        # Start watcher if needed
+        if not hasattr(self, '_watcher'):
+            asyncio.create_task(self._watch_timeouts())
+
+    async def _watch_timeouts(self):
+        """Check for conversation timeouts."""
+        while True:
+            await asyncio.sleep(60)
+
+            now = datetime.now()
+            for user_id, last_activity in list(self.active.items()):
+                if now - last_activity > self.timeout:
+                    # Conversation ended
+                    del self.active[user_id]
+                    await self.orchestrator.on_conversation_end(user_id)
+```
+
+**Confidence Score:** 0.5-0.7 (medium confidence for implicit preferences)
+
+#### 3. Pattern Recognition (Event-Triggered)
+
+**Implementation:**
+
+```python
+async def _check_triggers(self, user_id: str):
+    """Check if pattern analysis should be triggered."""
+
+    message_count = await self.conversation_store.count(user_id)
+
+    # TRIGGER 1: Every 20 messages
+    if message_count % 20 == 0:
+        self.jobs.enqueue(
+            'quick_pattern_check',
+            user_id=user_id,
+            priority='low'
+        )
+
+    # TRIGGER 2: Context change detection
+    current = await self.context_service.get_current_context()
+    last = await self.context_store.get_last_analyzed(user_id)
+
+    similarity = self._context_similarity(current, last)
+    if similarity < 0.5:
+        # Significant change!
+        self.jobs.enqueue(
+            'deep_pattern_analysis',
+            user_id=user_id,
+            context=current,
+            priority='medium'
+        )
+
+async def on_preference_rejected(self, user_id: str, pref_id: str):
+    """Handle preference rejection feedback."""
+
+    pref = await self.preference_store.get(pref_id)
+    pref.rejection_count += 1
+    await self.preference_store.update(pref)
+
+    # TRIGGER 3: Confidence drift
+    if pref.rejection_count >= 3:
+        self.jobs.enqueue(
+            'revalidate_preference',
+            preference_id=pref_id,
+            priority='high'
+        )
+```
+
+**Background Jobs:**
+
+```python
+@job_queue.job(timeout=30)
+def quick_pattern_check(user_id: str):
+    """Lightweight pattern detection."""
+    recent = get_recent_messages(user_id, limit=20)
+
+    patterns = {
+        'keywords': detect_repeated_keywords(recent),
+        'time_patterns': detect_time_patterns(recent),
+        'sentiment': analyze_sentiment(recent)
+    }
+
+    update_user_patterns(user_id, patterns)
+
+@job_queue.job(timeout=300)
+def deep_pattern_analysis(user_id: str, context: dict):
+    """Heavy LLM analysis for new context."""
+    messages = get_messages_for_context(user_id, context)
+
+    # Full LLM analysis
+    patterns = llm_extract_patterns(messages, context)
+    store_patterns(user_id, context, patterns)
+
+@job_queue.job(timeout=120)
+def revalidate_preference(preference_id: str):
+    """Re-validate after multiple rejections."""
+    pref = get_preference(preference_id)
+
+    # LLM decides: keep, modify, or delete
+    decision = llm_revalidate(pref, get_recent_behavior(pref.user_id))
+
+    if decision['action'] == 'delete':
+        delete_preference(preference_id)
+    elif decision['action'] == 'modify':
+        update_preference(preference_id, decision['new_value'])
+    else:
+        adjust_confidence(preference_id, decision['confidence'])
+```
+
+### Infrastructure Requirements
+
+**Redis Queue (RQ):**
+```yaml
+# docker-compose.yml
+redis:
+  image: redis:7-alpine
+  ports:
+    - "6379:6379"
+
+rq-worker:
+  build: ./packages/api
+  command: rq worker fidus-learning
+  depends_on:
+    - redis
+    - neo4j
+    - qdrant
+```
+
+**Job Monitoring:**
+```python
+# Monitor job queue
+from rq import Worker
+from rq.job import Job
+
+# Get job status
+job = Job.fetch(job_id, connection=redis_conn)
+print(job.get_status())  # queued, started, finished, failed
+
+# Dashboard (RQ Dashboard)
+# pip install rq-dashboard
+# rq-dashboard
+```
+
+---
+
 ## Migration from Prototype to Production
 
 ### Fidus Memory (Prototype)
 - Basic temporal context (time, day)
 - LLM-extracted activity and social context
 - Single embedding per context
+- Three learning modes (immediate, deferred, pattern)
+- Redis Queue for background jobs
 
 ### Full Fidus System
 - Multi-dimensional context (6+ dimensions)
@@ -895,8 +1179,9 @@ logger.info(
 - Multi-embedding strategy (temporal, activity, social)
 - Context relevance learning
 - Predictive context
+- Advanced trigger strategies
 
-**Migration Strategy:** Protot context storage is forward-compatible. Adding new features doesn't require data migration.
+**Migration Strategy:** Prototype context storage is forward-compatible. Adding new features doesn't require data migration.
 
 ---
 
