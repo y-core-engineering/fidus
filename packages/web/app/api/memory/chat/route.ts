@@ -1,29 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 interface ChatRequest {
   user_id: string;
   message: string;
 }
 
-interface ChatResponse {
-  response: string;
-}
-
-export async function POST(request: NextRequest): Promise<NextResponse<ChatResponse | { error: string }>> {
+export async function POST(request: NextRequest) {
   try {
     const body: ChatRequest = await request.json();
     const { user_id, message } = body;
 
     // Validate input
     if (!user_id || !message) {
-      return NextResponse.json(
-        { error: 'Missing required fields: user_id and message' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: user_id and message' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
-    // Call Python backend
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    // Call Python backend with streaming
+    const backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:8000';
     const response = await fetch(`${backendUrl}/memory/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -33,19 +32,56 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error:', errorText);
-      return NextResponse.json(
-        { error: 'Failed to communicate with backend' },
-        { status: response.status }
+      return new Response(
+        JSON.stringify({ error: 'Failed to communicate with backend' }),
+        {
+          status: response.status,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
-    const data: ChatResponse = await response.json();
-    return NextResponse.json(data);
+    // Stream the response back to the client
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = response.body?.getReader();
+        if (!reader) {
+          controller.close();
+          return;
+        }
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              controller.close();
+              break;
+            }
+            controller.enqueue(value);
+          }
+        } catch (error) {
+          console.error('Stream error:', error);
+          controller.error(error);
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
   } catch (error) {
     console.error('API route error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
   }
 }

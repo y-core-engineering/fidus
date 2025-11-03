@@ -3,6 +3,8 @@
 import * as React from 'react';
 import { z } from 'zod';
 import { cva } from 'class-variance-authority';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Avatar } from '../avatar';
 import { Chip } from '../chip';
 import { ConfidenceIndicator } from '../confidence-indicator';
@@ -30,6 +32,7 @@ export const MessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
   content: z.string(),
   timestamp: z.date(),
+  status: z.enum(['sending', 'sent', 'error']).optional(),
   suggestions: z.array(SuggestionSchema).optional(),
   avatar: z
     .object({
@@ -73,7 +76,7 @@ function formatRelativeTime(date: Date): string {
 }
 
 const messageTextVariants = cva(
-  'p-3 rounded-lg max-w-[80%]',
+  'p-3 rounded-lg break-words',
   {
     variants: {
       role: {
@@ -120,7 +123,7 @@ const messageTextVariants = cva(
  * ```
  */
 export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps>(
-  ({ id, role, content, timestamp, suggestions, avatar, className }, ref) => {
+  ({ id, role, content, timestamp, status, suggestions, avatar, className }, ref) => {
     const isUser = role === 'user';
     const defaultFallback = isUser ? 'You' : 'AI';
 
@@ -142,18 +145,67 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
         />
 
         {/* Content Container */}
-        <Stack direction="vertical" spacing="xs" className="min-w-0">
+        <Stack direction="vertical" spacing="xs" className="flex-1 max-w-[85%]">
           {/* Message Text */}
-          <div className={messageTextVariants({ role })}>
-            {content}
+          <div className={cn(messageTextVariants({ role }), 'prose prose-sm max-w-none')}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                // Style links to inherit color
+                a: ({ node, ...props }) => (
+                  <a {...props} className="underline hover:opacity-80" />
+                ),
+                // Style code blocks
+                code: ({ node, inline, ...props }: any) => (
+                  inline ? (
+                    <code {...props} className="bg-black/10 px-1 py-0.5 rounded text-sm" />
+                  ) : (
+                    <code {...props} className="block bg-black/10 p-2 rounded text-sm overflow-x-auto" />
+                  )
+                ),
+                // Style lists
+                ul: ({ node, ...props }) => (
+                  <ul {...props} className="list-disc list-inside my-2" />
+                ),
+                ol: ({ node, ...props }) => (
+                  <ol {...props} className="list-decimal list-inside my-2" />
+                ),
+                // Style paragraphs
+                p: ({ node, ...props }) => (
+                  <p {...props} className="mb-2 last:mb-0" />
+                ),
+              }}
+            >
+              {content}
+            </ReactMarkdown>
           </div>
 
-          {/* Timestamp */}
+          {/* Timestamp with Status Indicator */}
           <div className={cn(
-            'text-xs text-muted-foreground',
-            isUser ? 'text-right' : 'text-left'
+            'text-xs text-muted-foreground flex items-center gap-1',
+            isUser ? 'flex-row-reverse' : 'flex-row'
           )}>
-            {formatRelativeTime(timestamp)}
+            <span>{formatRelativeTime(timestamp)}</span>
+            {isUser && status && (
+              <span className="flex items-center">
+                {status === 'sending' && (
+                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {status === 'sent' && (
+                  <svg className="h-3 w-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+                {status === 'error' && (
+                  <svg className="h-3 w-3 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </span>
+            )}
           </div>
 
           {/* Suggestions (only for assistant messages) */}
