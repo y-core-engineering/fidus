@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfidenceIndicator, MessageBubble, Link, type Message } from '@fidus/ui';
+import { ConfidenceIndicator, MessageBubble, Link, Stack, type Message } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Check, X } from 'lucide-react';
@@ -229,48 +229,26 @@ export default function ConfidenceIndicatorPage() {
       </ComponentPreview>
 
       <h3>Detailed</h3>
-      <p>The detailed variant shows a progress bar, badge, and confidence level label. Use this when you have more space and want to emphasize the confidence level:</p>
+      <p>The detailed variant shows a progress bar, badge, and confidence level label. This variant is used when rendering standalone ConfidenceIndicator components in settings or detailed views (not within MessageBubble suggestions):</p>
 
       <ComponentPreview
-        code={`// Note: The detailed variant is typically used in expanded views
-// or settings pages, not in compact chat interfaces.
-<MessageBubble
-  id="msg-2"
-  role="assistant"
-  content="Multiple beverages detected:"
-  timestamp={new Date()}
-  avatar={{ fallback: 'AI' }}
-  suggestions={[
-    {
-      id: 'sug-3',
-      text: 'espresso',
-      confidence: 0.92,
-      variant: 'detailed', // Shows progress bar + label
-      onAccept: () => console.log('Accepted'),
-      onReject: () => console.log('Rejected')
-    }
-  ]}
-/>`}
+        code={`// Note: The detailed variant is NOT available within MessageBubble suggestions.
+// It's used when rendering ConfidenceIndicator as a standalone component
+// in settings pages or detailed preference views.
+
+import { ConfidenceIndicator, Stack } from '@fidus/ui';
+
+<Stack direction="vertical" spacing="md">
+  <ConfidenceIndicator confidence={0.92} variant="detailed" />
+  <ConfidenceIndicator confidence={0.65} variant="detailed" />
+  <ConfidenceIndicator confidence={0.35} variant="detailed" />
+</Stack>`}
       >
-        <div className="max-w-lg">
-          <MessageBubble
-            id="msg-2"
-            role="assistant"
-            content="Multiple beverages detected:"
-            timestamp={new Date()}
-            avatar={{ fallback: 'AI' }}
-            suggestions={[
-              {
-                id: 'sug-3',
-                text: 'espresso',
-                confidence: 0.92,
-                variant: 'detailed',
-                onAccept: () => console.log('Accepted'),
-                onReject: () => console.log('Rejected'),
-              },
-            ]}
-          />
-        </div>
+        <Stack direction="vertical" spacing="md">
+          <ConfidenceIndicator confidence={0.92} variant="detailed" />
+          <ConfidenceIndicator confidence={0.65} variant="detailed" />
+          <ConfidenceIndicator confidence={0.35} variant="detailed" />
+        </Stack>
       </ComponentPreview>
 
       <h2>Confidence Levels</h2>
