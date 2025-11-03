@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfidenceIndicator, MessageBubble, Link, Stack, type Message } from '@fidus/ui';
+import { ConfidenceIndicator, MessageBubble, Link, type Message } from '@fidus/ui';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Check, X } from 'lucide-react';
@@ -173,46 +173,108 @@ export default function ConfidenceIndicatorPage() {
 
       <h2>Variants</h2>
 
-      <h3>Minimal</h3>
-      <p>Shows only a percentage badge with color coding based on confidence level:</p>
+      <h3>Minimal (Default)</h3>
+      <p>The minimal variant shows only a percentage badge with color coding. This is the default variant used in suggestion chips:</p>
 
       <ComponentPreview
-        code={`<Stack direction="horizontal" spacing="md" align="center">
-  <ConfidenceIndicator confidence={0.95} variant="minimal" />
-  <ConfidenceIndicator confidence={0.7} variant="minimal" />
-  <ConfidenceIndicator confidence={0.4} variant="minimal" />
-  <ConfidenceIndicator confidence={0.2} variant="minimal" />
-</Stack>`}
+        code={`<MessageBubble
+  id="msg-1"
+  role="assistant"
+  content="I detected multiple preferences from your message!"
+  timestamp={new Date()}
+  avatar={{ fallback: 'AI' }}
+  suggestions={[
+    {
+      id: 'sug-1',
+      text: 'cappuccino',
+      confidence: 0.95, // minimal variant (default)
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected')
+    },
+    {
+      id: 'sug-2',
+      text: 'oat milk',
+      confidence: 0.7,
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected')
+    }
+  ]}
+/>`}
       >
-        <Stack direction="horizontal" spacing="md" align="center">
-          <ConfidenceIndicator confidence={0.95} variant="minimal" />
-          <ConfidenceIndicator confidence={0.7} variant="minimal" />
-          <ConfidenceIndicator confidence={0.4} variant="minimal" />
-          <ConfidenceIndicator confidence={0.2} variant="minimal" />
-        </Stack>
+        <div className="max-w-lg">
+          <MessageBubble
+            id="msg-1"
+            role="assistant"
+            content="I detected multiple preferences from your message!"
+            timestamp={new Date()}
+            avatar={{ fallback: 'AI' }}
+            suggestions={[
+              {
+                id: 'sug-1',
+                text: 'cappuccino',
+                confidence: 0.95,
+                onAccept: () => console.log('Accepted'),
+                onReject: () => console.log('Rejected'),
+              },
+              {
+                id: 'sug-2',
+                text: 'oat milk',
+                confidence: 0.7,
+                onAccept: () => console.log('Accepted'),
+                onReject: () => console.log('Rejected'),
+              },
+            ]}
+          />
+        </div>
       </ComponentPreview>
 
       <h3>Detailed</h3>
-      <p>Shows progress bar, badge, and confidence level label:</p>
+      <p>The detailed variant shows a progress bar, badge, and confidence level label. Use this when you have more space and want to emphasize the confidence level:</p>
 
       <ComponentPreview
-        code={`<Stack direction="vertical" spacing="md">
-  <ConfidenceIndicator confidence={0.92} variant="detailed" />
-  <ConfidenceIndicator confidence={0.65} variant="detailed" />
-  <ConfidenceIndicator confidence={0.35} variant="detailed" />
-  <ConfidenceIndicator confidence={0.15} variant="detailed" />
-</Stack>`}
+        code={`// Note: The detailed variant is typically used in expanded views
+// or settings pages, not in compact chat interfaces.
+<MessageBubble
+  id="msg-2"
+  role="assistant"
+  content="Multiple beverages detected:"
+  timestamp={new Date()}
+  avatar={{ fallback: 'AI' }}
+  suggestions={[
+    {
+      id: 'sug-3',
+      text: 'espresso',
+      confidence: 0.92,
+      variant: 'detailed', // Shows progress bar + label
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected')
+    }
+  ]}
+/>`}
       >
-        <Stack direction="vertical" spacing="md">
-          <ConfidenceIndicator confidence={0.92} variant="detailed" />
-          <ConfidenceIndicator confidence={0.65} variant="detailed" />
-          <ConfidenceIndicator confidence={0.35} variant="detailed" />
-          <ConfidenceIndicator confidence={0.15} variant="detailed" />
-        </Stack>
+        <div className="max-w-lg">
+          <MessageBubble
+            id="msg-2"
+            role="assistant"
+            content="Multiple beverages detected:"
+            timestamp={new Date()}
+            avatar={{ fallback: 'AI' }}
+            suggestions={[
+              {
+                id: 'sug-3',
+                text: 'espresso',
+                confidence: 0.92,
+                variant: 'detailed',
+                onAccept: () => console.log('Accepted'),
+                onReject: () => console.log('Rejected'),
+              },
+            ]}
+          />
+        </div>
       </ComponentPreview>
 
       <h2>Confidence Levels</h2>
-      <p>The component automatically maps confidence scores to color-coded levels:</p>
+      <p>The component automatically maps confidence scores to color-coded levels. See the examples above for how each level appears in context:</p>
 
       <div className="not-prose my-lg">
         <table className="min-w-full border-collapse">
@@ -221,7 +283,7 @@ export default function ConfidenceIndicatorPage() {
               <th className="text-left py-sm px-md text-sm font-semibold">Range</th>
               <th className="text-left py-sm px-md text-sm font-semibold">Level</th>
               <th className="text-left py-sm px-md text-sm font-semibold">Color</th>
-              <th className="text-left py-sm px-md text-sm font-semibold">Example</th>
+              <th className="text-left py-sm px-md text-sm font-semibold">Description</th>
             </tr>
           </thead>
           <tbody>
@@ -232,7 +294,7 @@ export default function ConfidenceIndicatorPage() {
                 <span className="text-success">Green (success)</span>
               </td>
               <td className="py-sm px-md text-sm">
-                <ConfidenceIndicator confidence={0.9} variant="minimal" />
+                AI is highly certain about this prediction
               </td>
             </tr>
             <tr className="border-b border-border">
@@ -242,7 +304,7 @@ export default function ConfidenceIndicatorPage() {
                 <span className="text-info">Blue (info)</span>
               </td>
               <td className="py-sm px-md text-sm">
-                <ConfidenceIndicator confidence={0.65} variant="minimal" />
+                AI is reasonably confident about this prediction
               </td>
             </tr>
             <tr className="border-b border-border">
@@ -252,7 +314,7 @@ export default function ConfidenceIndicatorPage() {
                 <span className="text-warning">Yellow (warning)</span>
               </td>
               <td className="py-sm px-md text-sm">
-                <ConfidenceIndicator confidence={0.4} variant="minimal" />
+                AI is still learning, prediction may be uncertain
               </td>
             </tr>
             <tr>
@@ -262,7 +324,7 @@ export default function ConfidenceIndicatorPage() {
                 <span className="text-muted-foreground">Gray (default)</span>
               </td>
               <td className="py-sm px-md text-sm">
-                <ConfidenceIndicator confidence={0.2} variant="minimal" />
+                AI is uncertain, user confirmation recommended
               </td>
             </tr>
           </tbody>
@@ -270,18 +332,78 @@ export default function ConfidenceIndicatorPage() {
       </div>
 
       <h2>Sizes</h2>
+      <p>The ConfidenceIndicator supports three sizes. The default size is 'md', which works well in most contexts:</p>
+
       <ComponentPreview
-        code={`<Stack direction="horizontal" spacing="md" align="center">
-  <ConfidenceIndicator confidence={0.85} size="sm" />
-  <ConfidenceIndicator confidence={0.85} size="md" />
-  <ConfidenceIndicator confidence={0.85} size="lg" />
-</Stack>`}
+        code={`<MessageBubble
+  id="msg-sizes"
+  role="assistant"
+  content="Different confidence indicator sizes in suggestions:"
+  timestamp={new Date()}
+  avatar={{ fallback: 'AI' }}
+  suggestions={[
+    {
+      id: 'sug-sm',
+      text: 'small badge',
+      confidence: 0.85,
+      size: 'sm',
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected')
+    },
+    {
+      id: 'sug-md',
+      text: 'medium badge (default)',
+      confidence: 0.85,
+      size: 'md',
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected')
+    },
+    {
+      id: 'sug-lg',
+      text: 'large badge',
+      confidence: 0.85,
+      size: 'lg',
+      onAccept: () => console.log('Accepted'),
+      onReject: () => console.log('Rejected')
+    }
+  ]}
+/>`}
       >
-        <Stack direction="horizontal" spacing="md" align="center">
-          <ConfidenceIndicator confidence={0.85} size="sm" />
-          <ConfidenceIndicator confidence={0.85} size="md" />
-          <ConfidenceIndicator confidence={0.85} size="lg" />
-        </Stack>
+        <div className="max-w-lg">
+          <MessageBubble
+            id="msg-sizes"
+            role="assistant"
+            content="Different confidence indicator sizes in suggestions:"
+            timestamp={new Date()}
+            avatar={{ fallback: 'AI' }}
+            suggestions={[
+              {
+                id: 'sug-sm',
+                text: 'small badge',
+                confidence: 0.85,
+                size: 'sm',
+                onAccept: () => console.log('Accepted'),
+                onReject: () => console.log('Rejected'),
+              },
+              {
+                id: 'sug-md',
+                text: 'medium badge (default)',
+                confidence: 0.85,
+                size: 'md',
+                onAccept: () => console.log('Accepted'),
+                onReject: () => console.log('Rejected'),
+              },
+              {
+                id: 'sug-lg',
+                text: 'large badge',
+                confidence: 0.85,
+                size: 'lg',
+                onAccept: () => console.log('Accepted'),
+                onReject: () => console.log('Rejected'),
+              },
+            ]}
+          />
+        </div>
       </ComponentPreview>
 
       <h2>Props</h2>
@@ -366,11 +488,15 @@ export default function ConfidenceIndicatorPage() {
           <ul className="space-y-md text-sm">
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
+              <span>Use within MessageBubble suggestions for proper context</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
               <span>Use minimal variant for compact UI (suggestion chips)</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Use detailed variant when explaining AI decisions</span>
+              <span>Use detailed variant when space allows for better visibility</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
@@ -381,13 +507,6 @@ export default function ConfidenceIndicatorPage() {
               <span>Keep tooltips enabled for user education</span>
             </li>
           </ul>
-          <div className="mt-md p-md bg-success/10 rounded-md">
-            <ComponentPreview
-              code={`<ConfidenceIndicator confidence={0.85} variant="detailed" />`}
-            >
-              <ConfidenceIndicator confidence={0.85} variant="detailed" />
-            </ComponentPreview>
-          </div>
         </div>
 
         <div className="border-2 border-error rounded-lg p-lg">
@@ -397,11 +516,15 @@ export default function ConfidenceIndicatorPage() {
           <ul className="space-y-md text-sm">
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
+              <span>Don't use standalone without MessageBubble context</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-error shrink-0">•</span>
               <span>Don't use confidence values outside 0.0-1.0 range</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Don't show confidence scores without context</span>
+              <span>Don't show confidence scores without user-facing context</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
@@ -412,14 +535,6 @@ export default function ConfidenceIndicatorPage() {
               <span>Don't use for non-ML certainty indicators</span>
             </li>
           </ul>
-          <div className="mt-md p-md bg-error/20 rounded-md">
-            <ComponentPreview
-              code={`// ❌ Wrong: confidence > 1.0
-<ConfidenceIndicator confidence={1.5} />`}
-            >
-              <div className="text-sm text-error">Invalid confidence value</div>
-            </ComponentPreview>
-          </div>
         </div>
       </div>
 
