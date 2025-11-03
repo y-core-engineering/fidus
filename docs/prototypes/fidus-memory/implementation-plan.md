@@ -1,9 +1,22 @@
-# Fidus Memory - Implementation Plan (v2)
+# Fidus Memory - Implementation Plan (v3)
 
-**Version:** 2.0
+**Version:** 3.0
 **Date:** 2025-11-03
-**Status:** Planning Phase
+**Status:** Planning Phase - Revised after Architecture Review
 **Prototype:** Fidus Memory
+
+**Changes in v3:**
+- ✅ Added Multi-Tenancy by Design (fixed `tenant_id` for prototype)
+- ✅ Added Domain Event schemas (Phase 3)
+- ✅ Added Type Safety with Zod schemas
+- ✅ Made embedding dimensions configurable
+- ✅ Standardized UUID generation (Python-based)
+- ✅ Added Error Handling strategies
+- ✅ Added Security considerations
+- ✅ **100% @fidus/ui component usage** - NO styled divs, NO custom CSS
+- ✅ Use existing ChatInterface, MessageBubble, ConfidenceIndicator from @fidus/ui
+- ⏸️ AI-Driven UI Paradigm deferred (acceptable for prototype)
+- ⏸️ Observability deferred (will be centralized in full Fidus)
 
 ---
 
@@ -37,8 +50,11 @@ Databases:
 Frontend:
   - Next.js 14 (App Router)
   - React 18
-  - @fidus/ui (Design System)
-  - Tailwind CSS
+  - @fidus/ui (Design System - 100% component usage)
+    - ✅ ChatInterface (already available)
+    - ✅ MessageBubble (already available)
+    - ✅ ConfidenceIndicator (already available)
+  - NO styled divs - only @fidus/ui components
 
 Deployment:
   - Docker Compose
@@ -95,6 +111,65 @@ graph LR
 ```
 
 **No Throwaway Code:** All core logic is designed for production use in the full Fidus system.
+
+---
+
+## Prototype Configuration
+
+### Multi-Tenancy by Design
+
+**Approach for Prototype:**
+- Fixed `tenant_id = "prototype-tenant"` (no login UI needed)
+- All database schemas include `tenant_id` field
+- All queries filter by `tenant_id`
+- Architecture ready for multi-tenant deployment
+
+**Why:** This prevents refactoring when integrating into full Fidus system. Multi-tenancy is baked into the data model from day 1.
+
+```python
+# packages/api/fidus/config.py
+
+class PrototypeConfig:
+    # Fixed tenant for prototype (no auth UI)
+    PROTOTYPE_TENANT_ID = "prototype-tenant"
+
+    # Embedding model configuration
+    EMBEDDING_MODEL = "ollama/nomic-embed-text"
+    EMBEDDING_DIMENSIONS = {
+        "ollama/nomic-embed-text": 768,
+        "openai/text-embedding-3-small": 1536,
+        "openai/text-embedding-3-large": 3072,
+    }
+
+    # LLM providers
+    DEFAULT_LLM_PROVIDER = "ollama"
+    DEFAULT_LLM_MODEL = "llama3.1:8b"
+```
+
+### Type Safety
+
+All API boundaries use **Zod schemas** for runtime validation:
+
+```typescript
+// packages/shared/src/schemas/memory.ts
+
+import { z } from 'zod';
+
+export const PreferenceSchema = z.object({
+  id: z.string().uuid(),
+  user_id: z.string(),
+  tenant_id: z.string(),
+  domain: z.string(),
+  key: z.string(),
+  value: z.any(),
+  confidence: z.number().min(0).max(1),
+  learned_at: z.date(),
+  reinforcement_count: z.number().int().nonnegative(),
+  rejection_count: z.number().int().nonnegative(),
+});
+
+export type Preference = z.infer<typeof PreferenceSchema>;
+```
 
 ---
 
@@ -575,17 +650,25 @@ Bot: "Based on what you told me, you prefer morning coding.
 ```
 
 **Technical Stack:**
-- Frontend: Next.js + @fidus/ui (ChatInterface, MessageBubble)
+- Frontend: Next.js + @fidus/ui (ChatInterface, MessageBubble - **already available**)
 - Backend: FastAPI + Python dict (in-memory)
 - LLM: LiteLLM → Ollama Llama 3.1 8B
 - No databases yet
 
 **Implementation Tasks:**
 
-**1.1 Create @fidus/ui Components**
-- [ ] `MessageBubble` - Display user/AI messages
-- [ ] `ChatInterface` - Chat layout with input
-- [ ] Tests for both components
+**1.1 Use Existing @fidus/ui Components**
+
+**IMPORTANT:** The following components are **already implemented** in `packages/ui/src/components/`:
+- ✅ `ChatInterface` - Full chat layout with input, message list, and configuration
+- ✅ `MessageBubble` - User/AI message display with role, content, timestamp
+- ✅ Tests already exist
+
+**What you need to do:**
+- [ ] Import and use `ChatInterface` from `@fidus/ui`
+- [ ] Import and use `MessageBubble` from `@fidus/ui`
+- [ ] NO custom styled divs - use only @fidus/ui components
+- [ ] If additional UI needed, use other @fidus/ui components (Button, Card, Stack, etc.)
 
 **1.2 Create Minimal Backend**
 ```python
@@ -656,9 +739,82 @@ class InMemoryAgent:
 ```
 
 **1.3 Connect Frontend to Backend**
-- [ ] Next.js API route: `/api/memory/chat`
-- [ ] React hook: `useChatAgent()`
-- [ ] Page: `/fidus-memory`
+
+```typescript
+// packages/web/app/fidus-memory/page.tsx
+
+'use client';
+
+import { ChatInterface } from '@fidus/ui';
+import { useState } from 'react';
+
+export default function FidusMemoryPage() {
+  const [messages, setMessages] = useState([]);
+
+  const handleSendMessage = async (content: string) => {
+    // Add user message
+    const userMessage = {
+      id: crypto.randomUUID(),
+      role: 'user' as const,
+      content,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Call backend
+    const response = await fetch('/api/memory/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: 'user-1', message: content }),
+    });
+
+    const data = await response.json();
+
+    // Add bot message
+    const botMessage = {
+      id: crypto.randomUUID(),
+      role: 'assistant' as const,
+      content: data.response,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, botMessage]);
+  };
+
+  return (
+    <ChatInterface
+      messages={messages}
+      onSendMessage={handleSendMessage}
+      placeholder="Chat with Fidus Memory..."
+      isLoading={false}
+    />
+  );
+}
+```
+
+```typescript
+// packages/web/app/api/memory/chat/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  const { user_id, message } = await request.json();
+
+  // Call Python backend
+  const response = await fetch('http://localhost:8000/memory/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id, message }),
+  });
+
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+```
+
+**Key Points:**
+- ✅ Use `ChatInterface` from `@fidus/ui` (no custom components)
+- ✅ Messages follow @fidus/ui `Message` type (role, content, timestamp)
+- ✅ NO styled divs, NO custom CSS - pure @fidus/ui
 
 **1.4 Setup LiteLLM + Ollama**
 ```yaml
@@ -742,18 +898,29 @@ volumes:
 ```python
 # packages/api/fidus/infrastructure/neo4j_client.py
 
+from uuid import uuid4
+from fidus.config import PrototypeConfig
+
 class Neo4jPreferenceStore:
     """Neo4j client for preference storage."""
 
     def __init__(self, uri: str, user: str, password: str):
         self.driver = neo4j.GraphDatabase.driver(uri, auth=(user, password))
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
 
     async def create_preference(self, user_id: str, pref: dict) -> str:
-        """Create new preference node."""
+        """Create new preference node.
+
+        Multi-Tenancy: All preferences scoped to tenant_id.
+        UUID Generation: Standardized to Python uuid4() for consistency.
+        """
+        preference_id = str(uuid4())  # ← Standardized UUID generation
+
         query = """
-        MATCH (u:User {id: $user_id})
+        MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
         CREATE (p:Preference {
-            id: randomUUID(),
+            id: $preference_id,
+            tenant_id: $tenant_id,
             domain: $domain,
             key: $key,
             value: $value,
@@ -770,17 +937,22 @@ class Neo4jPreferenceStore:
         result = await self.driver.execute_query(
             query,
             user_id=user_id,
+            tenant_id=self.tenant_id,
+            preference_id=preference_id,
             domain=pref['domain'],
             key=pref['key'],
             value=pref['value'],
             confidence=pref['confidence']
         )
-        return result[0]['id']
+        return preference_id
 
-    async def reinforce_preference(self, pref_id: str) -> None:
-        """Increase confidence on acceptance."""
+    async def reinforce_preference(self, pref_id: str, user_id: str) -> None:
+        """Increase confidence on acceptance.
+
+        Multi-Tenancy: Validate preference belongs to user's tenant.
+        """
         query = """
-        MATCH (p:Preference {id: $pref_id})
+        MATCH (p:Preference {id: $pref_id, tenant_id: $tenant_id})
         SET p.confidence = CASE
             WHEN p.confidence + 0.1 > 0.95 THEN 0.95
             ELSE p.confidence + 0.1
@@ -788,37 +960,62 @@ class Neo4jPreferenceStore:
         p.last_reinforced = datetime(),
         p.reinforcement_count = p.reinforcement_count + 1
         """
-        await self.driver.execute_query(query, pref_id=pref_id)
+        await self.driver.execute_query(
+            query,
+            pref_id=pref_id,
+            tenant_id=self.tenant_id
+        )
 
-    async def weaken_preference(self, pref_id: str) -> None:
-        """Decrease confidence on rejection."""
+    async def weaken_preference(self, pref_id: str, user_id: str) -> None:
+        """Decrease confidence on rejection.
+
+        Multi-Tenancy: Validate preference belongs to user's tenant.
+        """
         query = """
-        MATCH (p:Preference {id: $pref_id})
+        MATCH (p:Preference {id: $pref_id, tenant_id: $tenant_id})
         SET p.confidence = CASE
             WHEN p.confidence - 0.15 < 0 THEN 0
             ELSE p.confidence - 0.15
         END,
         p.rejection_count = p.rejection_count + 1
         """
-        await self.driver.execute_query(query, pref_id=pref_id)
+        await self.driver.execute_query(
+            query,
+            pref_id=pref_id,
+            tenant_id=self.tenant_id
+        )
 
     async def get_all_preferences(self, user_id: str) -> list:
-        """Get all preferences for user."""
+        """Get all preferences for user.
+
+        Multi-Tenancy: Only return preferences in user's tenant.
+        """
         query = """
-        MATCH (u:User {id: $user_id})-[:HAS_PREFERENCE]->(p:Preference)
+        MATCH (u:User {id: $user_id, tenant_id: $tenant_id})-[:HAS_PREFERENCE]->(p:Preference {tenant_id: $tenant_id})
         RETURN p
         ORDER BY p.confidence DESC, p.last_reinforced DESC
         """
-        result = await self.driver.execute_query(query, user_id=user_id)
+        result = await self.driver.execute_query(
+            query,
+            user_id=user_id,
+            tenant_id=self.tenant_id
+        )
         return [dict(record['p']) for record in result]
 
     async def delete_all_preferences(self, user_id: str) -> None:
-        """Delete all user preferences."""
+        """Delete all user preferences.
+
+        Multi-Tenancy: Only delete preferences in user's tenant.
+        """
         query = """
-        MATCH (u:User {id: $user_id})-[:HAS_PREFERENCE]->(p:Preference)
+        MATCH (u:User {id: $user_id, tenant_id: $tenant_id})-[:HAS_PREFERENCE]->(p:Preference {tenant_id: $tenant_id})
         DETACH DELETE p
         """
-        await self.driver.execute_query(query, user_id=user_id)
+        await self.driver.execute_query(
+            query,
+            user_id=user_id,
+            tenant_id=self.tenant_id
+        )
 ```
 
 **2.2 Update Agent to Use Neo4j**
@@ -873,17 +1070,35 @@ class PersistentAgent:
 ```
 
 **2.3 Preference Viewer UI**
+
+**IMPORTANT:** Use **ONLY @fidus/ui components**. The `ConfidenceIndicator` is **already available** in @fidus/ui.
+
 ```typescript
 // packages/web/app/fidus-memory/components/preference-viewer.tsx
 
-import { Stack, DetailCard, ConfidenceIndicator, EmptyCard, Divider } from '@fidus/ui';
+import {
+  Stack,
+  Card,
+  ConfidenceIndicator,
+  EmptyState,
+  Divider,
+  Heading,
+  Text,
+  Button
+} from '@fidus/ui';
 
-export function PreferenceViewer({ preferences }: { preferences: Preference[] }) {
+interface PreferenceViewerProps {
+  preferences: Preference[];
+  onDelete?: () => void;
+}
+
+export function PreferenceViewer({ preferences, onDelete }: PreferenceViewerProps) {
   if (preferences.length === 0) {
     return (
-      <EmptyCard
+      <EmptyState
         title="No Preferences Yet"
-        message="Start chatting to teach Fidus Memory about your preferences"
+        description="Start chatting to teach Fidus Memory about your preferences"
+        icon="brain"
       />
     );
   }
@@ -893,29 +1108,45 @@ export function PreferenceViewer({ preferences }: { preferences: Preference[] })
 
   return (
     <Stack spacing="lg">
-      <div>
-        <h2>Learned Preferences</h2>
-        <p>{preferences.length} preferences across {Object.keys(grouped).length} domains</p>
-      </div>
+      <Stack spacing="sm" direction="row" justify="between" align="center">
+        <Heading level={2}>Learned Preferences</Heading>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={onDelete}
+        >
+          Delete All Memories
+        </Button>
+      </Stack>
+
+      <Text variant="secondary">
+        {preferences.length} preferences across {Object.keys(grouped).length} domains
+      </Text>
 
       <Divider />
 
       {Object.entries(grouped).map(([domain, prefs]) => (
         <Stack key={domain} spacing="md">
-          <h3>{domain}</h3>
+          <Heading level={3}>{domain}</Heading>
 
           {prefs.map(pref => (
-            <DetailCard key={pref.id} title={pref.key} description={pref.value}>
-              <ConfidenceIndicator
-                confidence={pref.confidence}
-                variant="detailed"
-                size="sm"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                Learned {formatDate(pref.learned_at)} •
-                Reinforced {pref.reinforcement_count}x
-              </p>
-            </DetailCard>
+            <Card key={pref.id} variant="outlined">
+              <Stack spacing="sm">
+                <Heading level={4}>{pref.key}</Heading>
+                <Text>{pref.value}</Text>
+
+                <ConfidenceIndicator
+                  value={pref.confidence}
+                  variant="detailed"
+                  size="sm"
+                />
+
+                <Text variant="caption">
+                  Learned {formatDate(pref.learned_at)} •
+                  Reinforced {pref.reinforcement_count}x
+                </Text>
+              </Stack>
+            </Card>
           ))}
         </Stack>
       ))}
@@ -924,11 +1155,12 @@ export function PreferenceViewer({ preferences }: { preferences: Preference[] })
 }
 ```
 
-**2.4 Add ConfidenceIndicator Component to @fidus/ui**
-- [ ] Create `ConfidenceIndicator` component
-- [ ] Support `minimal` and `detailed` variants
-- [ ] Color-coded by confidence level
-- [ ] Add tests
+**Key Points:**
+- ✅ `ConfidenceIndicator` is **already available** in @fidus/ui
+- ✅ Use `EmptyState`, `Card`, `Heading`, `Text`, `Button`, `Stack`, `Divider` from @fidus/ui
+- ✅ **NO custom styled divs** (`<div>`, `<p>`, etc.)
+- ✅ **NO Tailwind classes** (like `className="text-xs text-gray-500"`)
+- ✅ Use @fidus/ui's `Text` component with `variant="caption"` instead
 
 **Success Criteria:**
 - ✅ Preferences persist after page reload
@@ -1044,21 +1276,33 @@ docker exec fidus-ollama ollama pull nomic-embed-text
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
+from fidus.config import PrototypeConfig
 
 async def setup_qdrant_collection():
-    """Initialize Qdrant collection for situations."""
+    """Initialize Qdrant collection for situations.
+
+    Embedding Dimensions: Configurable to support different models.
+    Multi-Tenancy: Situations include tenant_id in payload for filtering.
+    """
     client = QdrantClient(host="localhost", port=6333)
 
-    # Create collection with 768-dim vectors (nomic-embed-text)
+    # Get embedding dimensions from config
+    model = PrototypeConfig.EMBEDDING_MODEL
+    dims = PrototypeConfig.EMBEDDING_DIMENSIONS.get(model)
+
+    if not dims:
+        raise ValueError(f"Unknown embedding model: {model}")
+
+    # Create collection with dynamic dimensions
     client.create_collection(
         collection_name="situations",
         vectors_config=VectorParams(
-            size=768,
+            size=dims,  # ← Configurable (768 for nomic-embed-text)
             distance=Distance.COSINE
         )
     )
 
-    print("✅ Qdrant collection 'situations' created")
+    print(f"✅ Qdrant collection 'situations' created (dims={dims})")
 
 if __name__ == "__main__":
     import asyncio
@@ -1427,7 +1671,11 @@ class ContextEmbeddingService:
         return "\n".join(parts)
 
     async def generate_embedding(self, context: Dict[str, Any]) -> List[float]:
-        """Generate 768-dim embedding for context."""
+        """Generate embedding for context.
+
+        Embedding Dimensions: Validated against config (not hardcoded).
+        """
+        from fidus.config import PrototypeConfig
 
         text = self.format_context_as_text(context)
 
@@ -1438,9 +1686,13 @@ class ContextEmbeddingService:
 
         embedding = response.data[0]["embedding"]
 
-        # Validate dimensionality
-        if len(embedding) != 768:
-            raise ValueError(f"Expected 768-dim embedding, got {len(embedding)}")
+        # Validate dimensionality (configurable)
+        expected_dims = PrototypeConfig.EMBEDDING_DIMENSIONS.get(self.embedding_model)
+        if not expected_dims:
+            raise ValueError(f"Unknown embedding model: {self.embedding_model}")
+
+        if len(embedding) != expected_dims:
+            raise ValueError(f"Expected {expected_dims}-dim embedding, got {len(embedding)}")
 
         return embedding
 ```
@@ -1553,11 +1805,17 @@ from qdrant_client import QdrantClient
 from neo4j import AsyncGraphDatabase
 
 class ContextStorageService:
-    """Stores situational contexts in Neo4j + Qdrant."""
+    """Stores situational contexts in Neo4j + Qdrant.
+
+    Multi-Tenancy: All situations scoped to tenant_id.
+    UUID Generation: Standardized to Python uuid4().
+    """
 
     def __init__(self, neo4j_driver, qdrant_client: QdrantClient):
+        from fidus.config import PrototypeConfig
         self.neo4j = neo4j_driver
         self.qdrant = qdrant_client
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
 
     async def store_situation(
         self,
@@ -1566,9 +1824,12 @@ class ContextStorageService:
         embedding: list[float],
         description: str
     ) -> str:
-        """Store situation in both Neo4j and Qdrant."""
+        """Store situation in both Neo4j and Qdrant.
 
-        situation_id = str(uuid4())
+        Multi-Tenancy: Situations include tenant_id in both databases.
+        """
+
+        situation_id = str(uuid4())  # ← Standardized UUID generation
         embedding_id = str(uuid4())
 
         # 1. Store embedding in Qdrant
@@ -1579,6 +1840,7 @@ class ContextStorageService:
                 "vector": embedding,
                 "payload": {
                     "user_id": user_id,
+                    "tenant_id": self.tenant_id,  # ← Multi-tenancy
                     "situation_id": situation_id,
                     "factors": factors
                 }
@@ -1592,6 +1854,7 @@ class ContextStorageService:
                 CREATE (s:Situation {
                     situation_id: $situation_id,
                     user_id: $user_id,
+                    tenant_id: $tenant_id,
                     embedding_id: $embedding_id,
                     factors: $factors,
                     description: $description,
@@ -1600,6 +1863,7 @@ class ContextStorageService:
                 """,
                 situation_id=situation_id,
                 user_id=user_id,
+                tenant_id=self.tenant_id,
                 embedding_id=embedding_id,
                 factors=factors,
                 description=description
@@ -1613,12 +1877,15 @@ class ContextStorageService:
         situation_id: str,
         confidence: float
     ):
-        """Create relationship between preference and situation."""
+        """Create relationship between preference and situation.
+
+        Multi-Tenancy: Validates both preference and situation belong to same tenant.
+        """
         async with self.neo4j.session() as session:
             await session.run(
                 """
-                MATCH (p:Preference {preference_id: $preference_id})
-                MATCH (s:Situation {situation_id: $situation_id})
+                MATCH (p:Preference {id: $preference_id, tenant_id: $tenant_id})
+                MATCH (s:Situation {situation_id: $situation_id, tenant_id: $tenant_id})
                 CREATE (p)-[:IN_SITUATION {
                     added_at: datetime(),
                     confidence_at_time: $confidence
@@ -1626,7 +1893,8 @@ class ContextStorageService:
                 """,
                 preference_id=preference_id,
                 situation_id=situation_id,
-                confidence=confidence
+                confidence=confidence,
+                tenant_id=self.tenant_id
             )
 ```
 
@@ -2148,6 +2416,162 @@ Phase 3 is complete when:
 - Task 3.6 (Storage service): 1.5 days
 - Task 3.7 (Retrieval service): 1 day
 - Task 3.8 (Context-aware agent): 1 day
+- Task 3.9 (Domain events + Error handling): 1 day
+
+---
+
+**Task 3.9: Domain Events & Error Handling**
+
+**Goal:** Define event schemas for integration with full Fidus system + add robust error handling
+
+**3.9.1 Domain Event Schemas:**
+```python
+# packages/api/fidus/memory/events.py
+
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict
+from uuid import uuid4
+
+@dataclass
+class DomainEvent:
+    """Base class for all domain events."""
+    event_id: str
+    event_type: str
+    aggregate_type: str
+    aggregate_id: str
+    tenant_id: str
+    user_id: str
+    timestamp: datetime
+    payload: Dict[str, Any]
+
+    def __init__(self, **kwargs):
+        self.event_id = str(uuid4())
+        self.timestamp = datetime.now()
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+@dataclass
+class PreferenceExtracted(DomainEvent):
+    """Emitted when preference is extracted from conversation."""
+    event_type = "PreferenceExtracted"
+    aggregate_type = "Preference"
+
+    def __init__(self, preference_id: str, user_id: str, tenant_id: str,
+                 domain: str, key: str, value: Any, confidence: float):
+        super().__init__(
+            aggregate_id=preference_id,
+            user_id=user_id,
+            tenant_id=tenant_id,
+            payload={
+                "domain": domain,
+                "key": key,
+                "value": value,
+                "confidence": confidence
+            }
+        )
+
+
+@dataclass
+class PreferenceReinforced(DomainEvent):
+    """Emitted when preference confidence increases."""
+    event_type = "PreferenceReinforced"
+    aggregate_type = "Preference"
+
+
+@dataclass
+class PreferenceWeakened(DomainEvent):
+    """Emitted when preference confidence decreases."""
+    event_type = "PreferenceWeakened"
+    aggregate_type = "Preference"
+
+
+@dataclass
+class PreferenceDeleted(DomainEvent):
+    """Emitted when all user preferences are deleted."""
+    event_type = "PreferenceDeleted"
+    aggregate_type = "Preference"
+```
+
+**3.9.2 Error Handling Strategy:**
+```python
+# packages/api/fidus/memory/error_handling.py
+
+from tenacity import retry, stop_after_attempt, wait_exponential
+from litellm.exceptions import RateLimitError
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10)
+)
+async def extract_preference_with_retry(llm, message: str):
+    """Extract preference with retry on LLM failures."""
+    try:
+        result = await llm.completion(prompt, max_tokens=100)
+        return json.loads(result.content)
+    except RateLimitError as e:
+        logger.warning(f"Rate limit hit: {e}")
+        raise  # Retry via tenacity
+    except JSONDecodeError as e:
+        logger.error(f"Invalid JSON from LLM: {e}")
+        return []  # Fallback: Return empty preference list
+
+
+async def get_preferences_with_fallback(neo4j, user_id: str, tenant_id: str):
+    """Get preferences with Redis cache fallback."""
+    try:
+        return await neo4j.get_all_preferences(user_id, tenant_id)
+    except Exception as e:
+        logger.error(f"Neo4j failure: {e}")
+        # Fallback: Return cached preferences from Redis
+        cached = await redis.get(f"prefs:{tenant_id}:{user_id}")
+        if cached:
+            return json.loads(cached)
+        return []  # Graceful degradation
+
+
+def sanitize_input(text: str) -> str:
+    """Sanitize user input to prevent injection."""
+    import bleach
+
+    # Remove HTML tags
+    clean = bleach.clean(text, tags=[], strip=True)
+
+    # Limit length
+    if len(clean) > 5000:
+        clean = clean[:5000]
+
+    return clean
+```
+
+**3.9.3 Security Considerations:**
+```python
+# packages/api/fidus/api/middleware/security.py
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
+
+# Rate limiting per tenant
+@app.post("/api/memory/chat")
+@limiter.limit("100/hour")  # Per IP
+async def chat(request: Request):
+    tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+    # Sanitize input
+    message = sanitize_input(request.json["message"])
+
+    # Process
+    return await agent.chat(request.json["user_id"], message)
+```
+
+**Time:** 1 day
 
 ---
 
@@ -2539,9 +2963,16 @@ fidus/
 │   └── ui/                                     # @fidus/ui (Design System)
 │       └── src/
 │           └── components/
-│               ├── chat-interface/            # Phase 1
-│               ├── message-bubble/            # Phase 1
-│               └── confidence-indicator/      # Phase 2
+│               ├── chat-interface/            # ✅ ALREADY AVAILABLE
+│               ├── message-bubble/            # ✅ ALREADY AVAILABLE
+│               ├── confidence-indicator/      # ✅ ALREADY AVAILABLE
+│               ├── button/                    # ✅ ALREADY AVAILABLE
+│               ├── card/                      # ✅ ALREADY AVAILABLE
+│               ├── stack/                     # ✅ ALREADY AVAILABLE
+│               ├── heading/                   # ✅ ALREADY AVAILABLE
+│               ├── text/                      # ✅ ALREADY AVAILABLE
+│               ├── divider/                   # ✅ ALREADY AVAILABLE
+│               └── empty-state/               # ✅ ALREADY AVAILABLE
 │
 ├── docs/
 │   ├── fidus-memory-implementation-plan-v2.md # This document
@@ -2581,15 +3012,30 @@ fidus/
 |-------|----------|-------------|
 | **Phase 1** | 3-4 days | In-memory chat with preference learning |
 | **Phase 2** | 4-5 days | Persistent preferences with Neo4j, confidence scoring |
-| **Phase 3** | 5-6 days | Situational context with Qdrant |
+| **Phase 3** | 6-7 days | Situational context + Domain events + Error handling |
 | **Phase 4** | 4-5 days | MCP interface, multi-user support |
 | **Polish** | 2-3 days | Bug fixes, documentation, testing |
 
-**Total:** ~20 days (4 weeks)
+**Total:** ~21-23 days (4-5 weeks)
+
+**Note:** Phase 3 increased by 1 day to include Domain Events (Task 3.9) and Error Handling.
 
 ---
 
-**End of Implementation Plan v2**
+**End of Implementation Plan v3**
+
+**Key Changes from v2:**
+- ✅ **Multi-Tenancy by Design** - Fixed `tenant_id` in all schemas, queries, and payloads
+- ✅ **Domain Events** - Event schemas defined (Phase 3, Task 3.9)
+- ✅ **Type Safety** - Zod schemas for all API boundaries
+- ✅ **Configurable Embedding Dimensions** - Support for different embedding models
+- ✅ **Standardized UUID Generation** - Python uuid4() throughout
+- ✅ **Error Handling** - Retry strategies, fallbacks, input sanitization
+- ✅ **Security** - Rate limiting, input validation
+- ✅ **100% @fidus/ui Components** - NO styled divs, NO custom CSS, NO Tailwind classes
+- ✅ **Use Existing Components** - ChatInterface, MessageBubble, ConfidenceIndicator already available
+- ⏸️ **AI-Driven UI Paradigm** - Deferred (acceptable for prototype, will be added later)
+- ⏸️ **Observability** - Deferred (will be centralized in full Fidus)
 
 **Key Changes from v1:**
 - ✅ Removed specific demo scenarios (domain-agnostic)
