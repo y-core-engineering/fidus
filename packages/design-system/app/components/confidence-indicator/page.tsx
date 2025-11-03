@@ -97,12 +97,12 @@ export default function ConfidenceIndicatorPage() {
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <h1>Confidence Indicator</h1>
       <p className="lead">
-        Visual display of ML confidence scores with color-coded badges and progress bars. Shows how certain the AI is about its predictions.
+        Visual display of ML confidence scores with color-coded badges. The ConfidenceIndicator is automatically integrated into MessageBubble suggestion chips and shows how certain the AI is about detected preferences.
       </p>
 
-      <h2>In Context: Chat Messages with Suggestions</h2>
+      <h2>How It Appears in Chat Messages</h2>
       <p>
-        The ConfidenceIndicator is most commonly used within suggestion chips in chat messages. Each suggestion shows a confidence badge indicating how certain the AI is about the detected preference.
+        When you use MessageBubble with suggestions, the ConfidenceIndicator is automatically rendered inside each suggestion chip with color-coded badges based on the confidence level.
       </p>
 
       <h3>High Confidence (92% - Green)</h3>
@@ -171,30 +171,24 @@ export default function ConfidenceIndicatorPage() {
         </div>
       </ComponentPreview>
 
-      <h2>Variants</h2>
-
-      <h3>Minimal (Default)</h3>
-      <p>The minimal variant shows only a percentage badge with color coding. This is the default variant used in suggestion chips:</p>
+      <h2>Automatic Integration</h2>
+      <p>
+        You don't need to manually add ConfidenceIndicator to your code. When you create a MessageBubble with suggestions, the confidence badge is automatically displayed based on the <code>confidence</code> value you provide:
+      </p>
 
       <ComponentPreview
-        code={`<MessageBubble
+        code={`// Simply provide the confidence value in the suggestion object
+<MessageBubble
   id="msg-1"
   role="assistant"
-  content="I detected multiple preferences from your message!"
+  content="I detected preferences from your message!"
   timestamp={new Date()}
   avatar={{ fallback: 'AI' }}
   suggestions={[
     {
       id: 'sug-1',
       text: 'cappuccino',
-      confidence: 0.95, // minimal variant (default)
-      onAccept: () => console.log('Accepted'),
-      onReject: () => console.log('Rejected')
-    },
-    {
-      id: 'sug-2',
-      text: 'oat milk',
-      confidence: 0.7,
+      confidence: 0.95, // The badge appears automatically
       onAccept: () => console.log('Accepted'),
       onReject: () => console.log('Rejected')
     }
@@ -228,15 +222,31 @@ export default function ConfidenceIndicatorPage() {
         </div>
       </ComponentPreview>
 
-      <h3>Detailed</h3>
-      <p>The detailed variant shows a progress bar, badge, and confidence level label. This variant is used when rendering standalone ConfidenceIndicator components in settings or detailed views (not within MessageBubble suggestions):</p>
+      <h2>Standalone Usage (Advanced)</h2>
+      <p>
+        If you need to display confidence scores outside of MessageBubble suggestions (e.g., in settings or detailed views), you can use ConfidenceIndicator as a standalone component:
+      </p>
 
+      <h3>Minimal Variant (Badge Only)</h3>
       <ComponentPreview
-        code={`// Note: The detailed variant is NOT available within MessageBubble suggestions.
-// It's used when rendering ConfidenceIndicator as a standalone component
-// in settings pages or detailed preference views.
+        code={`import { ConfidenceIndicator, Stack } from '@fidus/ui';
 
-import { ConfidenceIndicator, Stack } from '@fidus/ui';
+<Stack direction="horizontal" spacing="md" align="center">
+  <ConfidenceIndicator confidence={0.95} variant="minimal" size="sm" />
+  <ConfidenceIndicator confidence={0.7} variant="minimal" size="md" />
+  <ConfidenceIndicator confidence={0.4} variant="minimal" size="lg" />
+</Stack>`}
+      >
+        <Stack direction="horizontal" spacing="md" align="center">
+          <ConfidenceIndicator confidence={0.95} variant="minimal" size="sm" />
+          <ConfidenceIndicator confidence={0.7} variant="minimal" size="md" />
+          <ConfidenceIndicator confidence={0.4} variant="minimal" size="lg" />
+        </Stack>
+      </ComponentPreview>
+
+      <h3>Detailed Variant (With Progress Bar)</h3>
+      <ComponentPreview
+        code={`import { ConfidenceIndicator, Stack } from '@fidus/ui';
 
 <Stack direction="vertical" spacing="md">
   <ConfidenceIndicator confidence={0.92} variant="detailed" />
@@ -309,25 +319,6 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
         </table>
       </div>
 
-      <h2>Sizes</h2>
-      <p>The ConfidenceIndicator supports three sizes when used as a standalone component (not within MessageBubble suggestions):</p>
-
-      <ComponentPreview
-        code={`import { ConfidenceIndicator, Stack } from '@fidus/ui';
-
-<Stack direction="horizontal" spacing="md" align="center">
-  <ConfidenceIndicator confidence={0.85} size="sm" />
-  <ConfidenceIndicator confidence={0.85} size="md" />
-  <ConfidenceIndicator confidence={0.85} size="lg" />
-</Stack>`}
-      >
-        <Stack direction="horizontal" spacing="md" align="center">
-          <ConfidenceIndicator confidence={0.85} size="sm" />
-          <ConfidenceIndicator confidence={0.85} size="md" />
-          <ConfidenceIndicator confidence={0.85} size="lg" />
-        </Stack>
-      </ComponentPreview>
-
       <h2>Props</h2>
       <PropsTable props={props} />
 
@@ -338,11 +329,7 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
           <ul className="space-y-sm text-sm">
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Displaying ML model confidence scores</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-muted-foreground shrink-0">•</span>
-              <span>Showing certainty of AI-suggested preferences</span>
+              <span>Showing AI confidence in detected user preferences (automatic in MessageBubble)</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
@@ -352,6 +339,10 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
               <span className="text-muted-foreground shrink-0">•</span>
               <span>Helping users understand when to trust AI predictions</span>
             </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Displaying confidence scores in settings or analytics pages (standalone)</span>
+            </li>
           </ul>
         </div>
 
@@ -360,11 +351,7 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
           <ul className="space-y-sm text-sm">
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Use minimal variant for inline display (e.g., in suggestion chips)</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-muted-foreground shrink-0">•</span>
-              <span>Use detailed variant when space allows for better visibility</span>
+              <span>Just provide confidence values in MessageBubble suggestions - the indicator appears automatically</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
@@ -372,7 +359,11 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
             </li>
             <li className="flex gap-sm">
               <span className="text-muted-foreground shrink-0">•</span>
-              <span>Keep tooltips enabled for additional context</span>
+              <span>Use standalone mode only when displaying confidence outside of chat (e.g., settings)</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-muted-foreground shrink-0">•</span>
+              <span>Higher confidence (&gt;0.8) should correlate with better AI training data</span>
             </li>
           </ul>
         </div>
@@ -410,15 +401,7 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
           <ul className="space-y-md text-sm">
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Use within MessageBubble suggestions for proper context</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-success shrink-0">•</span>
-              <span>Use minimal variant for compact UI (suggestion chips)</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-success shrink-0">•</span>
-              <span>Use detailed variant when space allows for better visibility</span>
+              <span>Just add confidence to MessageBubble suggestions - it works automatically</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
@@ -426,7 +409,11 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
             </li>
             <li className="flex gap-sm">
               <span className="text-success shrink-0">•</span>
-              <span>Keep tooltips enabled for user education</span>
+              <span>Use color-coded badges to help users quickly assess AI certainty</span>
+            </li>
+            <li className="flex gap-sm">
+              <span className="text-success shrink-0">•</span>
+              <span>Use standalone mode for settings or analytics pages</span>
             </li>
           </ul>
         </div>
@@ -438,7 +425,7 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
           <ul className="space-y-md text-sm">
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Don't use standalone without MessageBubble context</span>
+              <span>Don't manually add ConfidenceIndicator inside MessageBubble - it's automatic</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
@@ -446,15 +433,11 @@ import { ConfidenceIndicator, Stack } from '@fidus/ui';
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Don't show confidence scores without user-facing context</span>
+              <span>Don't show confidence scores without explaining what they mean</span>
             </li>
             <li className="flex gap-sm">
               <span className="text-error shrink-0">•</span>
-              <span>Don't disable tooltips unless absolutely necessary</span>
-            </li>
-            <li className="flex gap-sm">
-              <span className="text-error shrink-0">•</span>
-              <span>Don't use for non-ML certainty indicators</span>
+              <span>Don't use for non-ML certainty indicators (use Badge instead)</span>
             </li>
           </ul>
         </div>

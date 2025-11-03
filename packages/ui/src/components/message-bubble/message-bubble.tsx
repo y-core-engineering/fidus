@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { cva } from 'class-variance-authority';
 import { Avatar } from '../avatar';
 import { Chip } from '../chip';
+import { ConfidenceIndicator } from '../confidence-indicator';
 import { cn } from '../../lib/cn';
 
 /**
@@ -177,8 +178,13 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
                   key={suggestion.id}
                   className="flex items-center gap-2"
                 >
-                  <Chip size="sm" variant="outlined">
-                    {suggestion.text} ({Math.round(suggestion.confidence * 100)}%)
+                  <Chip size="sm" variant="outlined" className="flex items-center gap-1.5">
+                    <span>{suggestion.text}</span>
+                    <ConfidenceIndicator
+                      confidence={suggestion.confidence}
+                      variant="minimal"
+                      size="sm"
+                    />
                   </Chip>
                   {suggestion.onAccept && (
                     <button
