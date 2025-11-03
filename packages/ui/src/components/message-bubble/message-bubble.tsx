@@ -152,11 +152,11 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
               remarkPlugins={[remarkGfm]}
               components={{
                 // Style links to inherit color
-                a: ({ node, ...props }) => (
+                a: ({ ...props }) => (
                   <a {...props} className="underline hover:opacity-80" />
                 ),
                 // Style code blocks
-                code: ({ node, inline, ...props }: any) => (
+                code: ({ inline, ...props }: any) => (
                   inline ? (
                     <code {...props} className="bg-black/10 px-1 py-0.5 rounded text-sm" />
                   ) : (
@@ -164,14 +164,14 @@ export const MessageBubble = React.forwardRef<HTMLDivElement, MessageBubbleProps
                   )
                 ),
                 // Style lists
-                ul: ({ node, ...props }) => (
+                ul: ({ ...props }) => (
                   <ul {...props} className="list-disc list-inside my-2" />
                 ),
-                ol: ({ node, ...props }) => (
+                ol: ({ ...props }) => (
                   <ol {...props} className="list-decimal list-inside my-2" />
                 ),
                 // Style paragraphs
-                p: ({ node, ...props }) => (
+                p: ({ ...props }) => (
                   <p {...props} className="mb-2 last:mb-0" />
                 ),
               }}
