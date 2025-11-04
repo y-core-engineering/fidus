@@ -1,27 +1,33 @@
 """Persistent chat agent with Neo4j-backed preference storage.
 
 This module extends the InMemoryAgent with Neo4j persistence,
-confidence scoring, and accept/reject functionality for preferences.
+confidence scoring, accept/reject functionality, and context-aware
+preference learning (Phase 3: Situational Context Awareness).
 """
 
 import json
 import logging
-from typing import Dict, List, Any, AsyncGenerator, Optional
+from typing import Dict, List, Any, AsyncGenerator
 from fidus.memory.simple_agent import InMemoryAgent
 from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
+from fidus.memory.context.agent import ContextAwareAgent
 from fidus.config import config
 
 logger = logging.getLogger(__name__)
 
 
 class PersistentAgent(InMemoryAgent):
-    """Chat agent with Neo4j-backed persistent preferences.
+    """Chat agent with Neo4j-backed persistent preferences and context-awareness.
 
     Extends InMemoryAgent to add:
     - Neo4j persistence for preferences
     - Confidence scoring (+0.1 on accept, -0.15 on reject)
     - Accept/reject actions for user feedback
     - Multi-tenant support
+    - **Phase 3: Situational context awareness**
+      - Context extraction from messages (LLM + system)
+      - Context-based preference storage (Neo4j + Qdrant)
+      - Context-based preference retrieval (similarity search)
     """
 
     def __init__(
@@ -29,6 +35,7 @@ class PersistentAgent(InMemoryAgent):
         tenant_id: str = "default-tenant",
         llm_model: str | None = None,
         max_history_messages: int = 20,
+        enable_context_awareness: bool = True,
     ):
         """Initialize persistent agent.
 
@@ -36,11 +43,21 @@ class PersistentAgent(InMemoryAgent):
             tenant_id: Tenant identifier for multi-tenancy
             llm_model: LLM model to use (defaults to config)
             max_history_messages: Conversation history window size
+            enable_context_awareness: Enable Phase 3 context-aware features (default: True)
         """
         super().__init__(llm_model=llm_model, max_history_messages=max_history_messages)
         self.tenant_id = tenant_id
         self.store = Neo4jPreferenceStore(config)
         self._connected = False
+        self.enable_context_awareness = enable_context_awareness
+
+        # Initialize ContextAwareAgent for Phase 3
+        if enable_context_awareness:
+            self.context_agent = ContextAwareAgent()
+            logger.info("Context-awareness enabled (Phase 3)")
+        else:
+            self.context_agent = None
+            logger.info("Context-awareness disabled")
 
     async def connect(self) -> None:
         """Connect to Neo4j database."""
@@ -53,11 +70,16 @@ class PersistentAgent(InMemoryAgent):
             await self._load_preferences()
 
     async def disconnect(self) -> None:
-        """Disconnect from Neo4j database."""
+        """Disconnect from Neo4j database and close context agent."""
         if self._connected:
             await self.store.disconnect()
             self._connected = False
             logger.info("Disconnected from Neo4j")
+
+        # Close context agent connections
+        if self.context_agent:
+            await self.context_agent.close()
+            logger.info("Closed ContextAwareAgent connections")
 
     async def _load_preferences(self) -> None:
         """Load preferences from Neo4j into memory."""
@@ -146,9 +168,15 @@ class PersistentAgent(InMemoryAgent):
             self.preferences[key] = pref_data
 
             # Mark for persistence (will be persisted on next save)
+            # Phase 3: Include original message and user_id for context recording
             if not hasattr(self, '_pending_saves'):
                 self._pending_saves = []
-            self._pending_saves.append(pref_data)
+
+            save_data = pref_data.copy()
+            save_data["original_message"] = getattr(self, '_last_user_message', "")
+            save_data["user_id"] = getattr(self, '_current_user_id', "unknown")
+
+            self._pending_saves.append(save_data)
 
             sentiment_emoji = "👍" if new_sentiment == "positive" else "👎" if new_sentiment == "negative" else "😐"
             action = "Updated" if key in self.preferences else "Added"
@@ -279,8 +307,69 @@ class PersistentAgent(InMemoryAgent):
 
         return await self.store.get_preferences(self.tenant_id)
 
+    async def _get_context_relevant_preferences(
+        self,
+        message: str,
+        user_id: str,
+        top_k: int = 10,
+        min_score: float = 0.6,
+    ) -> Dict[str, Dict[str, Any]]:
+        """Get preferences relevant to current context (Phase 3).
+
+        Args:
+            message: Current user message to extract context from
+            user_id: User ID for context tracking
+            top_k: Maximum number of situations to retrieve
+            min_score: Minimum similarity score (0.0 to 1.0)
+
+        Returns:
+            Dict of context-relevant preferences (same format as self.preferences)
+        """
+        if not self.enable_context_awareness or not self.context_agent:
+            # Fall back to all preferences if context-awareness disabled
+            return self.preferences
+
+        try:
+            # Get similar situations based on current context
+            similar_situations = await self.context_agent.get_relevant_preferences(
+                message=message,
+                tenant_id=self.tenant_id,
+                user_id=user_id,
+                top_k=top_k,
+                min_score=min_score,
+            )
+
+            if not similar_situations:
+                logger.info("No similar situations found, using all preferences")
+                return self.preferences
+
+            # Extract preference IDs from situations (via Neo4j relationships)
+            relevant_prefs = {}
+            for situation in similar_situations:
+                # Find preferences linked to this situation
+                for key, pref in self.preferences.items():
+                    # Check if this preference is linked to the situation
+                    # (For now, include all preferences - proper filtering would query Neo4j IN_SITUATION relationships)
+                    if pref.get("id"):
+                        relevant_prefs[key] = pref
+
+            logger.info(
+                f"Context-aware retrieval: {len(similar_situations)} situations → "
+                f"{len(relevant_prefs)} relevant preferences (total: {len(self.preferences)})"
+            )
+
+            # If no preferences found via context, fall back to all
+            return relevant_prefs if relevant_prefs else self.preferences
+
+        except Exception as e:
+            logger.warning(f"Context-aware retrieval failed, using all preferences: {e}")
+            return self.preferences
+
     async def _persist_pending_saves(self) -> None:
-        """Persist any pending preference saves to Neo4j."""
+        """Persist any pending preference saves to Neo4j.
+
+        Phase 3: Also records situational context for each preference.
+        """
         if not self._connected:
             return
 
@@ -308,47 +397,127 @@ class PersistentAgent(InMemoryAgent):
                 self.preferences[key]["id"] = created_pref["id"]
                 logger.info(f"Persisted preference to Neo4j: {key}")
 
+                # Phase 3: Record situational context
+                if self.enable_context_awareness and self.context_agent:
+                    try:
+                        # Get the original message that triggered this preference
+                        original_message = pref_data.get("original_message", "")
+
+                        if original_message:
+                            situation = await self.context_agent.record_preference_with_context(
+                                message=original_message,
+                                preference_id=created_pref["id"],
+                                tenant_id=self.tenant_id,
+                                user_id=pref_data.get("user_id", "unknown"),
+                            )
+                            logger.info(
+                                f"Recorded context for preference {key}: "
+                                f"{len(situation.context.factors)} factors, situation_id={situation.id}"
+                            )
+                    except Exception as e:
+                        # Don't fail preference creation if context recording fails
+                        logger.warning(f"Failed to record context for preference {key}: {e}")
+
             except Exception as e:
                 logger.error(f"Failed to persist preference {pref_data['key']}: {e}")
 
         # Clear pending saves
         self._pending_saves = []
 
-    async def chat(self, user_message: str) -> str:
+    async def chat(self, user_message: str, user_id: str = "unknown") -> str:
         """Process user message and return response.
 
-        Overrides parent to add Neo4j persistence after processing.
-        """
-        response = await super().chat(user_message)
+        Overrides parent to add Neo4j persistence and context-awareness.
 
-        # Persist any new preferences to Neo4j
+        Args:
+            user_message: The user's message
+            user_id: User identifier for context tracking (Phase 3)
+
+        Returns:
+            str: Bot response
+        """
+        # Phase 3: Store message and user_id for context recording
+        self._last_user_message = user_message
+        self._current_user_id = user_id
+
+        # Phase 3: Get context-relevant preferences before generating response
+        if self.enable_context_awareness and self.context_agent:
+            original_prefs = self.preferences.copy()
+            try:
+                # Temporarily set preferences to context-relevant ones
+                self.preferences = await self._get_context_relevant_preferences(
+                    message=user_message,
+                    user_id=user_id,
+                )
+
+                response = await super().chat(user_message)
+
+                # Restore original preferences
+                self.preferences = original_prefs
+            except Exception as e:
+                logger.warning(f"Context-aware filtering failed, using all preferences: {e}")
+                self.preferences = original_prefs
+                response = await super().chat(user_message)
+        else:
+            response = await super().chat(user_message)
+
+        # Persist any new preferences to Neo4j (and context to Qdrant)
         await self._persist_pending_saves()
 
         return response
 
-    async def chat_stream(self, user_message: str) -> AsyncGenerator[str, None]:
+    async def chat_stream(self, user_message: str, user_id: str = "unknown") -> AsyncGenerator[str, None]:
         """Process user message and stream response token by token.
 
-        Overrides parent to add Neo4j persistence after processing.
+        Overrides parent to add Neo4j persistence and context-awareness.
+
+        Args:
+            user_message: The user's message
+            user_id: User identifier for context tracking (Phase 3)
+
+        Yields:
+            str: SSE events (tokens, preferences_updated, conflicts, done)
         """
-        async for event in super().chat_stream(user_message):
-            # Check event type
+        # Phase 3: Store message and user_id for context recording
+        self._last_user_message = user_message
+        self._current_user_id = user_id
+
+        # Phase 3: Get context-relevant preferences before generating response
+        if self.enable_context_awareness and self.context_agent:
+            original_prefs = self.preferences.copy()
             try:
-                event_data = json.loads(event)
-                event_type = event_data.get("type")
+                # Temporarily set preferences to context-relevant ones
+                self.preferences = await self._get_context_relevant_preferences(
+                    message=user_message,
+                    user_id=user_id,
+                )
+            except Exception as e:
+                logger.warning(f"Context-aware filtering failed, using all preferences: {e}")
+                # Keep original preferences on error
 
-                if event_type == "preferences_updated":
-                    # Persist to Neo4j immediately when preferences are updated
-                    await self._persist_pending_saves()
-                    # Now yield the event so frontend can refresh
-                    yield event
-                    continue
-                elif event_type == "done":
-                    # Just yield done - persistence already happened at preferences_updated
-                    yield event
-                    continue
-            except json.JSONDecodeError:
-                pass
+        try:
+            async for event in super().chat_stream(user_message):
+                # Check event type
+                try:
+                    event_data = json.loads(event)
+                    event_type = event_data.get("type")
 
-            # Yield all other events (tokens, acknowledged, etc.)
-            yield event
+                    if event_type == "preferences_updated":
+                        # Persist to Neo4j immediately when preferences are updated
+                        await self._persist_pending_saves()
+                        # Now yield the event so frontend can refresh
+                        yield event
+                        continue
+                    elif event_type == "done":
+                        # Just yield done - persistence already happened at preferences_updated
+                        yield event
+                        continue
+                except json.JSONDecodeError:
+                    pass
+
+                # Yield all other events (tokens, acknowledged, etc.)
+                yield event
+        finally:
+            # Phase 3: Restore original preferences after stream
+            if self.enable_context_awareness and self.context_agent:
+                self.preferences = original_prefs

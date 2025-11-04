@@ -3,7 +3,6 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from fidus.memory.simple_agent import InMemoryAgent
 from fidus.memory.persistent_agent import PersistentAgent
-from fidus.config import config
 import logging
 import traceback
 import os
@@ -59,11 +58,15 @@ class AIConfigResponse(BaseModel):
 
 @router.post("/chat")
 async def chat_stream(request: ChatRequest):
-    """Chat endpoint with SSE streaming."""
+    """Chat endpoint with SSE streaming.
+
+    Phase 3: Passes user_id to agent for context-aware preference learning.
+    """
     try:
         async def event_generator():
             try:
-                async for event in agent.chat_stream(request.message):
+                # Phase 3: Pass user_id to agent for context tracking
+                async for event in agent.chat_stream(request.message, user_id=request.user_id):
                     # SSE format: "data: {json}\n\n"
                     yield f"data: {event}\n"
             except Exception as e:
@@ -91,9 +94,13 @@ async def chat_stream(request: ChatRequest):
 
 @router.post("/chat/legacy", response_model=ChatResponse)
 async def chat_legacy(request: ChatRequest):
-    """Legacy non-streaming chat endpoint (for backwards compatibility)."""
+    """Legacy non-streaming chat endpoint (for backwards compatibility).
+
+    Phase 3: Passes user_id to agent for context-aware preference learning.
+    """
     try:
-        response = await agent.chat(request.message)
+        # Phase 3: Pass user_id to agent for context tracking
+        response = await agent.chat(request.message, user_id=request.user_id)
         return ChatResponse(response=response)
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
