@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { Button, Alert } from '@fidus/ui';
 
 interface ContextFactor {
@@ -32,6 +32,8 @@ export const SituationsViewer = forwardRef<SituationsViewerRef, SituationsViewer
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [expandedSituation, setExpandedSituation] = useState<string | null>(null);
+    const [filterKey, setFilterKey] = useState<string>('');
+    const [filterValue, setFilterValue] = useState<string>('');
 
     const fetchSituations = async () => {
       setIsLoading(true);
@@ -105,6 +107,64 @@ export const SituationsViewer = forwardRef<SituationsViewerRef, SituationsViewer
         .join(' ');
     };
 
+    // Filter situations based on filter criteria
+    const filteredSituations = useMemo(() => {
+      if (!filterKey && !filterValue) {
+        return situations;
+      }
+
+      return situations.filter((situation) => {
+        if (filterKey && filterValue) {
+          // Filter by specific key-value pair
+          return situation.factors[filterKey]?.toLowerCase().includes(filterValue.toLowerCase());
+        } else if (filterKey) {
+          // Filter by key existence
+          return filterKey in situation.factors;
+        } else if (filterValue) {
+          // Filter by value in any factor
+          return Object.values(situation.factors).some((val) =>
+            val.toLowerCase().includes(filterValue.toLowerCase())
+          );
+        }
+        return true;
+      });
+    }, [situations, filterKey, filterValue]);
+
+    // Calculate statistics
+    const statistics = useMemo(() => {
+      const factorCounts: Record<string, Record<string, number>> = {};
+
+      situations.forEach((situation) => {
+        Object.entries(situation.factors).forEach(([key, value]) => {
+          if (!factorCounts[key]) {
+            factorCounts[key] = {};
+          }
+          factorCounts[key][value] = (factorCounts[key][value] || 0) + 1;
+        });
+      });
+
+      // Get top 5 most common context patterns
+      const topFactors = Object.entries(factorCounts)
+        .map(([key, values]) => {
+          const topValue = Object.entries(values).sort((a, b) => b[1] - a[1])[0];
+          return {
+            key,
+            value: topValue[0],
+            count: topValue[1],
+            percentage: Math.round((topValue[1] / situations.length) * 100),
+          };
+        })
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      return {
+        total: situations.length,
+        filtered: filteredSituations.length,
+        topFactors,
+        uniqueFactorKeys: Object.keys(factorCounts),
+      };
+    }, [situations, filteredSituations]);
+
     if (isLoading && situations.length === 0) {
       return (
         <div className={`p-4 ${className}`}>
@@ -141,8 +201,112 @@ export const SituationsViewer = forwardRef<SituationsViewerRef, SituationsViewer
 
     return (
       <div className={`${className}`}>
+        {/* Statistics Section */}
+        {situations.length > 0 && (
+          <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+            <h3 className="text-sm font-semibold text-gray-800 mb-3">📊 Context Statistics</h3>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="bg-white p-2 rounded border border-gray-200">
+                <div className="text-xs text-gray-500">Total Situations</div>
+                <div className="text-2xl font-bold text-blue-600">{statistics.total}</div>
+              </div>
+              <div className="bg-white p-2 rounded border border-gray-200">
+                <div className="text-xs text-gray-500">Filtered Results</div>
+                <div className="text-2xl font-bold text-purple-600">{statistics.filtered}</div>
+              </div>
+            </div>
+
+            {/* Top Context Patterns */}
+            <div className="bg-white p-3 rounded border border-gray-200">
+              <h4 className="text-xs font-semibold text-gray-700 mb-2">Most Common Patterns</h4>
+              <div className="space-y-2">
+                {statistics.topFactors.map((factor) => (
+                  <div key={factor.key} className="flex items-center gap-2">
+                    <span className="text-lg">{getFactorIcon(factor.key)}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-gray-700">
+                        {getFactorDisplayName(factor.key)}: {factor.value}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full transition-all"
+                            style={{ width: `${factor.percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                          {factor.count} ({factor.percentage}%)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Filter Section */}
+        {situations.length > 0 && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">🔍 Filter Situations</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs text-gray-600 mb-1 block">Context Factor</label>
+                <select
+                  value={filterKey}
+                  onChange={(e) => setFilterKey(e.target.value)}
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">All Factors</option>
+                  {statistics.uniqueFactorKeys.map((key) => (
+                    <option key={key} value={key}>
+                      {getFactorIcon(key)} {getFactorDisplayName(key)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 mb-1 block">Value</label>
+                <input
+                  type="text"
+                  value={filterValue}
+                  onChange={(e) => setFilterValue(e.target.value)}
+                  placeholder="Search value..."
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            {(filterKey || filterValue) && (
+              <button
+                onClick={() => {
+                  setFilterKey('');
+                  setFilterValue('');
+                }}
+                className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="space-y-3">
-          {situations.map((situation) => {
+          {filteredSituations.length === 0 && situations.length > 0 && (
+            <div className="text-center text-gray-500 py-8">
+              <p className="text-lg mb-2">🔍 No situations match your filters</p>
+              <button
+                onClick={() => {
+                  setFilterKey('');
+                  setFilterValue('');
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 underline"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+          {filteredSituations.map((situation) => {
             const isExpanded = expandedSituation === situation.id;
             const factorCount = Object.keys(situation.factors).length;
 

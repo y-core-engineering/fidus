@@ -246,6 +246,14 @@ class PersistentAgent(InMemoryAgent):
         if updated_pref["confidence"] <= 0.0:
             await self.delete_preference(preference_id)
 
+            # Clean up orphaned situations (situations without any linked preferences)
+            try:
+                orphaned_count = await self.store.cleanup_orphaned_situations(self.tenant_id)
+                if orphaned_count > 0:
+                    logger.info(f"Cleaned up {orphaned_count} orphaned situations")
+            except Exception as e:
+                logger.warning(f"Failed to cleanup orphaned situations: {e}")
+
         logger.info(f"Rejected preference {preference_id}: confidence now {updated_pref['confidence']:.2f}")
 
         return updated_pref

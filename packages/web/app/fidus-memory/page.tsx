@@ -307,15 +307,15 @@ export default function FidusMemoryPage() {
           )}
 
           {/* Main Content: Chat + Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg" style={{ height: 'calc(100vh - 280px)' }}>
             {/* Chat Interface */}
-            <div className="lg:col-span-2 shadow-lg rounded-lg overflow-hidden">
+            <div className="lg:col-span-2 shadow-lg rounded-lg overflow-hidden h-full">
               <ChatInterface
                 messages={messages}
                 onSendMessage={handleSendMessage}
                 placeholder="Tell me about your preferences..."
                 isLoading={isLoading}
-                maxHeight="600px"
+                maxHeight="100%"
                 emptyStateTitle="Start a conversation"
                 emptyStateMessage="Tell me about your preferences, habits, or anything you'd like me to remember. I'll learn from our conversation and help you in the future."
                 privacyBadges={getPrivacyBadges('chat')}
@@ -457,7 +457,7 @@ export default function FidusMemoryPage() {
             </div>
 
             {/* Sidebar with Tabs */}
-            <div className="shadow-lg rounded-lg overflow-hidden bg-white" style={{ maxHeight: '600px', display: 'flex', flexDirection: 'column' }}>
+            <div className="shadow-lg rounded-lg overflow-hidden bg-white h-full" style={{ display: 'flex', flexDirection: 'column' }}>
               {/* Tab Headers */}
               <div className="flex border-b border-gray-200">
                 <button

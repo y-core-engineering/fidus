@@ -324,6 +324,89 @@ async def delete_all_preferences():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.delete("/purge-all")
+async def purge_all_memories():
+    """Purge ALL memories: preferences, situations, and embeddings from all databases.
+
+    This removes:
+    - All Preferences from Neo4j
+    - All Situations from Neo4j
+    - All embeddings from Qdrant
+    - Clears in-memory preferences
+
+    WARNING: This action cannot be undone!
+    """
+    if not USE_NEO4J:
+        raise HTTPException(status_code=501, detail="Purge requires Neo4j")
+
+    try:
+        deleted_counts = {
+            "preferences": 0,
+            "situations": 0,
+            "qdrant_collections": 0
+        }
+
+        # 1. Delete all situations from Neo4j (do this FIRST to remove relationships)
+        from fidus.memory.context.storage import ContextStorageService
+        storage = ContextStorageService()
+
+        async with storage.neo4j_driver.session() as session:
+            # Delete all Situation nodes for this tenant
+            result = await session.run("""
+                MATCH (s:Situation {tenant_id: $tenant_id})
+                DETACH DELETE s
+                RETURN count(s) as count
+            """, tenant_id=agent.tenant_id)
+
+            record = await result.single()
+            deleted_counts["situations"] = record["count"] if record else 0
+
+        # 2. Delete all preferences from Neo4j + in-memory
+        deleted_counts["preferences"] = await agent.delete_all_preferences()
+
+        # 3. Delete all embeddings from Qdrant
+        try:
+            from qdrant_client import QdrantClient
+            from fidus.config import config as app_config
+
+            qdrant_client = QdrantClient(
+                host=app_config.qdrant_host,
+                port=app_config.qdrant_port,
+                grpc_port=app_config.qdrant_grpc_port,
+                prefer_grpc=True,
+            )
+
+            # Delete the entire collection (will be recreated on next use)
+            collection_name = f"situations_{agent.tenant_id}"
+            try:
+                qdrant_client.delete_collection(collection_name)
+                deleted_counts["qdrant_collections"] = 1
+                logger.info(f"Deleted Qdrant collection: {collection_name}")
+            except Exception as e:
+                logger.warning(f"Qdrant collection might not exist: {e}")
+
+        except Exception as e:
+            logger.warning(f"Could not delete Qdrant data: {e}")
+
+        logger.info(
+            f"Purged all memories for tenant {agent.tenant_id}: "
+            f"{deleted_counts['preferences']} preferences, "
+            f"{deleted_counts['situations']} situations, "
+            f"{deleted_counts['qdrant_collections']} Qdrant collections"
+        )
+
+        return {
+            "status": "purged_all",
+            "deleted": deleted_counts,
+            "message": "All memories have been permanently deleted from all databases"
+        }
+
+    except Exception as e:
+        logger.error(f"Error purging all memories: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Phase 3: Situational Context endpoints
 
 

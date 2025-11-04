@@ -138,24 +138,21 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
     const isSendButtonDisabled = isDisabled || !inputValue.trim();
 
     return (
-      <Stack
+      <div
         ref={ref}
-        direction="vertical"
-        spacing="none"
         className={cn(
-          'bg-background border border-border rounded-lg',
+          'bg-background border border-border rounded-lg relative flex flex-col',
           className
         )}
+        style={{ height: maxHeight }}
         data-testid="chat-interface"
       >
         {/* Message List */}
-        <Stack
-          direction="vertical"
-          spacing="md"
-          className="flex-1 overflow-y-auto p-md scroll-smooth"
-          style={{ maxHeight }}
+        <div
+          className="flex-1 overflow-y-auto p-md scroll-smooth pb-[180px]"
           data-testid="message-list"
         >
+          <Stack direction="vertical" spacing="md">
           {messages.length === 0 ? (
             /* Empty State */
             <EmptyCard
@@ -192,15 +189,15 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
               <div ref={messagesEndRef} />
             </>
           )}
-        </Stack>
+          </Stack>
+        </div>
 
-        {/* Input Area */}
-        <Stack
-          direction="vertical"
-          spacing="sm"
-          className="border-t border-border p-md"
+        {/* Input Area - Fixed at bottom */}
+        <div
+          className="absolute bottom-0 left-0 right-0 border-t border-border p-md bg-background"
           data-testid="input-area"
         >
+          <Stack direction="vertical" spacing="sm">
           <textarea
             ref={textareaRef}
             value={inputValue}
@@ -250,8 +247,9 @@ export const ChatInterface = React.forwardRef<HTMLDivElement, ChatInterfaceProps
               Send
             </Button>
           </Stack>
-        </Stack>
-      </Stack>
+          </Stack>
+        </div>
+      </div>
     );
   }
 );

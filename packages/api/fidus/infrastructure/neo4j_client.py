@@ -278,7 +278,7 @@ class Neo4jPreferenceStore:
                 """
                 MATCH (p:Preference)
                 WHERE p.id = $id AND p.tenant_id = $tenant_id
-                DELETE p
+                DETACH DELETE p
                 RETURN count(p) as deleted_count
                 """,
                 id=preference_id,
@@ -309,8 +309,37 @@ class Neo4jPreferenceStore:
                 """
                 MATCH (p:Preference)
                 WHERE p.tenant_id = $tenant_id
-                DELETE p
+                DETACH DELETE p
                 RETURN count(p) as deleted_count
+                """,
+                tenant_id=tenant_id,
+            )
+
+            record = await result.single()
+            return record["deleted_count"] if record else 0
+
+    async def cleanup_orphaned_situations(self, tenant_id: str) -> int:
+        """Delete situations that have no linked preferences (orphaned).
+
+        Args:
+            tenant_id: Tenant identifier
+
+        Returns:
+            Number of orphaned situations deleted
+
+        Raises:
+            RuntimeError: If driver not initialized
+        """
+        if not self._driver:
+            raise RuntimeError("Driver not initialized. Call connect() first.")
+
+        async with self._driver.session() as session:
+            result = await session.run(
+                """
+                MATCH (s:Situation {tenant_id: $tenant_id})
+                WHERE NOT (s)<-[:IN_SITUATION]-(:Preference)
+                DETACH DELETE s
+                RETURN count(s) as deleted_count
                 """,
                 tenant_id=tenant_id,
             )
