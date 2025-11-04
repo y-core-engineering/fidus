@@ -113,3 +113,4 @@ site/
 
 # Prompts (local only, not for repo)
 docs/prompts/
+.env.memory
