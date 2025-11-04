@@ -1,8 +1,8 @@
 'use client';
 
 import { ChatInterface, Alert, Stack, Container, OpportunityCard, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui';
-import { PreferenceViewer } from './components/PreferenceViewer';
-import { useState, useEffect } from 'react';
+import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceViewer';
+import { useState, useEffect, useRef } from 'react';
 
 interface Message {
   id: string;
@@ -43,6 +43,7 @@ export default function FidusMemoryPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [conflicts, setConflicts] = useState<PreferenceConflict[]>([]);
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null);
+  const preferenceViewerRef = useRef<PreferenceViewerRef>(null);
 
   const fetchAIConfig = async () => {
     try {
@@ -139,7 +140,8 @@ export default function FidusMemoryPage() {
                 break;
 
               case 'preferences_updated':
-                // PreferenceViewer will auto-refresh via polling
+                // Trigger refresh of PreferenceViewer via ref
+                preferenceViewerRef.current?.refresh();
                 break;
 
               case 'preference_conflict':
@@ -452,7 +454,7 @@ export default function FidusMemoryPage() {
 
             {/* Learned Preferences Sidebar */}
             <div className="shadow-lg rounded-lg overflow-hidden" style={{ maxHeight: '600px' }}>
-              <PreferenceViewer />
+              <PreferenceViewer ref={preferenceViewerRef} />
             </div>
           </div>
 

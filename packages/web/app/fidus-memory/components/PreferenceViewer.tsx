@@ -9,26 +9,40 @@ import {
   Spinner,
   EmptyCard,
   Stack,
-  Grid
+  Grid,
+  DetailCard
 } from '@fidus/ui';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 interface PreferenceViewerProps {
   onDeleteAll?: () => Promise<void>;
 }
 
-export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
+export interface PreferenceViewerRef {
+  refresh: () => Promise<void>;
+}
+
+export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewerProps>(
+  function PreferenceViewer({ onDeleteAll }, ref) {
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPreferences();
+    // Initial load with spinner
+    fetchPreferences(true);
   }, []);
 
-  const fetchPreferences = async () => {
+  // Expose refresh method to parent via ref
+  useImperativeHandle(ref, () => ({
+    refresh: () => fetchPreferences(false),
+  }));
+
+  const fetchPreferences = async (showLoadingSpinner = true) => {
     try {
-      setLoading(true);
+      if (showLoadingSpinner) {
+        setLoading(true);
+      }
       setError(null);
       const response = await fetch('http://localhost:8000/memory/preferences');
       if (!response.ok) {
@@ -39,7 +53,9 @@ export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      setLoading(false);
+      if (showLoadingSpinner) {
+        setLoading(false);
+      }
     }
   };
 
@@ -78,8 +94,8 @@ export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
         throw new Error('Failed to accept preference');
       }
 
-      // Refresh preferences to show updated confidence
-      await fetchPreferences();
+      // Refresh preferences to show updated confidence (no spinner)
+      await fetchPreferences(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to accept');
     }
@@ -97,8 +113,8 @@ export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
         throw new Error('Failed to reject preference');
       }
 
-      // Refresh preferences to show updated confidence
-      await fetchPreferences();
+      // Refresh preferences to show updated confidence (no spinner)
+      await fetchPreferences(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reject');
     }
@@ -132,8 +148,8 @@ export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
     return (
       <Container size="md" padding="lg">
         <Stack direction="vertical" spacing="md">
-          <p>Error: {error}</p>
-          <Button onClick={fetchPreferences}>
+          <div className="text-sm text-destructive">Error: {error}</div>
+          <Button onClick={() => fetchPreferences(true)}>
             Retry
           </Button>
         </Stack>
@@ -156,7 +172,7 @@ export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
     <Container size="full" padding="lg">
       <Stack direction="vertical" spacing="lg">
         <Stack direction="horizontal" spacing="md" justify="between">
-          <h2>Your Preferences</h2>
+          <div className="text-lg font-semibold text-foreground">Your Preferences</div>
           <Button
             onClick={handleDeleteAll}
             variant="destructive"
@@ -167,73 +183,86 @@ export function PreferenceViewer({ onDeleteAll }: PreferenceViewerProps) {
         </Stack>
 
         {groupedPreferences.map((group) => (
-          <Stack key={group.domain} direction="vertical" spacing="md">
-            <h3>{group.domain}</h3>
+          <DetailCard
+            key={group.domain}
+            title={group.domain}
+            subtitle={`${group.preferences.length} ${group.preferences.length === 1 ? 'preference' : 'preferences'}`}
+            defaultExpanded={true}
+            collapsible={true}
+          >
             <Grid cols="3" gap="md">
               {group.preferences.map((pref) => (
-                <Stack key={pref.id} direction="vertical" spacing="sm">
-                  <Stack direction="horizontal" spacing="sm" justify="between">
-                    <Stack direction="vertical" spacing="xs">
-                      <strong>{pref.key.split('.').pop()}</strong>
-                      <span>{pref.value}</span>
-                    </Stack>
-                    <Badge
-                      variant={pref.sentiment === 'positive' ? 'success' : pref.sentiment === 'negative' ? 'error' : 'normal'}
-                    >
-                      {pref.sentiment === 'positive' ? '👍' : pref.sentiment === 'negative' ? '👎' : '😐'}
-                    </Badge>
-                  </Stack>
-
-                  <Stack direction="horizontal" spacing="sm" justify="between">
-                    <ConfidenceIndicator
-                      confidence={pref.confidence}
-                      variant="minimal"
-                      size="sm"
-                    />
-                    <Stack direction="horizontal" spacing="xs">
-                      {pref.is_exception && (
-                        <Badge variant="warning" size="sm">
-                          Exception
-                        </Badge>
-                      )}
-                      {(pref.reinforcement_count !== undefined && pref.reinforcement_count > 0) && (
-                        <Badge variant="success" size="sm">
-                          +{pref.reinforcement_count}
-                        </Badge>
-                      )}
-                      {(pref.rejection_count !== undefined && pref.rejection_count > 0) && (
-                        <Badge variant="error" size="sm">
-                          -{pref.rejection_count}
-                        </Badge>
-                      )}
-                    </Stack>
-                  </Stack>
-
-                  {/* Accept/Reject buttons (only if we have ID from Neo4j) */}
-                  {pref.id && (
-                    <Stack direction="horizontal" spacing="xs">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => handleAcceptPreference(pref.id!)}
+                <div key={pref.id} className="rounded-lg border border-border bg-card p-3 shadow-sm">
+                  <Stack direction="vertical" spacing="sm">
+                    {/* Preference header with title and sentiment */}
+                    <Stack direction="horizontal" spacing="sm" justify="between">
+                      <Stack direction="vertical" spacing="xs">
+                        <div className="text-sm font-semibold text-foreground">
+                          {pref.key.split('.').pop()}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {pref.value}
+                        </div>
+                      </Stack>
+                      <Badge
+                        variant={pref.sentiment === 'positive' ? 'success' : pref.sentiment === 'negative' ? 'error' : 'normal'}
                       >
-                        Accept
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRejectPreference(pref.id!)}
-                      >
-                        Reject
-                      </Button>
+                        {pref.sentiment === 'positive' ? '👍' : pref.sentiment === 'negative' ? '👎' : '😐'}
+                      </Badge>
                     </Stack>
-                  )}
-                </Stack>
+
+                    {/* Confidence and metadata */}
+                    <Stack direction="horizontal" spacing="sm" justify="between">
+                      <ConfidenceIndicator
+                        confidence={pref.confidence}
+                        variant="minimal"
+                        size="sm"
+                      />
+                      <Stack direction="horizontal" spacing="xs">
+                        {pref.is_exception && (
+                          <Badge variant="warning" size="sm">
+                            Exception
+                          </Badge>
+                        )}
+                        {(pref.reinforcement_count !== undefined && pref.reinforcement_count > 0) && (
+                          <Badge variant="success" size="sm">
+                            +{pref.reinforcement_count}
+                          </Badge>
+                        )}
+                        {(pref.rejection_count !== undefined && pref.rejection_count > 0) && (
+                          <Badge variant="error" size="sm">
+                            -{pref.rejection_count}
+                          </Badge>
+                        )}
+                      </Stack>
+                    </Stack>
+
+                    {/* Accept/Reject buttons (only if we have ID from Neo4j) */}
+                    {pref.id && (
+                      <Stack direction="horizontal" spacing="xs">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleAcceptPreference(pref.id!)}
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRejectPreference(pref.id!)}
+                        >
+                          Reject
+                        </Button>
+                      </Stack>
+                    )}
+                  </Stack>
+                </div>
               ))}
             </Grid>
-          </Stack>
+          </DetailCard>
         ))}
       </Stack>
     </Container>
   );
-}
+});
