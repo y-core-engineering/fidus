@@ -304,29 +304,38 @@ class InMemoryAgent:
         """Find semantically related preferences that might conflict.
 
         Uses LLM to identify preferences that are subcategories or closely related
-        to the new preference.
+        to the new preference. Only checks preferences within the same domain category.
         """
         if not self.preferences:
             return []
 
-        # Extract just the key part (without domain prefix)
+        # Extract domain and key part
+        new_domain = new_key.split('.')[0] if '.' in new_key else None
         new_key_only = new_key.split('.')[-1] if '.' in new_key else new_key
 
-        # Build list of existing preference keys
-        existing_keys = list(self.preferences.keys())
+        # Filter existing keys to only same domain (e.g., both "food.*")
+        existing_keys = [
+            key for key in self.preferences.keys()
+            if (key.split('.')[0] if '.' in key else None) == new_domain
+        ]
+
+        # If no keys in same domain, no conflicts possible
+        if not existing_keys:
+            return []
 
         prompt = f"""Analyze if any existing preferences are semantically related to the new preference.
 
-New preference: "{new_key_only}" with sentiment "{new_sentiment}"
+New preference: "{new_key_only}" (domain: {new_domain}) with sentiment "{new_sentiment}"
 
-Existing preferences: {json.dumps(existing_keys)}
+Existing preferences in same domain: {json.dumps(existing_keys)}
 
 Rules:
 - Find preferences that are subcategories or specific types of the new preference
-- Example: "coffee" (negative) conflicts with "cappuccino" (positive), "espresso" (positive)
-- Example: "meat" (negative) conflicts with "beef" (positive), "chicken" (positive)
+- Example: "food.coffee" (negative) conflicts with "food.cappuccino" (positive), "food.espresso" (positive)
+- Example: "food.meat" (negative) conflicts with "food.beef" (positive), "food.chicken" (positive)
 - Only include DIRECT relationships (parent-child, synonym, or subcategory)
-- DO NOT include loosely related items
+- DO NOT include loosely related items (e.g., "food.cappuccino" is NOT related to "lifestyle.mornings")
+- Only return keys from the SAME domain ({new_domain})
 
 Return ONLY a JSON object with a "related_keys" array of preference keys that are semantically related.
 If no related preferences found, return: {{"related_keys": []}}
@@ -383,6 +392,12 @@ Response:"""
 
                 # Skip if the related preference is marked as an exception
                 if pref2.get("is_exception", False):
+                    continue
+
+                # Skip if not in same domain (e.g., food.* vs lifestyle.*)
+                domain1 = key1.split('.')[0] if '.' in key1 else None
+                domain2 = key2.split('.')[0] if '.' in key2 else None
+                if domain1 != domain2:
                     continue
 
                 # Skip if already checked (avoid duplicates)
