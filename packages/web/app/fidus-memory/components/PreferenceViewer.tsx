@@ -9,8 +9,14 @@ import {
   Spinner,
   EmptyCard,
   Stack,
-  Grid,
-  DetailCard
+  DetailCard,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  IconButton
 } from '@fidus/ui';
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
@@ -120,19 +126,27 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
     }
   };
 
-  // Group preferences by domain
-  const groupedPreferences: PreferenceGroup[] = preferences.reduce((groups, pref) => {
-    const domain = pref.domain || 'general';
-    let group = groups.find(g => g.domain === domain);
+  // Group preferences by domain and sort alphabetically
+  const groupedPreferences: PreferenceGroup[] = preferences
+    .reduce((groups, pref) => {
+      const domain = pref.domain || 'general';
+      let group = groups.find(g => g.domain === domain);
 
-    if (!group) {
-      group = { domain, preferences: [] };
-      groups.push(group);
-    }
+      if (!group) {
+        group = { domain, preferences: [] };
+        groups.push(group);
+      }
 
-    group.preferences.push(pref);
-    return groups;
-  }, [] as PreferenceGroup[]);
+      group.preferences.push(pref);
+      return groups;
+    }, [] as PreferenceGroup[])
+    // Sort groups alphabetically by domain name
+    .sort((a, b) => a.domain.localeCompare(b.domain))
+    // Sort preferences within each group alphabetically by key
+    .map(group => ({
+      ...group,
+      preferences: group.preferences.sort((a, b) => a.key.localeCompare(b.key))
+    }));
 
   if (loading) {
     return (
@@ -190,34 +204,41 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
             defaultExpanded={true}
             collapsible={true}
           >
-            <Grid cols="3" gap="md">
-              {group.preferences.map((pref) => (
-                <div key={pref.id} className="rounded-lg border border-border bg-card p-3 shadow-sm">
-                  <Stack direction="vertical" spacing="sm">
-                    {/* Preference header with title and sentiment */}
-                    <Stack direction="horizontal" spacing="sm" justify="between">
-                      <Stack direction="vertical" spacing="xs">
-                        <div className="text-sm font-semibold text-foreground">
-                          {pref.key.split('.').pop()}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {pref.value}
-                        </div>
-                      </Stack>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Preference</TableHead>
+                  <TableHead>Value</TableHead>
+                  <TableHead>Sentiment</TableHead>
+                  <TableHead>Confidence</TableHead>
+                  <TableHead>Metadata</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {group.preferences.map((pref) => (
+                  <TableRow key={pref.id}>
+                    <TableCell className="font-medium">
+                      {pref.key.split('.').pop()}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {pref.value}
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         variant={pref.sentiment === 'positive' ? 'success' : pref.sentiment === 'negative' ? 'error' : 'normal'}
                       >
                         {pref.sentiment === 'positive' ? '👍' : pref.sentiment === 'negative' ? '👎' : '😐'}
                       </Badge>
-                    </Stack>
-
-                    {/* Confidence and metadata */}
-                    <Stack direction="horizontal" spacing="sm" justify="between">
+                    </TableCell>
+                    <TableCell>
                       <ConfidenceIndicator
                         confidence={pref.confidence}
                         variant="minimal"
                         size="sm"
                       />
+                    </TableCell>
+                    <TableCell>
                       <Stack direction="horizontal" spacing="xs">
                         {pref.is_exception && (
                           <Badge variant="warning" size="sm">
@@ -235,31 +256,38 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
                           </Badge>
                         )}
                       </Stack>
-                    </Stack>
-
-                    {/* Accept/Reject buttons (only if we have ID from Neo4j) */}
-                    {pref.id && (
-                      <Stack direction="horizontal" spacing="xs">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleAcceptPreference(pref.id!)}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleRejectPreference(pref.id!)}
-                        >
-                          Reject
-                        </Button>
-                      </Stack>
-                    )}
-                  </Stack>
-                </div>
-              ))}
-            </Grid>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {pref.id && (
+                        <Stack direction="horizontal" spacing="xs" justify="end">
+                          <IconButton
+                            variant="primary"
+                            size="sm"
+                            aria-label="Accept preference"
+                            onClick={() => handleAcceptPreference(pref.id!)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </IconButton>
+                          <IconButton
+                            variant="destructive"
+                            size="sm"
+                            aria-label="Reject preference"
+                            onClick={() => handleRejectPreference(pref.id!)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </IconButton>
+                        </Stack>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </DetailCard>
         ))}
       </Stack>
