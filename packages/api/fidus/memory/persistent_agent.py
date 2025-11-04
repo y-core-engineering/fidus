@@ -331,8 +331,6 @@ class PersistentAgent(InMemoryAgent):
 
         Overrides parent to add Neo4j persistence after processing.
         """
-        preferences_updated = False
-
         async for event in super().chat_stream(user_message):
             # Check event type
             try:
@@ -340,24 +338,13 @@ class PersistentAgent(InMemoryAgent):
                 event_type = event_data.get("type")
 
                 if event_type == "preferences_updated":
-                    preferences_updated = True
-                    # Don't yield yet - persist first, then yield before "done"
+                    # Persist to Neo4j immediately when preferences are updated
+                    await self._persist_pending_saves()
+                    # Now yield the event so frontend can refresh
+                    yield event
                     continue
                 elif event_type == "done":
-                    # Intercept "done" - we'll send preferences_updated first, then done
-                    # Persist any new preferences to Neo4j
-                    if preferences_updated:
-                        await self._persist_pending_saves()
-                        # Yield preferences_updated event BEFORE done
-                        yield json.dumps({
-                            "type": "preferences_updated",
-                            "count": len(self._pending_saves) if hasattr(self, '_pending_saves') else 0
-                        }) + "\n"
-                    else:
-                        # No new preferences, but persist anyway in case of updates
-                        await self._persist_pending_saves()
-
-                    # Now yield the done event
+                    # Just yield done - persistence already happened at preferences_updated
                     yield event
                     continue
             except json.JSONDecodeError:

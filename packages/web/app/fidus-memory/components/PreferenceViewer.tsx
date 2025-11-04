@@ -16,7 +16,9 @@ import {
   TableRow,
   TableHead,
   TableCell,
-  IconButton
+  IconButton,
+  Modal,
+  Tooltip
 } from '@fidus/ui';
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
@@ -33,6 +35,7 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     // Initial load with spinner
@@ -66,10 +69,6 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
   };
 
   const handleDeleteAll = async () => {
-    if (!confirm('Are you sure you want to delete all memories? This action cannot be undone.')) {
-      return;
-    }
-
     try {
       const response = await fetch('http://localhost:8000/memory/preferences', {
         method: 'DELETE',
@@ -80,11 +79,13 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
       }
 
       setPreferences([]);
+      setShowDeleteModal(false);
       if (onDeleteAll) {
         await onDeleteAll();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete');
+      setShowDeleteModal(false);
     }
   };
 
@@ -188,7 +189,7 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
         <Stack direction="horizontal" spacing="md" justify="between">
           <div className="text-lg font-semibold text-foreground">Your Preferences</div>
           <Button
-            onClick={handleDeleteAll}
+            onClick={() => setShowDeleteModal(true)}
             variant="destructive"
             disabled={preferences.length === 0}
           >
@@ -204,81 +205,99 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
             defaultExpanded={true}
             collapsible={true}
           >
-            <Table>
+            <div className="-mx-4 -my-3">
+              <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Preference</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Sentiment</TableHead>
-                  <TableHead>Confidence</TableHead>
-                  <TableHead>Metadata</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-full">Preference</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">
+                    <Stack direction="horizontal" spacing="xs" align="center" justify="end">
+                      <span>This you?</span>
+                      <Tooltip content="👍 Thumbs Up: Increase confidence (+10%). 👎 Thumbs Down: Decrease confidence (-15%). If confidence reaches 0%, the preference is automatically deleted.">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M12 16v-4"></path>
+                          <path d="M12 8h.01"></path>
+                        </svg>
+                      </Tooltip>
+                    </Stack>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {group.preferences.map((pref) => (
                   <TableRow key={pref.id}>
-                    <TableCell className="font-medium">
-                      {pref.key.split('.').pop()}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {pref.value}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={pref.sentiment === 'positive' ? 'success' : pref.sentiment === 'negative' ? 'error' : 'normal'}
-                      >
-                        {pref.sentiment === 'positive' ? '👍' : pref.sentiment === 'negative' ? '👎' : '😐'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <ConfidenceIndicator
-                        confidence={pref.confidence}
-                        variant="minimal"
-                        size="sm"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="horizontal" spacing="xs">
-                        {pref.is_exception && (
-                          <Badge variant="warning" size="sm">
-                            Exception
-                          </Badge>
-                        )}
-                        {(pref.reinforcement_count !== undefined && pref.reinforcement_count > 0) && (
-                          <Badge variant="success" size="sm">
-                            +{pref.reinforcement_count}
-                          </Badge>
-                        )}
-                        {(pref.rejection_count !== undefined && pref.rejection_count > 0) && (
-                          <Badge variant="error" size="sm">
-                            -{pref.rejection_count}
-                          </Badge>
-                        )}
+                    <TableCell className="w-full">
+                      <Stack direction="horizontal" spacing="sm" align="start" justify="between">
+                        <Stack direction="vertical" spacing="xs" className="flex-1 min-w-0">
+                          <Stack direction="horizontal" spacing="xs" align="center" className="flex-wrap">
+                            <div className="font-medium">{pref.key.split('.').pop()}</div>
+                            <Tooltip content={
+                              pref.sentiment === 'positive'
+                                ? '👍 Positive: You like or prefer this'
+                                : pref.sentiment === 'negative'
+                                ? '👎 Negative: You dislike or avoid this'
+                                : '😐 Neutral: No strong preference'
+                            }>
+                              <Badge
+                                variant={pref.sentiment === 'positive' ? 'success' : pref.sentiment === 'negative' ? 'error' : 'normal'}
+                                size="sm"
+                              >
+                                {pref.sentiment === 'positive' ? '👍' : pref.sentiment === 'negative' ? '👎' : '😐'}
+                              </Badge>
+                            </Tooltip>
+                          </Stack>
+                          <div className="text-sm text-muted-foreground break-words">{pref.value}</div>
+                          <Stack direction="horizontal" spacing="xs" align="center" className="flex-wrap">
+                            <Tooltip content={`Confidence: ${Math.round(pref.confidence * 100)}% - This shows how certain Fidus is about this preference. Give feedback with 👍/👎 buttons to adjust confidence. Preferences with 0% confidence are automatically removed.`}>
+                              <div>
+                                <ConfidenceIndicator
+                                  confidence={pref.confidence}
+                                  variant="minimal"
+                                  size="sm"
+                                />
+                              </div>
+                            </Tooltip>
+                            {pref.is_exception && (
+                              <Tooltip content="Exception: This preference has special rules or conditions">
+                                <Badge variant="warning" size="sm">Exception</Badge>
+                              </Tooltip>
+                            )}
+                            {(pref.reinforcement_count !== undefined && pref.reinforcement_count > 0) && (
+                              <Tooltip content={`You agreed with this preference ${pref.reinforcement_count} ${pref.reinforcement_count === 1 ? 'time' : 'times'}`}>
+                                <Badge variant="success" size="sm">+{pref.reinforcement_count}</Badge>
+                              </Tooltip>
+                            )}
+                            {(pref.rejection_count !== undefined && pref.rejection_count > 0) && (
+                              <Tooltip content={`You disagreed with this preference ${pref.rejection_count} ${pref.rejection_count === 1 ? 'time' : 'times'}`}>
+                                <Badge variant="error" size="sm">-{pref.rejection_count}</Badge>
+                              </Tooltip>
+                            )}
+                          </Stack>
+                        </Stack>
                       </Stack>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="whitespace-nowrap text-right align-top">
                       {pref.id && (
                         <Stack direction="horizontal" spacing="xs" justify="end">
                           <IconButton
                             variant="primary"
                             size="sm"
-                            aria-label="Accept preference"
+                            aria-label="Increase confidence (I agree)"
                             onClick={() => handleAcceptPreference(pref.id!)}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12"></polyline>
+                              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                             </svg>
                           </IconButton>
                           <IconButton
                             variant="destructive"
                             size="sm"
-                            aria-label="Reject preference"
+                            aria-label="Decrease confidence (I disagree)"
                             onClick={() => handleRejectPreference(pref.id!)}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <line x1="18" y1="6" x2="6" y2="18"></line>
-                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                              <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
                             </svg>
                           </IconButton>
                         </Stack>
@@ -287,10 +306,34 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+              </Table>
+            </div>
           </DetailCard>
         ))}
       </Stack>
+
+      <Modal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        title="Delete All Memories?"
+        description="This action cannot be undone. All your preferences will be permanently deleted."
+        dismissible={false}
+        closeOnBackdropClick={false}
+        closeOnEscape={false}
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAll}>
+              Delete All
+            </Button>
+          </>
+        }
+      >
+        <></>
+      </Modal>
     </Container>
   );
 });
