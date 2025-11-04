@@ -453,7 +453,7 @@ export default function FidusMemoryPage() {
             </div>
 
             {/* Learned Preferences Sidebar */}
-            <div className="shadow-lg rounded-lg overflow-hidden" style={{ maxHeight: '600px' }}>
+            <div className="shadow-lg rounded-lg overflow-y-auto" style={{ maxHeight: '600px' }}>
               <PreferenceViewer ref={preferenceViewerRef} />
             </div>
           </div>
