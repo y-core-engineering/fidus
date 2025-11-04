@@ -452,7 +452,12 @@ class PersistentAgent(InMemoryAgent):
 
                 response = await super().chat(user_message)
 
-                # Restore original preferences
+                # Merge any NEW preferences learned during chat back into original
+                for key, pref in self.preferences.items():
+                    if key not in original_prefs:
+                        original_prefs[key] = pref
+
+                # Restore original preferences (now including new ones)
                 self.preferences = original_prefs
             except Exception as e:
                 logger.warning(f"Context-aware filtering failed, using all preferences: {e}")
@@ -520,4 +525,10 @@ class PersistentAgent(InMemoryAgent):
         finally:
             # Phase 3: Restore original preferences after stream
             if self.enable_context_awareness and self.context_agent:
+                # Merge any NEW preferences learned during chat back into original
+                for key, pref in self.preferences.items():
+                    if key not in original_prefs:
+                        original_prefs[key] = pref
+
+                # Restore original preferences (now including new ones)
                 self.preferences = original_prefs

@@ -4,6 +4,7 @@ This module provides storage and retrieval of situations with their context
 in both the graph database (Neo4j) and vector database (Qdrant).
 """
 
+import json
 import logging
 import uuid
 from datetime import datetime, timezone
@@ -97,7 +98,7 @@ class ContextStorageService:
         timestamp = datetime.now(timezone.utc).isoformat()
 
         logger.info(
-            f"Storing situation",
+            "Storing situation",
             extra={
                 "situation_id": situation_id,
                 "tenant_id": tenant_id,
@@ -137,7 +138,7 @@ class ContextStorageService:
             )
 
             logger.info(
-                f"Situation stored successfully",
+                "Situation stored successfully",
                 extra={
                     "situation_id": situation_id,
                     "tenant_id": tenant_id,
@@ -221,7 +222,7 @@ class ContextStorageService:
             situation_id=situation_id,
             tenant_id=tenant_id,
             user_id=user_id,
-            factors=context.factors,
+            factors=json.dumps(context.factors),  # Serialize dict to JSON string for Neo4j
             timestamp=timestamp,
         )
 
@@ -281,7 +282,7 @@ class ContextStorageService:
             ValueError: If nodes don't exist or belong to different tenants
         """
         logger.info(
-            f"Linking preference to situation",
+            "Linking preference to situation",
             extra={
                 "preference_id": preference_id,
                 "situation_id": situation_id,
@@ -304,7 +305,7 @@ class ContextStorageService:
                 )
 
         logger.info(
-            f"Preference linked to situation",
+            "Preference linked to situation",
             extra={
                 "preference_id": preference_id,
                 "situation_id": situation_id,
@@ -362,7 +363,7 @@ class ContextStorageService:
             Optional[Situation]: The situation if found, None otherwise
         """
         logger.info(
-            f"Retrieving situation",
+            "Retrieving situation",
             extra={
                 "situation_id": situation_id,
                 "tenant_id": tenant_id,
@@ -379,7 +380,7 @@ class ContextStorageService:
 
             if not result:
                 logger.warning(
-                    f"Situation not found",
+                    "Situation not found",
                     extra={
                         "situation_id": situation_id,
                         "tenant_id": tenant_id,
@@ -395,7 +396,7 @@ class ContextStorageService:
 
         if not points:
             logger.warning(
-                f"Situation embedding not found in Qdrant",
+                "Situation embedding not found in Qdrant",
                 extra={
                     "situation_id": situation_id,
                     "tenant_id": tenant_id,
@@ -406,7 +407,7 @@ class ContextStorageService:
             # Validate tenant_id from Qdrant payload
             if points[0].payload["tenant_id"] != tenant_id:
                 logger.error(
-                    f"Tenant mismatch in Qdrant",
+                    "Tenant mismatch in Qdrant",
                     extra={
                         "situation_id": situation_id,
                         "expected_tenant": tenant_id,
@@ -421,14 +422,14 @@ class ContextStorageService:
             id=result["id"],
             tenant_id=result["tenant_id"],
             user_id=result["user_id"],
-            context=ContextFactors(factors=result["factors"]),
+            context=ContextFactors(factors=json.loads(result["factors"])),  # Deserialize JSON string back to dict
             embedding=embedding,
             created_at=result["created_at"],
             updated_at=result["updated_at"],
         )
 
         logger.info(
-            f"Situation retrieved successfully",
+            "Situation retrieved successfully",
             extra={
                 "situation_id": situation_id,
                 "tenant_id": tenant_id,
