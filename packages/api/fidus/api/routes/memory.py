@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from fidus.memory.simple_agent import InMemoryAgent
 from fidus.memory.persistent_agent import PersistentAgent
+import json
 import logging
 import traceback
 import os
@@ -54,6 +55,30 @@ class AIConfigResponse(BaseModel):
     model: str
     provider: str  # "openai", "anthropic", "ollama", etc.
     is_local: bool  # True for Ollama, False for cloud providers
+
+
+class ContextFactor(BaseModel):
+    key: str
+    value: str
+
+
+class SituationItem(BaseModel):
+    id: str
+    tenant_id: str
+    user_id: str
+    factors: dict[str, str]  # Context factors
+    preference_ids: list[str] = []  # Linked preference IDs
+    created_at: str
+    updated_at: str
+
+
+class SituationsResponse(BaseModel):
+    situations: list[SituationItem]
+
+
+class PreferenceWithContext(BaseModel):
+    preference: PreferenceItem
+    situations: list[SituationItem]  # Situations where this preference was learned
 
 
 @router.post("/chat")
@@ -295,5 +320,100 @@ async def delete_all_preferences():
         return {"status": "deleted_all", "count": count}
     except Exception as e:
         logger.error(f"Error deleting all preferences: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Phase 3: Situational Context endpoints
+
+
+@router.get("/situations", response_model=SituationsResponse)
+async def get_situations():
+    """Get all situations with their context factors (Phase 3)."""
+    if not USE_NEO4J:
+        raise HTTPException(status_code=501, detail="Situational context requires Neo4j")
+
+    if not agent.enable_context_awareness or not agent.context_agent:
+        raise HTTPException(status_code=501, detail="Context-awareness is disabled")
+
+    try:
+        # Query Neo4j for all situations
+        from fidus.memory.context.storage import ContextStorageService
+        storage = ContextStorageService()
+
+        # Get all situations from Neo4j (we need to add a method for this)
+        # For now, query directly via Neo4j
+        async with storage.neo4j_driver.session() as session:
+            result = await session.run("""
+                MATCH (s:Situation {tenant_id: $tenant_id})
+                OPTIONAL MATCH (s)<-[:IN_SITUATION]-(p:Preference)
+                RETURN s, collect(p.id) as preference_ids
+                ORDER BY s.created_at DESC
+                LIMIT 100
+            """, tenant_id=agent.tenant_id)
+
+            records = await result.values()
+            situations = []
+
+            for record in records:
+                situation_node = record[0]
+                preference_ids = record[1] if len(record) > 1 else []
+
+                situations.append(SituationItem(
+                    id=situation_node["id"],
+                    tenant_id=situation_node["tenant_id"],
+                    user_id=situation_node["user_id"],
+                    factors=json.loads(situation_node["factors"]),
+                    preference_ids=[pid for pid in preference_ids if pid],
+                    created_at=situation_node["created_at"],
+                    updated_at=situation_node["updated_at"]
+                ))
+
+        return SituationsResponse(situations=situations)
+    except Exception as e:
+        logger.error(f"Error getting situations: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/preferences/{preference_id}/context")
+async def get_preference_context(preference_id: str):
+    """Get situational context for a specific preference (Phase 3)."""
+    if not USE_NEO4J:
+        raise HTTPException(status_code=501, detail="Situational context requires Neo4j")
+
+    if not agent.enable_context_awareness or not agent.context_agent:
+        raise HTTPException(status_code=501, detail="Context-awareness is disabled")
+
+    try:
+        from fidus.memory.context.storage import ContextStorageService
+        storage = ContextStorageService()
+
+        # Query Neo4j for situations linked to this preference
+        async with storage.neo4j_driver.session() as session:
+            result = await session.run("""
+                MATCH (p:Preference {id: $preference_id, tenant_id: $tenant_id})-[:IN_SITUATION]->(s:Situation)
+                RETURN s
+                ORDER BY s.created_at DESC
+            """, preference_id=preference_id, tenant_id=agent.tenant_id)
+
+            records = await result.values()
+            situations = []
+
+            for record in records:
+                situation_node = record[0]
+                situations.append(SituationItem(
+                    id=situation_node["id"],
+                    tenant_id=situation_node["tenant_id"],
+                    user_id=situation_node["user_id"],
+                    factors=json.loads(situation_node["factors"]),
+                    preference_ids=[preference_id],
+                    created_at=situation_node["created_at"],
+                    updated_at=situation_node["updated_at"]
+                ))
+
+        return {"preference_id": preference_id, "situations": situations}
+    except Exception as e:
+        logger.error(f"Error getting preference context: {str(e)}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))

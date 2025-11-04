@@ -2,6 +2,7 @@
 
 import { ChatInterface, Alert, Stack, Container, OpportunityCard, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui';
 import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceViewer';
+import { SituationsViewer, SituationsViewerRef } from './components/SituationsViewer';
 import { useState, useEffect, useRef } from 'react';
 
 interface Message {
@@ -43,7 +44,9 @@ export default function FidusMemoryPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [conflicts, setConflicts] = useState<PreferenceConflict[]>([]);
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null);
+  const [sidebarTab, setSidebarTab] = useState<'preferences' | 'situations'>('preferences');
   const preferenceViewerRef = useRef<PreferenceViewerRef>(null);
+  const situationsViewerRef = useRef<SituationsViewerRef>(null);
 
   const fetchAIConfig = async () => {
     try {
@@ -140,8 +143,9 @@ export default function FidusMemoryPage() {
                 break;
 
               case 'preferences_updated':
-                // Trigger refresh of PreferenceViewer via ref
+                // Trigger refresh of PreferenceViewer and SituationsViewer via refs
                 preferenceViewerRef.current?.refresh();
+                situationsViewerRef.current?.refresh();
                 break;
 
               case 'preference_conflict':
@@ -452,9 +456,41 @@ export default function FidusMemoryPage() {
               </ChatInterface>
             </div>
 
-            {/* Learned Preferences Sidebar */}
-            <div className="shadow-lg rounded-lg overflow-y-auto" style={{ maxHeight: '600px' }}>
-              <PreferenceViewer ref={preferenceViewerRef} />
+            {/* Sidebar with Tabs */}
+            <div className="shadow-lg rounded-lg overflow-hidden bg-white" style={{ maxHeight: '600px', display: 'flex', flexDirection: 'column' }}>
+              {/* Tab Headers */}
+              <div className="flex border-b border-gray-200">
+                <button
+                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
+                    sidebarTab === 'preferences'
+                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSidebarTab('preferences')}
+                >
+                  📋 Preferences
+                </button>
+                <button
+                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
+                    sidebarTab === 'situations'
+                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSidebarTab('situations')}
+                >
+                  🎯 Situations
+                </button>
+              </div>
+
+              {/* Tab Content */}
+              <div className="flex-1 overflow-y-auto">
+                {sidebarTab === 'preferences' && (
+                  <PreferenceViewer ref={preferenceViewerRef} />
+                )}
+                {sidebarTab === 'situations' && (
+                  <SituationsViewer ref={situationsViewerRef} className="p-4" />
+                )}
+              </div>
             </div>
           </div>
 
