@@ -334,26 +334,34 @@ class PersistentAgent(InMemoryAgent):
         preferences_updated = False
 
         async for event in super().chat_stream(user_message):
-            # Check if this is a preferences_updated event
+            # Check event type
             try:
                 event_data = json.loads(event)
-                if event_data.get("type") == "preferences_updated":
+                event_type = event_data.get("type")
+
+                if event_type == "preferences_updated":
                     preferences_updated = True
-                    # Don't yield yet - persist first, then yield
+                    # Don't yield yet - persist first, then yield before "done"
+                    continue
+                elif event_type == "done":
+                    # Intercept "done" - we'll send preferences_updated first, then done
+                    # Persist any new preferences to Neo4j
+                    if preferences_updated:
+                        await self._persist_pending_saves()
+                        # Yield preferences_updated event BEFORE done
+                        yield json.dumps({
+                            "type": "preferences_updated",
+                            "count": len(self._pending_saves) if hasattr(self, '_pending_saves') else 0
+                        }) + "\n"
+                    else:
+                        # No new preferences, but persist anyway in case of updates
+                        await self._persist_pending_saves()
+
+                    # Now yield the done event
+                    yield event
                     continue
             except json.JSONDecodeError:
                 pass
 
+            # Yield all other events (tokens, acknowledged, etc.)
             yield event
-
-        # Persist any new preferences to Neo4j before sending preferences_updated event
-        if preferences_updated:
-            await self._persist_pending_saves()
-            # Now yield the preferences_updated event AFTER persistence
-            yield json.dumps({
-                "type": "preferences_updated",
-                "count": len(self._pending_saves) if hasattr(self, '_pending_saves') else 0
-            }) + "\n"
-        else:
-            # No new preferences, but persist anyway in case of updates
-            await self._persist_pending_saves()
