@@ -78,12 +78,8 @@ class InMemoryAgent:
         extracted = await self._extract_preferences(user_message)
         conflicts = self._update_preferences(extracted)
 
-        # Yield preferences update event
-        if extracted:
-            yield json.dumps({
-                "type": "preferences_updated",
-                "count": len(extracted)
-            }) + "\n"
+        # Store extracted count for later event (don't yield yet - stream LLM response first)
+        extracted_count = len(extracted) if extracted else 0
 
         # Check for semantic inconsistencies in newly added preferences
         semantic_conflicts = await self._find_semantic_inconsistencies()
@@ -174,7 +170,14 @@ class InMemoryAgent:
         # 7. Add to conversation history
         self.conversation_history.append({"role": "assistant", "content": full_response})
 
-        # 8. Yield completion event
+        # 8. Yield preferences update event (AFTER streaming, so persistence can complete before frontend refreshes)
+        if extracted_count > 0:
+            yield json.dumps({
+                "type": "preferences_updated",
+                "count": extracted_count
+            }) + "\n"
+
+        # 9. Yield completion event
         yield json.dumps({"type": "done"}) + "\n"
 
     async def _extract_preferences(self, text: str) -> List[Dict[str, Any]]:
