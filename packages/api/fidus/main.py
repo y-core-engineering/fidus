@@ -7,6 +7,9 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fidus.api.routes import memory
+import logging
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Fidus Memory API")
 
@@ -21,6 +24,31 @@ app.add_middleware(
 
 # Register routers
 app.include_router(memory.router)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize connections on startup."""
+    # Connect PersistentAgent to Neo4j if configured
+    if hasattr(memory.agent, 'connect'):
+        try:
+            await memory.agent.connect()
+            logger.info("Successfully connected PersistentAgent to Neo4j")
+        except Exception as e:
+            logger.error(f"Failed to connect to Neo4j: {e}")
+            logger.warning("Falling back to in-memory mode")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up connections on shutdown."""
+    # Disconnect PersistentAgent from Neo4j
+    if hasattr(memory.agent, 'disconnect'):
+        try:
+            await memory.agent.disconnect()
+            logger.info("Disconnected PersistentAgent from Neo4j")
+        except Exception as e:
+            logger.error(f"Error disconnecting from Neo4j: {e}")
 
 
 @app.get("/health")
