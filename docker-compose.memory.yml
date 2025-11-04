@@ -19,6 +19,33 @@ services:
       start_period: 30s
 
   # =============================================================================
+  # Neo4j Database
+  # =============================================================================
+
+  neo4j:
+    image: neo4j:5.15.0
+    container_name: fidus-memory-neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/fidus-memory-dev-password
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_apoc_export_file_enabled: 'true'
+      NEO4J_apoc_import_file_enabled: 'true'
+      NEO4J_apoc_import_file_use__neo4j__config: 'true'
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # =============================================================================
   # Fidus Memory API
   # =============================================================================
 
@@ -43,12 +70,19 @@ services:
       ENVIRONMENT: ${ENVIRONMENT:-production}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
 
+      # Neo4j Configuration
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: fidus-memory-dev-password
+
       # CORS
       CORS_ORIGINS: http://localhost:3001,http://memory-web:3000
     ports:
       - "8000:8000"
     depends_on:
       ollama:
+        condition: service_healthy
+      neo4j:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
@@ -90,6 +124,10 @@ services:
 
 volumes:
   ollama_data:
+    driver: local
+  neo4j_data:
+    driver: local
+  neo4j_logs:
     driver: local
 
 # =============================================================================

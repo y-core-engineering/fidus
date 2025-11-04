@@ -78,11 +78,12 @@ class InMemoryAgent:
         extracted = await self._extract_preferences(user_message)
         conflicts = self._update_preferences(extracted)
 
-        # Yield preferences update event
-        if extracted:
+        # Yield preferences update event immediately after extraction
+        extracted_count = len(extracted) if extracted else 0
+        if extracted_count > 0:
             yield json.dumps({
                 "type": "preferences_updated",
-                "count": len(extracted)
+                "count": extracted_count
             }) + "\n"
 
         # Check for semantic inconsistencies in newly added preferences

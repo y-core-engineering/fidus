@@ -1,7 +1,8 @@
 'use client';
 
-import { ChatInterface, Alert, Stack, Container, ConfidenceIndicator, OpportunityCard, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui';
-import { useState, useEffect } from 'react';
+import { ChatInterface, Alert, Stack, Container, OpportunityCard, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui';
+import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceViewer';
+import { useState, useEffect, useRef } from 'react';
 
 interface Message {
   id: string;
@@ -9,14 +10,6 @@ interface Message {
   content: string;
   timestamp: Date;
   status?: 'sending' | 'sent' | 'error';
-}
-
-interface Preference {
-  key: string;
-  value: string;
-  sentiment: 'positive' | 'negative' | 'neutral';
-  confidence: number;
-  is_exception?: boolean;
 }
 
 interface RelatedPreference {
@@ -48,21 +41,9 @@ export default function FidusMemoryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [preferences, setPreferences] = useState<Preference[]>([]);
   const [conflicts, setConflicts] = useState<PreferenceConflict[]>([]);
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null);
-
-  const fetchPreferences = async () => {
-    try {
-      const response = await fetch('/api/memory/preferences');
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data.preferences);
-      }
-    } catch (error) {
-      console.error('Error fetching preferences:', error);
-    }
-  };
+  const preferenceViewerRef = useRef<PreferenceViewerRef>(null);
 
   const fetchAIConfig = async () => {
     try {
@@ -76,9 +57,8 @@ export default function FidusMemoryPage() {
     }
   };
 
-  // Load preferences and AI config on initial mount
+  // Load AI config on initial mount
   useEffect(() => {
-    fetchPreferences();
     fetchAIConfig();
   }, []);
 
@@ -160,8 +140,8 @@ export default function FidusMemoryPage() {
                 break;
 
               case 'preferences_updated':
-                // Fetch updated preferences
-                await fetchPreferences();
+                // Trigger refresh of PreferenceViewer via ref
+                preferenceViewerRef.current?.refresh();
                 break;
 
               case 'preference_conflict':
@@ -399,7 +379,7 @@ export default function FidusMemoryPage() {
 
                             console.log('Accepted new preference:', conflict.new_value);
                             setConflicts((prev) => prev.filter((_, i) => i !== index));
-                            await fetchPreferences();
+                            // PreferenceViewer will auto-refresh
                           } catch (error) {
                             console.error('Error updating preference:', error);
                             setError('Failed to update preference. Please try again.');
@@ -429,7 +409,7 @@ export default function FidusMemoryPage() {
 
                             console.log('Kept old preference:', conflict.old_value);
                             setConflicts((prev) => prev.filter((_, i) => i !== index));
-                            await fetchPreferences();
+                            // PreferenceViewer will auto-refresh
                           } catch (error) {
                             console.error('Error updating preferences:', error);
                             setError('Failed to update preferences. Please try again.');
@@ -473,92 +453,8 @@ export default function FidusMemoryPage() {
             </div>
 
             {/* Learned Preferences Sidebar */}
-            <div className="bg-card border border-border rounded-lg shadow-lg flex flex-col" style={{ maxHeight: '600px' }}>
-              <div className="flex items-center justify-between p-md border-b border-border flex-shrink-0">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Learned Preferences
-                </h2>
-                <div className="flex items-center gap-1">
-                  {getPrivacyBadges('preferences').map((badge, index) => (
-                    badge.tooltip ? (
-                      <TooltipProvider key={index}>
-                        <TooltipRoot delayDuration={200}>
-                          <TooltipTrigger asChild>
-                            <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded cursor-help">
-                              {badge.label}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom" showArrow={true}>
-                            {badge.tooltip}
-                          </TooltipContent>
-                        </TooltipRoot>
-                      </TooltipProvider>
-                    ) : (
-                      <span key={index} className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
-                        {badge.label}
-                      </span>
-                    )
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-md">
-                {preferences.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No preferences learned yet. Start chatting to teach me about your preferences!
-                  </p>
-                ) : (
-                  <Stack direction="vertical" spacing="sm">
-                    {preferences.map((pref, index) => {
-                      const sentimentEmoji = pref.sentiment === 'positive' ? '👍' : pref.sentiment === 'negative' ? '👎' : '😐';
-                      const sentimentColor = pref.sentiment === 'positive' ? 'text-green-600' : pref.sentiment === 'negative' ? 'text-red-600' : 'text-gray-600';
-
-                      return (
-                        <div
-                          key={index}
-                          className="bg-background border border-border rounded-md p-sm"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-center gap-1">
-                              <div className="text-xs font-medium text-muted-foreground">
-                                {pref.key}
-                              </div>
-                              {pref.is_exception && (
-                                <TooltipProvider>
-                                  <TooltipRoot delayDuration={200}>
-                                    <TooltipTrigger asChild>
-                                      <span className="text-xs px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 rounded cursor-help">
-                                        Exception
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" showArrow={true}>
-                                      This is a specific exception to a more general preference
-                                    </TooltipContent>
-                                  </TooltipRoot>
-                                </TooltipProvider>
-                              )}
-                            </div>
-                            <span className={`text-sm ${sentimentColor}`}>
-                              {sentimentEmoji}
-                            </span>
-                          </div>
-                          <div className="text-sm text-foreground mb-1">
-                            {pref.value}
-                          </div>
-                          <div className="flex items-center justify-end">
-                            <ConfidenceIndicator
-                              confidence={pref.confidence}
-                              variant="minimal"
-                              size="sm"
-                              showTooltip={true}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </Stack>
-                )}
-              </div>
+            <div className="shadow-lg rounded-lg overflow-y-auto" style={{ maxHeight: '600px' }}>
+              <PreferenceViewer ref={preferenceViewerRef} />
             </div>
           </div>
 
