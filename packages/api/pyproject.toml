@@ -22,6 +22,7 @@ asyncpg = "^0.29.0"
 psycopg2-binary = "^2.9.9"
 redis = "^5.0.0"
 neo4j = "^5.17.0"
+qdrant-client = "^1.7.0"
 bcrypt = "^4.1.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
