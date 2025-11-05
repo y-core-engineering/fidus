@@ -6,12 +6,18 @@ load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fidus.api.routes import memory
+from fidus.api.routes import memory, mcp, health
+from fidus.api.middleware.auth import SimpleAuthMiddleware
+from fidus.memory.mcp_server import PreferenceMCPServer
 import logging
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Fidus Memory API")
+
+# Authentication middleware (Phase 4: Multi-User Support)
+# MUST be added before CORS to ensure user_id is available
+app.add_middleware(SimpleAuthMiddleware)
 
 # CORS middleware
 app.add_middleware(
@@ -23,7 +29,9 @@ app.add_middleware(
 )
 
 # Register routers
-app.include_router(memory.router)
+app.include_router(health.router)  # Health checks (no auth required)
+app.include_router(memory.router)  # Memory endpoints (auth required)
+app.include_router(mcp.router)     # MCP endpoints (auth required)
 
 
 @app.on_event("startup")
@@ -38,6 +46,15 @@ async def startup_event():
             logger.error(f"Failed to connect to Neo4j: {e}")
             logger.warning("Falling back to in-memory mode")
 
+    # Initialize MCP server with the memory agent
+    try:
+        mcp_server = PreferenceMCPServer(memory.agent)
+        mcp.init_mcp_server(mcp_server)
+        logger.info("Successfully initialized MCP server")
+    except Exception as e:
+        logger.error(f"Failed to initialize MCP server: {e}")
+        logger.warning("MCP endpoints will not be available")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -51,6 +68,4 @@ async def shutdown_event():
             logger.error(f"Error disconnecting from Neo4j: {e}")
 
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+# Health check moved to health.router (see fidus/api/routes/health.py)

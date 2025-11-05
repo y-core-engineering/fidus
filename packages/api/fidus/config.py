@@ -15,12 +15,25 @@ class PrototypeConfig:
     for development and production environments.
     """
 
+    # Prototype tenant ID (constant for Phase 4)
+    PROTOTYPE_TENANT_ID: str = "prototype-tenant"
+
     def __init__(self):
         """Initialize configuration from environment variables."""
+        # PostgreSQL Configuration
+        self.postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
+        self.postgres_port: int = int(os.getenv("POSTGRES_PORT", "5432"))
+        self.postgres_user: str = os.getenv("POSTGRES_USER", "fidus")
+        self.postgres_password: str = os.getenv("POSTGRES_PASSWORD", "fidus_password")
+        self.postgres_db: str = os.getenv("POSTGRES_DB", "fidus")
+
         # Neo4j Configuration
         self.neo4j_uri: str = os.getenv("NEO4J_URI", "bolt://localhost:7687")
         self.neo4j_user: str = os.getenv("NEO4J_USER", "neo4j")
-        self.neo4j_password: str = os.getenv("NEO4J_PASSWORD", "password")
+        self.neo4j_password: str = os.getenv("NEO4J_PASSWORD", "neo4j_password")
+
+        # Redis Configuration
+        self.redis_url: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
         # Qdrant Configuration
         self.qdrant_host: str = os.getenv("QDRANT_HOST", "localhost")
@@ -72,6 +85,18 @@ class PrototypeConfig:
                 f"Supported models: {', '.join(self.embedding_dimensions.keys())}"
             )
         return self.embedding_dimensions[self.embedding_model]
+
+    @property
+    def postgres_dsn(self) -> str:
+        """Get PostgreSQL connection DSN for asyncpg.
+
+        Returns:
+            str: PostgreSQL DSN (e.g., "postgresql://user:pass@host:port/db")
+        """
+        return (
+            f"postgresql://{self.postgres_user}:{self.postgres_password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
 
 
 # Global config instance

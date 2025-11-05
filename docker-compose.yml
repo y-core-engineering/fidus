@@ -5,9 +5,9 @@ services:
   # Databases
   # =============================================================================
 
-  postgres:
+  memory-postgres:
     image: postgres:15-alpine
-    container_name: fidus-postgres
+    container_name: fidus-memory-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: fidus
@@ -24,9 +24,9 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  memory-redis:
     image: redis:7-alpine
-    container_name: fidus-redis
+    container_name: fidus-memory-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -39,9 +39,9 @@ services:
       timeout: 5s
       retries: 5
 
-  neo4j:
+  memory-neo4j:
     image: neo4j:5-community
-    container_name: fidus-neo4j
+    container_name: fidus-memory-neo4j
     restart: unless-stopped
     environment:
       NEO4J_AUTH: neo4j/neo4j_password
@@ -63,9 +63,9 @@ services:
   # LLM Services
   # =============================================================================
 
-  ollama:
+  memory-ollama:
     image: ollama/ollama:latest
-    container_name: fidus-ollama
+    container_name: fidus-memory-ollama
     restart: unless-stopped
     ports:
       - "11434:11434"
@@ -78,16 +78,16 @@ services:
       retries: 5
       start_period: 30s
 
-  litellm:
+  memory-litellm:
     image: ghcr.io/berriai/litellm:main-latest
-    container_name: fidus-litellm
+    container_name: fidus-memory-litellm
     restart: unless-stopped
     ports:
       - "4000:4000"
     volumes:
       - ./litellm_config.yaml:/app/config.yaml
     depends_on:
-      ollama:
+      memory-ollama:
         condition: service_healthy
     command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8"]
     healthcheck:
@@ -100,17 +100,17 @@ services:
   # Application Services
   # =============================================================================
 
-  api:
+  memory-api:
     build:
       context: .
       dockerfile: packages/api/Dockerfile
-    container_name: fidus-api
+    container_name: fidus-memory-api
     restart: unless-stopped
     environment:
       # Database
-      DATABASE_URL: postgresql+asyncpg://fidus:fidus_password@postgres:5432/fidus
-      REDIS_URL: redis://redis:6379/0
-      NEO4J_URI: bolt://neo4j:7687
+      DATABASE_URL: postgresql+asyncpg://fidus:fidus_password@memory-postgres:5432/fidus
+      REDIS_URL: redis://memory-redis:6379/0
+      NEO4J_URI: bolt://memory-neo4j:7687
       NEO4J_USER: neo4j
       NEO4J_PASSWORD: neo4j_password
 
@@ -118,8 +118,8 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEFAULT_LLM_PROVIDER: anthropic
-      LITELLM_URL: http://litellm:4000
-      OLLAMA_URL: http://ollama:11434
+      LITELLM_URL: http://memory-litellm:4000
+      OLLAMA_URL: http://memory-ollama:11434
 
       # Security (CHANGE IN PRODUCTION!)
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -138,15 +138,13 @@ services:
       - ./packages/api:/app
       - api_uploads:/tmp/fidus/uploads
     depends_on:
-      postgres:
+      memory-postgres:
         condition: service_healthy
-      redis:
+      memory-redis:
         condition: service_healthy
-      neo4j:
+      memory-neo4j:
         condition: service_healthy
-      litellm:
-        condition: service_healthy
-      ollama:
+      memory-ollama:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
@@ -155,29 +153,26 @@ services:
       retries: 3
     command: >
       sh -c "
-        poetry run alembic upgrade head &&
         poetry run uvicorn fidus.main:app --host 0.0.0.0 --port 8000 --reload
       "
 
-  web:
+  memory-web:
     build:
       context: .
       dockerfile: packages/web/Dockerfile
-    container_name: fidus-web
+    container_name: fidus-memory-web
     restart: unless-stopped
     environment:
+      # Client-side URLs (browser)
       NEXT_PUBLIC_API_URL: http://localhost:8000
       NEXT_PUBLIC_WS_URL: ws://localhost:8000/ws
-      NODE_ENV: development
+      # Server-side URL (container-to-container)
+      BACKEND_URL: http://memory-api:8000
+      NODE_ENV: production
     ports:
       - "3000:3000"
-    volumes:
-      - ./packages/web:/app
-      - /app/node_modules
-      - /app/.next
     depends_on:
-      - api
-    command: pnpm dev
+      - memory-api
 
   # =============================================================================
   # Monitoring (Optional - commented out by default)

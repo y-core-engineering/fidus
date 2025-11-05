@@ -1,0 +1,464 @@
+"""MCP server for Fidus Memory.
+
+This module exposes Fidus Memory capabilities as MCP (Model Context Protocol)
+tools and resources, enabling external domain supervisors to query preferences,
+record interactions, and learn from conversations.
+"""
+
+from typing import Dict, Any, List, Optional
+from mcp.server import FastMCP
+from fidus.memory.persistent_agent import PersistentAgent
+from fidus.config import PrototypeConfig
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class PreferenceMCPServer:
+    """MCP server for preference service.
+
+    Exposes Fidus Memory capabilities as MCP tools and resources.
+
+    Multi-Tenancy: All operations scoped to tenant_id + user_id.
+    """
+
+    def __init__(self, agent: PersistentAgent) -> None:
+        """Initialize MCP server with persistent agent.
+
+        Args:
+            agent: PersistentAgent instance with Neo4j persistence
+        """
+        self.agent = agent
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+        self.mcp = FastMCP(name="fidus-memory")
+
+        # Register tools and resources
+        self._register_tools()
+        self._register_resources()
+
+        logger.info("PreferenceMCPServer initialized")
+
+    def _register_tools(self) -> None:
+        """Register MCP tools."""
+
+        @self.mcp.tool()
+        async def get_preferences(
+            user_id: str,
+            domain: Optional[str] = None,
+            min_confidence: float = 0.3
+        ) -> Dict[str, Any]:
+            """Get user preferences, optionally filtered by domain.
+
+            Args:
+                user_id: User identifier
+                domain: Optional domain filter (e.g., 'coffee', 'food')
+                min_confidence: Minimum confidence threshold (0.0-1.0)
+
+            Returns:
+                Dictionary with preferences list
+            """
+            try:
+                # Get all preferences from Neo4j
+                preferences = await self.agent.get_all_preferences()
+
+                # Filter by domain if specified
+                if domain:
+                    preferences = [
+                        p for p in preferences
+                        if p.get("key", "").startswith(f"{domain}.")
+                    ]
+
+                # Filter by confidence
+                preferences = [
+                    p for p in preferences
+                    if p.get("confidence", 0) >= min_confidence
+                ]
+
+                logger.info(
+                    f"Retrieved {len(preferences)} preferences for user {user_id} "
+                    f"(domain={domain}, min_confidence={min_confidence})"
+                )
+
+                return {"preferences": preferences}
+
+            except Exception as e:
+                logger.error(f"Error getting preferences: {e}")
+                return {"error": str(e), "preferences": []}
+
+        @self.mcp.tool()
+        async def record_interaction(
+            user_id: str,
+            preference_id: str,
+            accepted: bool
+        ) -> Dict[str, Any]:
+            """Record user interaction with preference suggestion.
+
+            Args:
+                user_id: User identifier
+                preference_id: Preference that was suggested
+                accepted: Whether user accepted the suggestion
+
+            Returns:
+                Dictionary with status and new confidence
+            """
+            try:
+                if accepted:
+                    updated = await self.agent.accept_preference(preference_id)
+                    new_confidence = updated.get("confidence", 0)
+                    logger.info(
+                        f"User {user_id} accepted preference {preference_id}, "
+                        f"new confidence: {new_confidence:.2f}"
+                    )
+                else:
+                    updated = await self.agent.reject_preference(preference_id)
+                    new_confidence = updated.get("confidence", 0)
+                    logger.info(
+                        f"User {user_id} rejected preference {preference_id}, "
+                        f"new confidence: {new_confidence:.2f}"
+                    )
+
+                return {
+                    "status": "recorded",
+                    "new_confidence": new_confidence
+                }
+
+            except Exception as e:
+                logger.error(f"Error recording interaction: {e}")
+                return {"error": str(e), "status": "failed"}
+
+        @self.mcp.tool()
+        async def learn_preference(
+            user_id: str,
+            message: str
+        ) -> Dict[str, Any]:
+            """Learn preferences from a user message.
+
+            This tool processes a user message through the chat agent,
+            which will extract and store preferences automatically.
+
+            Args:
+                user_id: User identifier
+                message: User message to learn from
+
+            Returns:
+                Dictionary with learned preferences
+            """
+            try:
+                # Process message through agent (which learns preferences)
+                response = await self.agent.chat(message, user_id=user_id)
+
+                # Get updated preferences
+                preferences = await self.agent.get_all_preferences()
+
+                logger.info(
+                    f"Learned from user {user_id} message, "
+                    f"now have {len(preferences)} total preferences"
+                )
+
+                return {
+                    "status": "learned",
+                    "response": response,
+                    "total_preferences": len(preferences)
+                }
+
+            except Exception as e:
+                logger.error(f"Error learning preference: {e}")
+                return {"error": str(e), "status": "failed"}
+
+        @self.mcp.tool()
+        async def delete_all_preferences(user_id: str) -> Dict[str, Any]:
+            """Delete all preferences for a user (privacy feature).
+
+            Args:
+                user_id: User identifier
+
+            Returns:
+                Dictionary with status and count
+            """
+            try:
+                count = await self.agent.delete_all_preferences()
+
+                logger.info(f"Deleted all {count} preferences for user {user_id}")
+
+                return {
+                    "status": "deleted",
+                    "count": count
+                }
+
+            except Exception as e:
+                logger.error(f"Error deleting preferences: {e}")
+                return {"error": str(e), "status": "failed"}
+
+    def _register_resources(self) -> None:
+        """Register MCP resources."""
+
+        @self.mcp.resource("user://{user_id}/preferences")
+        async def user_preferences(user_id: str) -> str:
+            """Get all preferences for a user.
+
+            Resource URI: user://{user_id}/preferences
+
+            Args:
+                user_id: User identifier
+
+            Returns:
+                String representation of preferences
+            """
+            try:
+                preferences = await self.agent.get_all_preferences()
+
+                logger.info(f"Resource access: user://{user_id}/preferences")
+
+                # Format as readable text
+                if not preferences:
+                    return f"No preferences found for user {user_id}"
+
+                lines = [f"Preferences for user {user_id}:\n"]
+                for pref in preferences:
+                    key = pref.get("key", "unknown")
+                    value = pref.get("value", "")
+                    sentiment = pref.get("sentiment", "neutral")
+                    confidence = pref.get("confidence", 0)
+                    lines.append(
+                        f"- {key}: {value} ({sentiment}, {confidence:.0%} confident)"
+                    )
+
+                return "\n".join(lines)
+
+            except Exception as e:
+                logger.error(f"Error accessing preferences resource: {e}")
+                return f"Error: {str(e)}"
+
+        @self.mcp.resource("user://{user_id}/contexts")
+        async def user_contexts(user_id: str) -> str:
+            """Get all stored contexts for a user.
+
+            Resource URI: user://{user_id}/contexts
+
+            Args:
+                user_id: User identifier
+
+            Returns:
+                String representation of contexts
+            """
+            try:
+                if not self.agent.context_agent:
+                    return "Context awareness is disabled"
+
+                # Query Neo4j for situations
+                from fidus.memory.context.storage import ContextStorageService
+                storage = ContextStorageService()
+
+                async with storage.neo4j_driver.session() as session:
+                    result = await session.run(
+                        """
+                        MATCH (s:Situation {user_id: $user_id, tenant_id: $tenant_id})
+                        RETURN s.id as id, s.factors as factors
+                        ORDER BY s.created_at DESC
+                        LIMIT 20
+                        """,
+                        user_id=user_id,
+                        tenant_id=self.tenant_id
+                    )
+
+                    records = await result.values()
+
+                    if not records:
+                        return f"No contexts found for user {user_id}"
+
+                    lines = [f"Contexts for user {user_id}:\n"]
+                    for record in records:
+                        situation_id = record[0]
+                        factors = record[1]
+                        lines.append(f"\nSituation {situation_id}:")
+                        if isinstance(factors, str):
+                            import json
+                            factors = json.loads(factors)
+                        for key, value in factors.items():
+                            lines.append(f"  - {key}: {value}")
+
+                    return "\n".join(lines)
+
+            except Exception as e:
+                logger.error(f"Error accessing contexts resource: {e}")
+                return f"Error: {str(e)}"
+
+    async def call_tool(self, tool_name: str, **arguments: Any) -> Dict[str, Any]:
+        """Call an MCP tool by name.
+
+        Args:
+            tool_name: Name of the tool to call
+            arguments: Tool arguments
+
+        Returns:
+            Tool result
+        """
+        # Map tool names to internal methods
+        tools = {
+            "get_preferences": "get_preferences",
+            "record_interaction": "record_interaction",
+            "learn_preference": "learn_preference",
+            "delete_all_preferences": "delete_all_preferences",
+        }
+
+        if tool_name not in tools:
+            raise ValueError(f"Unknown tool: {tool_name}")
+
+        # Get the tool function from the MCP instance
+        # Note: FastMCP provides tools via decorator, we need to call them directly
+        # For now, we'll manually route to our methods
+        if tool_name == "get_preferences":
+            return await self._call_get_preferences(**arguments)
+        elif tool_name == "record_interaction":
+            return await self._call_record_interaction(**arguments)
+        elif tool_name == "learn_preference":
+            return await self._call_learn_preference(**arguments)
+        elif tool_name == "delete_all_preferences":
+            return await self._call_delete_all_preferences(**arguments)
+
+    async def _call_get_preferences(
+        self,
+        user_id: str,
+        domain: Optional[str] = None,
+        min_confidence: float = 0.3
+    ) -> Dict[str, Any]:
+        """Internal method for get_preferences tool."""
+        preferences = await self.agent.get_all_preferences()
+
+        if domain:
+            preferences = [
+                p for p in preferences
+                if p.get("key", "").startswith(f"{domain}.")
+            ]
+
+        preferences = [
+            p for p in preferences
+            if p.get("confidence", 0) >= min_confidence
+        ]
+
+        return {"preferences": preferences}
+
+    async def _call_record_interaction(
+        self,
+        user_id: str,
+        preference_id: str,
+        accepted: bool
+    ) -> Dict[str, Any]:
+        """Internal method for record_interaction tool."""
+        if accepted:
+            updated = await self.agent.accept_preference(preference_id)
+        else:
+            updated = await self.agent.reject_preference(preference_id)
+
+        return {
+            "status": "recorded",
+            "new_confidence": updated.get("confidence", 0)
+        }
+
+    async def _call_learn_preference(
+        self,
+        user_id: str,
+        message: str
+    ) -> Dict[str, Any]:
+        """Internal method for learn_preference tool."""
+        response = await self.agent.chat(message, user_id=user_id)
+        preferences = await self.agent.get_all_preferences()
+
+        return {
+            "status": "learned",
+            "response": response,
+            "total_preferences": len(preferences)
+        }
+
+    async def _call_delete_all_preferences(self, user_id: str) -> Dict[str, Any]:
+        """Internal method for delete_all_preferences tool."""
+        count = await self.agent.delete_all_preferences()
+
+        return {
+            "status": "deleted",
+            "count": count
+        }
+
+    async def get_resource(self, resource_uri: str) -> str:
+        """Get an MCP resource by URI.
+
+        Args:
+            resource_uri: Resource URI (e.g., "user://user123/preferences")
+
+        Returns:
+            Resource content as string
+        """
+        # Parse URI
+        if resource_uri.startswith("user://"):
+            parts = resource_uri[7:].split("/")
+            if len(parts) < 2:
+                raise ValueError(f"Invalid resource URI: {resource_uri}")
+
+            user_id = parts[0]
+            resource_type = parts[1]
+
+            if resource_type == "preferences":
+                return await self._get_preferences_resource(user_id)
+            elif resource_type == "contexts":
+                return await self._get_contexts_resource(user_id)
+            else:
+                raise ValueError(f"Unknown resource type: {resource_type}")
+        else:
+            raise ValueError(f"Invalid resource URI: {resource_uri}")
+
+    async def _get_preferences_resource(self, user_id: str) -> str:
+        """Get preferences resource."""
+        preferences = await self.agent.get_all_preferences()
+
+        if not preferences:
+            return f"No preferences found for user {user_id}"
+
+        lines = [f"Preferences for user {user_id}:\n"]
+        for pref in preferences:
+            key = pref.get("key", "unknown")
+            value = pref.get("value", "")
+            sentiment = pref.get("sentiment", "neutral")
+            confidence = pref.get("confidence", 0)
+            lines.append(
+                f"- {key}: {value} ({sentiment}, {confidence:.0%} confident)"
+            )
+
+        return "\n".join(lines)
+
+    async def _get_contexts_resource(self, user_id: str) -> str:
+        """Get contexts resource."""
+        if not self.agent.context_agent:
+            return "Context awareness is disabled"
+
+        from fidus.memory.context.storage import ContextStorageService
+        storage = ContextStorageService()
+
+        async with storage.neo4j_driver.session() as session:
+            result = await session.run(
+                """
+                MATCH (s:Situation {user_id: $user_id, tenant_id: $tenant_id})
+                RETURN s.id as id, s.factors as factors
+                ORDER BY s.created_at DESC
+                LIMIT 20
+                """,
+                user_id=user_id,
+                tenant_id=self.tenant_id
+            )
+
+            records = await result.values()
+
+            if not records:
+                return f"No contexts found for user {user_id}"
+
+            lines = [f"Contexts for user {user_id}:\n"]
+            for record in records:
+                situation_id = record[0]
+                factors = record[1]
+                lines.append(f"\nSituation {situation_id}:")
+                if isinstance(factors, str):
+                    import json
+                    factors = json.loads(factors)
+                for key, value in factors.items():
+                    lines.append(f"  - {key}: {value}")
+
+            return "\n".join(lines)
