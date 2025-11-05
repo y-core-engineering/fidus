@@ -4,7 +4,7 @@
       "command": "node",
       "args": [],
       "env": {
-        "X_USER_ID": "REPLACE_WITH_YOUR_USER_ID"
+        "X_USER_ID": "guest-06f0d1fd-6f9f-48fa-bba1-83b75485ade0"
       },
       "disabled": false,
       "alwaysAllow": [],

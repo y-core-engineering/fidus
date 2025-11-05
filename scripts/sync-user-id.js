@@ -20,9 +20,9 @@ const readline = require('readline');
 
 // Claude Desktop config paths by OS
 const CONFIG_PATHS = {
-  darwin: path.join(process.env.HOME, 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json'),
-  win32: path.join(process.env.APPDATA, 'Claude', 'config.json'),
-  linux: path.join(process.env.HOME, '.config', 'Claude', 'claude_desktop_config.json'),
+  darwin: path.join(process.env.HOME || '~', 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json'),
+  win32: path.join(process.env.APPDATA || process.env.USERPROFILE || '~', 'Claude', 'config.json'),
+  linux: path.join(process.env.HOME || '~', '.config', 'Claude', 'claude_desktop_config.json'),
 };
 
 const PROJECT_CONFIG_PATH = path.join(__dirname, '..', 'claude-desktop-config.json');
@@ -149,10 +149,10 @@ async function main() {
     process.exit(1);
   }
 
-  // Validate user_id format (should be UUID)
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  // Validate user_id format (should be UUID or guest-UUID)
+  const uuidRegex = /^(?:guest-)?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(userId)) {
-    console.error(`❌ Error: Invalid user_id format. Expected UUID, got: ${userId}`);
+    console.error(`❌ Error: Invalid user_id format. Expected UUID or guest-UUID, got: ${userId}`);
     process.exit(1);
   }
 
