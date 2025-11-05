@@ -21,6 +21,8 @@ import {
   Tooltip
 } from '@fidus/ui';
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { PreferenceContext } from './PreferenceContext';
+import { getUserId, setUserId } from '../../lib/userSession';
 
 interface PreferenceViewerProps {
   onDeleteAll?: () => Promise<void>;
@@ -53,10 +55,29 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
         setLoading(true);
       }
       setError(null);
-      const response = await fetch('http://localhost:8000/memory/preferences');
+
+      // Get user_id from LocalStorage and prepare headers
+      const userId = getUserId();
+      const headers: Record<string, string> = {};
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+
+      const response = await fetch('/api/memory/preferences', {
+        method: 'GET',
+        headers,
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch preferences');
       }
+
+      // Extract and store X-User-ID from response
+      const responseUserId = response.headers.get('X-User-ID');
+      if (responseUserId) {
+        setUserId(responseUserId);
+      }
+
       const data = await response.json();
       setPreferences(data.preferences || []);
     } catch (err) {
@@ -70,12 +91,12 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
 
   const handleDeleteAll = async () => {
     try {
-      const response = await fetch('http://localhost:8000/memory/preferences', {
+      const response = await fetch('http://localhost:8000/memory/purge-all', {
         method: 'DELETE',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete preferences');
+        throw new Error('Failed to purge all memories');
       }
 
       setPreferences([]);
@@ -84,7 +105,7 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
         await onDeleteAll();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete');
+      setError(err instanceof Error ? err.message : 'Failed to purge memories');
       setShowDeleteModal(false);
     }
   };
@@ -274,6 +295,8 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
                               </Tooltip>
                             )}
                           </Stack>
+                          {/* Context Information */}
+                          {pref.id && <PreferenceContext preferenceId={pref.id} />}
                         </Stack>
                       </Stack>
                     </TableCell>

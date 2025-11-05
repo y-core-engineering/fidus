@@ -4,14 +4,29 @@ from dotenv import load_dotenv
 # This ensures env vars are available when modules are initialized
 load_dotenv()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fidus.api.routes import memory
+from fidus.api.routes import memory, mcp, health
+from fidus.api.middleware.auth import SimpleAuthMiddleware
+from fidus.memory.mcp_server import PreferenceMCPServer
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Rate limiter (Phase 4: Security)
+# 100 requests per hour per IP address
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(title="Fidus Memory API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Authentication middleware (Phase 4: Multi-User Support)
+# MUST be added before CORS to ensure user_id is available
+app.add_middleware(SimpleAuthMiddleware)
 
 # CORS middleware
 app.add_middleware(
@@ -23,7 +38,9 @@ app.add_middleware(
 )
 
 # Register routers
-app.include_router(memory.router)
+app.include_router(health.router)  # Health checks (no auth required)
+app.include_router(memory.router)  # Memory endpoints (auth required)
+app.include_router(mcp.router)     # MCP endpoints (auth required)
 
 
 @app.on_event("startup")
@@ -38,6 +55,15 @@ async def startup_event():
             logger.error(f"Failed to connect to Neo4j: {e}")
             logger.warning("Falling back to in-memory mode")
 
+    # Initialize MCP server with the memory agent
+    try:
+        mcp_server = PreferenceMCPServer(memory.agent)
+        mcp.init_mcp_server(mcp_server)
+        logger.info("Successfully initialized MCP server")
+    except Exception as e:
+        logger.error(f"Failed to initialize MCP server: {e}")
+        logger.warning("MCP endpoints will not be available")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -51,6 +77,4 @@ async def shutdown_event():
             logger.error(f"Error disconnecting from Neo4j: {e}")
 
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+# Health check moved to health.router (see fidus/api/routes/health.py)

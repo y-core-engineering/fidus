@@ -21,11 +21,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Extract X-User-ID from request headers (if present)
+    const userIdHeader = request.headers.get('X-User-ID');
+
     // Call Python backend with streaming
     const backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:8000';
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Forward X-User-ID header to backend if present
+    if (userIdHeader) {
+      headers['X-User-ID'] = userIdHeader;
+    }
+
     const response = await fetch(`${backendUrl}/memory/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ user_id, message }),
     });
 
@@ -67,12 +79,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Extract X-User-ID from backend response and forward to client
+    const responseHeaders: Record<string, string> = {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    };
+
+    const backendUserId = response.headers.get('X-User-ID');
+    if (backendUserId) {
+      responseHeaders['X-User-ID'] = backendUserId;
+    }
+
     return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+      headers: responseHeaders,
     });
   } catch (error) {
     console.error('API route error:', error);

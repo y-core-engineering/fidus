@@ -19,9 +19,14 @@ class InMemoryAgent:
         self.conversation_history: List[Dict[str, str]] = []
         self.max_history_messages = max_history_messages  # Sliding window size
 
-    async def chat(self, user_message: str) -> str:
-        """Process user message and return response."""
-        logger.info(f"Chat called with message: {user_message[:50]}...")
+    async def chat(self, user_message: str, user_id: str = "unknown") -> str:
+        """Process user message and return response.
+
+        Args:
+            user_message: The user's message
+            user_id: User identifier for context tracking (Phase 4)
+        """
+        logger.info(f"Chat called with message: {user_message[:50]}... (user: {user_id})")
         logger.info(f"Using model: {self.llm_model}")
 
         # 1. Add to history
@@ -63,9 +68,14 @@ class InMemoryAgent:
         self.conversation_history.append({"role": "assistant", "content": bot_response})
         return bot_response
 
-    async def chat_stream(self, user_message: str) -> AsyncGenerator[str, None]:
-        """Process user message and stream response token by token."""
-        logger.info(f"Chat stream called with message: {user_message[:50]}...")
+    async def chat_stream(self, user_message: str, user_id: str = "unknown") -> AsyncGenerator[str, None]:
+        """Process user message and stream response token by token.
+
+        Args:
+            user_message: The user's message
+            user_id: User identifier for context tracking (Phase 4)
+        """
+        logger.info(f"Chat stream called with message: {user_message[:50]}... (user: {user_id})")
         logger.info(f"Using model: {self.llm_model}")
 
         # 1. Add to history
