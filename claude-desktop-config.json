@@ -3,7 +3,9 @@
     "fidus-memory": {
       "command": "node",
       "args": [],
-      "env": {},
+      "env": {
+        "X_USER_ID": "REPLACE_WITH_YOUR_USER_ID"
+      },
       "disabled": false,
       "alwaysAllow": [],
       "timeout": 60000,
