@@ -637,28 +637,36 @@ class PreferenceMCPServer:
 
 
 # Standalone server runner
-async def run_mcp_server(host: str = "0.0.0.0", port: int = 8001) -> None:
-    """Run MCP server as standalone service.
+def run_mcp_server_sync(host: str = "0.0.0.0", port: int = 8001) -> None:
+    """Run MCP server as standalone service (sync wrapper).
 
     Args:
         host: Host to bind to (default: 0.0.0.0)
         port: Port to bind to (default: 8001)
     """
+    import asyncio
+    import uvicorn
+
     logger.info(f"Starting Fidus Memory MCP Server on {host}:{port}")
 
-    # Initialize agent
+    # Initialize agent sync
     agent = PersistentAgent(
         tenant_id=PrototypeConfig.PROTOTYPE_TENANT_ID,
         enable_context_awareness=True,
     )
-    await agent.connect()
+
+    # Connect in event loop
+    asyncio.run(agent.connect())
 
     # Create MCP server
     server = PreferenceMCPServer(agent)
 
-    # Run server (SSE transport)
+    # Get SSE FastAPI app from FastMCP
+    app = server.mcp.sse_app
+
+    # Run with uvicorn
     logger.info("MCP Server ready for connections")
-    await server.mcp.run(transport="sse", host=host, port=port)
+    uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":
