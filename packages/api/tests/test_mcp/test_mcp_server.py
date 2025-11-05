@@ -43,7 +43,7 @@ async def mcp_server() -> PreferenceMCPServer:
 async def test_get_preferences_tool_empty(mcp_server: PreferenceMCPServer) -> None:
     """Should return empty preferences list when no preferences exist."""
     result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_1"
     )
 
@@ -57,7 +57,7 @@ async def test_learn_and_get_preferences(mcp_server: PreferenceMCPServer) -> Non
     """Should learn preferences from message and retrieve them."""
     # Learn preference via message
     learn_result = await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_2",
         message="I love cappuccino coffee in the morning"
     )
@@ -68,7 +68,7 @@ async def test_learn_and_get_preferences(mcp_server: PreferenceMCPServer) -> Non
 
     # Get preferences
     get_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_2"
     )
 
@@ -86,20 +86,20 @@ async def test_get_preferences_with_domain_filter(mcp_server: PreferenceMCPServe
     """Should filter preferences by domain."""
     # Learn multiple preferences
     await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_3",
         message="I like cappuccino and pizza"
     )
 
     # Get all preferences
     all_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_3"
     )
 
     # Get coffee preferences only
     coffee_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_3",
         domain="coffee"
     )
@@ -113,21 +113,21 @@ async def test_get_preferences_with_confidence_filter(mcp_server: PreferenceMCPS
     """Should filter preferences by confidence threshold."""
     # Learn preference
     await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_4",
         message="I prefer cappuccino"
     )
 
     # Get with high confidence threshold (should return fewer/none)
     high_conf_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_4",
         min_confidence=0.9
     )
 
     # Get with low confidence threshold (should return more)
     low_conf_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_4",
         min_confidence=0.1
     )
@@ -141,14 +141,14 @@ async def test_record_interaction_accept(mcp_server: PreferenceMCPServer) -> Non
     """Should increase confidence when interaction is accepted."""
     # Learn preference
     await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_5",
         message="I like cappuccino"
     )
 
     # Get preferences to find ID
     prefs_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_5"
     )
 
@@ -159,7 +159,7 @@ async def test_record_interaction_accept(mcp_server: PreferenceMCPServer) -> Non
 
     # Accept preference
     accept_result = await mcp_server.call_tool(
-        "record_interaction",
+        "user.record_interaction",
         user_id="test_user_5",
         preference_id=pref_id,
         accepted=True
@@ -174,14 +174,14 @@ async def test_record_interaction_reject(mcp_server: PreferenceMCPServer) -> Non
     """Should decrease confidence when interaction is rejected."""
     # Learn preference
     await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_6",
         message="I enjoy espresso"
     )
 
     # Get preferences to find ID
     prefs_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_6"
     )
 
@@ -192,7 +192,7 @@ async def test_record_interaction_reject(mcp_server: PreferenceMCPServer) -> Non
 
     # Reject preference
     reject_result = await mcp_server.call_tool(
-        "record_interaction",
+        "user.record_interaction",
         user_id="test_user_6",
         preference_id=pref_id,
         accepted=False
@@ -207,21 +207,21 @@ async def test_delete_all_preferences(mcp_server: PreferenceMCPServer) -> None:
     """Should delete all preferences for user."""
     # Learn preferences
     await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_7",
         message="I love cappuccino and pizza"
     )
 
     # Verify preferences exist
     before_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_7"
     )
     assert len(before_result["preferences"]) > 0
 
     # Delete all
     delete_result = await mcp_server.call_tool(
-        "delete_all_preferences",
+        "user.delete_all_preferences",
         user_id="test_user_7"
     )
 
@@ -230,7 +230,7 @@ async def test_delete_all_preferences(mcp_server: PreferenceMCPServer) -> None:
 
     # Verify preferences deleted
     after_result = await mcp_server.call_tool(
-        "get_preferences",
+        "user.get_preferences",
         user_id="test_user_7"
     )
     # Note: Deleted preferences might still exist with low confidence
@@ -245,7 +245,7 @@ async def test_user_preferences_resource(mcp_server: PreferenceMCPServer) -> Non
     """Should retrieve preferences via MCP resource."""
     # Learn preference
     await mcp_server.call_tool(
-        "learn_preference",
+        "user.learn_preference",
         user_id="test_user_8",
         message="I prefer tea over coffee"
     )

@@ -34,6 +34,8 @@ structlog = "^24.1.0"
 prometheus-client = "^0.20.0"
 litellm = "^1.50.0"
 mcp = "^1.2.0"
+slowapi = "^0.1.9"
+bleach = "^6.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

@@ -6,6 +6,7 @@ This middleware provides basic user identification and isolation:
 - Stores user_id in request.state for use by endpoints
 - Returns user_id in response header for client tracking
 - Skips authentication for health check and docs endpoints
+- Phase 4: Sanitizes user_id to prevent injection attacks
 """
 
 import logging
@@ -13,6 +14,7 @@ import uuid
 from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+from fidus.api.utils.sanitize import sanitize_user_id
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +60,8 @@ class SimpleAuthMiddleware(BaseHTTPMiddleware):
             user_id = f"guest-{uuid.uuid4()}"
             logger.info(f"Created guest user: {user_id}")
         else:
+            # Phase 4: Sanitize user_id to prevent injection attacks
+            user_id = sanitize_user_id(user_id)
             logger.debug(f"Authenticated user: {user_id}")
 
         # Store user_id in request state for endpoint access

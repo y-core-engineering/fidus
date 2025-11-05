@@ -3,6 +3,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from fidus.memory.simple_agent import InMemoryAgent
 from fidus.memory.persistent_agent import PersistentAgent
+from fidus.api.utils.sanitize import sanitize_text
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from typing import Dict
 import json
 import logging
@@ -10,6 +13,9 @@ import traceback
 import os
 
 logger = logging.getLogger(__name__)
+
+# Rate limiter: 100 requests per hour per IP (Phase 4: Security)
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/memory", tags=["memory"])
 
@@ -117,15 +123,20 @@ class PreferenceWithContext(BaseModel):
 
 
 @router.post("/chat")
+@limiter.limit("100/hour")
 async def chat_stream(chat_request: ChatRequest, request: Request):
     """Chat endpoint with SSE streaming.
 
     Phase 3: Passes user_id to agent for context-aware preference learning.
     Phase 4: Uses user_id from auth middleware for multi-user isolation.
+    Rate Limited: 100 requests/hour per IP (Phase 4: Security)
     """
     try:
         # Phase 4: Get user_id from auth middleware
         user_id = request.state.user_id
+
+        # Phase 4: Sanitize message input
+        sanitized_message = sanitize_text(chat_request.message, field_name="message")
 
         # Phase 4: Get user-specific agent instance
         user_agent = get_user_agent(user_id)
@@ -137,8 +148,8 @@ async def chat_stream(chat_request: ChatRequest, request: Request):
         async def event_generator():
             try:
                 # Phase 3: Pass user_id to agent for context tracking
-                # Phase 4: Use user-specific agent
-                async for event in user_agent.chat_stream(chat_request.message, user_id=user_id):
+                # Phase 4: Use user-specific agent with sanitized input
+                async for event in user_agent.chat_stream(sanitized_message, user_id=user_id):
                     # SSE format: "data: {json}\n\n"
                     yield f"data: {event}\n"
             except Exception as e:
@@ -165,15 +176,20 @@ async def chat_stream(chat_request: ChatRequest, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/chat/legacy", response_model=ChatResponse)
+@limiter.limit("100/hour")
 async def chat_legacy(chat_request: ChatRequest, request: Request):
     """Legacy non-streaming chat endpoint (for backwards compatibility).
 
     Phase 3: Passes user_id to agent for context-aware preference learning.
     Phase 4: Uses user_id from auth middleware for multi-user isolation.
+    Rate Limited: 100 requests/hour per IP (Phase 4: Security)
     """
     try:
         # Phase 4: Get user_id from auth middleware
         user_id = request.state.user_id
+
+        # Phase 4: Sanitize message input
+        sanitized_message = sanitize_text(chat_request.message, field_name="message")
 
         # Phase 4: Get user-specific agent instance
         user_agent = get_user_agent(user_id)
@@ -183,8 +199,8 @@ async def chat_legacy(chat_request: ChatRequest, request: Request):
             await user_agent.connect()
 
         # Phase 3: Pass user_id to agent for context tracking
-        # Phase 4: Use user-specific agent
-        response = await user_agent.chat(chat_request.message, user_id=user_id)
+        # Phase 4: Use user-specific agent with sanitized input
+        response = await user_agent.chat(sanitized_message, user_id=user_id)
         return ChatResponse(response=response)
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")

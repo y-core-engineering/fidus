@@ -4,16 +4,25 @@ from dotenv import load_dotenv
 # This ensures env vars are available when modules are initialized
 load_dotenv()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fidus.api.routes import memory, mcp, health
 from fidus.api.middleware.auth import SimpleAuthMiddleware
 from fidus.memory.mcp_server import PreferenceMCPServer
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Rate limiter (Phase 4: Security)
+# 100 requests per hour per IP address
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(title="Fidus Memory API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Authentication middleware (Phase 4: Multi-User Support)
 # MUST be added before CORS to ensure user_id is available

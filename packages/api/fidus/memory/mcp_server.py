@@ -41,7 +41,7 @@ class PreferenceMCPServer:
     def _register_tools(self) -> None:
         """Register MCP tools."""
 
-        @self.mcp.tool()
+        @self.mcp.tool(name="user.get_preferences")
         async def get_preferences(
             user_id: str,
             domain: Optional[str] = None,
@@ -85,7 +85,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error getting preferences: {e}")
                 return {"error": str(e), "preferences": []}
 
-        @self.mcp.tool()
+        @self.mcp.tool(name="user.record_interaction")
         async def record_interaction(
             user_id: str,
             preference_id: str,
@@ -126,7 +126,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error recording interaction: {e}")
                 return {"error": str(e), "status": "failed"}
 
-        @self.mcp.tool()
+        @self.mcp.tool(name="user.learn_preference")
         async def learn_preference(
             user_id: str,
             message: str
@@ -165,7 +165,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error learning preference: {e}")
                 return {"error": str(e), "status": "failed"}
 
-        @self.mcp.tool()
+        @self.mcp.tool(name="user.delete_all_preferences")
         async def delete_all_preferences(user_id: str) -> Dict[str, Any]:
             """Delete all preferences for a user (privacy feature).
 
@@ -295,10 +295,10 @@ class PreferenceMCPServer:
         """
         # Map tool names to internal methods
         tools = {
-            "get_preferences": "get_preferences",
-            "record_interaction": "record_interaction",
-            "learn_preference": "learn_preference",
-            "delete_all_preferences": "delete_all_preferences",
+            "user.get_preferences": "get_preferences",
+            "user.record_interaction": "record_interaction",
+            "user.learn_preference": "learn_preference",
+            "user.delete_all_preferences": "delete_all_preferences",
         }
 
         if tool_name not in tools:
@@ -307,13 +307,13 @@ class PreferenceMCPServer:
         # Get the tool function from the MCP instance
         # Note: FastMCP provides tools via decorator, we need to call them directly
         # For now, we'll manually route to our methods
-        if tool_name == "get_preferences":
+        if tool_name == "user.get_preferences":
             return await self._call_get_preferences(**arguments)
-        elif tool_name == "record_interaction":
+        elif tool_name == "user.record_interaction":
             return await self._call_record_interaction(**arguments)
-        elif tool_name == "learn_preference":
+        elif tool_name == "user.learn_preference":
             return await self._call_learn_preference(**arguments)
-        elif tool_name == "delete_all_preferences":
+        elif tool_name == "user.delete_all_preferences":
             return await self._call_delete_all_preferences(**arguments)
 
     async def _call_get_preferences(
