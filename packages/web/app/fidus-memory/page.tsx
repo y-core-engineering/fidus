@@ -4,6 +4,7 @@ import { ChatInterface, Alert, Stack, Container, OpportunityCard, TooltipProvide
 import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceViewer';
 import { SituationsViewer, SituationsViewerRef } from './components/SituationsViewer';
 import { useState, useEffect, useRef } from 'react';
+import { getUserId, setUserId } from '../lib/userSession';
 
 interface Message {
   id: string;
@@ -84,11 +85,22 @@ export default function FidusMemoryPage() {
     setIsLoading(true);
 
     try {
+      // Get user_id from LocalStorage
+      const userId = getUserId() || 'user-1'; // Fallback to 'user-1' if not set
+
+      // Prepare headers with X-User-ID
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+
       // Call backend with SSE streaming
       const response = await fetch('/api/memory/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: 'user-1', message: content }),
+        headers,
+        body: JSON.stringify({ user_id: userId, message: content }),
       });
 
       if (!response.ok) {
@@ -102,6 +114,13 @@ export default function FidusMemoryPage() {
         } else {
           throw new Error('Something went wrong. Please check your connection and try again.');
         }
+      }
+
+      // Extract and store X-User-ID from response headers
+      const responseUserId = response.headers.get('X-User-ID');
+      if (responseUserId) {
+        setUserId(responseUserId);
+        console.log('Stored user_id from response:', responseUserId);
       }
 
       // Read SSE stream

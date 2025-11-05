@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { Button, Alert } from '@fidus/ui';
+import { getUserId, setUserId } from '../../lib/userSession';
 
 interface ContextFactor {
   key: string;
@@ -40,9 +41,26 @@ export const SituationsViewer = forwardRef<SituationsViewerRef, SituationsViewer
       setError(null);
 
       try {
-        const response = await fetch('/api/memory/situations');
+        // Get user_id from LocalStorage and prepare headers
+        const userId = getUserId();
+        const headers: Record<string, string> = {};
+        if (userId) {
+          headers['X-User-ID'] = userId;
+        }
+
+        const response = await fetch('/api/memory/situations', {
+          method: 'GET',
+          headers,
+        });
+
         if (!response.ok) {
           throw new Error(`Failed to fetch situations: ${response.statusText}`);
+        }
+
+        // Extract and store X-User-ID from response
+        const responseUserId = response.headers.get('X-User-ID');
+        if (responseUserId) {
+          setUserId(responseUserId);
         }
 
         const data = await response.json();

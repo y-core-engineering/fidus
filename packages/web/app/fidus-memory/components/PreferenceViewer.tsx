@@ -22,6 +22,7 @@ import {
 } from '@fidus/ui';
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { PreferenceContext } from './PreferenceContext';
+import { getUserId, setUserId } from '../../lib/userSession';
 
 interface PreferenceViewerProps {
   onDeleteAll?: () => Promise<void>;
@@ -54,10 +55,29 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
         setLoading(true);
       }
       setError(null);
-      const response = await fetch('http://localhost:8000/memory/preferences');
+
+      // Get user_id from LocalStorage and prepare headers
+      const userId = getUserId();
+      const headers: Record<string, string> = {};
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+
+      const response = await fetch('/api/memory/preferences', {
+        method: 'GET',
+        headers,
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch preferences');
       }
+
+      // Extract and store X-User-ID from response
+      const responseUserId = response.headers.get('X-User-ID');
+      if (responseUserId) {
+        setUserId(responseUserId);
+      }
+
       const data = await response.json();
       setPreferences(data.preferences || []);
     } catch (err) {
