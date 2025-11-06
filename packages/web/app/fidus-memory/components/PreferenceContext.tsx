@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ContextBadges } from './ContextBadges';
+import { getUserId } from '../../lib/userSession';
 
 interface Situation {
   id: string;
@@ -34,7 +35,17 @@ export function PreferenceContext({ preferenceId }: PreferenceContextProps) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/memory/preferences/${preferenceId}/context`);
+      // Get user_id from LocalStorage and prepare headers
+      const userId = getUserId();
+      const headers: Record<string, string> = {};
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+
+      const response = await fetch(`/api/memory/preferences/${preferenceId}/context`, {
+        method: 'GET',
+        headers,
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch context');
       }

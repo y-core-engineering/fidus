@@ -112,9 +112,16 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
 
   const handleAcceptPreference = async (preferenceId: string) => {
     try {
+      const userId = getUserId();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
       const response = await fetch('http://localhost:8000/memory/preferences/accept', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ preference_id: preferenceId }),
       });
 
@@ -131,9 +138,16 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
 
   const handleRejectPreference = async (preferenceId: string) => {
     try {
+      const userId = getUserId();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
       const response = await fetch('http://localhost:8000/memory/preferences/reject', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ preference_id: preferenceId }),
       });
 
