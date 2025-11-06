@@ -218,12 +218,14 @@ All components are production-ready and shared across packages.
 
 ✅ **Foundation Pages** - Colors, Typography, Spacing, Motion, Accessibility, Privacy UX, AI-Driven UI
 ✅ **Token Pages** - Color, Typography, Spacing, Shadow, Motion tokens
-✅ **Component Documentation** - Interactive component previews with props tables
+✅ **Component Documentation** - Interactive component previews with props tables (45+ components)
+✅ **Chat UI Components** - MessageBubble, ChatInterface, ConfidenceIndicator (v1.2.0)
 ✅ **Code Examples** - Syntax-highlighted code blocks with copy functionality
 ✅ **Responsive Design** - Mobile-first, works across all devices
 ✅ **Dark Mode** - Automatic theme switching
 ✅ **Navigation** - Collapsible sidebar with category organization
 ✅ **Design Tokens** - CSS variables with interactive inspector
+✅ **Release Notes** - Comprehensive version history and changelog
 
 ### Upcoming Features
 
