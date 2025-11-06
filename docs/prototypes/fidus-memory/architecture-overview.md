@@ -1455,11 +1455,12 @@ docker run -p 8000:8000 -p 8001:8001 fidus/memory:latest
 ### Local Development
 
 ```bash
-# Start all services
+# Start all services (includes MCP server on port 8001)
 docker-compose up -d
 
 # View logs
-docker-compose logs -f memory-api
+docker-compose logs -f memory-api      # REST API logs
+docker-compose logs -f memory-mcp      # MCP server logs
 
 # Stop services
 docker-compose down
@@ -1467,6 +1468,18 @@ docker-compose down
 # Full cleanup (removes data)
 docker-compose down -v
 ```
+
+**Services Running:**
+- **REST API** (port 8000): For web frontend and direct API access
+- **MCP Server** (port 8001): For external LLM clients (Claude, VS Code, etc.)
+- **Web UI** (port 3001): Interactive chat interface
+- **Neo4j** (ports 7474, 7687): Preference storage + browser UI
+- **Qdrant** (port 6333): Vector database + dashboard
+- **PostgreSQL** (port 5432): Conversation history
+- **Redis** (port 6379): Session cache
+
+**MCP Server Details:**
+The MCP server runs as a separate container (`memory-mcp`) and provides the `get_context()` tool for external LLMs. It connects to the same databases as the REST API but serves the MCP protocol on port 8001.
 
 ### Production Deployment
 

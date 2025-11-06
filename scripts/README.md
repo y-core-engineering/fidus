@@ -175,11 +175,122 @@ SUMMARY:
    Please fix these before committing!
 ```
 
+## sync-user-id.js
+
+Synchronizes user_id between Web UI and Claude Desktop configuration.
+
+### Purpose
+
+When testing Fidus Memory integration with Claude Desktop, you want the same user_id across both interfaces so memory learning is shared. This script automates updating your Claude Desktop config with the user_id from your Web UI session.
+
+### Usage
+
+**Interactive mode (recommended):**
+```bash
+node scripts/sync-user-id.js
+```
+
+**Direct mode:**
+```bash
+node scripts/sync-user-id.js <your-user-id>
+```
+
+### Step-by-Step Example
+
+1. **Start Fidus Memory services:**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Open Web UI and get your user_id:**
+   - Open http://localhost:3001
+   - Open DevTools Console (F12 or Cmd+Option+I)
+   - Run: `localStorage.getItem('fidus_user_id')`
+   - Copy the UUID (e.g., `d3f72106-1fe0-48a8-9d75-ac5f1bb3ddab`)
+
+3. **Run the sync script:**
+   ```bash
+   node scripts/sync-user-id.js
+   ```
+
+   When prompted, paste the user_id you copied.
+
+4. **Restart Claude Desktop**
+
+### What It Does
+
+The script:
+1. ✅ Validates the user_id format (must be UUID)
+2. ✅ Locates your Claude Desktop config file (OS-specific)
+3. ✅ Updates or creates the `fidus-memory` MCP server configuration
+4. ✅ Sets the `X_USER_ID` environment variable
+5. ✅ Adds global instructions for automatic memory usage
+6. ✅ Updates the project template config for reference
+
+### Config Locations
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%/Claude/config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+### Example Output
+
+```bash
+$ node scripts/sync-user-id.js
+
+📋 To get your user_id from the Web UI:
+   1. Open http://localhost:3001 in your browser
+   2. Open DevTools Console (F12 or Cmd+Option+I)
+   3. Run: localStorage.getItem("fidus_user_id")
+   4. Copy the user_id (without quotes)
+
+Paste your user_id here: d3f72106-1fe0-48a8-9d75-ac5f1bb3ddab
+
+🔧 Updating Claude Desktop configuration...
+   Platform: darwin
+   Config path: /Users/you/Library/Application Support/Claude/claude_desktop_config.json
+
+✅ Successfully updated Claude Desktop config at:
+   /Users/you/Library/Application Support/Claude/claude_desktop_config.json
+
+📝 X-USER-ID set to: d3f72106-1fe0-48a8-9d75-ac5f1bb3ddab
+
+🔄 Please restart Claude Desktop for changes to take effect.
+
+✅ Also updated project config: claude-desktop-config.json
+```
+
+### Troubleshooting
+
+**Error: "Invalid user_id format"**
+
+Make sure you copied the UUID correctly without quotes or extra whitespace:
+```bash
+# ❌ Wrong (has quotes)
+"d3f72106-1fe0-48a8-9d75-ac5f1bb3ddab"
+
+# ✅ Right
+d3f72106-1fe0-48a8-9d75-ac5f1bb3ddab
+```
+
+**Error: "Permission denied" or "ENOENT"**
+
+The script needs to create/modify your Claude Desktop config. Make sure:
+1. Claude Desktop is installed
+2. The config directory exists (run Claude Desktop once to create it)
+3. You have write permissions
+
+### See Also
+
+- [Claude Desktop Setup Guide](../docs/prototypes/fidus-memory/claude-desktop-setup.md) - Complete setup instructions
+- [MCP Server Implementation](../packages/api/fidus/memory/mcp_server.py) - Server code
+- [Architecture Overview](../docs/prototypes/fidus-memory/architecture-overview.md) - System design
+
 ## Development
 
-The check-mermaid.js script is self-contained and has no external dependencies beyond Node.js built-ins.
+The scripts in this directory are self-contained and have no external dependencies beyond Node.js built-ins.
 
 To modify or extend:
-1. Edit `scripts/check-mermaid.js`
-2. Test with `node scripts/check-mermaid.js scripts/test-file.md`
+1. Edit the relevant script
+2. Test your changes
 3. Update this README if adding new features

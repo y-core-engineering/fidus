@@ -3,9 +3,17 @@
 This module exposes Fidus Memory capabilities as MCP (Model Context Protocol)
 tools and resources, enabling external domain supervisors to query preferences,
 record interactions, and learn from conversations.
+
+**Phase 5: Passive Learning for External LLMs**
+
+Added `get_context()` tool for external LLMs (Claude CLI, VS Code):
+- Single tool call retrieves preferences + situations
+- Auto-learn parameter triggers background learning
+- Non-blocking: Learning happens asynchronously
 """
 
 from typing import Dict, Any, List, Optional
+import asyncio
 from mcp.server import FastMCP
 from fidus.memory.persistent_agent import PersistentAgent
 from fidus.config import PrototypeConfig
@@ -41,7 +49,7 @@ class PreferenceMCPServer:
     def _register_tools(self) -> None:
         """Register MCP tools."""
 
-        @self.mcp.tool(name="user.get_preferences")
+        @self.mcp.tool(name="user_get_preferences")
         async def get_preferences(
             user_id: str,
             domain: Optional[str] = None,
@@ -85,7 +93,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error getting preferences: {e}")
                 return {"error": str(e), "preferences": []}
 
-        @self.mcp.tool(name="user.record_interaction")
+        @self.mcp.tool(name="user_record_interaction")
         async def record_interaction(
             user_id: str,
             preference_id: str,
@@ -126,7 +134,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error recording interaction: {e}")
                 return {"error": str(e), "status": "failed"}
 
-        @self.mcp.tool(name="user.learn_preference")
+        @self.mcp.tool(name="user_learn_preference")
         async def learn_preference(
             user_id: str,
             message: str
@@ -165,7 +173,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error learning preference: {e}")
                 return {"error": str(e), "status": "failed"}
 
-        @self.mcp.tool(name="user.delete_all_preferences")
+        @self.mcp.tool(name="user_delete_all_preferences")
         async def delete_all_preferences(user_id: str) -> Dict[str, Any]:
             """Delete all preferences for a user (privacy feature).
 
@@ -188,6 +196,111 @@ class PreferenceMCPServer:
             except Exception as e:
                 logger.error(f"Error deleting preferences: {e}")
                 return {"error": str(e), "status": "failed"}
+
+        @self.mcp.tool(name="get_context")
+        async def get_context(
+            query: str,
+            user_id: str,
+            auto_learn: bool = True,
+            include_preferences: bool = True,
+            include_situations: bool = True,
+            min_confidence: float = 0.5,
+        ) -> Dict[str, Any]:
+            """Get relevant memory context for a query with passive learning.
+
+            **Passive Learning:** If auto_learn=True (default), this tool will
+            automatically analyze and learn from the query in the background
+            while retrieving context.
+
+            This is the PRIMARY tool for external LLMs (Claude CLI, VS Code) to use.
+
+            Args:
+                query: Query message to find relevant context
+                user_id: User identifier
+                auto_learn: Enable background learning (default: True)
+                include_preferences: Include user preferences (default: True)
+                include_situations: Include similar situations (default: True)
+                min_confidence: Minimum preference confidence (default: 0.5)
+
+            Returns:
+                Dictionary with:
+                - preferences: List of relevant preferences
+                - situations: List of similar past situations
+                - summary: Human-readable summary
+                - learned: Whether learning was triggered
+            """
+            try:
+                # Start passive learning in background (non-blocking)
+                if auto_learn:
+                    asyncio.create_task(
+                        self._learn_from_query(query, user_id)
+                    )
+
+                result = {}
+
+                # Active retrieval (immediate)
+                if include_preferences:
+                    preferences = await self.agent.get_all_preferences()
+                    # Filter by confidence
+                    preferences = [
+                        p for p in preferences
+                        if p.get("confidence", 0) >= min_confidence
+                    ]
+                    result["preferences"] = preferences
+                    logger.info(
+                        f"Retrieved {len(preferences)} preferences "
+                        f"(min_confidence={min_confidence})"
+                    )
+
+                if include_situations:
+                    # Search similar situations using context agent
+                    if self.agent.context_agent:
+                        situations = await self.agent.context_agent.retrieval.search_similar_situations(
+                            query=query,
+                            user_id=user_id,
+                            limit=3,
+                            min_score=0.0,
+                        )
+                        result["situations"] = [
+                            {
+                                "id": str(sit.id),
+                                "message": sit.message,
+                                "factors": sit.factors.model_dump() if sit.factors else {},
+                                "score": sit.similarity_score or 0.0,
+                                "timestamp": sit.timestamp.isoformat() if sit.timestamp else None,
+                            }
+                            for sit in situations
+                        ]
+                        logger.info(f"Retrieved {len(situations)} similar situations")
+                    else:
+                        result["situations"] = []
+                        logger.warning("Context awareness disabled, no situations retrieved")
+
+                # Generate summary
+                result["summary"] = self._generate_summary(
+                    result.get("preferences", []),
+                    result.get("situations", []),
+                )
+                result["learned"] = auto_learn
+
+                logger.info(
+                    f"get_context for user {user_id}: "
+                    f"{len(result.get('preferences', []))} prefs, "
+                    f"{len(result.get('situations', []))} situations, "
+                    f"learning={'enabled' if auto_learn else 'disabled'}"
+                )
+
+                return result
+
+            except Exception as e:
+                logger.error(f"Error in get_context: {e}")
+                return {
+                    "error": str(e),
+                    "preferences": [],
+                    "situations": [],
+                    "summary": f"Error retrieving context: {str(e)}",
+                    "learned": False,
+                }
 
     def _register_resources(self) -> None:
         """Register MCP resources."""
@@ -295,10 +408,10 @@ class PreferenceMCPServer:
         """
         # Map tool names to internal methods
         tools = {
-            "user.get_preferences": "get_preferences",
-            "user.record_interaction": "record_interaction",
-            "user.learn_preference": "learn_preference",
-            "user.delete_all_preferences": "delete_all_preferences",
+            "user_get_preferences": "get_preferences",
+            "user_record_interaction": "record_interaction",
+            "user_learn_preference": "learn_preference",
+            "user_delete_all_preferences": "delete_all_preferences",
         }
 
         if tool_name not in tools:
@@ -307,13 +420,13 @@ class PreferenceMCPServer:
         # Get the tool function from the MCP instance
         # Note: FastMCP provides tools via decorator, we need to call them directly
         # For now, we'll manually route to our methods
-        if tool_name == "user.get_preferences":
+        if tool_name == "user_get_preferences":
             return await self._call_get_preferences(**arguments)
-        elif tool_name == "user.record_interaction":
+        elif tool_name == "user_record_interaction":
             return await self._call_record_interaction(**arguments)
-        elif tool_name == "user.learn_preference":
+        elif tool_name == "user_learn_preference":
             return await self._call_learn_preference(**arguments)
-        elif tool_name == "user.delete_all_preferences":
+        elif tool_name == "user_delete_all_preferences":
             return await self._call_delete_all_preferences(**arguments)
 
     async def _call_get_preferences(
@@ -462,3 +575,104 @@ class PreferenceMCPServer:
                     lines.append(f"  - {key}: {value}")
 
             return "\n".join(lines)
+
+    async def _learn_from_query(self, query: str, user_id: str) -> None:
+        """Background task: Learn from query (passive learning).
+
+        This method runs asynchronously in the background to:
+        1. Extract preferences from the query
+        2. Extract and store situational context
+
+        Args:
+            query: User query to learn from
+            user_id: User identifier
+        """
+        try:
+            logger.info(f"Starting passive learning for user {user_id}")
+
+            # Use the agent's chat method to process and learn
+            # This will trigger preference extraction and context recording
+            await self.agent.chat(query, user_id=user_id)
+
+            logger.info(f"Completed passive learning for user {user_id}")
+
+        except Exception as e:
+            logger.error(f"Error in passive learning for user {user_id}: {e}")
+
+    def _generate_summary(
+        self,
+        preferences: List[Dict[str, Any]],
+        situations: List[Dict[str, Any]],
+    ) -> str:
+        """Generate human-readable summary of context.
+
+        Args:
+            preferences: List of preferences
+            situations: List of situations
+
+        Returns:
+            Summary string
+        """
+        parts = []
+
+        if preferences:
+            parts.append(f"Found {len(preferences)} relevant preferences:")
+            for pref in preferences[:5]:  # Top 5
+                key = pref.get("key", "unknown")
+                value = pref.get("value", "")
+                confidence = pref.get("confidence", 0)
+                parts.append(f"  - {key}: {value} ({confidence:.0%} confident)")
+
+        if situations:
+            parts.append(f"\nFound {len(situations)} similar past situations:")
+            for sit in situations[:3]:  # Top 3
+                message = sit.get("message", "")
+                score = sit.get("score", 0)
+                parts.append(f"  - '{message[:60]}...' (similarity: {score:.0%})")
+
+        if not parts:
+            return "No relevant context found."
+
+        return "\n".join(parts)
+
+
+# Standalone server runner
+def run_mcp_server_sync(host: str = "0.0.0.0", port: int = 8001) -> None:
+    """Run MCP server as standalone service (sync wrapper).
+
+    Args:
+        host: Host to bind to (default: 0.0.0.0)
+        port: Port to bind to (default: 8001)
+    """
+    import asyncio
+    import uvicorn
+    from fastapi import FastAPI, Response
+    from starlette.requests import Request
+
+    logger.info(f"Starting Fidus Memory MCP Server on {host}:{port}")
+
+    # Initialize agent sync
+    agent = PersistentAgent(
+        tenant_id=PrototypeConfig.PROTOTYPE_TENANT_ID,
+        enable_context_awareness=True,
+    )
+
+    # Connect in event loop
+    asyncio.run(agent.connect())
+
+    # Create MCP server
+    server = PreferenceMCPServer(agent)
+
+    # Run SSE server using FastMCP's built-in method
+    # NOTE: Claude Desktop should connect directly to the SSE endpoint
+    # FastMCP v0.3.0+ does not require a separate Discovery endpoint
+    logger.info("MCP Server ready for SSE connections")
+    logger.info(f"Claude Desktop should use: http://localhost:{port}/sse")
+
+    # Run the server
+    server.mcp.run(transport="sse")
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(run_mcp_server())
