@@ -687,8 +687,8 @@ graph TD
     %% ✅ GOOD: Use bullets for button lists
     Card[Budget Alert<br/>• Set Alarm • Dismiss]
 
-    %% ❌ BAD: Nested brackets
-    %% BadCard[Alert<br/>[Button1] [Button2]]  ← Parse error!
+    %% ❌ BAD: Nested brackets (commented to avoid validation error)
+    %% BadCard with nested square brackets causes parse errors
 
     %% ✅ GOOD: Explicit text color on dark backgrounds
     style E fill:#000000,color:#ffffff
