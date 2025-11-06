@@ -1,17 +1,21 @@
 {
   "mcpServers": {
     "fidus-memory": {
-      "command": "node",
+      "command": "/absolute/path/to/fidus/packages/api/run_mcp_stdio.sh",
       "args": [],
       "env": {
-        "X_USER_ID": "guest-06f0d1fd-6f9f-48fa-bba1-83b75485ade0"
+        "X_USER_ID": "guest-YOUR-UUID-HERE",
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "fidus-memory-dev-password",
+        "QDRANT_HOST": "localhost",
+        "QDRANT_PORT": "6333",
+        "FIDUS_LLM_MODEL": "openai/gpt-4o-mini",
+        "OLLAMA_API_BASE": "http://localhost:11434"
       },
       "disabled": false,
       "alwaysAllow": [],
-      "timeout": 60000,
-      "initializationOptions": {
-        "serverUrl": "http://localhost:8001/sse"
-      }
+      "timeout": 60000
     }
   },
   "globalCustomInstructions": "# Fidus Memory Integration\n\nYou have access to Fidus Memory via MCP.\n\n## CRITICAL: Memory Usage Protocol\n\nBEFORE responding to ANY user message:\n1. ALWAYS call `get_context(user_message)` to retrieve relevant preferences and past context\n2. Use the returned memory to personalize your response\n3. Learning happens automatically in the background\n\n## Example Flow:\n\nUser: \"What should I drink?\"\n1. [Call get_context('What should I drink?')]\n2. [Receive: {preferences: [\"coffee: loves it\"], situations: [\"I need coffee before 9am\" (87% similar)]}]\n3. [Respond using this context]: \"Given that you love coffee and typically drink it in the morning, how about a nice cup of coffee?\"\n\n## Available Tools:\n\n- **get_context(query, user_id, auto_learn=True)**: Retrieves preferences + situations. Automatically learns from query in background.\n  - Returns: {preferences: [...], situations: [...], summary: \"...\", learned: true}\n  - Use this for EVERY user message to personalize responses\n\nNEVER skip calling get_context()!"

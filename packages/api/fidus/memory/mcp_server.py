@@ -49,7 +49,7 @@ class PreferenceMCPServer:
     def _register_tools(self) -> None:
         """Register MCP tools."""
 
-        @self.mcp.tool(name="user.get_preferences")
+        @self.mcp.tool(name="user_get_preferences")
         async def get_preferences(
             user_id: str,
             domain: Optional[str] = None,
@@ -93,7 +93,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error getting preferences: {e}")
                 return {"error": str(e), "preferences": []}
 
-        @self.mcp.tool(name="user.record_interaction")
+        @self.mcp.tool(name="user_record_interaction")
         async def record_interaction(
             user_id: str,
             preference_id: str,
@@ -134,7 +134,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error recording interaction: {e}")
                 return {"error": str(e), "status": "failed"}
 
-        @self.mcp.tool(name="user.learn_preference")
+        @self.mcp.tool(name="user_learn_preference")
         async def learn_preference(
             user_id: str,
             message: str
@@ -173,7 +173,7 @@ class PreferenceMCPServer:
                 logger.error(f"Error learning preference: {e}")
                 return {"error": str(e), "status": "failed"}
 
-        @self.mcp.tool(name="user.delete_all_preferences")
+        @self.mcp.tool(name="user_delete_all_preferences")
         async def delete_all_preferences(user_id: str) -> Dict[str, Any]:
             """Delete all preferences for a user (privacy feature).
 
@@ -408,10 +408,10 @@ class PreferenceMCPServer:
         """
         # Map tool names to internal methods
         tools = {
-            "user.get_preferences": "get_preferences",
-            "user.record_interaction": "record_interaction",
-            "user.learn_preference": "learn_preference",
-            "user.delete_all_preferences": "delete_all_preferences",
+            "user_get_preferences": "get_preferences",
+            "user_record_interaction": "record_interaction",
+            "user_learn_preference": "learn_preference",
+            "user_delete_all_preferences": "delete_all_preferences",
         }
 
         if tool_name not in tools:
@@ -420,13 +420,13 @@ class PreferenceMCPServer:
         # Get the tool function from the MCP instance
         # Note: FastMCP provides tools via decorator, we need to call them directly
         # For now, we'll manually route to our methods
-        if tool_name == "user.get_preferences":
+        if tool_name == "user_get_preferences":
             return await self._call_get_preferences(**arguments)
-        elif tool_name == "user.record_interaction":
+        elif tool_name == "user_record_interaction":
             return await self._call_record_interaction(**arguments)
-        elif tool_name == "user.learn_preference":
+        elif tool_name == "user_learn_preference":
             return await self._call_learn_preference(**arguments)
-        elif tool_name == "user.delete_all_preferences":
+        elif tool_name == "user_delete_all_preferences":
             return await self._call_delete_all_preferences(**arguments)
 
     async def _call_get_preferences(
@@ -646,6 +646,8 @@ def run_mcp_server_sync(host: str = "0.0.0.0", port: int = 8001) -> None:
     """
     import asyncio
     import uvicorn
+    from fastapi import FastAPI, Response
+    from starlette.requests import Request
 
     logger.info(f"Starting Fidus Memory MCP Server on {host}:{port}")
 
@@ -661,12 +663,14 @@ def run_mcp_server_sync(host: str = "0.0.0.0", port: int = 8001) -> None:
     # Create MCP server
     server = PreferenceMCPServer(agent)
 
-    # Get SSE FastAPI app from FastMCP
-    app = server.mcp.sse_app
+    # Run SSE server using FastMCP's built-in method
+    # NOTE: Claude Desktop should connect directly to the SSE endpoint
+    # FastMCP v0.3.0+ does not require a separate Discovery endpoint
+    logger.info("MCP Server ready for SSE connections")
+    logger.info(f"Claude Desktop should use: http://localhost:{port}/sse")
 
-    # Run with uvicorn
-    logger.info("MCP Server ready for connections")
-    uvicorn.run(app, host=host, port=port, log_level="info")
+    # Run the server
+    server.mcp.run(transport="sse")
 
 
 if __name__ == "__main__":

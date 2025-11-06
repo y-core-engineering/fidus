@@ -47,18 +47,27 @@ function updateConfig(configPath, userId) {
       config.mcpServers = {};
     }
 
-    // Ensure fidus-memory server exists
+    // Get absolute path to the wrapper script
+    const scriptPath = path.join(__dirname, '..', 'packages', 'api', 'run_mcp_stdio.sh');
+    const absoluteScriptPath = path.resolve(scriptPath);
+
+    // Ensure fidus-memory server exists with stdio transport
     if (!config.mcpServers['fidus-memory']) {
       config.mcpServers['fidus-memory'] = {
-        command: "node",
+        command: absoluteScriptPath,
         args: [],
-        env: {},
+        env: {
+          NEO4J_URI: "bolt://localhost:7687",
+          NEO4J_USER: "neo4j",
+          NEO4J_PASSWORD: "fidus-memory-dev-password",
+          QDRANT_HOST: "localhost",
+          QDRANT_PORT: "6333",
+          FIDUS_LLM_MODEL: "openai/gpt-4o-mini",
+          OLLAMA_API_BASE: "http://localhost:11434"
+        },
         disabled: false,
         alwaysAllow: [],
-        timeout: 60000,
-        initializationOptions: {
-          serverUrl: "http://localhost:8001/sse"
-        }
+        timeout: 60000
       };
     }
 
@@ -67,8 +76,38 @@ function updateConfig(configPath, userId) {
       config.mcpServers['fidus-memory'].env = {};
     }
 
+    // Update command and args to use stdio transport via wrapper script
+    config.mcpServers['fidus-memory'].command = absoluteScriptPath;
+    config.mcpServers['fidus-memory'].args = [];
+
     // Set the X-USER-ID
     config.mcpServers['fidus-memory'].env['X_USER_ID'] = userId;
+
+    // Set other required environment variables if missing
+    if (!config.mcpServers['fidus-memory'].env.NEO4J_URI) {
+      config.mcpServers['fidus-memory'].env.NEO4J_URI = "bolt://localhost:7687";
+    }
+    if (!config.mcpServers['fidus-memory'].env.NEO4J_USER) {
+      config.mcpServers['fidus-memory'].env.NEO4J_USER = "neo4j";
+    }
+    if (!config.mcpServers['fidus-memory'].env.NEO4J_PASSWORD) {
+      config.mcpServers['fidus-memory'].env.NEO4J_PASSWORD = "fidus-memory-dev-password";
+    }
+    if (!config.mcpServers['fidus-memory'].env.QDRANT_HOST) {
+      config.mcpServers['fidus-memory'].env.QDRANT_HOST = "localhost";
+    }
+    if (!config.mcpServers['fidus-memory'].env.QDRANT_PORT) {
+      config.mcpServers['fidus-memory'].env.QDRANT_PORT = "6333";
+    }
+    if (!config.mcpServers['fidus-memory'].env.FIDUS_LLM_MODEL) {
+      config.mcpServers['fidus-memory'].env.FIDUS_LLM_MODEL = "openai/gpt-4o-mini";
+    }
+    if (!config.mcpServers['fidus-memory'].env.OLLAMA_API_BASE) {
+      config.mcpServers['fidus-memory'].env.OLLAMA_API_BASE = "http://localhost:11434";
+    }
+
+    // Remove old HTTP-based configuration if present
+    delete config.mcpServers['fidus-memory'].initializationOptions;
 
     // Add global instructions if missing
     if (!config.globalCustomInstructions) {
