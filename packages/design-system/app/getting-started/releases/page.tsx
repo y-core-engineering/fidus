@@ -5,7 +5,7 @@ import { Calendar, Package, GitBranch, CheckCircle2, Sparkles } from 'lucide-rea
 
 export default function ReleasesPage() {
   return (
-    <Container size="lg" className="p-lg">
+    <Container size="lg" padding="lg">
       <Stack direction="column" gap="xl">
         {/* Header */}
         <Stack direction="column" gap="md">
