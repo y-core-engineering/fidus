@@ -215,7 +215,7 @@ services:
         condition: service_healthy
     command: poetry run python -m fidus.run_mcp
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8001/.well-known/mcp || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8001/sse || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
