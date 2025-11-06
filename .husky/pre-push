@@ -25,7 +25,7 @@ TYPECHECK_EXIT=$?
 # Check Mermaid diagrams
 echo ""
 echo "→ Checking Mermaid diagrams..."
-node scripts/check-mermaid.js docs/**/*.md
+node scripts/check-mermaid.js docs/**/*.md packages/**/*.md *.md
 MERMAID_EXIT=$?
 
 echo ""

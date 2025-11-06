@@ -314,6 +314,27 @@ export default function HomePage() {
           Recent Updates
         </h2>
         <div className="max-w-3xl mx-auto space-y-4">
+          <div className="p-6 border-2 border-primary rounded-lg bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold">@fidus/ui v1.2.0 Release</h3>
+                <span className="px-2 py-0.5 text-xs font-bold rounded bg-success text-black">
+                  Latest
+                </span>
+              </div>
+              <span className="text-sm text-muted-foreground">2025-11-04</span>
+            </div>
+            <p className="text-muted-foreground mb-3">
+              Chat UI components for conversational AI interfaces: MessageBubble with privacy badges,
+              ChatInterface with streaming support, and ConfidenceIndicator for ML confidence visualization.
+              OpportunityCard enhanced with privacy badges array.
+            </p>
+            <Link href="/getting-started/releases" className="inline-flex items-center text-primary font-medium hover:underline">
+              View release details
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
           <div className="p-6 border border-border rounded-lg bg-card">
             <div className="flex items-start justify-between mb-2">
               <h3 className="text-lg font-semibold">Navigation Restructure</h3>
@@ -336,21 +357,10 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="p-6 border border-border rounded-lg bg-card">
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="text-lg font-semibold">Form Components Complete</h3>
-              <span className="text-sm text-muted-foreground">2025-01-28</span>
-            </div>
-            <p className="text-muted-foreground">
-              Implemented all 9 form components: Text Input, Text Area, Checkbox,
-              Radio Button, Toggle Switch, Select, Date Picker, Time Picker, and File Upload.
-            </p>
-          </div>
-
           <div className="text-center mt-8">
-            <Link href="/resources/contributing">
+            <Link href="/getting-started/releases">
               <Button variant="tertiary">
-                View Full Changelog
+                View All Releases
               </Button>
             </Link>
           </div>

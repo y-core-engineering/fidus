@@ -23,6 +23,7 @@ const navigation: NavItem[] = [
       { title: 'For Designers', href: '/getting-started/for-designers' },
       { title: 'For Developers', href: '/getting-started/for-developers' },
       { title: 'Design Philosophy', href: '/getting-started/design-philosophy' },
+      { title: 'Release Notes', href: '/getting-started/releases' },
     ],
   },
   {
