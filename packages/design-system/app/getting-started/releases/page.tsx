@@ -6,9 +6,9 @@ import { Calendar, Package, GitBranch, CheckCircle2, Sparkles } from 'lucide-rea
 export default function ReleasesPage() {
   return (
     <Container size="lg" padding="lg">
-      <Stack direction="column" gap="xl">
+      <Stack direction="vertical" spacing="xl">
         {/* Header */}
-        <Stack direction="column" gap="md">
+        <Stack direction="vertical" spacing="md">
           <h1 className="text-4xl font-bold text-foreground">Release Notes</h1>
           <p className="text-lg text-muted-foreground">
             Track the evolution of @fidus/ui component library. All notable changes are documented here.
@@ -18,36 +18,36 @@ export default function ReleasesPage() {
         <Divider />
 
         {/* Version 1.2.0 */}
-        <Stack direction="column" gap="lg" className="border border-border rounded-lg p-lg bg-card">
-          <Stack direction="row" gap="md" align="center" className="flex-wrap">
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
             <h2 className="text-3xl font-bold text-foreground">v1.2.0</h2>
             <Badge variant="success">Latest</Badge>
-            <Badge variant="secondary">
+            <Badge variant="info">
               <Sparkles className="w-3 h-3 mr-1" />
               Chat UI Components
             </Badge>
           </Stack>
 
-          <Stack direction="row" gap="md" align="center" className="text-sm text-muted-foreground flex-wrap">
-            <Stack direction="row" gap="xs" align="center">
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <Calendar className="w-4 h-4" />
               <span>November 4, 2025</span>
             </Stack>
-            <Stack direction="row" gap="xs" align="center">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <GitBranch className="w-4 h-4" />
               <Link
                 href="https://github.com/y-core-engineering/fidus/pull/45"
-                variant="primary"
+               
                 target="_blank"
               >
                 PR #45
               </Link>
             </Stack>
-            <Stack direction="row" gap="xs" align="center">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <Package className="w-4 h-4" />
               <Link
                 href="https://www.npmjs.com/package/@fidus/ui/v/1.2.0"
-                variant="primary"
+               
                 target="_blank"
               >
                 NPM Package
@@ -58,15 +58,15 @@ export default function ReleasesPage() {
           <Divider />
 
           {/* New Components */}
-          <Stack direction="column" gap="md">
+          <Stack direction="vertical" spacing="md">
             <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-success" />
               New Components
             </h3>
 
-            <Stack direction="column" gap="sm" className="ml-7">
-              <Stack direction="column" gap="xs">
-                <Link href="/components/chat-interface" variant="primary" className="font-medium">
+            <Stack direction="vertical" spacing="sm" className="ml-7">
+              <Stack direction="vertical" spacing="xs">
+                <Link href="/components/chat-interface" className="font-medium">
                   ChatInterface
                 </Link>
                 <p className="text-sm text-muted-foreground">
@@ -75,8 +75,8 @@ export default function ReleasesPage() {
                 </p>
               </Stack>
 
-              <Stack direction="column" gap="xs">
-                <Link href="/components/message-bubble" variant="primary" className="font-medium">
+              <Stack direction="vertical" spacing="xs">
+                <Link href="/components/message-bubble" className="font-medium">
                   MessageBubble
                 </Link>
                 <p className="text-sm text-muted-foreground">
@@ -85,8 +85,8 @@ export default function ReleasesPage() {
                 </p>
               </Stack>
 
-              <Stack direction="column" gap="xs">
-                <Link href="/components/confidence-indicator" variant="primary" className="font-medium">
+              <Stack direction="vertical" spacing="xs">
+                <Link href="/components/confidence-indicator" className="font-medium">
                   ConfidenceIndicator
                 </Link>
                 <p className="text-sm text-muted-foreground">
@@ -98,15 +98,15 @@ export default function ReleasesPage() {
           </Stack>
 
           {/* Enhanced Components */}
-          <Stack direction="column" gap="md">
+          <Stack direction="vertical" spacing="md">
             <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-success" />
               Enhanced Components
             </h3>
 
-            <Stack direction="column" gap="sm" className="ml-7">
-              <Stack direction="column" gap="xs">
-                <Link href="/components/opportunity-card" variant="primary" className="font-medium">
+            <Stack direction="vertical" spacing="sm" className="ml-7">
+              <Stack direction="vertical" spacing="xs">
+                <Link href="/components/opportunity-card" className="font-medium">
                   OpportunityCard
                 </Link>
                 <p className="text-sm text-muted-foreground">
@@ -117,13 +117,13 @@ export default function ReleasesPage() {
           </Stack>
 
           {/* Build Improvements */}
-          <Stack direction="column" gap="md">
+          <Stack direction="vertical" spacing="md">
             <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-success" />
               Build Improvements
             </h3>
 
-            <Stack direction="column" gap="sm" className="ml-7">
+            <Stack direction="vertical" spacing="sm" className="ml-7">
               <p className="text-sm text-muted-foreground">
                 Fixed bundling configuration for react-markdown and remark-gfm dependencies, improving build performance
                 and reducing bundle size.
@@ -132,10 +132,10 @@ export default function ReleasesPage() {
           </Stack>
 
           {/* Technical Details */}
-          <Stack direction="column" gap="md">
+          <Stack direction="vertical" spacing="md">
             <h3 className="text-xl font-semibold text-foreground">Technical Details</h3>
 
-            <Stack direction="column" gap="sm" className="ml-7">
+            <Stack direction="vertical" spacing="sm" className="ml-7">
               <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
                 <li>All components built with 100% Fidus UI primitives (Stack, Chip, Avatar, Button)</li>
                 <li>Design tokens for consistent spacing (p-md, gap-sm, gap-xs)</li>
@@ -148,13 +148,13 @@ export default function ReleasesPage() {
           </Stack>
 
           {/* Real-World Usage */}
-          <Stack direction="column" gap="md">
+          <Stack direction="vertical" spacing="md">
             <h3 className="text-xl font-semibold text-foreground">Real-World Usage</h3>
 
-            <Stack direction="column" gap="sm" className="ml-7">
+            <Stack direction="vertical" spacing="sm" className="ml-7">
               <p className="text-sm text-muted-foreground">
                 These components are used in production in the{' '}
-                <Link href="http://localhost:3000/fidus-memory" variant="primary" target="_blank">
+                <Link href="http://localhost:3000/fidus-memory" target="_blank">
                   Fidus Memory Prototype
                 </Link>
                 {' '}to provide conversational AI interactions with preference learning and context awareness.
@@ -164,22 +164,22 @@ export default function ReleasesPage() {
         </Stack>
 
         {/* Version 1.1.0 */}
-        <Stack direction="column" gap="lg" className="border border-border rounded-lg p-lg bg-card opacity-75">
-          <Stack direction="row" gap="md" align="center" className="flex-wrap">
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card opacity-75">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
             <h2 className="text-2xl font-bold text-foreground">v1.1.0</h2>
-            <Badge variant="secondary">Initial Chat Components</Badge>
+            <Badge variant="info">Initial Chat Components</Badge>
           </Stack>
 
-          <Stack direction="row" gap="md" align="center" className="text-sm text-muted-foreground flex-wrap">
-            <Stack direction="row" gap="xs" align="center">
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <Calendar className="w-4 h-4" />
               <span>November 3, 2025</span>
             </Stack>
-            <Stack direction="row" gap="xs" align="center">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <GitBranch className="w-4 h-4" />
               <Link
                 href="https://github.com/y-core-engineering/fidus/pull/39"
-                variant="primary"
+               
                 target="_blank"
               >
                 PR #39
@@ -196,14 +196,14 @@ export default function ReleasesPage() {
         </Stack>
 
         {/* Version 1.0.2 */}
-        <Stack direction="column" gap="lg" className="border border-border rounded-lg p-lg bg-card opacity-50">
-          <Stack direction="row" gap="md" align="center" className="flex-wrap">
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card opacity-50">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
             <h2 className="text-2xl font-bold text-foreground">v1.0.2</h2>
-            <Badge variant="secondary">Documentation</Badge>
+            <Badge variant="info">Documentation</Badge>
           </Stack>
 
-          <Stack direction="row" gap="md" align="center" className="text-sm text-muted-foreground flex-wrap">
-            <Stack direction="row" gap="xs" align="center">
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <Calendar className="w-4 h-4" />
               <span>October 2025</span>
             </Stack>
@@ -218,14 +218,14 @@ export default function ReleasesPage() {
         </Stack>
 
         {/* Version 1.0.1 */}
-        <Stack direction="column" gap="lg" className="border border-border rounded-lg p-lg bg-card opacity-50">
-          <Stack direction="row" gap="md" align="center" className="flex-wrap">
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card opacity-50">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
             <h2 className="text-2xl font-bold text-foreground">v1.0.1</h2>
-            <Badge variant="secondary">Bug Fixes</Badge>
+            <Badge variant="info">Bug Fixes</Badge>
           </Stack>
 
-          <Stack direction="row" gap="md" align="center" className="text-sm text-muted-foreground flex-wrap">
-            <Stack direction="row" gap="xs" align="center">
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <Calendar className="w-4 h-4" />
               <span>January 1, 2025</span>
             </Stack>
@@ -241,14 +241,14 @@ export default function ReleasesPage() {
         </Stack>
 
         {/* Version 1.0.0 */}
-        <Stack direction="column" gap="lg" className="border border-border rounded-lg p-lg bg-card opacity-50">
-          <Stack direction="row" gap="md" align="center" className="flex-wrap">
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card opacity-50">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
             <h2 className="text-2xl font-bold text-foreground">v1.0.0</h2>
             <Badge variant="success">Initial Release</Badge>
           </Stack>
 
-          <Stack direction="row" gap="md" align="center" className="text-sm text-muted-foreground flex-wrap">
-            <Stack direction="row" gap="xs" align="center">
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
               <Calendar className="w-4 h-4" />
               <span>January 1, 2025</span>
             </Stack>
@@ -260,7 +260,7 @@ export default function ReleasesPage() {
             Initial component library setup with core components:
           </p>
 
-          <Stack direction="column" gap="xs" className="ml-4">
+          <Stack direction="vertical" spacing="xs" className="ml-4">
             <p className="text-sm text-muted-foreground">
               • Button, Card, Input, Select, Toast, Dialog, Dropdown Menu
             </p>
@@ -280,13 +280,13 @@ export default function ReleasesPage() {
         </Stack>
 
         {/* Footer */}
-        <Stack direction="column" gap="md" className="border-t border-border pt-lg">
+        <Stack direction="vertical" spacing="md" className="border-t border-border pt-lg">
           <h3 className="text-lg font-semibold text-foreground">View on GitHub</h3>
           <p className="text-sm text-muted-foreground">
             For complete changelog and technical details, see the{' '}
             <Link
               href="https://github.com/y-core-engineering/fidus/blob/main/packages/ui/CHANGELOG.md"
-              variant="primary"
+             
               target="_blank"
             >
               CHANGELOG.md
