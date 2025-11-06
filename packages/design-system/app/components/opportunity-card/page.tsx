@@ -363,6 +363,236 @@ export default function OpportunityCardPage() {
       <h2>Props</h2>
       <PropsTable props={props} />
 
+      <h2>Privacy Badges (v1.2.0)</h2>
+      <p className="lead">
+        OpportunityCard supports multiple privacy badges with optional tooltips to communicate data
+        handling and privacy levels to users. This feature was enhanced in v1.2.0 to support arrays
+        of badges with hover tooltips.
+      </p>
+
+      <h3>Single Privacy Badge</h3>
+      <ComponentPreview
+        code={`<OpportunityCard
+  title="Local Budget Alert"
+  icon={<DollarSign className="h-5 w-5" />}
+  urgency="important"
+  privacyBadges={[{ label: "🔒 Local" }]}
+  primaryAction={{
+    label: 'View Details',
+    onClick: () => console.log('View'),
+  }}
+>
+  <p>Your food budget is 95% spent</p>
+</OpportunityCard>`}
+      >
+        <OpportunityCard
+          title="Local Budget Alert"
+          icon={<DollarSign className="h-5 w-5" />}
+          urgency="important"
+          privacyBadges={[{ label: "🔒 Local" }]}
+          primaryAction={{
+            label: 'View Details',
+            onClick: () => console.log('View'),
+          }}
+        >
+          <p>Your food budget is 95% spent</p>
+        </OpportunityCard>
+      </ComponentPreview>
+
+      <h3>Multiple Privacy Badges</h3>
+      <ComponentPreview
+        code={`<OpportunityCard
+  title="Travel Recommendation"
+  icon={<Plane className="h-5 w-5" />}
+  urgency="normal"
+  privacyBadges={[
+    { label: "🔒 Local" },
+    { label: "🌐 Cloud" },
+  ]}
+  primaryAction={{
+    label: 'View Options',
+    onClick: () => console.log('View'),
+  }}
+>
+  <Stack spacing="sm">
+    <p><strong>Upcoming trip to Paris</strong></p>
+    <p className="text-sm text-muted-foreground">
+      Based on your calendar (local) and weather forecast (cloud)
+    </p>
+  </Stack>
+</OpportunityCard>`}
+      >
+        <OpportunityCard
+          title="Travel Recommendation"
+          icon={<Plane className="h-5 w-5" />}
+          urgency="normal"
+          privacyBadges={[
+            { label: "🔒 Local" },
+            { label: "🌐 Cloud" },
+          ]}
+          primaryAction={{
+            label: 'View Options',
+            onClick: () => console.log('View'),
+          }}
+        >
+          <Stack spacing="sm">
+            <p><strong>Upcoming trip to Paris</strong></p>
+            <p className="text-sm text-muted-foreground">
+              Based on your calendar (local) and weather forecast (cloud)
+            </p>
+          </Stack>
+        </OpportunityCard>
+      </ComponentPreview>
+
+      <h3>Privacy Badges with Tooltips</h3>
+      <ComponentPreview
+        code={`<OpportunityCard
+  title="Smart Home Suggestion"
+  icon={<AlertCircle className="h-5 w-5" />}
+  urgency="low"
+  privacyBadges={[
+    {
+      label: "🔒 Local",
+      tooltip: "Processed entirely on your device"
+    },
+    {
+      label: "🤖 AI",
+      tooltip: "Uses on-device AI model"
+    },
+    {
+      label: "⚡ Real-time",
+      tooltip: "Live sensor data from your home"
+    },
+  ]}
+  primaryAction={{
+    label: 'Adjust Settings',
+    onClick: () => console.log('Adjust'),
+  }}
+  context="Temperature dropping below your comfort threshold"
+>
+  <Stack spacing="sm">
+    <p><strong>Heating optimization available</strong></p>
+    <p className="text-sm">Current: 18°C → Recommended: 21°C</p>
+    <p className="text-sm text-muted-foreground">
+      Save 15% energy by scheduling heating 30 min earlier
+    </p>
+  </Stack>
+</OpportunityCard>`}
+      >
+        <OpportunityCard
+          title="Smart Home Suggestion"
+          icon={<AlertCircle className="h-5 w-5" />}
+          urgency="low"
+          privacyBadges={[
+            {
+              label: "🔒 Local",
+              tooltip: "Processed entirely on your device"
+            },
+            {
+              label: "🤖 AI",
+              tooltip: "Uses on-device AI model"
+            },
+            {
+              label: "⚡ Real-time",
+              tooltip: "Live sensor data from your home"
+            },
+          ]}
+          primaryAction={{
+            label: 'Adjust Settings',
+            onClick: () => console.log('Adjust'),
+          }}
+          context="Temperature dropping below your comfort threshold"
+        >
+          <Stack spacing="sm">
+            <p><strong>Heating optimization available</strong></p>
+            <p className="text-sm">Current: 18°C → Recommended: 21°C</p>
+            <p className="text-sm text-muted-foreground">
+              Save 15% energy by scheduling heating 30 min earlier
+            </p>
+          </Stack>
+        </OpportunityCard>
+      </ComponentPreview>
+
+      <h3>Privacy Badge Types</h3>
+      <div className="not-prose my-lg">
+        <p className="text-sm text-muted-foreground mb-md">
+          Common privacy badge patterns to help users understand data handling:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <div className="p-md border border-border rounded-lg">
+            <Stack spacing="sm">
+              <div className="flex items-center gap-sm">
+                <span className="text-xs px-2 py-1 bg-muted rounded">🔒 Local</span>
+                <span className="text-sm font-medium">Local Processing</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Data stays on device, no cloud upload
+              </p>
+            </Stack>
+          </div>
+
+          <div className="p-md border border-border rounded-lg">
+            <Stack spacing="sm">
+              <div className="flex items-center gap-sm">
+                <span className="text-xs px-2 py-1 bg-muted rounded">🌐 Cloud</span>
+                <span className="text-sm font-medium">Cloud Data</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Uses external API or cloud service
+              </p>
+            </Stack>
+          </div>
+
+          <div className="p-md border border-border rounded-lg">
+            <Stack spacing="sm">
+              <div className="flex items-center gap-sm">
+                <span className="text-xs px-2 py-1 bg-muted rounded">🤖 AI</span>
+                <span className="text-sm font-medium">AI Processing</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Uses AI/ML model (specify on-device or cloud)
+              </p>
+            </Stack>
+          </div>
+
+          <div className="p-md border border-border rounded-lg">
+            <Stack spacing="sm">
+              <div className="flex items-center gap-sm">
+                <span className="text-xs px-2 py-1 bg-muted rounded">⚡ Real-time</span>
+                <span className="text-sm font-medium">Live Data</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Uses real-time sensor or API data
+              </p>
+            </Stack>
+          </div>
+
+          <div className="p-md border border-border rounded-lg">
+            <Stack spacing="sm">
+              <div className="flex items-center gap-sm">
+                <span className="text-xs px-2 py-1 bg-muted rounded">🔐 Encrypted</span>
+                <span className="text-sm font-medium">End-to-End Encryption</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Data encrypted in transit and at rest
+              </p>
+            </Stack>
+          </div>
+
+          <div className="p-md border border-border rounded-lg">
+            <Stack spacing="sm">
+              <div className="flex items-center gap-sm">
+                <span className="text-xs px-2 py-1 bg-muted rounded">👤 Personal</span>
+                <span className="text-sm font-medium">Personal Data</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Contains sensitive personal information
+              </p>
+            </Stack>
+          </div>
+        </div>
+      </div>
+
       <h2>Usage Guidelines</h2>
       <div className="not-prose space-y-lg my-lg">
         <div>
