@@ -360,10 +360,19 @@ export default function FidusMemoryPage() {
                         label: hasRelated ? 'Apply to All' : 'Keep New',
                         onClick: async () => {
                           try {
+                            // Get user_id for authentication
+                            const userId = getUserId();
+                            const headers: Record<string, string> = {
+                              'Content-Type': 'application/json'
+                            };
+                            if (userId) {
+                              headers['X-User-ID'] = userId;
+                            }
+
                             // Update main preference
                             const response = await fetch(`/api/memory/preferences/${encodeURIComponent(conflict.key)}`, {
                               method: 'PUT',
-                              headers: { 'Content-Type': 'application/json' },
+                              headers,
                               body: JSON.stringify({
                                 key: conflict.key,
                                 value: conflict.new_value,
@@ -389,7 +398,7 @@ export default function FidusMemoryPage() {
                                 // Update related preference to have the same sentiment as the general preference
                                 await fetch(`/api/memory/preferences/${encodeURIComponent(related.key)}`, {
                                   method: 'PUT',
-                                  headers: { 'Content-Type': 'application/json' },
+                                  headers,
                                   body: JSON.stringify({
                                     key: related.key,
                                     value: newValue,  // Update value to match new sentiment
@@ -413,12 +422,21 @@ export default function FidusMemoryPage() {
                         label: hasRelated ? 'Keep Exceptions' : 'Keep Old',
                         onClick: async () => {
                           try {
+                            // Get user_id for authentication
+                            const userId = getUserId();
+                            const headers: Record<string, string> = {
+                              'Content-Type': 'application/json'
+                            };
+                            if (userId) {
+                              headers['X-User-ID'] = userId;
+                            }
+
                             // If user chose "Keep Exceptions", mark all related preferences as exceptions
                             if (hasRelated && conflict.related_preferences) {
                               for (const related of conflict.related_preferences) {
                                 await fetch(`/api/memory/preferences/${encodeURIComponent(related.key)}`, {
                                   method: 'PUT',
-                                  headers: { 'Content-Type': 'application/json' },
+                                  headers,
                                   body: JSON.stringify({
                                     key: related.key,
                                     value: related.value,
