@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.4.1
+
+### Patch Changes
+
+- fix(tailwind): preserve hsl() wrapper for Tailwind CSS v3+ compatibility
+
+  **Critical Bug Fix for v1.4.0**
+
+  Fixed a critical issue where Tailwind CSS v3+ would strip the `hsl()` wrapper from color definitions, causing invalid CSS output like `background-color: 45 100% 51%` instead of `background-color: hsl(45 100% 51%)`.
+
+  **Changes:**
+  - Updated color helper function to use `<alpha-value>` placeholder pattern: `hsl(var(--color-primary) / <alpha-value>)`
+  - This pattern forces Tailwind to preserve the `hsl()` wrapper while enabling opacity modifiers (e.g., `bg-primary/50`)
+  - All color definitions now use the new `hslColor()` helper function
+
+  **Technical Details:**
+  - Previous approach: `'hsl(var(--color-primary))'` - Tailwind v3+ stripped the wrapper
+  - New approach: `'hsl(var(--color-primary) / <alpha-value>)'` - Tailwind preserves the wrapper
+
+  **Impact:**
+  - Components now render with correct colors
+  - Opacity modifiers work correctly (e.g., `bg-primary/50`, `text-error/80`)
+  - No breaking changes to component APIs or CSS variable names
+
+  **Migration:**
+  Users on v1.4.0 should upgrade immediately. No code changes required - just update the package version.
+
 ## 1.4.0
 
 ### Minor Changes

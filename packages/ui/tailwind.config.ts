@@ -24,38 +24,45 @@ import type { Config } from 'tailwindcss';
  * export default config;
  * ```
  */
+/**
+ * Color helper function for HSL with opacity support
+ * Tailwind CSS v3+ requires this format to preserve hsl() wrapper
+ * and support opacity modifiers (e.g., bg-primary/50)
+ */
+const hslColor = (variable: string) => `hsl(var(${variable}) / <alpha-value>)`;
+
 const fidusTailwindPreset: Partial<Config> = {
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'hsl(var(--color-primary))',
-          foreground: 'hsl(var(--color-primary-foreground))',
-          hover: 'hsl(var(--color-primary-hover))',
-          active: 'hsl(var(--color-primary-active))',
+          DEFAULT: hslColor('--color-primary'),
+          foreground: hslColor('--color-primary-foreground'),
+          hover: hslColor('--color-primary-hover'),
+          active: hslColor('--color-primary-active'),
         },
-        black: 'hsl(var(--color-black))',
-        white: 'hsl(var(--color-white))',
+        black: hslColor('--color-black'),
+        white: hslColor('--color-white'),
         trust: {
-          local: 'hsl(var(--color-trust-local))',
-          cloud: 'hsl(var(--color-trust-cloud))',
-          encrypted: 'hsl(var(--color-trust-encrypted))',
+          local: hslColor('--color-trust-local'),
+          cloud: hslColor('--color-trust-cloud'),
+          encrypted: hslColor('--color-trust-encrypted'),
         },
-        success: 'hsl(var(--color-success))',
-        warning: 'hsl(var(--color-warning))',
-        error: 'hsl(var(--color-error))',
-        info: 'hsl(var(--color-info))',
-        urgent: 'hsl(var(--color-urgent))',
-        medium: 'hsl(var(--color-medium))',
-        low: 'hsl(var(--color-low))',
-        background: 'hsl(var(--color-background))',
-        foreground: 'hsl(var(--color-foreground))',
+        success: hslColor('--color-success'),
+        warning: hslColor('--color-warning'),
+        error: hslColor('--color-error'),
+        info: hslColor('--color-info'),
+        urgent: hslColor('--color-urgent'),
+        medium: hslColor('--color-medium'),
+        low: hslColor('--color-low'),
+        background: hslColor('--color-background'),
+        foreground: hslColor('--color-foreground'),
         muted: {
-          DEFAULT: 'hsl(var(--color-muted))',
-          foreground: 'hsl(var(--color-muted-foreground))',
+          DEFAULT: hslColor('--color-muted'),
+          foreground: hslColor('--color-muted-foreground'),
         },
-        border: 'hsl(var(--color-border))',
-        input: 'hsl(var(--color-input-bg))',
+        border: hslColor('--color-border'),
+        input: hslColor('--color-input-bg'),
       },
       fontFamily: {
         sans: ['var(--font-sans)'],

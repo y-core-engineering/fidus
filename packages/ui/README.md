@@ -581,10 +581,47 @@ Override CSS variables in your global CSS file, not in `tailwind.config.ts`:
 
 ### Module not found: '@fidus/ui/tailwind'
 
-**Cause**: Old version of `@fidus/ui` (< 1.3.2)
+**Cause**: Old version of `@fidus/ui` (< 1.4.0)
 
 **Solution**:
 Update to latest version: `npm install @fidus/ui@latest`
+
+### Colors not working in v1.4.0 (CRITICAL BUG - FIXED in v1.4.1)
+
+**Cause**: Tailwind CSS v3+ strips `hsl()` wrapper from color definitions, even when defined as strings. This causes CSS like `background-color: 45 100% 51%` (invalid) instead of `background-color: hsl(45 100% 51%)`.
+
+**Solution**:
+Update to `@fidus/ui@1.4.1` or later, which uses the `<alpha-value>` placeholder pattern:
+
+```bash
+npm install @fidus/ui@latest
+```
+
+**If you cannot upgrade immediately**, add this workaround to your global CSS:
+
+```css
+/* Temporary workaround for @fidus/ui@1.4.0 color bug */
+@layer utilities {
+  .bg-primary { background-color: hsl(var(--color-primary)) !important; }
+  .text-primary { color: hsl(var(--color-primary)) !important; }
+  .border-primary { border-color: hsl(var(--color-primary)) !important; }
+
+  .bg-success { background-color: hsl(var(--color-success)) !important; }
+  .text-success { color: hsl(var(--color-success)) !important; }
+
+  .bg-error { background-color: hsl(var(--color-error)) !important; }
+  .text-error { color: hsl(var(--color-error)) !important; }
+
+  .bg-warning { background-color: hsl(var(--color-warning)) !important; }
+  .text-warning { color: hsl(var(--color-warning)) !important; }
+
+  /* Add other colors as needed... */
+}
+```
+
+**Technical Details**:
+- v1.4.0 used `'hsl(var(--color-primary))'` (string) which Tailwind CSS v3+ automatically optimizes away
+- v1.4.1 uses `'hsl(var(--color-primary) / <alpha-value>)'` which Tailwind preserves for opacity support
 
 ## Browser Support
 
