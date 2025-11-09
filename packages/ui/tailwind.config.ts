@@ -26,10 +26,23 @@ import type { Config } from 'tailwindcss';
  */
 /**
  * Color helper function for HSL with opacity support
- * Tailwind CSS v3+ requires this format to preserve hsl() wrapper
- * and support opacity modifiers (e.g., bg-primary/50)
+ *
+ * Uses callback pattern instead of <alpha-value> placeholder because:
+ * - Tailwind CSS v3.4+ inconsistently strips hsl() wrapper from string values
+ * - Callback pattern forces Tailwind to preserve hsl() in all setups
+ * - Enables opacity modifiers (e.g., bg-primary/50)
+ *
+ * @param variable - CSS custom property name (e.g., '--color-primary')
+ * @returns Tailwind color function that generates: hsl(var(--color-primary) / <opacity>)
  */
-const hslColor = (variable: string) => `hsl(var(${variable}) / <alpha-value>)`;
+const hslColor = (variable: string) => {
+  return (({ opacityValue }: { opacityValue?: string }) => {
+    if (opacityValue !== undefined) {
+      return `hsl(var(${variable}) / ${opacityValue})`;
+    }
+    return `hsl(var(${variable}) / 1)`;
+  }) as any;
+};
 
 const fidusTailwindPreset: Partial<Config> = {
   theme: {

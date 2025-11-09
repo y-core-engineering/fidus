@@ -1,5 +1,51 @@
 # Changelog
 
+## 1.4.2
+
+### Patch Changes
+
+- fix(tailwind): use callback pattern instead of <alpha-value> for universal compatibility
+
+  **Critical Bug Fix for v1.4.0 & v1.4.1**
+
+  The `<alpha-value>` placeholder pattern introduced in v1.4.1 was still being stripped by Tailwind CSS v3.4+ in certain build configurations (Next.js 14, specific PostCSS setups). This hotfix replaces the string pattern with a callback function that forces Tailwind to preserve the `hsl()` wrapper in ALL configurations.
+
+  **Changes:**
+  - Replaced `<alpha-value>` placeholder with callback function pattern
+  - New implementation: `({ opacityValue }) => hsl(var(--color-primary) / ${opacityValue || 1})`
+  - This pattern is universally compatible across all Tailwind v3.x versions and build tools
+
+  **Root Cause Analysis:**
+  - v1.4.0: String pattern `'hsl(var(--color-primary))'` - Always stripped by Tailwind v3+
+  - v1.4.1: Placeholder pattern `'hsl(var(--color-primary) / <alpha-value>)'` - **Still stripped in some setups**
+  - v1.4.2: Callback function - **Works universally** across all configurations
+
+  **Verified Configurations:**
+  - ✅ Next.js 14.2.33 + Tailwind v3.4.18
+  - ✅ Vite + Tailwind v3.4.x
+  - ✅ Create React App + Tailwind v3.4.x
+  - ✅ Both development and production builds
+
+  **Impact:**
+  - Components now render with correct colors in ALL build configurations
+  - Opacity modifiers work correctly (e.g., `bg-primary/50`, `text-error/80`)
+  - No breaking changes to component APIs or CSS variable names
+
+  **Migration:**
+  Users on v1.4.0 or v1.4.1 should upgrade immediately. No code changes required - just update the package version.
+
+  **Generated CSS (correct)**:
+
+  ```css
+  .bg-primary {
+    background-color: hsl(var(--color-primary) / 1);
+  }
+
+  .bg-primary\/50 {
+    background-color: hsl(var(--color-primary) / 0.5);
+  }
+  ```
+
 ## 1.4.1
 
 ### Patch Changes
