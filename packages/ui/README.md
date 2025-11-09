@@ -586,12 +586,16 @@ Override CSS variables in your global CSS file, not in `tailwind.config.ts`:
 **Solution**:
 Update to latest version: `npm install @fidus/ui@latest`
 
-### Colors not working in v1.4.0 (CRITICAL BUG - FIXED in v1.4.1)
+### Colors not working in v1.4.0 & v1.4.1 (CRITICAL BUG - FIXED in v1.4.2)
 
-**Cause**: Tailwind CSS v3+ strips `hsl()` wrapper from color definitions, even when defined as strings. This causes CSS like `background-color: 45 100% 51%` (invalid) instead of `background-color: hsl(45 100% 51%)`.
+**Cause**: Tailwind CSS v3.4+ inconsistently strips `hsl()` wrapper from color definitions in certain build configurations, causing invalid CSS like `background-color: 45 100% 51%` instead of `background-color: hsl(45 100% 51%)`.
+
+**Root Cause**:
+- v1.4.0 used string pattern: `'hsl(var(--color-primary))'` - Tailwind always stripped this
+- v1.4.1 used `<alpha-value>` placeholder: `'hsl(var(--color-primary) / <alpha-value>)'` - **Still stripped in some setups** (Next.js 14, Tailwind v3.4.18+)
 
 **Solution**:
-Update to `@fidus/ui@1.4.1` or later, which uses the `<alpha-value>` placeholder pattern:
+Update to `@fidus/ui@1.4.2` or later, which uses a **callback function pattern** that forces Tailwind to preserve `hsl()` in all configurations:
 
 ```bash
 npm install @fidus/ui@latest
@@ -600,28 +604,29 @@ npm install @fidus/ui@latest
 **If you cannot upgrade immediately**, add this workaround to your global CSS:
 
 ```css
-/* Temporary workaround for @fidus/ui@1.4.0 color bug */
+/* Temporary workaround for @fidus/ui@1.4.0-1.4.1 color bug */
 @layer utilities {
-  .bg-primary { background-color: hsl(var(--color-primary)) !important; }
-  .text-primary { color: hsl(var(--color-primary)) !important; }
-  .border-primary { border-color: hsl(var(--color-primary)) !important; }
+  .bg-primary { background-color: hsl(var(--color-primary) / 1) !important; }
+  .text-primary { color: hsl(var(--color-primary) / 1) !important; }
+  .border-primary { border-color: hsl(var(--color-primary) / 1) !important; }
 
-  .bg-success { background-color: hsl(var(--color-success)) !important; }
-  .text-success { color: hsl(var(--color-success)) !important; }
+  .bg-success { background-color: hsl(var(--color-success) / 1) !important; }
+  .text-success { color: hsl(var(--color-success) / 1) !important; }
 
-  .bg-error { background-color: hsl(var(--color-error)) !important; }
-  .text-error { color: hsl(var(--color-error)) !important; }
+  .bg-error { background-color: hsl(var(--color-error) / 1) !important; }
+  .text-error { color: hsl(var(--color-error) / 1) !important; }
 
-  .bg-warning { background-color: hsl(var(--color-warning)) !important; }
-  .text-warning { color: hsl(var(--color-warning)) !important; }
+  .bg-warning { background-color: hsl(var(--color-warning) / 1) !important; }
+  .text-warning { color: hsl(var(--color-warning) / 1) !important; }
 
   /* Add other colors as needed... */
 }
 ```
 
 **Technical Details**:
-- v1.4.0 used `'hsl(var(--color-primary))'` (string) which Tailwind CSS v3+ automatically optimizes away
-- v1.4.1 uses `'hsl(var(--color-primary) / <alpha-value>)'` which Tailwind preserves for opacity support
+- v1.4.0: `'hsl(var(--color-primary))'` (string) - Tailwind CSS v3+ strips wrapper
+- v1.4.1: `'hsl(var(--color-primary) / <alpha-value>)'` - Still stripped in Next.js 14 + Tailwind v3.4.18+
+- v1.4.2: Callback function `({ opacityValue }) => hsl(var(--color-primary) / ${opacityValue || 1})` - **Works universally**
 
 ## Browser Support
 
