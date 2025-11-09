@@ -1,5 +1,45 @@
 # Changelog
 
+## 1.4.0
+
+### Minor Changes
+
+- Add Tailwind CSS integration for external projects
+
+  **New Features:**
+  - Export Tailwind preset (`@fidus/ui/tailwind`) with all custom theme configuration
+  - Export CSS variables file (`@fidus/ui/styles.css`) with complete design tokens
+  - Add comprehensive AI-friendly setup documentation in README
+
+  **What's Changed:**
+  - **Tailwind Preset**: External projects can now import a pre-configured Tailwind preset that includes all custom colors, spacing, typography, and other design tokens
+  - **CSS Variables**: All CSS custom properties are now exported in a standalone file, making it easy to use Fidus UI components in any project
+  - **Documentation**: Added AI Assistant Quick Reference section to README with step-by-step setup instructions, common mistakes to avoid, and troubleshooting guide
+
+  **Breaking Changes:** None (backward compatible)
+
+  **How to Use:**
+
+  ```typescript
+  // tailwind.config.ts
+  import fidusTailwindPreset from "@fidus/ui/tailwind";
+
+  export default {
+    presets: [fidusTailwindPreset],
+    content: [
+      "./src/**/*.{js,ts,jsx,tsx}",
+      "./node_modules/@fidus/ui/dist/**/*.{js,mjs}",
+    ],
+  };
+  ```
+
+  ```typescript
+  // layout.tsx or main.tsx
+  import "@fidus/ui/styles.css";
+  ```
+
+  **For AI Assistants:** This release makes it significantly easier to integrate Fidus UI into external projects. The README now includes a dedicated AI Assistant Quick Reference section with all necessary setup steps and common pitfalls to avoid.
+
 ## 1.3.1
 
 ### Patch Changes

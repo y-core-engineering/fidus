@@ -1,9 +1,89 @@
 # @fidus/ui
 
-Fidus UI Component Library - A modern, accessible React component library built with Radix UI primitives.
+Fidus UI Component Library - A modern, accessible React component library built with Radix UI primitives and Tailwind CSS.
 
 [![npm version](https://badge.fury.io/js/@fidus%2Fui.svg)](https://www.npmjs.com/package/@fidus/ui)
 [![License](https://img.shields.io/badge/license-Sustainable%20Use-blue.svg)](../../LICENSE.md)
+
+---
+
+## 🤖 AI Assistant Quick Reference
+
+**This section is for AI coding assistants (Claude, GitHub Copilot, etc.) to quickly understand how to use this library.**
+
+### Key Information for AI Assistants
+
+1. **Package Name**: `@fidus/ui`
+2. **Framework**: React 18+ with TypeScript
+3. **Styling**: Tailwind CSS + CSS Variables
+4. **Component Primitives**: Radix UI
+5. **Import Pattern**: Named imports from `@fidus/ui`
+
+### Required Setup Steps (IMPORTANT!)
+
+When helping users integrate `@fidus/ui` into a new project, **always** follow these steps:
+
+1. **Install package**: `npm install @fidus/ui`
+2. **Install Tailwind CSS** (if not already installed): `npm install -D tailwindcss postcss autoprefixer`
+3. **Configure Tailwind** - Use the Fidus preset in `tailwind.config.ts`:
+   ```typescript
+   import fidusTailwindPreset from '@fidus/ui/tailwind';
+   export default {
+     presets: [fidusTailwindPreset],
+     content: ['./src/**/*.{js,ts,jsx,tsx}', './node_modules/@fidus/ui/dist/**/*.{js,mjs}'],
+   };
+   ```
+4. **Import CSS variables** - Add to root CSS file or layout:
+   ```typescript
+   import '@fidus/ui/styles.css';
+   ```
+
+### Common Mistakes to Avoid
+
+- ❌ **Don't** import `@fidus/ui` without setting up Tailwind first
+- ❌ **Don't** forget to import `@fidus/ui/styles.css` - components won't style correctly
+- ❌ **Don't** use `import * as` - always use named imports
+- ❌ **Don't** customize colors in `tailwind.config.ts` - override CSS variables instead
+
+### Component Import Examples
+
+```typescript
+// ✅ Correct - Named imports
+import { Button, TextInput, Modal } from '@fidus/ui';
+
+// ❌ Wrong - Default import
+import FidusUI from '@fidus/ui';
+
+// ❌ Wrong - Wildcard import
+import * as FidusUI from '@fidus/ui';
+```
+
+### Available Components by Category
+
+**Forms**: Button, TextInput, TextArea, Checkbox, RadioButton, ToggleSwitch, Select, DatePicker, TimePicker, FileUpload
+**Layout**: Container, Grid, Stack, Divider
+**Display**: Table, List, Badge, Chip, Avatar, OpportunityCard, DetailCard, EmptyCard
+**Feedback**: Toast, Modal, Alert, Banner, ProgressBar, Spinner, Skeleton
+**Overlays**: Dropdown, Popover, Tooltip, Drawer
+**Navigation**: Tabs, Breadcrumbs, Pagination, Header, Sidebar
+**Chat**: MessageBubble, ChatInterface, ConfidenceIndicator
+
+### TypeScript Usage
+
+All components are fully typed. Import types:
+
+```typescript
+import type { ButtonProps, ModalProps } from '@fidus/ui';
+```
+
+### Styling Pattern
+
+- **CSS Variables**: Override in `:root` selector (see Theming section)
+- **Tailwind Classes**: Use standard Tailwind utilities
+- **Dark Mode**: Add `dark` class to root element
+- **Custom Styles**: Pass `className` prop to any component
+
+---
 
 ## Features
 
@@ -39,6 +119,81 @@ This library requires React 18 or higher:
 
 ```bash
 npm install react react-dom
+```
+
+## Setup (Required for External Projects)
+
+To use `@fidus/ui` in your project, you need to set up Tailwind CSS and import the required styles.
+
+### 1. Install Tailwind CSS
+
+If you haven't already, install Tailwind CSS:
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+### 2. Configure Tailwind
+
+Update your `tailwind.config.ts` to use the Fidus preset:
+
+```typescript
+import type { Config } from 'tailwindcss';
+import fidusTailwindPreset from '@fidus/ui/tailwind';
+
+const config: Config = {
+  presets: [fidusTailwindPreset],
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@fidus/ui/dist/**/*.{js,mjs}',
+  ],
+  // Your custom configuration...
+};
+
+export default config;
+```
+
+### 3. Import Styles
+
+Import the Fidus UI styles in your root CSS or layout file:
+
+```css
+/* src/app/globals.css or src/index.css */
+@import '@fidus/ui/styles.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+Or import directly in your root layout/app file:
+
+```typescript
+// src/app/layout.tsx or src/main.tsx
+import '@fidus/ui/styles.css';
+import './globals.css';
+```
+
+### 4. Dark Mode (Optional)
+
+The Fidus UI components support dark mode out of the box. To enable dark mode, add the `dark` class to your root element:
+
+```tsx
+// Add to your layout or app component
+<html className="dark">
+  {/* Your app */}
+</html>
+```
+
+Or use a dynamic class based on user preference:
+
+```tsx
+const [isDark, setIsDark] = useState(false);
+
+<html className={isDark ? 'dark' : ''}>
+  {/* Your app */}
+</html>
 ```
 
 ## Usage
@@ -310,26 +465,52 @@ import { ConfidenceIndicator } from '@fidus/ui';
 
 ## Theming
 
-The component library uses CSS variables for theming. Override these in your global CSS:
+The component library uses CSS variables for theming. The default theme is included in `@fidus/ui/styles.css`, but you can override any CSS variables in your own CSS:
 
 ```css
+/* Override specific variables in your global CSS */
 :root {
-  /* Colors */
-  --color-primary: #00ff94;
-  --color-background: #000000;
-  --color-foreground: #ffffff;
+  /* Brand colors - HSL format: hue saturation lightness */
+  --color-primary: 45 100% 51%;        /* Gold (#FFD700) */
+  --color-primary-foreground: 0 0% 0%; /* Black text on gold */
+
+  /* Semantic colors */
+  --color-success: 122 39% 49%;        /* Green */
+  --color-warning: 36 100% 50%;        /* Amber */
+  --color-error: 4 90% 58%;            /* Red */
+
+  /* Neutral colors */
+  --color-background: 0 0% 100%;       /* White */
+  --color-foreground: 0 0% 0%;         /* Black */
+  --color-muted: 0 0% 96%;             /* Light gray */
+  --color-border: 0 0% 88%;            /* Border gray */
 
   /* Spacing */
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
 
-  /* Border Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
+  /* Border radius */
+  --radius-sm: 0.25rem;    /* 4px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+
+  /* Typography */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-md: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-background: 0 0% 9%;        /* Dark gray */
+  --color-foreground: 0 0% 98%;       /* Off-white */
+  --color-muted: 0 0% 15%;            /* Darker gray */
+  --color-border: 0 0% 18%;           /* Dark border */
 }
 ```
+
+**Note:** Colors use HSL format without `hsl()` wrapper. The format is `hue saturation% lightness%`. This allows Tailwind to modify opacity using the `/` syntax (e.g., `bg-primary/50`).
 
 ## TypeScript Support
 
@@ -352,6 +533,58 @@ All components follow WCAG 2.1 AA guidelines:
 - Keyboard navigation support
 - Focus management
 - Color contrast ratios > 4.5:1
+
+## Troubleshooting
+
+### Components have no styling / look broken
+
+**Cause**: Missing Tailwind CSS configuration or CSS variables
+
+**Solution**:
+1. Verify Tailwind preset is imported in `tailwind.config.ts`:
+   ```typescript
+   import fidusTailwindPreset from '@fidus/ui/tailwind';
+   ```
+2. Verify `@fidus/ui/styles.css` is imported in your root file
+3. Check that your build tool processes Tailwind CSS (PostCSS)
+
+### TypeScript errors when importing components
+
+**Cause**: Missing type definitions or incorrect import path
+
+**Solution**:
+1. Ensure `@fidus/ui` is installed: `npm list @fidus/ui`
+2. Use named imports: `import { Button } from '@fidus/ui'`
+3. Check TypeScript version is 5.0+
+
+### Dark mode not working
+
+**Cause**: Missing `dark` class on root element
+
+**Solution**:
+Add `dark` class to your root HTML element:
+```tsx
+<html className="dark">
+```
+
+### Custom colors not applying
+
+**Cause**: Trying to override colors in Tailwind config instead of CSS variables
+
+**Solution**:
+Override CSS variables in your global CSS file, not in `tailwind.config.ts`:
+```css
+:root {
+  --color-primary: 200 100% 50%; /* HSL format */
+}
+```
+
+### Module not found: '@fidus/ui/tailwind'
+
+**Cause**: Old version of `@fidus/ui` (< 1.3.2)
+
+**Solution**:
+Update to latest version: `npm install @fidus/ui@latest`
 
 ## Browser Support
 

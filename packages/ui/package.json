@@ -1,6 +1,6 @@
 {
   "name": "@fidus/ui",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "Fidus UI Component Library",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -35,10 +35,18 @@
       "types": "./dist/components/*/index.d.ts",
       "import": "./dist/components/*/index.mjs",
       "require": "./dist/components/*/index.js"
+    },
+    "./styles.css": "./styles.css",
+    "./tailwind": {
+      "types": "./tailwind.config.ts",
+      "import": "./tailwind.config.ts",
+      "require": "./tailwind.config.ts"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "styles.css",
+    "tailwind.config.ts"
   ],
   "scripts": {
     "build": "tsup",
