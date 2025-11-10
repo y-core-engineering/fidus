@@ -111,6 +111,6 @@ temp/
 docs/_build/
 site/
 
-# Prompts (local only, not for repo)
-docs/prompts/
+# Local prompts (but allow docs/prompts/ssr/ for milestone implementation prompts)
 .env.memory
+CLAUDE_template.md
