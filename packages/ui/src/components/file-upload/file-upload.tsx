@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { z } from 'zod';
@@ -77,14 +75,22 @@ export const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     );
     const [isDragActive, setIsDragActive] = React.useState(false);
     const [validationError, setValidationError] = React.useState<string>('');
+    const [isClient, setIsClient] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const currentFiles = value !== undefined ? value : internalFiles;
     const hasError = !!error || !!validationError;
     const displayError = error || validationError;
 
+    // Client-side hydration
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
+
     // Generate previews for images
     React.useEffect(() => {
+      if (!isClient) return;
+
       const files = currentFiles as FileWithPreview[];
       files.forEach((file) => {
         if (file.type.startsWith('image/') && !file.preview) {
@@ -96,7 +102,7 @@ export const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
           reader.readAsDataURL(file);
         }
       });
-    }, [currentFiles]);
+    }, [currentFiles, isClient]);
 
     // Cleanup previews on unmount
     React.useEffect(() => {
@@ -306,7 +312,7 @@ export const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         </div>
 
         {/* File List */}
-        {currentFiles.length > 0 && (
+        {isClient && currentFiles.length > 0 && (
           <div className="mt-3 space-y-2">
             {currentFiles.map((file, index) => (
               <div

@@ -13,6 +13,10 @@ import { ConfidenceIndicator } from '../components/confidence-indicator/confiden
 import { Avatar } from '../components/avatar/avatar';
 import { Breadcrumbs } from '../components/breadcrumbs/breadcrumbs';
 import { Pagination } from '../components/pagination/pagination';
+import { TextInput } from '../components/text-input/text-input';
+import { TextArea } from '../components/text-area/text-area';
+import { FileUpload } from '../components/file-upload/file-upload';
+import { TimePicker } from '../components/time-picker/time-picker';
 
 /**
  * SSR Compatibility Tests
@@ -468,6 +472,204 @@ describe('SSR Compatibility', () => {
       );
 
       expect(html).not.toContain('aria-label="Remove"');
+    });
+  });
+
+  describe('Phase 2: Form Components', () => {
+    describe('TextInput Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <TextInput label="Email" type="email" placeholder="Enter email" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Email');
+        expect(html).toContain('placeholder="Enter email"');
+      });
+
+      it('should render all input types in SSR', () => {
+        const types: Array<'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'> = [
+          'text', 'email', 'password', 'number', 'search', 'tel', 'url'
+        ];
+
+        types.forEach(type => {
+          const html = renderToString(
+            <TextInput label={`Test ${type}`} type={type} />
+          );
+
+          expect(html).toBeTruthy();
+          expect(html).toContain(`Test ${type}`);
+        });
+      });
+
+      it('should render error state in SSR', () => {
+        const html = renderToString(
+          <TextInput label="Username" error="Username is required" />
+        );
+
+        expect(html).toContain('Username is required');
+        expect(html).toContain('role="alert"');
+      });
+
+      it('should render helper text in SSR', () => {
+        const html = renderToString(
+          <TextInput label="Password" helperText="Must be at least 8 characters" />
+        );
+
+        expect(html).toContain('Must be at least 8 characters');
+      });
+
+      it('should render character count in SSR', () => {
+        const html = renderToString(
+          <TextInput label="Bio" maxLength={100} showCharCount value="Hello" />
+        );
+
+        expect(html).toContain('5<!-- --> / <!-- -->100');
+      });
+
+      it('should render required indicator in SSR', () => {
+        const html = renderToString(
+          <TextInput label="Required Field" required />
+        );
+
+        expect(html).toContain('*');
+      });
+    });
+
+    describe('TextArea Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <TextArea label="Description" placeholder="Enter description" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Description');
+        expect(html).toContain('placeholder="Enter description"');
+      });
+
+      it('should render error state in SSR', () => {
+        const html = renderToString(
+          <TextArea label="Comments" error="Comments are required" />
+        );
+
+        expect(html).toContain('Comments are required');
+        expect(html).toContain('role="alert"');
+      });
+
+      it('should render character count in SSR', () => {
+        const html = renderToString(
+          <TextArea label="Message" maxLength={500} showCharCount value="Test message" />
+        );
+
+        expect(html).toContain('12<!-- --> / <!-- -->500');
+      });
+
+      it('should render resizable textarea in SSR', () => {
+        const html = renderToString(
+          <TextArea label="Notes" resizable />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Notes');
+      });
+    });
+
+    describe('FileUpload Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <FileUpload label="Upload File" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Upload File');
+      });
+
+      it('should render with accept types in SSR', () => {
+        const html = renderToString(
+          <FileUpload label="Upload Image" accept="image/*" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('accept="image/*"');
+      });
+
+      it('should render multiple file upload in SSR', () => {
+        const html = renderToString(
+          <FileUpload label="Upload Files" multiple />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('multiple');
+      });
+
+      it('should not render file preview in SSR', () => {
+        const html = renderToString(
+          <FileUpload label="Upload" showPreview />
+        );
+
+        // File preview requires client-side FileReader API
+        expect(html).toBeTruthy();
+        expect(html).toContain('Upload');
+      });
+
+      it('should render drag and drop zone in SSR', () => {
+        const html = renderToString(
+          <FileUpload label="Upload" dragAndDrop />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Upload');
+      });
+    });
+
+    describe('TimePicker Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <TimePicker label="Select Time" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Select Time');
+      });
+
+      it('should render with default value in SSR', () => {
+        const html = renderToString(
+          <TimePicker label="Meeting Time" value="14:30" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Meeting Time');
+        // TimePicker uses separate hour/minute selects, check they're rendered
+        expect(html).toContain('aria-label="Hour"');
+        expect(html).toContain('aria-label="Minute"');
+      });
+
+      it('should render 12-hour format in SSR', () => {
+        const html = renderToString(
+          <TimePicker label="Time" format="12h" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Time');
+      });
+
+      it('should render error state in SSR', () => {
+        const html = renderToString(
+          <TimePicker label="Time" error="Time is required" />
+        );
+
+        expect(html).toContain('Time is required');
+        expect(html).toContain('role="alert"');
+      });
+
+      it('should render disabled state in SSR', () => {
+        const html = renderToString(
+          <TimePicker label="Time" disabled />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('disabled');
+      });
     });
   });
 });
