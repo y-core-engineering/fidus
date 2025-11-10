@@ -17,11 +17,186 @@ export default function ReleasesPage() {
 
         <Divider />
 
+        {/* Version 1.6.0 */}
+        <Stack direction="vertical" spacing="lg" className="border-2 border-primary rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
+            <h2 className="text-3xl font-bold text-foreground">v1.6.0</h2>
+            <Badge variant="success">Latest</Badge>
+            <Badge variant="info">
+              <Sparkles className="w-3 h-3 mr-1" />
+              Phase 2 SSR Enhancements
+            </Badge>
+          </Stack>
+
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Calendar className="w-4 h-4" />
+              <span>November 10, 2025</span>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <GitBranch className="w-4 h-4" />
+              <Link
+                href="https://github.com/y-core-engineering/fidus/pull/68"
+                target="_blank"
+              >
+                PR #68
+              </Link>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Package className="w-4 h-4" />
+              <Link
+                href="https://www.npmjs.com/package/@fidus/ui/v/1.6.0"
+                target="_blank"
+              >
+                NPM Package
+              </Link>
+            </Stack>
+          </Stack>
+
+          <Divider />
+
+          {/* Example Projects */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Example Projects (3 complete implementations)
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7">
+              <Stack direction="vertical" spacing="xs">
+                <span className="font-medium">Next.js 14 App Router</span>
+                <p className="text-sm text-muted-foreground">
+                  Complete example at <code className="bg-muted px-1 py-0.5 rounded text-xs">/examples/nextjs-app-router</code> showcasing
+                  15+ components with Tailwind CSS integration and comprehensive README.
+                </p>
+              </Stack>
+
+              <Stack direction="vertical" spacing="xs">
+                <span className="font-medium">Next.js Pages Router</span>
+                <p className="text-sm text-muted-foreground">
+                  Traditional SSR example at <code className="bg-muted px-1 py-0.5 rounded text-xs">/examples/nextjs-pages-router</code> demonstrating
+                  server-side rendering with classic Next.js architecture.
+                </p>
+              </Stack>
+
+              <Stack direction="vertical" spacing="xs">
+                <span className="font-medium">Vite + React SPA</span>
+                <p className="text-sm text-muted-foreground">
+                  Client-side rendering example at <code className="bg-muted px-1 py-0.5 rounded text-xs">/examples/vite-react</code> showing
+                  fast development workflow with Vite build tooling.
+                </p>
+              </Stack>
+            </Stack>
+          </Stack>
+
+          {/* SSR Testing */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Comprehensive SSR Testing
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-2xl text-primary">133</span>
+                <span className="text-sm text-muted-foreground">SSR compatibility tests (up from 55) - 142% increase</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                All 40+ components tested with <code className="bg-muted px-1 py-0.5 rounded text-xs">renderToString()</code> compatibility.
+                Verified Portal components (Toast, Modal, Drawer) don't crash during SSR. 100% test pass rate across all component variants and edge cases.
+              </p>
+            </Stack>
+          </Stack>
+
+          {/* Documentation */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Documentation Improvements
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7 text-sm text-muted-foreground">
+              <p>✅ Examples README with quick-start guide and framework-specific notes</p>
+              <p>✅ Updated @fidus/ui README with comprehensive SSR section</p>
+              <p>✅ Component API usage patterns verified in real Next.js/Vite apps</p>
+              <p>✅ SSR test suite documents expected behavior for all components</p>
+            </Stack>
+          </Stack>
+
+          {/* Key Insights */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground">Key Insights</h3>
+            <Stack direction="vertical" spacing="sm" className="ml-7 text-sm text-muted-foreground">
+              <p>• Portal components (Radix UI) correctly return empty HTML in SSR (expected behavior)</p>
+              <p>• Client-side components with <code className="bg-muted px-1 py-0.5 rounded text-xs">'use client'</code> still render structure safely in SSR</p>
+              <p>• All 16 SSR-optimized components work seamlessly across frameworks</p>
+            </Stack>
+          </Stack>
+
+          {/* Migration */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground">Migration</h3>
+            <div className="ml-7 p-4 bg-success/10 border border-success/20 rounded-lg">
+              <p className="text-sm font-medium text-success-foreground">✅ No code changes required - this is a documentation and testing release</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Use example projects as reference for integrating @fidus/ui in your app. All existing features remain fully backward compatible.
+              </p>
+            </div>
+          </Stack>
+        </Stack>
+
+        {/* Version 1.5.0 */}
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
+            <h2 className="text-3xl font-bold text-foreground">v1.5.0</h2>
+            <Badge variant="info">SSR Optimization</Badge>
+          </Stack>
+
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Calendar className="w-4 h-4" />
+              <span>November 8, 2025</span>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <GitBranch className="w-4 h-4" />
+              <Link
+                href="https://github.com/y-core-engineering/fidus/pull/67"
+                target="_blank"
+              >
+                PR #67
+              </Link>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Package className="w-4 h-4" />
+              <Link
+                href="https://www.npmjs.com/package/@fidus/ui/v/1.5.0"
+                target="_blank"
+              >
+                NPM Package
+              </Link>
+            </Stack>
+          </Stack>
+
+          <Divider />
+
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              SSR-Optimized Components (16 total)
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7 text-sm text-muted-foreground">
+              <p><strong>Phase 1 (12 components):</strong> Alert, Banner, Chip, DetailCard, Checkbox, RadioButton, ToggleSwitch, ErrorState, ConfidenceIndicator, Avatar, Breadcrumbs, Pagination</p>
+              <p><strong>Phase 2 (4 components):</strong> TextInput, TextArea, FileUpload, TimePicker</p>
+              <p className="mt-2">~25-28% reduction in client-side JavaScript bundle. Improved Core Web Vitals (FCP, LCP, TTI) for Next.js 14+ App Router, Remix, and Gatsby.</p>
+            </Stack>
+          </Stack>
+        </Stack>
+
         {/* Version 1.2.0 */}
         <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card">
           <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
             <h2 className="text-3xl font-bold text-foreground">v1.2.0</h2>
-            <Badge variant="success">Latest</Badge>
             <Badge variant="info">
               <Sparkles className="w-3 h-3 mr-1" />
               Chat UI Components
