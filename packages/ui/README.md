@@ -239,6 +239,170 @@ All components have been tested with `renderToString()` compatibility:
 - **Improved Core Web Vitals** - Better FCP, LCP, and TTI scores
 - **Zero Breaking Changes** - Fully backward compatible
 
+## Tree-Shaking & Bundle Optimization
+
+`@fidus/ui` supports **tree-shaking** via subpath imports to dramatically reduce your bundle size.
+
+### Bundle Size Comparison
+
+| Import Style | Typical Bundle Impact |
+|--------------|----------------------|
+| Barrel import: `import { Button } from '@fidus/ui'` | Includes entire library (~370KB) |
+| Subpath import: `import { Button } from '@fidus/ui/button'` | Only imports Button (~4KB) + shared deps |
+
+### Recommended: Subpath Imports
+
+For production builds, use subpath imports to include only what you need:
+
+```typescript
+// ✅ Tree-shaking optimized (recommended for production)
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';
+import { Alert } from '@fidus/ui/alert';
+import { TextInput } from '@fidus/ui/text-input';
+```
+
+### Development: Barrel Imports
+
+For development and prototyping, barrel imports are convenient:
+
+```typescript
+// 🚀 Fast development (imports everything)
+import { Button, Stack, Alert, TextInput } from '@fidus/ui';
+```
+
+### All Available Subpaths
+
+All 45+ components support subpath imports. Common ones include:
+
+```typescript
+// Forms
+import { TextInput } from '@fidus/ui/text-input';
+import { TextArea } from '@fidus/ui/text-area';
+import { Checkbox } from '@fidus/ui/checkbox';
+import { RadioButton } from '@fidus/ui/radio-button';
+import { Select } from '@fidus/ui/select';
+import { DatePicker } from '@fidus/ui/date-picker';
+
+// Layout
+import { Stack } from '@fidus/ui/stack';
+import { Grid } from '@fidus/ui/grid';
+import { Container } from '@fidus/ui/container';
+
+// Display
+import { Alert } from '@fidus/ui/alert';
+import { Banner } from '@fidus/ui/banner';
+import { Card } from '@fidus/ui/card';
+import { Badge } from '@fidus/ui/badge';
+
+// Navigation
+import { Header } from '@fidus/ui/header';
+import { Sidebar } from '@fidus/ui/sidebar';
+import { Tabs } from '@fidus/ui/tabs';
+import { Breadcrumbs } from '@fidus/ui/breadcrumbs';
+
+// Feedback
+import { Toast } from '@fidus/ui/toast';
+import { Modal } from '@fidus/ui/modal';
+import { Spinner } from '@fidus/ui/spinner';
+import { ProgressBar } from '@fidus/ui/progress-bar';
+```
+
+See [package.json exports](https://github.com/y-core-engineering/fidus/blob/main/packages/ui/package.json) for the complete list.
+
+## Form Validation
+
+`@fidus/ui` form components work seamlessly with [React Hook Form](https://react-hook-form.com/).
+
+### Basic Example
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { TextInput } from '@fidus/ui/text-input';
+import { Button } from '@fidus/ui/button';
+
+function LoginForm() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+
+  return (
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <TextInput
+        label="Email"
+        type="email"
+        error={errors.email?.message}
+        {...register('email', { required: 'Email is required' })}
+      />
+
+      <TextInput
+        label="Password"
+        type="password"
+        error={errors.password?.message}
+        {...register('password', { required: 'Password is required' })}
+      />
+
+      <Button type="submit">Login</Button>
+    </form>
+  );
+}
+```
+
+### With Zod Schema Validation
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { TextInput } from '@fidus/ui/text-input';
+import { Checkbox } from '@fidus/ui/checkbox';
+
+const schema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  terms: z.boolean().refine((val) => val, 'You must accept terms'),
+});
+
+type FormData = z.infer<typeof schema>;
+
+function SignupForm() {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  return (
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <TextInput
+        label="Email"
+        error={errors.email?.message}
+        {...register('email')}
+      />
+
+      <TextInput
+        label="Password"
+        type="password"
+        error={errors.password?.message}
+        {...register('password')}
+      />
+
+      <Checkbox
+        label="I accept the terms and conditions"
+        error={errors.terms?.message}
+        {...register('terms')}
+      />
+
+      <Button type="submit">Sign Up</Button>
+    </form>
+  );
+}
+```
+
+### Supported Form Components
+
+All form components support `forwardRef` and work with React Hook Form:
+
+- TextInput, TextArea, FileUpload, TimePicker
+- Checkbox, RadioButton, ToggleSwitch
+- Select, DatePicker, Dropdown
+
 ## Usage
 
 ### Basic Example
