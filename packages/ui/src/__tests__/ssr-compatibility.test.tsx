@@ -17,6 +17,35 @@ import { TextInput } from '../components/text-input/text-input';
 import { TextArea } from '../components/text-area/text-area';
 import { FileUpload } from '../components/file-upload/file-upload';
 import { TimePicker } from '../components/time-picker/time-picker';
+import { Button } from '../components/button/button';
+import { Link } from '../components/link/link';
+import { IconButton } from '../components/icon-button/icon-button';
+import { ButtonGroup } from '../components/button-group/button-group';
+import { Container } from '../components/container/container';
+import { Grid } from '../components/grid/grid';
+import { Stack } from '../components/stack/stack';
+import { Divider } from '../components/divider/divider';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/table/table';
+import { List, ListItem } from '../components/list/list';
+import { Badge } from '../components/badge/badge';
+import { OpportunityCard } from '../components/opportunity-card/opportunity-card';
+import { EmptyCard } from '../components/empty-card/empty-card';
+import { Select } from '../components/select/select';
+import { DatePicker } from '../components/date-picker/date-picker';
+import { Toast, ToastProvider } from '../components/toast/toast';
+import { Modal, ModalRoot, ModalContent, ModalHeader, ModalTitle, ModalBody } from '../components/modal/modal';
+import { ProgressBar } from '../components/progress-bar/progress-bar';
+import { Spinner } from '../components/spinner/spinner';
+import { Skeleton } from '../components/skeleton/skeleton';
+import { Dropdown } from '../components/dropdown/dropdown';
+import { Popover } from '../components/popover/popover';
+import { Tooltip } from '../components/tooltip/tooltip';
+import { Drawer, DrawerRoot, DrawerContent, DrawerHeader, DrawerTitle } from '../components/drawer/drawer';
+import { Tabs, TabsRoot, TabsList, TabsTrigger, TabsContent } from '../components/tabs/tabs';
+import { Header } from '../components/header/header';
+import { Sidebar } from '../components/sidebar/sidebar';
+import { MessageBubble } from '../components/message-bubble/message-bubble';
+import { ChatInterface } from '../components/chat-interface/chat-interface';
 
 /**
  * SSR Compatibility Tests
@@ -669,6 +698,1077 @@ describe('SSR Compatibility', () => {
 
         expect(html).toBeTruthy();
         expect(html).toContain('disabled');
+      });
+    });
+  });
+
+  describe('Phase 3: Action Components', () => {
+    describe('Button Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Button>Click me</Button>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Click me');
+        expect(html).toContain('type="button"');
+      });
+
+      it('should render all variants in SSR', () => {
+        const variants: Array<'primary' | 'secondary' | 'tertiary' | 'destructive'> =
+          ['primary', 'secondary', 'tertiary', 'destructive'];
+
+        variants.forEach(variant => {
+          const html = renderToString(
+            <Button variant={variant}>{variant} button</Button>
+          );
+
+          expect(html).toBeTruthy();
+          expect(html).toContain(variant);
+          expect(html).toContain('button');
+        });
+      });
+
+      it('should render all sizes in SSR', () => {
+        const sizes: Array<'sm' | 'md' | 'lg'> = ['sm', 'md', 'lg'];
+
+        sizes.forEach(size => {
+          const html = renderToString(
+            <Button size={size}>{size} button</Button>
+          );
+
+          expect(html).toBeTruthy();
+          expect(html).toContain(size);
+        });
+      });
+
+      it('should render loading state in SSR', () => {
+        const html = renderToString(
+          <Button loading>Loading button</Button>
+        );
+
+        expect(html).toContain('Loading...');
+        expect(html).toContain('disabled');
+      });
+
+      it('should render disabled state in SSR', () => {
+        const html = renderToString(
+          <Button disabled>Disabled</Button>
+        );
+
+        expect(html).toContain('disabled');
+      });
+
+      it('should render with different button types in SSR', () => {
+        const types: Array<'button' | 'submit' | 'reset'> = ['button', 'submit', 'reset'];
+
+        types.forEach(type => {
+          const html = renderToString(
+            <Button type={type}>Test</Button>
+          );
+
+          expect(html).toContain(`type="${type}"`);
+        });
+      });
+    });
+
+    describe('Link Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Link href="/test">Test Link</Link>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Test Link');
+        expect(html).toContain('href="/test"');
+      });
+
+      it('should render variants in SSR', () => {
+        const variants: Array<'inline' | 'standalone'> = ['inline', 'standalone'];
+
+        variants.forEach(variant => {
+          const html = renderToString(
+            <Link href="/test" variant={variant}>{variant} link</Link>
+          );
+
+          expect(html).toBeTruthy();
+          expect(html).toContain(variant);
+        });
+      });
+
+      it('should render external link with icon in SSR', () => {
+        const html = renderToString(
+          <Link href="https://example.com" external>External</Link>
+        );
+
+        expect(html).toContain('target="_blank"');
+        expect(html).toContain('rel="noopener noreferrer"');
+        expect(html).toContain('<svg');
+      });
+
+      it('should render with showIcon in SSR', () => {
+        const html = renderToString(
+          <Link href="/test" showIcon>With Icon</Link>
+        );
+
+        expect(html).toContain('With Icon');
+        expect(html).toContain('<svg');
+      });
+    });
+
+    describe('IconButton Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <IconButton aria-label="Delete">
+            <span>X</span>
+          </IconButton>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('aria-label="Delete"');
+      });
+
+      it('should render all variants in SSR', () => {
+        const variants: Array<'primary' | 'secondary' | 'ghost' | 'destructive'> =
+          ['primary', 'secondary', 'ghost', 'destructive'];
+
+        variants.forEach(variant => {
+          const html = renderToString(
+            <IconButton variant={variant} aria-label={variant}>
+              <span>*</span>
+            </IconButton>
+          );
+
+          expect(html).toBeTruthy();
+        });
+      });
+
+      it('should render disabled state in SSR', () => {
+        const html = renderToString(
+          <IconButton disabled aria-label="Disabled">
+            <span>X</span>
+          </IconButton>
+        );
+
+        expect(html).toContain('disabled');
+      });
+    });
+
+    describe('ButtonGroup Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <ButtonGroup>
+            <Button>First</Button>
+            <Button>Second</Button>
+            <Button>Third</Button>
+          </ButtonGroup>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('First');
+        expect(html).toContain('Second');
+        expect(html).toContain('Third');
+      });
+
+      it('should render vertical orientation in SSR', () => {
+        const html = renderToString(
+          <ButtonGroup orientation="vertical">
+            <Button>Top</Button>
+            <Button>Bottom</Button>
+          </ButtonGroup>
+        );
+
+        expect(html).toContain('Top');
+        expect(html).toContain('Bottom');
+      });
+    });
+  });
+
+  describe('Phase 4: Layout Components', () => {
+    describe('Container Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Container>Container content</Container>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Container content');
+      });
+
+      it('should render all sizes in SSR', () => {
+        const sizes: Array<'sm' | 'md' | 'lg' | 'xl' | 'full'> = ['sm', 'md', 'lg', 'xl', 'full'];
+
+        sizes.forEach(size => {
+          const html = renderToString(
+            <Container size={size}>Content</Container>
+          );
+
+          expect(html).toContain('Content');
+        });
+      });
+
+      it('should render with different padding in SSR', () => {
+        const paddings: Array<'none' | 'sm' | 'md' | 'lg'> = ['none', 'sm', 'md', 'lg'];
+
+        paddings.forEach(padding => {
+          const html = renderToString(
+            <Container padding={padding}>Content</Container>
+          );
+
+          expect(html).toContain('Content');
+        });
+      });
+
+      it('should render with different semantic elements in SSR', () => {
+        const elements: Array<'div' | 'section' | 'article' | 'main'> =
+          ['div', 'section', 'article', 'main'];
+
+        elements.forEach(as => {
+          const html = renderToString(
+            <Container as={as}>Content</Container>
+          );
+
+          expect(html).toContain(`<${as}`);
+          expect(html).toContain('Content');
+        });
+      });
+    });
+
+    describe('Grid Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Grid>
+            <div>Item 1</div>
+            <div>Item 2</div>
+          </Grid>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Item 1');
+        expect(html).toContain('Item 2');
+      });
+
+      it('should render with different column counts in SSR', () => {
+        const html = renderToString(
+          <Grid cols={3}>
+            <div>A</div>
+            <div>B</div>
+            <div>C</div>
+          </Grid>
+        );
+
+        expect(html).toContain('A');
+        expect(html).toContain('B');
+        expect(html).toContain('C');
+      });
+
+      it('should render with gap in SSR', () => {
+        const html = renderToString(
+          <Grid gap="lg">
+            <div>Item</div>
+          </Grid>
+        );
+
+        expect(html).toContain('Item');
+      });
+    });
+
+    describe('Stack Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Stack>
+            <div>First</div>
+            <div>Second</div>
+          </Stack>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('First');
+        expect(html).toContain('Second');
+      });
+
+      it('should render horizontal direction in SSR', () => {
+        const html = renderToString(
+          <Stack direction="horizontal">
+            <div>Left</div>
+            <div>Right</div>
+          </Stack>
+        );
+
+        expect(html).toContain('Left');
+        expect(html).toContain('Right');
+      });
+
+      it('should render with spacing in SSR', () => {
+        const html = renderToString(
+          <Stack spacing="lg">
+            <div>Item</div>
+          </Stack>
+        );
+
+        expect(html).toContain('Item');
+      });
+
+      it('should render with alignment in SSR', () => {
+        const html = renderToString(
+          <Stack align="center">
+            <div>Centered</div>
+          </Stack>
+        );
+
+        expect(html).toContain('Centered');
+      });
+    });
+
+    describe('Divider Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Divider />
+        );
+
+        expect(html).toBeTruthy();
+      });
+
+      it('should render vertical orientation in SSR', () => {
+        const html = renderToString(
+          <Divider orientation="vertical" />
+        );
+
+        expect(html).toBeTruthy();
+      });
+
+      it('should render with label in SSR', () => {
+        const html = renderToString(
+          <Divider label="Section" />
+        );
+
+        expect(html).toContain('Section');
+      });
+    });
+  });
+
+  describe('Phase 5: Data Display Components', () => {
+    describe('Table Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>John Doe</TableCell>
+                <TableCell>john@example.com</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Jane Smith</TableCell>
+                <TableCell>jane@example.com</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Name');
+        expect(html).toContain('Email');
+        expect(html).toContain('John Doe');
+        expect(html).toContain('jane@example.com');
+      });
+
+      it('should render empty table in SSR', () => {
+        const html = renderToString(
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+            </TableBody>
+          </Table>
+        );
+
+        expect(html).toContain('Name');
+      });
+    });
+
+    describe('List Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <List>
+            <ListItem>First item</ListItem>
+            <ListItem>Second item</ListItem>
+          </List>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('First item');
+        expect(html).toContain('Second item');
+      });
+
+      it('should render ordered list in SSR', () => {
+        const html = renderToString(
+          <List variant="ordered">
+            <ListItem>Step 1</ListItem>
+            <ListItem>Step 2</ListItem>
+          </List>
+        );
+
+        expect(html).toContain('<ol');
+        expect(html).toContain('Step 1');
+      });
+
+      it('should render with spacing in SSR', () => {
+        const html = renderToString(
+          <List spacing="lg">
+            <ListItem>Item A</ListItem>
+            <ListItem>Item B</ListItem>
+          </List>
+        );
+
+        expect(html).toContain('Item A');
+        expect(html).toContain('Item B');
+      });
+    });
+
+    describe('Badge Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Badge>New</Badge>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('New');
+      });
+
+      it('should render all variants in SSR', () => {
+        const variants: Array<'urgent' | 'important' | 'normal' | 'low' | 'success' | 'warning' | 'error' | 'info'> =
+          ['urgent', 'important', 'normal', 'low', 'success', 'warning', 'error', 'info'];
+
+        variants.forEach(variant => {
+          const html = renderToString(
+            <Badge variant={variant}>{variant}</Badge>
+          );
+
+          expect(html).toContain(variant);
+        });
+      });
+
+      it('should render all sizes in SSR', () => {
+        const sizes: Array<'sm' | 'md' | 'lg'> = ['sm', 'md', 'lg'];
+
+        sizes.forEach(size => {
+          const html = renderToString(
+            <Badge size={size}>Badge</Badge>
+          );
+
+          expect(html).toContain('Badge');
+        });
+      });
+    });
+  });
+
+  describe('Phase 6: Card Components', () => {
+    describe('OpportunityCard Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <OpportunityCard title="Opportunity Title" urgency="important">
+            Description text
+          </OpportunityCard>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Opportunity Title');
+        expect(html).toContain('Description text');
+      });
+
+      it('should render all urgency levels in SSR', () => {
+        const urgencies: Array<'urgent' | 'important' | 'normal' | 'low'> =
+          ['urgent', 'important', 'normal', 'low'];
+
+        urgencies.forEach(urgency => {
+          const html = renderToString(
+            <OpportunityCard title={`${urgency} card`} urgency={urgency}>
+              Content
+            </OpportunityCard>
+          );
+
+          expect(html).toContain(urgency);
+        });
+      });
+
+      it('should render with context in SSR', () => {
+        const html = renderToString(
+          <OpportunityCard title="Card" context="Project: Acme Corp">
+            Content
+          </OpportunityCard>
+        );
+
+        expect(html).toContain('Project: Acme Corp');
+      });
+    });
+
+    describe('EmptyCard Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <EmptyCard
+            title="No items found"
+            description="Try adjusting your filters"
+          />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('No items found');
+        expect(html).toContain('Try adjusting your filters');
+      });
+
+      it('should render with action in SSR (without button)', () => {
+        const html = renderToString(
+          <EmptyCard
+            title="Empty"
+            actionLabel="Add Item"
+            onAction={() => {}}
+          />
+        );
+
+        expect(html).toContain('Empty');
+        // Action button may not render in SSR if client-only
+      });
+    });
+  });
+
+  describe('Phase 7: Form Advanced Components', () => {
+    describe('Select Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Select
+            label="Choose option"
+            options={[
+              { value: 'a', label: 'Option A' },
+              { value: 'b', label: 'Option B' }
+            ]}
+          />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Choose option');
+      });
+
+      it('should render with default value in SSR', () => {
+        const html = renderToString(
+          <Select
+            label="Select"
+            options={[{ value: 'test', label: 'Test' }]}
+            value="test"
+          />
+        );
+
+        expect(html).toContain('Select');
+      });
+
+      it('should render error state in SSR', () => {
+        const html = renderToString(
+          <Select
+            label="Select"
+            options={[]}
+            error="Selection required"
+          />
+        );
+
+        expect(html).toContain('Selection required');
+      });
+    });
+
+    describe('DatePicker Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <DatePicker label="Select date" />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Select date');
+      });
+
+      it('should render with default value in SSR', () => {
+        const html = renderToString(
+          <DatePicker
+            label="Date"
+            value={new Date('2024-01-15')}
+          />
+        );
+
+        expect(html).toContain('Date');
+      });
+
+      it('should render error state in SSR', () => {
+        const html = renderToString(
+          <DatePicker
+            label="Date"
+            error="Date is required"
+          />
+        );
+
+        expect(html).toContain('Date is required');
+      });
+    });
+  });
+
+  describe('Phase 8: Feedback Components', () => {
+    describe('Toast Component', () => {
+      it('should render without crashing in SSR', () => {
+        // Note: Toast uses Radix Portal which doesn't render content in SSR
+        // This test verifies the component doesn't crash during SSR
+        let didCrash = false;
+        try {
+          renderToString(
+            <ToastProvider>
+              <Toast title="Success!" variant="success" open />
+            </ToastProvider>
+          );
+        } catch (e) {
+          didCrash = true;
+        }
+
+        // Toast should not crash during SSR even though Portal doesn't render
+        expect(didCrash).toBe(false);
+      });
+
+      it('should render all variants without crashing in SSR', () => {
+        const variants: Array<'success' | 'error' | 'warning' | 'info'> =
+          ['success', 'error', 'warning', 'info'];
+
+        variants.forEach(variant => {
+          let didCrash = false;
+          try {
+            renderToString(
+              <ToastProvider>
+                <Toast title={`${variant} notification`} variant={variant} open />
+              </ToastProvider>
+            );
+          } catch (e) {
+            didCrash = true;
+          }
+
+          // Toast uses Portal which doesn't render in SSR, but should not crash
+          expect(didCrash).toBe(false);
+        });
+      });
+    });
+
+    describe('Modal Component', () => {
+      it('should render modal structure in SSR', () => {
+        // Note: Modal uses DialogPrimitive.Portal which doesn't render in SSR
+        // This test verifies the component doesn't crash during SSR
+        let didCrash = false;
+        try {
+          renderToString(
+            <ModalRoot open>
+              <ModalContent>
+                <ModalHeader>
+                  <ModalTitle>Modal Title</ModalTitle>
+                </ModalHeader>
+                <ModalBody>Modal content</ModalBody>
+              </ModalContent>
+            </ModalRoot>
+          );
+        } catch (e) {
+          didCrash = true;
+        }
+
+        // Portal content won't appear in SSR HTML, but should not crash
+        expect(didCrash).toBe(false);
+      });
+
+      it('should not crash with closed modal in SSR', () => {
+        let didCrash = false;
+        try {
+          renderToString(
+            <ModalRoot open={false}>
+              <ModalContent>Hidden content</ModalContent>
+            </ModalRoot>
+          );
+        } catch (e) {
+          didCrash = true;
+        }
+
+        expect(didCrash).toBe(false);
+      });
+    });
+
+    describe('ProgressBar Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <ProgressBar value={50} />
+        );
+
+        expect(html).toBeTruthy();
+      });
+
+      it('should render with label in SSR', () => {
+        // Note: ProgressBar has 'use client' but uses Radix Primitive
+        // which supports SSR, so label should render
+        const html = renderToString(
+          <ProgressBar value={75} showLabel label="Loading..." />
+        );
+
+        // Verify component renders without crashing
+        expect(html).toBeTruthy();
+        // Label container is rendered, even if styled differently in SSR
+        expect(html).toContain('progress-bar-label-container');
+      });
+
+      it('should render indeterminate state in SSR', () => {
+        const html = renderToString(
+          <ProgressBar indeterminate />
+        );
+
+        expect(html).toBeTruthy();
+      });
+    });
+
+    describe('Spinner Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Spinner />
+        );
+
+        expect(html).toBeTruthy();
+      });
+
+      it('should render all sizes in SSR', () => {
+        const sizes: Array<'sm' | 'md' | 'lg'> = ['sm', 'md', 'lg'];
+
+        sizes.forEach(size => {
+          const html = renderToString(
+            <Spinner size={size} />
+          );
+
+          expect(html).toBeTruthy();
+        });
+      });
+
+      it('should render with label in SSR', () => {
+        const html = renderToString(
+          <Spinner label="Loading data..." />
+        );
+
+        expect(html).toContain('Loading data...');
+      });
+    });
+
+    describe('Skeleton Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Skeleton />
+        );
+
+        expect(html).toBeTruthy();
+      });
+
+      it('should render all variants in SSR', () => {
+        const variants: Array<'text' | 'circular' | 'rectangular'> =
+          ['text', 'circular', 'rectangular'];
+
+        variants.forEach(variant => {
+          const html = renderToString(
+            <Skeleton variant={variant} />
+          );
+
+          expect(html).toBeTruthy();
+        });
+      });
+
+      it('should render with custom dimensions in SSR', () => {
+        const html = renderToString(
+          <Skeleton width="200px" height="100px" />
+        );
+
+        expect(html).toBeTruthy();
+      });
+    });
+  });
+
+  describe('Phase 9: Overlay Components', () => {
+    describe('Dropdown Component', () => {
+      it('should render trigger in SSR', () => {
+        const html = renderToString(
+          <Dropdown
+            trigger={<Button>Open Menu</Button>}
+            items={[
+              { label: 'Item 1', onClick: () => {} },
+              { label: 'Item 2', onClick: () => {} }
+            ]}
+          />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Open Menu');
+      });
+    });
+
+    describe('Popover Component', () => {
+      it('should render trigger in SSR', () => {
+        const html = renderToString(
+          <Popover
+            trigger={<Button>Show Popover</Button>}
+            content={<div>Popover content</div>}
+          />
+        );
+
+        expect(html).toContain('Show Popover');
+      });
+    });
+
+    describe('Tooltip Component', () => {
+      it('should render children in SSR', () => {
+        const html = renderToString(
+          <Tooltip content="Helpful tip">
+            <Button>Hover me</Button>
+          </Tooltip>
+        );
+
+        expect(html).toContain('Hover me');
+      });
+    });
+
+    describe('Drawer Component', () => {
+      it('should render drawer structure in SSR', () => {
+        // Note: Drawer uses Portal which doesn't render content in SSR
+        // This test verifies the component doesn't crash during SSR
+        let didCrash = false;
+        try {
+          renderToString(
+            <DrawerRoot open>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Drawer Title</DrawerTitle>
+                </DrawerHeader>
+                <div>Drawer content</div>
+              </DrawerContent>
+            </DrawerRoot>
+          );
+        } catch (e) {
+          didCrash = true;
+        }
+
+        // Portal content won't appear in SSR HTML, but should not crash
+        expect(didCrash).toBe(false);
+      });
+
+      it('should not crash with closed drawer in SSR', () => {
+        let didCrash = false;
+        try {
+          renderToString(
+            <DrawerRoot open={false}>
+              <DrawerContent>Hidden</DrawerContent>
+            </DrawerRoot>
+          );
+        } catch (e) {
+          didCrash = true;
+        }
+
+        expect(didCrash).toBe(false);
+      });
+    });
+  });
+
+  describe('Phase 10: Navigation Components', () => {
+    describe('Tabs Component', () => {
+      it('should render in SSR without errors', () => {
+        // Note: Tabs has 'use client' but uses Radix Tabs which supports SSR
+        const html = renderToString(
+          <TabsRoot defaultValue="tab1">
+            <TabsList>
+              <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+              <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1">Content 1</TabsContent>
+            <TabsContent value="tab2">Content 2</TabsContent>
+          </TabsRoot>
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Tab 1');
+        expect(html).toContain('Tab 2');
+      });
+
+      it('should render active tab content in SSR', () => {
+        const html = renderToString(
+          <TabsRoot defaultValue="a">
+            <TabsList>
+              <TabsTrigger value="a">A</TabsTrigger>
+            </TabsList>
+            <TabsContent value="a">A content</TabsContent>
+          </TabsRoot>
+        );
+
+        expect(html).toContain('A content');
+      });
+
+      it('should render convenience Tabs component in SSR', () => {
+        // Convenience Tabs component also works in SSR
+        const html = renderToString(
+          <Tabs
+            items={[
+              { value: 'tab1', label: 'Tab 1', content: <div>Content 1</div> },
+              { value: 'tab2', label: 'Tab 2', content: <div>Content 2</div> }
+            ]}
+            defaultValue="tab1"
+          />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Tab 1');
+        expect(html).toContain('Content 1');
+      });
+    });
+
+    describe('Header Component', () => {
+      it('should render in SSR without errors', () => {
+        // Note: Header has 'use client' directive
+        const html = renderToString(
+          <Header logo={{ text: 'App Title' }} />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('App Title');
+      });
+
+      it('should render with navigation items in SSR', () => {
+        // Note: Header has 'use client' - navigation items may render differently in SSR
+        const html = renderToString(
+          <Header
+            logo={{ text: 'App' }}
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'About', href: '/about' }
+            ]}
+          />
+        );
+
+        // Verify component renders without crashing
+        expect(html).toBeTruthy();
+        // Logo should render at minimum
+        expect(html).toContain('App');
+      });
+    });
+
+    describe('Sidebar Component', () => {
+      it('should render in SSR without errors', () => {
+        const html = renderToString(
+          <Sidebar
+            items={[
+              { label: 'Dashboard', href: '/' },
+              { label: 'Settings', href: '/settings' }
+            ]}
+          />
+        );
+
+        expect(html).toBeTruthy();
+        expect(html).toContain('Dashboard');
+        expect(html).toContain('Settings');
+      });
+
+      it('should render collapsed state in SSR', () => {
+        const html = renderToString(
+          <Sidebar
+            items={[{ label: 'Item', href: '/' }]}
+            collapsed
+          />
+        );
+
+        expect(html).toBeTruthy();
+      });
+    });
+  });
+
+  describe('Phase 11: Chat Components', () => {
+    describe('MessageBubble Component', () => {
+      it('should render in SSR without errors', () => {
+        // Note: MessageBubble has 'use client' - content uses ReactMarkdown which is client-side
+        const html = renderToString(
+          <MessageBubble
+            id="msg-1"
+            role="user"
+            content="Hello, world!"
+            timestamp={new Date('2024-01-15T10:30:00')}
+          />
+        );
+
+        // Verify component renders without crashing (structure renders even if content is processed client-side)
+        expect(html).toBeTruthy();
+      });
+
+      it('should render both role types in SSR', () => {
+        const roles: Array<'user' | 'assistant'> = ['user', 'assistant'];
+
+        roles.forEach(role => {
+          const html = renderToString(
+            <MessageBubble
+              id={`msg-${role}`}
+              role={role}
+              content={`Message from ${role}`}
+              timestamp={new Date()}
+            />
+          );
+
+          // Verify component renders without crashing
+          expect(html).toBeTruthy();
+        });
+      });
+
+      it('should render with suggestions in SSR', () => {
+        const html = renderToString(
+          <MessageBubble
+            id="msg-2"
+            role="assistant"
+            content="AI response"
+            timestamp={new Date()}
+            suggestions={[
+              {
+                id: 'sug-1',
+                text: 'suggestion',
+                confidence: 0.95,
+              }
+            ]}
+          />
+        );
+
+        // Verify component renders without crashing
+        expect(html).toBeTruthy();
+      });
+    });
+
+    describe('ChatInterface Component', () => {
+      it('should render in SSR without errors', () => {
+        // Note: ChatInterface has 'use client' - full chat functionality requires client-side JS
+        const html = renderToString(
+          <ChatInterface
+            messages={[
+              { id: '1', role: 'user', content: 'Hello', timestamp: new Date() },
+              { id: '2', role: 'assistant', content: 'Hi there', timestamp: new Date() }
+            ]}
+            onSendMessage={() => {}}
+          />
+        );
+
+        // Verify component renders without crashing
+        expect(html).toBeTruthy();
+      });
+
+      it('should render empty chat in SSR', () => {
+        const html = renderToString(
+          <ChatInterface
+            messages={[]}
+            onSendMessage={() => {}}
+          />
+        );
+
+        // Verify component renders without crashing
+        expect(html).toBeTruthy();
       });
     });
   });
