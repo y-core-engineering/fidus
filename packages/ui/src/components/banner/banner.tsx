@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { X, Info, AlertTriangle, AlertCircle } from 'lucide-react';
@@ -101,7 +99,16 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerComponentProps>(
     },
     ref
   ) => {
+    // SSR-safe: Start with visible state
     const [isVisible, setIsVisible] = React.useState(true);
+    // Track if component is hydrated (client-side only)
+    const [isClient, setIsClient] = React.useState(false);
+
+    // Set isClient to true after hydration
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
+
     const Icon = iconMap[variant || 'info'];
 
     const handleDismiss = () => {
@@ -109,7 +116,8 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerComponentProps>(
       onDismiss?.();
     };
 
-    if (!isVisible) return null;
+    // Don't render if dismissed (only after client hydration)
+    if (!isVisible && isClient) return null;
 
     return (
       <div
@@ -132,7 +140,8 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerComponentProps>(
             {actionLabel}
           </button>
         )}
-        {dismissible && (
+        {/* Only show dismiss button after client hydration to avoid hydration mismatches */}
+        {dismissible && isClient && (
           <button
             onClick={handleDismiss}
             className="ml-2 rounded-md p-1 opacity-80 transition-opacity hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2"

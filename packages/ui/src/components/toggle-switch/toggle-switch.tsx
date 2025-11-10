@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { z } from 'zod';
@@ -96,8 +94,15 @@ export const ToggleSwitch = React.forwardRef<
     ...rest
   } = props;
 
+  // SSR-safe: Track client-side hydration
+  const [isClient, setIsClient] = React.useState(false);
   const [internalChecked, setInternalChecked] =
     React.useState(defaultChecked);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Combine refs
@@ -165,6 +170,7 @@ export const ToggleSwitch = React.forwardRef<
         />
 
         {/* Switch Visual */}
+        {/* SSR-safe: Render switch visual always, but animation depends on client state */}
         <div
           role="switch"
           aria-checked={isChecked}
@@ -174,7 +180,7 @@ export const ToggleSwitch = React.forwardRef<
           onKeyDown={handleKeyDown}
           className={switchVariants({ checked: isChecked, size })}
         >
-          <span className={thumbVariants({ checked: isChecked, size })} />
+          <span className={thumbVariants({ checked: isClient ? isChecked : false, size })} />
         </div>
 
         {/* Label */}

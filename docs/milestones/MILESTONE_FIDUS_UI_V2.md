@@ -1,6 +1,8 @@
 # Milestone: @fidus/ui v2.0 - Production-Ready SSR & DX Improvements
 
 **Status:** 🟡 Planning
+**Start Date:** 2025-01-10
+**Target Date:** 2025-02-28 (7 weeks)
 **Owner:** Frontend Team
 **Related Issues:** [#57](https://github.com/y-core-engineering/fidus/issues/57), [#59](https://github.com/y-core-engineering/fidus/issues/59), [#60](https://github.com/y-core-engineering/fidus/issues/60), [#61](https://github.com/y-core-engineering/fidus/issues/61), [#62](https://github.com/y-core-engineering/fidus/issues/62), [#63](https://github.com/y-core-engineering/fidus/issues/63)
 
@@ -8,7 +10,7 @@
 
 ## Executive Summary
 
-This milestone delivers **production-ready Next.js 14 App Router compatibility** for @fidus/ui by fixing a critical SSR bug ([#57](https://github.com/y-core-engineering/fidus/issues/57)) and implementing essential features for modern React applications. The work is organized into three phases: **Critical Bug Fix**, **High Priority Features**, and **Medium Priority Enhancements**.
+This milestone delivers **production-ready Next.js 14 App Router compatibility** for @fidus/ui by fixing a critical SSR bug ([#57](https://github.com/y-core-engineering/fidus/issues/57)) and implementing essential features for modern React applications. The work is organized into three phases: **Critical Bug Fix** (Week 1), **High Priority Features** (Weeks 2-3), and **Medium Priority Enhancements** (Weeks 4-7).
 
 **Why this matters:**
 - **Blocks production deployment** - Users cannot use @fidus/ui in Next.js 14 App Router without `'use client'` workaround
@@ -48,13 +50,15 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 
 ## Work Breakdown Structure (WBS)
 
-### Phase 1: Critical Bug Fix 🔴
+### Phase 1: Critical Bug Fix 🔴 (Week 1)
 
 **Goal:** Resolve SSR `useContext` error ([#57](https://github.com/y-core-engineering/fidus/issues/57)) to unblock production
 
 #### 1.1 Root Cause Analysis
 
 ##### Task 1.1.1: Reproduce Bug in Isolated Test Setup
+- **Complexity:** S (Small)
+- **Effort:** 2 Story Points (~4 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** None
 - **Blocks:** 1.1.2
@@ -74,6 +78,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 1.1.2: Identify Faulty Context Hooks
+- **Complexity:** M (Medium)
+- **Effort:** 3 Story Points (~6 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 1.1.1
 - **Blocks:** 1.2.1
@@ -98,6 +104,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 #### 1.2 SSR Compatibility Fix
 
 ##### Task 1.2.1: Implement SSR-Safe Context Hooks
+- **Complexity:** L (Large)
+- **Effort:** 8 Story Points (~16 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 1.1.2
 - **Blocks:** 1.2.2, 2.1.1
@@ -139,6 +147,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 1.2.2: Add SSR Tests to CI/CD
+- **Complexity:** M (Medium)
+- **Effort:** 3 Story Points (~6 hours)
 - **Owner:** DevOps / Frontend Developer
 - **Dependencies:** Blocked by 1.2.1
 - **Blocks:** None
@@ -167,13 +177,15 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 
 ---
 
-### Phase 2: High Priority Features 🔴
+### Phase 2: High Priority Features 🔴 (Weeks 2-3)
 
 **Goal:** Full SSR support + comprehensive documentation ([#59](https://github.com/y-core-engineering/fidus/issues/59), [#60](https://github.com/y-core-engineering/fidus/issues/60))
 
 #### 2.1 SSR/SSG Support & Provider Documentation
 
 ##### Task 2.1.1: Document Provider Requirements
+- **Complexity:** S (Small)
+- **Effort:** 2 Story Points (~4 hours)
 - **Owner:** Tech Writer / Frontend Developer
 - **Dependencies:** Blocked by 1.2.1
 - **Blocks:** 2.1.2
@@ -197,6 +209,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 2.1.2: Create Interactive Setup Examples
+- **Complexity:** M (Medium)
+- **Effort:** 5 Story Points (~10 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 2.1.1
 - **Blocks:** 2.2.1
@@ -222,6 +236,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 2.1.3: Improve Error Messages
+- **Complexity:** S (Small)
+- **Effort:** 3 Story Points (~6 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 2.1.1
 - **Blocks:** None
@@ -255,6 +271,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 #### 2.2 SSR Test Coverage
 
 ##### Task 2.2.1: Add SSR Tests for All Components
+- **Complexity:** L (Large)
+- **Effort:** 8 Story Points (~16 hours)
 - **Owner:** Frontend Developer / QA Engineer
 - **Dependencies:** Blocked by 2.1.2
 - **Blocks:** None
@@ -276,13 +294,15 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 
 ---
 
-### Phase 3: Medium Priority Enhancements 🟡
+### Phase 3: Medium Priority Enhancements 🟡 (Weeks 4-7)
 
 **Goal:** Performance, accessibility, and developer experience improvements
 
 #### 3.1 Tree-Shaking Support ([#61](https://github.com/y-core-engineering/fidus/issues/61))
 
 ##### Task 3.1.1: Configure Subpath Exports
+- **Complexity:** M (Medium)
+- **Effort:** 5 Story Points (~10 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** None
 - **Blocks:** 3.1.2
@@ -319,6 +339,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 3.1.2: Verify Tree-Shaking with Bundle Analyzer
+- **Complexity:** S (Small)
+- **Effort:** 2 Story Points (~4 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 3.1.1
 - **Blocks:** 3.1.3
@@ -341,6 +363,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 3.1.3: Document Tree-Shaking Best Practices
+- **Complexity:** S (Small)
+- **Effort:** 2 Story Points (~4 hours)
 - **Owner:** Tech Writer
 - **Dependencies:** Blocked by 3.1.2
 - **Blocks:** None
@@ -361,6 +385,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 #### 3.2 Accessibility Compliance ([#62](https://github.com/y-core-engineering/fidus/issues/62))
 
 ##### Task 3.2.1: Accessibility Audit with axe DevTools
+- **Complexity:** M (Medium)
+- **Effort:** 5 Story Points (~10 hours)
 - **Owner:** Frontend Developer / Accessibility Specialist
 - **Dependencies:** None
 - **Blocks:** 3.2.2
@@ -380,6 +406,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 3.2.2: Implement Accessibility Fixes
+- **Complexity:** L (Large)
+- **Effort:** 13 Story Points (~26 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 3.2.1
 - **Blocks:** 3.2.3
@@ -405,6 +433,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 3.2.3: Add Accessibility Tests to CI/CD
+- **Complexity:** M (Medium)
+- **Effort:** 3 Story Points (~6 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 3.2.2
 - **Blocks:** None
@@ -434,6 +464,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 #### 3.3 Form Validation Integration ([#63](https://github.com/y-core-engineering/fidus/issues/63))
 
 ##### Task 3.3.1: Add `forwardRef` to Form Components
+- **Complexity:** M (Medium)
+- **Effort:** 5 Story Points (~10 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** None
 - **Blocks:** 3.3.2
@@ -467,6 +499,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 3.3.2: Document React Hook Form Integration
+- **Complexity:** S (Small)
+- **Effort:** 3 Story Points (~6 hours)
 - **Owner:** Tech Writer
 - **Dependencies:** Blocked by 3.3.1
 - **Blocks:** 3.3.3
@@ -487,6 +521,8 @@ This milestone delivers **production-ready Next.js 14 App Router compatibility**
 ---
 
 ##### Task 3.3.3: Create Storybook Form Examples
+- **Complexity:** M (Medium)
+- **Effort:** 5 Story Points (~10 hours)
 - **Owner:** Frontend Developer
 - **Dependencies:** Blocked by 3.3.2
 - **Blocks:** None
@@ -600,7 +636,7 @@ graph TB
 
 ## Release Plan
 
-### v2.0.0-alpha.1 (Phase 1 Complete)
+### v2.0.0-alpha.1 (End of Week 1 - Phase 1 Complete)
 **Focus:** SSR bug fix ([#57](https://github.com/y-core-engineering/fidus/issues/57))
 
 **Changes:**
@@ -640,7 +676,7 @@ function App() {
 
 ---
 
-### v2.0.0-beta.1 (Phase 2 Complete)
+### v2.0.0-beta.1 (End of Week 3 - Phase 2 Complete)
 **Focus:** Full SSR support + documentation ([#59](https://github.com/y-core-engineering/fidus/issues/59), [#60](https://github.com/y-core-engineering/fidus/issues/60))
 
 **Changes:**
@@ -664,7 +700,7 @@ function App() {
 
 ---
 
-### v2.0.0 (Phase 3 Complete)
+### v2.0.0 (End of Week 7 - Phase 3 Complete)
 **Focus:** Performance, accessibility, forms ([#61](https://github.com/y-core-engineering/fidus/issues/61), [#62](https://github.com/y-core-engineering/fidus/issues/62), [#63](https://github.com/y-core-engineering/fidus/issues/63))
 
 **Changes:**
@@ -701,7 +737,7 @@ function App() {
 - **External:** @fidus/ui users (via GitHub Releases, npm, Discord)
 
 ### Status Updates
-- **Regular Updates:** Update this document with task progress (✅ Done, 🚧 In Progress, ⏸️ Blocked)
+- **Weekly:** Update this document with task progress (✅ Done, 🚧 In Progress, ⏸️ Blocked)
 - **Phase Milestones:** GitHub Release with changelog, migration guide
 - **Blockers:** Immediate notification to team lead
 
@@ -714,6 +750,8 @@ This issue is part of **Milestone: @fidus/ui v2.0** ([WBS](https://github.com/y-
 
 **Phase:** [Phase 1/2/3]
 **WBS Tasks:** [Task IDs]
+**Estimated Effort:** [X] Story Points
+**Timeline:** Week [X]
 
 See full breakdown in [MILESTONE_FIDUS_UI_V2.md](https://github.com/y-core-engineering/fidus/blob/main/docs/milestones/MILESTONE_FIDUS_UI_V2.md)
 ```
@@ -721,6 +759,20 @@ See full breakdown in [MILESTONE_FIDUS_UI_V2.md](https://github.com/y-core-engin
 ---
 
 ## Appendix
+
+### Story Point Reference
+- **XS (1 SP):** ~2 hours - Simple fix, docs update
+- **S (2-3 SP):** ~4-6 hours - Single component change, basic feature
+- **M (5 SP):** ~10 hours - Multiple components, moderate complexity
+- **L (8 SP):** ~16 hours - Complex feature, multiple files
+- **XL (13 SP):** ~26 hours - Major refactor, architectural change
+
+### Team Capacity (Example)
+- **2 Frontend Developers** × 5 days/week × 6 hours/day = 60 hours/week
+- **1 Tech Writer** × 3 days/week × 6 hours/day = 18 hours/week
+- **1 QA Engineer** (part-time) × 2 days/week × 6 hours/day = 12 hours/week
+
+**Total:** ~90 hours/week (~45 Story Points/week)
 
 ### References
 - **Bug Report:** [bug-reports/GITHUB_ISSUE_BUG_SSR.md](../../bug-reports/GITHUB_ISSUE_BUG_SSR.md)
@@ -734,3 +786,4 @@ See full breakdown in [MILESTONE_FIDUS_UI_V2.md](https://github.com/y-core-engin
 
 **Document Version:** 1.0
 **Last Updated:** 2025-01-10
+**Next Review:** 2025-01-17 (End of Phase 1)

@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
@@ -110,6 +108,13 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
     },
     ref
   ) => {
+    // SSR-safe: Track client-side hydration
+    const [isClient, setIsClient] = React.useState(false);
+
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
+
     const pageNumbers = getPageNumbers(currentPage, totalPages);
 
     const handlePageChange = (page: number) => {
@@ -134,77 +139,81 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
         data-testid="pagination"
         {...props}
       >
-        <div className={cn(paginationVariants({ size }))}>
-          {showFirstLast && (
+        {/* SSR-safe: Only show interactive pagination controls after client hydration */}
+        {isClient && (
+          <div className={cn(paginationVariants({ size }))}>
+            {showFirstLast && (
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className={cn(pageButtonVariants({ variant, size }))}
+                aria-label="Go to first page"
+                data-testid="pagination-first"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
+            )}
+
             <button
-              onClick={() => handlePageChange(1)}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               className={cn(pageButtonVariants({ variant, size }))}
-              aria-label="Go to first page"
-              data-testid="pagination-first"
+              aria-label="Go to previous page"
+              data-testid="pagination-previous"
             >
-              <ChevronsLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          )}
 
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={cn(pageButtonVariants({ variant, size }))}
-            aria-label="Go to previous page"
-            data-testid="pagination-previous"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+            {pageNumbers.map((pageNumber, index) =>
+              pageNumber === 'ellipsis' ? (
+                <span
+                  key={`ellipsis-${index}`}
+                  className={cn(pageButtonVariants({ variant, size }), 'cursor-default')}
+                  data-testid={`pagination-ellipsis-${index}`}
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </span>
+              ) : (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePageChange(pageNumber)}
+                  disabled={pageNumber === currentPage}
+                  className={cn(pageButtonVariants({ variant, size, active: pageNumber === currentPage }))}
+                  aria-label={`Go to page ${pageNumber}`}
+                  aria-current={pageNumber === currentPage ? 'page' : undefined}
+                  data-testid={`pagination-page-${pageNumber}`}
+                >
+                  {pageNumber}
+                </button>
+              )
+            )}
 
-          {pageNumbers.map((pageNumber, index) =>
-            pageNumber === 'ellipsis' ? (
-              <span
-                key={`ellipsis-${index}`}
-                className={cn(pageButtonVariants({ variant, size }), 'cursor-default')}
-                data-testid={`pagination-ellipsis-${index}`}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </span>
-            ) : (
-              <button
-                key={pageNumber}
-                onClick={() => handlePageChange(pageNumber)}
-                disabled={pageNumber === currentPage}
-                className={cn(pageButtonVariants({ variant, size, active: pageNumber === currentPage }))}
-                aria-label={`Go to page ${pageNumber}`}
-                aria-current={pageNumber === currentPage ? 'page' : undefined}
-                data-testid={`pagination-page-${pageNumber}`}
-              >
-                {pageNumber}
-              </button>
-            )
-          )}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={cn(pageButtonVariants({ variant, size }))}
-            aria-label="Go to next page"
-            data-testid="pagination-next"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          {showFirstLast && (
             <button
-              onClick={() => handlePageChange(totalPages)}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               className={cn(pageButtonVariants({ variant, size }))}
-              aria-label="Go to last page"
-              data-testid="pagination-last"
+              aria-label="Go to next page"
+              data-testid="pagination-next"
             >
-              <ChevronsRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
             </button>
-          )}
-        </div>
 
-        {pageSize && onPageSizeChange && (
+            {showFirstLast && (
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className={cn(pageButtonVariants({ variant, size }))}
+                aria-label="Go to last page"
+                data-testid="pagination-last"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* SSR-safe: Only show page size selector after client hydration */}
+        {isClient && pageSize && onPageSizeChange && (
           <div className="flex items-center gap-2" data-testid="pagination-page-size">
             <label htmlFor="page-size" className="text-sm text-muted-foreground">
               Items per page:

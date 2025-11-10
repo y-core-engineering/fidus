@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
@@ -54,7 +52,15 @@ export const DetailCard = React.forwardRef<HTMLDivElement, DetailCardProps>(
       ...rest
     } = props;
 
+    // SSR-safe: Start with expanded/collapsed state
     const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
+    // Track if component is hydrated (client-side only)
+    const [isClient, setIsClient] = React.useState(false);
+
+    // Set isClient to true after hydration
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
 
     const toggleExpanded = () => {
       if (collapsible) {
@@ -87,7 +93,8 @@ export const DetailCard = React.forwardRef<HTMLDivElement, DetailCardProps>(
             )}
           </div>
           {header && <div className="flex-shrink-0 mr-2">{header}</div>}
-          {collapsible && (
+          {/* Only show chevron icons after client hydration to avoid hydration mismatches */}
+          {collapsible && isClient && (
             <div className="flex-shrink-0">
               {isExpanded ? (
                 <ChevronUp className="h-4 w-4 text-muted-foreground" />
