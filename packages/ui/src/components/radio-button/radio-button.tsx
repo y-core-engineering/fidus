@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { z } from 'zod';
@@ -57,6 +55,13 @@ export const RadioButton = React.forwardRef<
     ...rest
   } = props;
 
+  // SSR-safe: Track client-side hydration
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Combine refs
@@ -107,8 +112,8 @@ export const RadioButton = React.forwardRef<
         onKeyDown={handleKeyDown}
         className={radioVariants({ state })}
       >
-        {/* Inner Circle */}
-        {checked && (
+        {/* SSR-safe: Only show inner circle after client hydration */}
+        {isClient && checked && (
           <div className="h-2.5 w-2.5 rounded-full bg-primary"></div>
         )}
       </div>

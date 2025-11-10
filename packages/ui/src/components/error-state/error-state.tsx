@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { z } from 'zod';
 import { Button } from '../button';
@@ -74,7 +72,13 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
     },
     ref
   ) => {
+    // SSR-safe: Track client-side hydration
+    const [isClient, setIsClient] = React.useState(false);
     const [showTechnicalDetails, setShowTechnicalDetails] = React.useState(false);
+
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
 
     const hasTechnicalInfo = errorCode || errorId || timestamp || technicalDetails;
 
@@ -119,7 +123,8 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           )}
 
           {/* Action Buttons */}
-          {(onRetry || onSecondaryAction) && (
+          {/* SSR-safe: Only show interactive buttons after client hydration */}
+          {isClient && (onRetry || onSecondaryAction) && (
             <Stack direction="horizontal" spacing="sm">
               {onRetry && (
                 <Button
@@ -147,7 +152,8 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           )}
 
           {/* Technical Details (expandable) */}
-          {hasTechnicalInfo && (
+          {/* SSR-safe: Only show expandable technical details after client hydration */}
+          {isClient && hasTechnicalInfo && (
             <div className="border-t border-border pt-md mt-md">
               <button
                 onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}

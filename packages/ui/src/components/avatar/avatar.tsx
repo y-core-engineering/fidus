@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
@@ -53,7 +51,13 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       ...rest
     } = props;
 
+    // SSR-safe: Track client-side hydration and image errors
+    const [isClient, setIsClient] = React.useState(false);
     const [imageError, setImageError] = React.useState(false);
+
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
 
     const getInitials = (name?: string) => {
       if (!name) return null;
@@ -73,7 +77,8 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         className={cn(avatarVariants({ size, shape, className }))}
         {...rest}
       >
-        {showImage ? (
+        {/* SSR-safe: Show fallback immediately, image after client hydration */}
+        {isClient && showImage ? (
           <img
             src={src}
             alt={alt || 'Avatar'}

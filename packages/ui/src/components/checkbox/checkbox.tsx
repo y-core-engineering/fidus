@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { z } from 'zod';
@@ -64,9 +62,15 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       ...rest
     } = props;
 
+    // SSR-safe: Track client-side hydration
+    const [isClient, setIsClient] = React.useState(false);
     const [internalChecked, setInternalChecked] = React.useState(
       defaultChecked || false
     );
+
+    React.useEffect(() => {
+      setIsClient(true);
+    }, []);
 
     const isChecked = checked !== undefined ? checked : internalChecked;
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -149,13 +153,18 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             onKeyDown={handleKeyDown}
             className={checkboxVariants({ state })}
           >
-            {/* Checkmark */}
-            {isChecked && !indeterminate && (
-              <Check className="h-4 w-4" strokeWidth={3} />
-            )}
+            {/* SSR-safe: Only show icons after client hydration */}
+            {isClient && (
+              <>
+                {/* Checkmark */}
+                {isChecked && !indeterminate && (
+                  <Check className="h-4 w-4" strokeWidth={3} />
+                )}
 
-            {/* Indeterminate Mark */}
-            {indeterminate && <Minus className="h-4 w-4" strokeWidth={3} />}
+                {/* Indeterminate Mark */}
+                {indeterminate && <Minus className="h-4 w-4" strokeWidth={3} />}
+              </>
+            )}
           </div>
 
           {/* Label */}

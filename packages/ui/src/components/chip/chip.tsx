@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
@@ -51,6 +49,14 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>((props, ref) => 
     ...rest
   } = props;
 
+  // Track if component is hydrated (client-side only)
+  const [isClient, setIsClient] = React.useState(false);
+
+  // Set isClient to true after hydration
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDismiss?.();
@@ -63,7 +69,8 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>((props, ref) => 
       {...rest}
     >
       <span>{children}</span>
-      {dismissible && (
+      {/* Only show dismiss button after client hydration to avoid hydration mismatches */}
+      {dismissible && isClient && (
         <button
           type="button"
           onClick={handleDismiss}
