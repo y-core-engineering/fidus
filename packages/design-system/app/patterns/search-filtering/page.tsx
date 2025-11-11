@@ -1,6 +1,11 @@
 'use client';
 
-import { TextInput, Button, Badge, Chip, Link, Stack } from '@fidus/ui';
+import { TextInput } from '@fidus/ui/text-input';
+import { Button } from '@fidus/ui/button';
+import { Badge } from '@fidus/ui/badge';
+import { Chip } from '@fidus/ui/chip';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

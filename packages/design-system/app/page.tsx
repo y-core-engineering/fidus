@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';;
 import Link from 'next/link';
 import { Code, Palette, Book, ArrowRight, Sparkles, Shield, Network, Zap } from 'lucide-react';
 

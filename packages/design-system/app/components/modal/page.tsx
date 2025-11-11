@@ -1,18 +1,9 @@
 'use client';
 
-import {
-  Modal,
-  ModalRoot,
-  ModalContent,
-  ModalHeader,
-  ModalTitle,
-  ModalDescription,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Link,
-  Stack,
-} from '@fidus/ui';
+import { Modal, ModalRoot, ModalContent, ModalHeader, ModalTitle, ModalDescription, ModalBody, ModalFooter } from '@fidus/ui/modal';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';

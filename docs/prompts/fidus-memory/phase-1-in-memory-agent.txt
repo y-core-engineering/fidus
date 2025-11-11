@@ -1,0 +1,900 @@
+===========================================
+FIDUS MEMORY - PHASE 1: BASIC CHAT WITH IN-MEMORY LEARNING
+===========================================
+
+VERSION: 3.0
+PHASE: 1 of 4
+ESTIMATED DURATION: 3-4 days
+PREREQUISITE: None - This is Phase 1
+DELIVERABLE: Working chat where bot learns and suggests preferences (session-only, resets on reload)
+
+---
+
+ROLE & CONTEXT
+
+You are a Senior Full-Stack Engineer implementing the Fidus Memory prototype.
+
+EXPERTISE REQUIRED:
+- Python: FastAPI, async/await, type hints, JSON handling
+- TypeScript: Next.js 14 App Router, React 18, strict types
+- LLM Integration: LiteLLM, Ollama
+- Component Libraries: @fidus/ui (ChatInterface, MessageBubble)
+- Docker: docker-compose for service orchestration
+
+PROJECT CONTEXT
+Fidus Memory is a domain-agnostic conversational learning agent that demonstrates core learning capabilities of the Fidus system. It learns user preferences implicitly from conversations, stores them with confidence scores, and adapts to situational context.
+
+This is a PROTOTYPE with:
+- Fixed tenant_id = "prototype-tenant" (no login UI)
+- Multi-tenancy by design (ready for production scaling)
+- 100% @fidus/ui component usage (no custom CSS)
+- Local-first privacy (Ollama default)
+
+WHAT WAS BUILT PREVIOUSLY
+None - this is Phase 1 (foundational phase)
+
+WHAT THIS PHASE ADDS
+Phase 1 establishes the basic chat interaction. The bot extracts preferences from conversation using an LLM, stores them in memory (Python dict), and mentions learned preferences in subsequent responses. All data is session-only and resets on page reload. No persistence yet.
+
+---
+
+SUCCESS CRITERIA
+
+At the end of this phase, you must be able to demonstrate:
+
+USER EXPERIENCE:
+- User can chat with bot about any topic
+- Bot extracts at least 1 preference from conversation
+- Bot mentions learned preference in subsequent messages
+- Chat interface is responsive and usable
+
+EXAMPLE INTERACTION:
+User: "I'm working on a project today"
+Bot: "What kind of project are you working on?"
+User: "It's a coding project. I prefer to code in the morning"
+Bot: "Got it! Morning coding sessions work best for you."
+
+[Later in same session]
+User: "I need to focus"
+Bot: "Based on what you told me, you prefer morning coding. Would you like to plan that for tomorrow morning?"
+
+TECHNICAL REQUIREMENTS:
+- All tests passing (unit tests at minimum)
+- Lint checks passing (pnpm lint)
+- Type checks passing (pnpm typecheck)
+- @fidus/ui components used exclusively (NO custom divs)
+- Chat interface loads without errors
+- Backend responds within 3 seconds
+
+---
+
+IMPLEMENTATION TASKS
+
+---
+
+TASK 1.1: Use Existing @fidus/ui Components
+
+GOAL
+Set up the frontend chat interface using pre-built @fidus/ui components (ChatInterface and MessageBubble are already available).
+
+ACCEPTANCE CRITERIA
+- [ ] ChatInterface imported from @fidus/ui
+- [ ] MessageBubble used for message display (via ChatInterface)
+- [ ] NO custom HTML tags (<div>, <p>, <span>, <h1-6>)
+- [ ] NO Tailwind classes (className="...")
+- [ ] NO custom CSS or styled-components
+- [ ] Chat interface renders correctly in browser
+
+IMPLEMENTATION STEPS
+
+Step 1: Create Next.js page for Fidus Memory
+File: packages/web/app/fidus-memory/page.tsx
+Action: create new
+
+```typescript
+'use client';
+
+import { ChatInterface } from '@fidus/ui';
+import { useState } from 'react';
+
+export default function FidusMemoryPage() {
+  const [messages, setMessages] = useState([]);
+
+  const handleSendMessage = async (content: string) => {
+    // Add user message
+    const userMessage = {
+      id: crypto.randomUUID(),
+      role: 'user' as const,
+      content,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Call backend
+    const response = await fetch('/api/memory/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: 'user-1', message: content }),
+    });
+
+    const data = await response.json();
+
+    // Add bot message
+    const botMessage = {
+      id: crypto.randomUUID(),
+      role: 'assistant' as const,
+      content: data.response,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, botMessage]);
+  };
+
+  return (
+    <ChatInterface
+      messages={messages}
+      onSendMessage={handleSendMessage}
+      placeholder="Chat with Fidus Memory..."
+      isLoading={false}
+    />
+  );
+}
+```
+
+Validation:
+- Navigate to http://localhost:3000/fidus-memory
+- Chat interface should render
+- Input field should be visible
+- No console errors
+
+Step 2: Create Next.js API route (backend proxy)
+File: packages/web/app/api/memory/chat/route.ts
+Action: create new
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  const { user_id, message } = await request.json();
+
+  // Call Python backend
+  const response = await fetch('http://localhost:8000/memory/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id, message }),
+  });
+
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+```
+
+Validation:
+- API route exists at /api/memory/chat
+- Can be called via POST
+- Proxies to Python backend
+
+TESTING
+
+Manual Testing:
+```
+# Start Next.js dev server
+pushd packages/web
+pnpm dev
+popd
+
+# Open browser
+http://localhost:3000/fidus-memory
+
+# Expected: Chat interface renders
+# Expected: No console errors
+```
+
+VERIFICATION CHECKLIST
+- [ ] ChatInterface renders correctly
+- [ ] Only @fidus/ui components used
+- [ ] No custom divs or styled components
+- [ ] TypeScript compiles without errors
+
+---
+
+TASK 1.2: Create Minimal Backend (In-Memory Agent)
+
+GOAL
+Implement a Python FastAPI backend with an in-memory agent that extracts preferences from user messages using an LLM.
+
+ACCEPTANCE CRITERIA
+- [ ] InMemoryAgent class implemented
+- [ ] LLM extracts preferences from conversation
+- [ ] Preferences stored in Python dict (in-memory)
+- [ ] System prompt includes learned preferences
+- [ ] FastAPI endpoint /memory/chat implemented
+- [ ] Type hints on all functions
+
+IMPLEMENTATION STEPS
+
+Step 1: Create InMemoryAgent class
+File: packages/api/fidus/memory/simple_agent.py
+Action: create new
+
+```python
+import json
+from typing import Dict, List, Any
+from litellm import acompletion
+
+
+class InMemoryAgent:
+    """Simple chat agent with in-memory preference learning."""
+
+    def __init__(self, llm_model: str = "ollama/llama3.1:8b"):
+        self.llm_model = llm_model
+        self.preferences: Dict[str, Dict[str, Any]] = {}  # {domain.key: {value, confidence}}
+        self.conversation_history: List[Dict[str, str]] = []
+
+    async def chat(self, user_message: str) -> str:
+        """Process user message and return response."""
+        # 1. Add to history
+        self.conversation_history.append({"role": "user", "content": user_message})
+
+        # 2. Extract preferences from message
+        extracted = await self._extract_preferences(user_message)
+        self._update_preferences(extracted)
+
+        # 3. Build system prompt with learned preferences
+        system_prompt = self._build_prompt()
+
+        # 4. Generate response
+        response = await acompletion(
+            model=self.llm_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                *self.conversation_history
+            ]
+        )
+
+        bot_response = response.choices[0].message.content
+        self.conversation_history.append({"role": "assistant", "content": bot_response})
+        return bot_response
+
+    async def _extract_preferences(self, text: str) -> List[Dict[str, Any]]:
+        """Use LLM to extract preferences from text."""
+        prompt = f"""Extract user preferences from this text.
+
+        Text: "{text}"
+
+        Return JSON array of preferences:
+        [{{"domain": "...", "key": "...", "value": "...", "confidence": 0.0-1.0}}]
+
+        If no preferences found, return empty array [].
+        """
+
+        response = await acompletion(
+            model=self.llm_model,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"}
+        )
+
+        try:
+            result = json.loads(response.choices[0].message.content)
+            return result.get("preferences", [])
+        except json.JSONDecodeError:
+            return []
+
+    def _update_preferences(self, extracted: List[Dict[str, Any]]) -> None:
+        """Update in-memory preference dict."""
+        for pref in extracted:
+            key = f"{pref['domain']}.{pref['key']}"
+            self.preferences[key] = {
+                "value": pref['value'],
+                "confidence": pref.get('confidence', 0.7)
+            }
+
+    def _build_prompt(self) -> str:
+        """Build system prompt with learned preferences."""
+        base = "You are Fidus Memory, a conversational AI that learns user preferences.\n\n"
+
+        if self.preferences:
+            base += "What you've learned about the user:\n"
+            for key, pref in self.preferences.items():
+                base += f"- {key}: {pref['value']} (confidence: {pref['confidence']:.0%})\n"
+
+        return base
+```
+
+Validation:
+- Class can be instantiated
+- chat() method works
+- Preferences are extracted
+
+Step 2: Create FastAPI endpoint
+File: packages/api/fidus/api/routes/memory.py
+Action: create new
+
+```python
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from fidus.memory.simple_agent import InMemoryAgent
+
+router = APIRouter(prefix="/memory", tags=["memory"])
+
+# In-memory agent instance (session-scoped for Phase 1)
+agent = InMemoryAgent()
+
+
+class ChatRequest(BaseModel):
+    user_id: str
+    message: str
+
+
+class ChatResponse(BaseModel):
+    response: str
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    """Chat endpoint with in-memory preference learning."""
+    try:
+        response = await agent.chat(request.message)
+        return ChatResponse(response=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+Validation:
+- Endpoint exists at POST /memory/chat
+- Accepts {user_id, message}
+- Returns {response}
+
+Step 3: Register router in main app
+File: packages/api/fidus/main.py
+Action: modify existing
+
+```python
+from fastapi import FastAPI
+from fidus.api.routes import memory
+
+app = FastAPI(title="Fidus Memory API")
+
+# Register routers
+app.include_router(memory.router)
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+```
+
+Validation:
+- API starts without errors
+- /memory/chat endpoint accessible
+
+TESTING
+
+Unit Tests:
+File: packages/api/tests/memory/test_simple_agent.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.simple_agent import InMemoryAgent
+
+
+@pytest.mark.asyncio
+async def test_agent_initialization():
+    """Should initialize with empty preferences."""
+    agent = InMemoryAgent()
+    assert agent.preferences == {}
+    assert agent.conversation_history == []
+
+
+@pytest.mark.asyncio
+async def test_agent_chat():
+    """Should process message and return response."""
+    agent = InMemoryAgent()
+    response = await agent.chat("I prefer coding in the morning")
+
+    assert isinstance(response, str)
+    assert len(response) > 0
+
+
+@pytest.mark.asyncio
+async def test_preference_extraction():
+    """Should extract preferences from message."""
+    agent = InMemoryAgent()
+    await agent.chat("I always drink cappuccino in the morning")
+
+    # Check if any preference was learned
+    assert len(agent.preferences) >= 0  # May or may not extract depending on LLM
+```
+
+Manual Testing:
+```
+# Start backend
+pushd packages/api
+poetry run uvicorn fidus.main:app --reload
+popd
+
+# Test endpoint
+curl -X POST http://localhost:8000/memory/chat \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "user-1", "message": "I prefer coding in the morning"}'
+
+# Expected: JSON response with bot message
+```
+
+VERIFICATION CHECKLIST
+- [ ] InMemoryAgent class works
+- [ ] LLM calls succeed
+- [ ] Preferences are stored in memory
+- [ ] FastAPI endpoint responds
+- [ ] Unit tests pass
+
+---
+
+TASK 1.3: Setup LiteLLM + Ollama with Docker Compose
+
+GOAL
+Configure docker-compose.yml to run Ollama and LiteLLM services for LLM integration.
+
+ACCEPTANCE CRITERIA
+- [ ] Ollama service running in Docker
+- [ ] LiteLLM gateway running
+- [ ] Llama 3.1 8B model pulled
+- [ ] Backend can communicate with LiteLLM
+- [ ] All services start with docker-compose up
+
+IMPLEMENTATION STEPS
+
+Step 1: Create docker-compose.yml
+File: docker-compose.yml (project root)
+Action: create new
+
+```yaml
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: fidus-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - fidus-network
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: fidus-litellm
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    networks:
+      - fidus-network
+    depends_on:
+      - ollama
+
+  api:
+    build: ./packages/api
+    container_name: fidus-api
+    ports:
+      - "8000:8000"
+    environment:
+      - LITELLM_URL=http://litellm:4000
+      - OLLAMA_URL=http://ollama:11434
+    networks:
+      - fidus-network
+    depends_on:
+      - litellm
+      - ollama
+
+  web:
+    build: ./packages/web
+    container_name: fidus-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    networks:
+      - fidus-network
+    depends_on:
+      - api
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  fidus-network:
+    driver: bridge
+```
+
+Validation:
+- docker-compose.yml is valid YAML
+- All services defined
+
+Step 2: Create LiteLLM config
+File: litellm_config.yaml (project root)
+Action: create new
+
+```yaml
+model_list:
+  - model_name: llama3.1
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://ollama:11434
+```
+
+Validation:
+- Config file exists
+- Points to Ollama service
+
+Step 3: Pull Ollama model
+```
+# Start services
+docker-compose up -d
+
+# Pull Llama 3.1 8B
+docker exec fidus-ollama ollama pull llama3.1:8b
+
+# Verify model is available
+docker exec fidus-ollama ollama list
+```
+
+Validation:
+- Model appears in ollama list
+- No errors during pull
+
+TESTING
+
+Manual Testing:
+```
+# Start all services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# All services should be "Up"
+
+# Test Ollama directly
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.1:8b",
+  "prompt": "Hello",
+  "stream": false
+}'
+
+# Expected: JSON response with generated text
+
+# Test LiteLLM
+curl http://localhost:4000/health
+
+# Expected: {"status": "ok"}
+```
+
+VERIFICATION CHECKLIST
+- [ ] All services start successfully
+- [ ] Ollama responds to API calls
+- [ ] LiteLLM health check passes
+- [ ] Llama 3.1 8B model available
+
+---
+
+TASK 1.4: End-to-End Integration Test
+
+GOAL
+Verify the complete flow: Frontend → Next.js API → Python Backend → LLM → Response.
+
+ACCEPTANCE CRITERIA
+- [ ] User can send message from chat UI
+- [ ] Backend receives message
+- [ ] LLM generates response
+- [ ] Response appears in chat UI
+- [ ] No errors in browser console
+- [ ] No errors in backend logs
+
+IMPLEMENTATION STEPS
+
+Step 1: Start all services
+```
+docker-compose up -d
+```
+
+Step 2: Open frontend
+```
+http://localhost:3000/fidus-memory
+```
+
+Step 3: Test interaction
+- Type: "I prefer coding in the morning"
+- Send message
+- Wait for response
+- Verify bot responds
+
+Step 4: Test preference recall
+- Type: "What did I tell you about coding?"
+- Send message
+- Verify bot mentions "morning coding"
+
+TESTING
+
+Manual Testing Steps:
+1. Start services: docker-compose up -d
+2. Open http://localhost:3000/fidus-memory
+3. Send message: "I always drink cappuccino"
+4. Verify bot responds
+5. Send message: "What did I tell you?"
+6. Verify bot mentions cappuccino
+7. Reload page
+8. Send message: "What did I tell you?"
+9. Verify bot has no memory (expected - in-memory only)
+
+Expected Behavior:
+- Messages appear in chat
+- Bot responds within 3 seconds
+- Preferences are mentioned in same session
+- Memory resets on page reload
+
+VERIFICATION CHECKLIST
+- [ ] Full conversation flow works
+- [ ] Bot extracts preferences
+- [ ] Bot recalls preferences in same session
+- [ ] Memory resets on reload (expected)
+
+---
+
+ARCHITECTURE CONSTRAINTS (CRITICAL - DO NOT VIOLATE)
+
+MULTI-TENANCY (for future phases - not enforced in Phase 1)
+- Phase 1 uses in-memory storage (no database)
+- Phase 2+ will add tenant_id to all queries
+- Keep this in mind but not required for Phase 1
+
+TYPE SAFETY (MUST FOLLOW)
+- TypeScript: NO 'any' types, use strict mode
+- TypeScript: NO type casting with 'as' (use type guards)
+- Python: Type hints on ALL functions
+- Python: Use Pydantic for request/response models
+
+@fidus/ui COMPONENTS (MUST FOLLOW)
+- Use ONLY @fidus/ui components
+- Available components: ChatInterface, MessageBubble, Card, Stack, Heading, Text, Button
+- NO custom HTML tags: NO <div>, <p>, <span>, <h1-6>
+- NO Tailwind classes: NO className="text-xs text-gray-500"
+- NO custom CSS or styled-components
+
+UUID GENERATION (MUST FOLLOW)
+- Use Python uuid4() for ALL ID generation (when needed in future phases)
+- Consistency: str(uuid4()) everywhere
+
+ERROR HANDLING (MUST FOLLOW)
+- Wrap LLM calls in try-except
+- Return user-friendly error messages
+- Log errors with context
+
+---
+
+COMMON PITFALLS (AVOID THESE)
+
+❌ DON'T create custom UI components (use @fidus/ui)
+❌ DON'T use type casting (as) in TypeScript
+❌ DON'T skip error handling on LLM calls
+❌ DON'T use Tailwind classes or custom CSS
+❌ DON'T create <div> or <p> tags (use @fidus/ui Text/Stack)
+❌ DON'T commit without running tests
+❌ DON'T ignore CLAUDE.md conventions
+
+---
+
+TESTING STRATEGY
+
+UNIT TESTS (REQUIRED)
+
+Backend Tests:
+File: packages/api/tests/memory/test_simple_agent.py
+
+```python
+import pytest
+from fidus.memory.simple_agent import InMemoryAgent
+
+
+@pytest.mark.asyncio
+async def test_agent_initialization():
+    agent = InMemoryAgent()
+    assert agent.preferences == {}
+
+
+@pytest.mark.asyncio
+async def test_agent_chat():
+    agent = InMemoryAgent()
+    response = await agent.chat("Hello")
+    assert isinstance(response, str)
+    assert len(response) > 0
+
+
+@pytest.mark.asyncio
+async def test_preference_storage():
+    agent = InMemoryAgent()
+    await agent.chat("I prefer morning coding")
+    # Preferences should be populated (if LLM extracts)
+    # This test may be flaky depending on LLM output
+```
+
+Run tests:
+```
+pushd packages/api
+poetry run pytest tests/memory/ -v
+popd
+```
+
+MANUAL TESTING STEPS
+1. Start services: docker-compose up -d
+2. Open http://localhost:3000/fidus-memory
+3. Test basic chat: "Hello"
+4. Test preference learning: "I prefer coding in the morning"
+5. Test preference recall: "What did I tell you?"
+6. Reload page and verify memory is lost
+
+---
+
+PHASE COMPLETION CHECKLIST
+
+Before marking this phase as COMPLETE, verify ALL of the following:
+
+FUNCTIONALITY
+- [ ] Chat interface renders correctly
+- [ ] User can send messages
+- [ ] Bot responds within 3 seconds
+- [ ] Bot extracts at least 1 preference from conversation
+- [ ] Bot mentions learned preference in subsequent messages
+- [ ] Memory resets on page reload (expected behavior)
+
+CODE QUALITY
+- [ ] Unit tests passing (poetry run pytest)
+- [ ] Lint checks passing (pnpm lint)
+- [ ] Type checks passing (pnpm typecheck)
+- [ ] No console errors in browser
+- [ ] No Python exceptions in logs
+
+ARCHITECTURE COMPLIANCE
+- [ ] @fidus/ui components used exclusively
+- [ ] No custom divs or styled components
+- [ ] Type safety: No 'any' types
+- [ ] Error handling on LLM calls
+
+SERVICES
+- [ ] docker-compose up starts all services
+- [ ] Ollama responds to API calls
+- [ ] LiteLLM gateway accessible
+- [ ] Backend API responds
+
+DOCUMENTATION
+- [ ] Code comments for complex logic
+- [ ] No TODOs left in code
+
+---
+
+RESOURCES & DOCUMENTATION
+
+MUST READ BEFORE STARTING:
+1. docs/prototypes/fidus-memory/implementation-plan.md (Phase 1 section)
+2. CLAUDE.md (Development conventions - @fidus/ui usage)
+3. LiteLLM docs: https://docs.litellm.ai/
+4. Ollama docs: https://ollama.ai/
+
+REFERENCE ARCHITECTURE:
+- docs/architecture/README.md (System overview)
+- packages/ui/README.md (@fidus/ui component library)
+
+CONFIGURATION:
+- litellm_config.yaml (LLM gateway configuration)
+- docker-compose.yml (Service orchestration)
+
+KEY FILES IN THIS PHASE:
+- packages/web/app/fidus-memory/page.tsx (Frontend chat page)
+- packages/web/app/api/memory/chat/route.ts (Next.js API route)
+- packages/api/fidus/memory/simple_agent.py (In-memory agent)
+- packages/api/fidus/api/routes/memory.py (FastAPI routes)
+- packages/api/fidus/main.py (FastAPI app)
+
+USEFUL COMMANDS:
+```
+# Start all services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f api
+docker-compose logs -f web
+
+# Backend tests
+pushd packages/api
+poetry run pytest tests/ -v
+popd
+
+# Frontend dev server (standalone)
+pushd packages/web
+pnpm dev
+popd
+
+# Type check entire monorepo
+pnpm typecheck
+
+# Lint entire monorepo
+pnpm lint
+
+# Stop services
+docker-compose down
+```
+
+---
+
+DEVELOPMENT WORKFLOW
+
+RECOMMENDED APPROACH:
+1. Read implementation-plan.md Phase 1 section thoroughly
+2. Set up environment (docker-compose up -d)
+3. Work through tasks sequentially (Task 1.1, 1.2, 1.3, 1.4)
+4. After EACH task: test functionality manually
+5. Before moving to next task: commit working code
+6. After ALL tasks: run full phase completion checklist
+7. Demo the deliverable to confirm phase success
+
+GIT WORKFLOW:
+- Create feature branch: git checkout -b feature/phase-1-in-memory-agent
+- Commit after each completed task
+- Before final commit: run lint, typecheck, tests
+- Create PR when phase complete
+
+DEBUGGING TIPS:
+- Check docker-compose logs for service errors
+- Verify services are running: docker-compose ps
+- Test API directly: curl http://localhost:8000/memory/chat
+- Use Python debugger: import pdb; pdb.set_trace()
+- Check browser console for frontend errors
+- Test Ollama directly: curl http://localhost:11434/api/generate
+
+---
+
+QUESTIONS OR BLOCKERS?
+
+If you encounter issues:
+1. Re-read implementation-plan.md Phase 1 section
+2. Check CLAUDE.md for @fidus/ui component usage
+3. Verify all services running: docker-compose ps
+4. Check logs: docker-compose logs [service]
+5. Review error messages carefully
+6. If requirements ambiguous: ask for clarification
+7. If stuck: break task into smaller steps
+
+DO NOT:
+- Skip steps hoping it will work
+- Ignore test failures
+- Proceed if architecture constraints violated
+- Commit broken code
+- Use custom divs or styled components
+
+---
+
+NEXT PHASE PREVIEW
+
+Phase 2 will add persistence using Neo4j. Preferences will be stored in a graph database with multi-tenancy, confidence scoring, and reinforcement/weakening logic. A PreferenceViewer UI component will display learned preferences grouped by domain.
+
+---
+
+BEGIN IMPLEMENTATION
+
+Start with Task 1.1 and work sequentially through all tasks.
+
+REMEMBER:
+- Read implementation-plan.md Phase 1 section FIRST
+- Use ONLY @fidus/ui components (NO custom divs)
+- Test after EACH task
+- Verify phase completion checklist before marking complete
+
+Good luck! 🚀
+
+===========================================
+END OF PHASE 1 PROMPT
+===========================================

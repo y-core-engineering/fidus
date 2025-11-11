@@ -3,7 +3,9 @@
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { CodeBlock } from '../../../components/helpers/code-block';
-import { Link, ProgressBar, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';
+import { ProgressBar } from '@fidus/ui/progress-bar';
+import {      Table , TableHeader , TableBody , TableRow , TableHead , TableCell } from '@fidus/ui/table';;
 import { useState, useEffect } from 'react';
 import { getAllTokens } from '../../../components/helpers/get-tokens';
 

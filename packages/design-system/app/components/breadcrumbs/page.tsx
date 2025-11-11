@@ -1,6 +1,8 @@
 'use client';
 
-import { Breadcrumbs, Link, Stack } from '@fidus/ui';
+import { Breadcrumbs } from '@fidus/ui/breadcrumbs';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Home, Folder, File } from 'lucide-react';

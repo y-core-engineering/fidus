@@ -1,6 +1,9 @@
 'use client';
 
-import { Tooltip, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent, Button, Stack, Link } from '@fidus/ui';
+import { Tooltip, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui/tooltip';
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';
+import { Link } from '@fidus/ui/link';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Info, HelpCircle, Settings, Save, Share } from 'lucide-react';

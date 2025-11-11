@@ -1,14 +1,9 @@
 'use client';
 
-import {
-  Sidebar,
-  SidebarRoot,
-  SidebarSection,
-  SidebarItem,
-  Button,
-  Link,
-  Stack,
-} from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
+import { Sidebar, SidebarRoot, SidebarSection, SidebarItem } from '@fidus/ui/sidebar';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';

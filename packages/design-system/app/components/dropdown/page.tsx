@@ -1,23 +1,9 @@
 'use client';
 
-import {
-  Dropdown,
-  DropdownRoot,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
-  DropdownSeparator,
-  DropdownLabel,
-  DropdownCheckboxItem,
-  DropdownRadioGroup,
-  DropdownRadioItem,
-  DropdownSub,
-  DropdownSubTrigger,
-  DropdownSubContent,
-  Button,
-  Link,
-  Stack,
-} from '@fidus/ui';
+import { Dropdown, DropdownRoot, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator, DropdownLabel, DropdownCheckboxItem, DropdownRadioGroup, DropdownRadioItem, DropdownSub, DropdownSubTrigger, DropdownSubContent } from '@fidus/ui/dropdown';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { User, Settings, LogOut, Bell, Mail, Save, Share, Download, ChevronRight } from 'lucide-react';

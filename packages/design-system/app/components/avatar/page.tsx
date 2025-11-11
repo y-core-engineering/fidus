@@ -1,6 +1,8 @@
 'use client';
 
-import { Avatar, Link, Stack } from '@fidus/ui';
+import { Avatar } from '@fidus/ui/avatar';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 

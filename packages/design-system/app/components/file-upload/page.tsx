@@ -1,6 +1,8 @@
 'use client';
 
-import { FileUpload, Link, Stack } from '@fidus/ui';
+import { FileUpload } from '@fidus/ui/file-upload';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';

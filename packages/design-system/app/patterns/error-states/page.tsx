@@ -1,6 +1,12 @@
 'use client';
 
-import { Alert, Banner, Modal, Toast, ToastProvider, ToastViewport, Button, Link, Stack } from '@fidus/ui';
+import { Alert } from '@fidus/ui/alert';
+import { Banner } from '@fidus/ui/banner';
+import { Modal } from '@fidus/ui/modal';
+import { Toast, ToastProvider, ToastViewport } from '@fidus/ui/toast';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

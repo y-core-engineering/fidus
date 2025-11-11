@@ -1,6 +1,8 @@
 'use client';
 
-import { Select, Link, Stack } from '@fidus/ui';
+import { Select } from '@fidus/ui/select';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { useState } from 'react';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';

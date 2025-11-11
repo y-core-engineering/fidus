@@ -1,6 +1,10 @@
 'use client';
 
-import { Alert, Button, ProgressBar, Link, Stack } from '@fidus/ui';
+import { Alert } from '@fidus/ui/alert';
+import { Button } from '@fidus/ui/button';
+import { ProgressBar } from '@fidus/ui/progress-bar';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { CheckCircle2 } from 'lucide-react';
 

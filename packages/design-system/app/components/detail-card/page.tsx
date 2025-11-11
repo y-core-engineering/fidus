@@ -1,6 +1,9 @@
 'use client';
 
-import { DetailCard, Badge, Stack, Link } from '@fidus/ui';
+import { DetailCard } from '@fidus/ui/detail-card';
+import { Badge } from '@fidus/ui/badge';
+import { Stack } from '@fidus/ui/stack';
+import { Link } from '@fidus/ui/link';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Calendar, CheckCircle } from 'lucide-react';

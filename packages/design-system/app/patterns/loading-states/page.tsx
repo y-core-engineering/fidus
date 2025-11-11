@@ -1,6 +1,10 @@
 'use client';
 
-import { ProgressBar, Button, Alert, Link, Stack } from '@fidus/ui';
+import { ProgressBar } from '@fidus/ui/progress-bar';
+import { Button } from '@fidus/ui/button';
+import { Alert } from '@fidus/ui/alert';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

@@ -1,6 +1,8 @@
 'use client';
 
-import { Button, Link, Stack } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { CodeBlock } from '../../../components/helpers/code-block';
 import { useState } from 'react';

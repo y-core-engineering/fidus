@@ -1,6 +1,14 @@
 'use client';
 
-import { Button, Link, Stack, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, OpportunityCard, DetailCard, ModalRoot, ModalContent, ModalHeader, ModalTitle, ModalBody, Spinner, Skeleton } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@fidus/ui/table';
+import { OpportunityCard } from '@fidus/ui/opportunity-card';
+import { DetailCard } from '@fidus/ui/detail-card';
+import { Spinner } from '@fidus/ui/spinner';
+import { ModalRoot, ModalContent, ModalHeader, ModalTitle, ModalBody } from '@fidus/ui/modal';
+import { Skeleton } from '@fidus/ui/skeleton';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { CodeBlock } from '../../../components/helpers/code-block';
 import { useState } from 'react';
@@ -472,7 +480,8 @@ const [showModal, setShowModal] = useState(false);
       <h3>Spinner</h3>
       <p>Used for short operations where exact progress cannot be tracked:</p>
       <div className="not-prose my-md">
-        <ComponentPreview code={`import { Spinner, Stack } from '@fidus/ui';
+        <ComponentPreview code={`import { Spinner } from '@fidus/ui/spinner';
+import { Stack } from '@fidus/ui/stack';;
 
 <Stack direction="horizontal" spacing="lg" align="center">
   <Spinner size="sm" />

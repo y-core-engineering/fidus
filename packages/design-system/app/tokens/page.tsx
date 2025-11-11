@@ -1,6 +1,9 @@
 'use client';
 
-import { Link, Stack, Button, ProgressBar } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
+import { Button } from '@fidus/ui/button';
+import { ProgressBar } from '@fidus/ui/progress-bar';;
 import { Palette, Type, Ruler, Box, Zap, Download, FileJson, FileCode } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TokenInspector } from '../../components/helpers/token-inspector';
@@ -297,7 +300,7 @@ export default function TokensOverviewPage() {
           <h3 className="text-lg font-semibold mb-md">In React Components</h3>
           <CodeBlock
             language="tsx"
-            code={`import { Button } from '@fidus/ui';
+            code={`import { Button } from '@fidus/ui/button';;
 
 function MyComponent() {
   return (

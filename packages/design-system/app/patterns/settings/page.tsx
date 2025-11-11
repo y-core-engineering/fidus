@@ -1,6 +1,14 @@
 'use client';
 
-import { TextInput, ToggleSwitch, Select, Button, Badge, Modal, Alert, Link, Stack } from '@fidus/ui';
+import { TextInput } from '@fidus/ui/text-input';
+import { ToggleSwitch } from '@fidus/ui/toggle-switch';
+import { Select } from '@fidus/ui/select';
+import { Button } from '@fidus/ui/button';
+import { Badge } from '@fidus/ui/badge';
+import { Modal } from '@fidus/ui/modal';
+import { Alert } from '@fidus/ui/alert';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

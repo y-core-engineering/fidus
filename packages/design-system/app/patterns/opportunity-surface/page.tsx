@@ -1,6 +1,11 @@
 'use client';
 
-import { OpportunityCard, Alert, Badge, Button, Link, Stack } from '@fidus/ui';
+import { OpportunityCard } from '@fidus/ui/opportunity-card';
+import { Alert } from '@fidus/ui/alert';
+import { Badge } from '@fidus/ui/badge';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

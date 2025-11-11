@@ -1,6 +1,9 @@
 'use client';
 
-import { OpportunityCard, Badge, Stack, Link } from '@fidus/ui';
+import { OpportunityCard } from '@fidus/ui/opportunity-card';
+import { Badge } from '@fidus/ui/badge';
+import { Stack } from '@fidus/ui/stack';
+import { Link } from '@fidus/ui/link';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { AlertCircle, DollarSign, Calendar, Plane } from 'lucide-react';

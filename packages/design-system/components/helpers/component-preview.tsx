@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Check, Code2 } from 'lucide-react';
-import { IconButton } from '@fidus/ui';
+import { IconButton } from '@fidus/ui/icon-button';;
 import { CodeBlock } from './code-block';
 
 interface ComponentPreviewProps {

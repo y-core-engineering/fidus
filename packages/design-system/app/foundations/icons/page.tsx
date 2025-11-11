@@ -23,7 +23,8 @@ import {
   Cloud,
   Link as LinkIcon,
 } from 'lucide-react';
-import { Link, Stack } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { CodeBlock } from '../../../components/helpers/code-block';
 
 export default function IconsPage() {
@@ -276,7 +277,8 @@ export default function IconsPage() {
         <CodeBlock
           language="tsx"
           code={`import { Calendar } from 'lucide-react';
-import { Button, Stack } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';;
 
 <Button>
   <Stack direction="horizontal" spacing="sm" align="center">
