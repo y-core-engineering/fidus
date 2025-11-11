@@ -4,7 +4,7 @@ import { Link } from '@fidus/ui/link';
 import { Stack } from '@fidus/ui/stack';
 import { Badge } from '@fidus/ui/badge';
 import { Divider } from '@fidus/ui/divider';
-import { Container } from '@fidus/ui/container';;
+import { Container } from '@fidus/ui/container';
 import { Calendar, Package, GitBranch, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function ReleasesPage() {
@@ -106,7 +106,7 @@ import { Alert } from '@fidus/ui/alert';
 // ✅ Still works (development)
 import { Button } from '@fidus/ui/button';
 import { Stack } from '@fidus/ui/stack';
-import { Alert } from '@fidus/ui/alert';;`}</code>
+import { Alert } from '@fidus/ui/alert';`}</code>
                 </pre>
               </div>
             </Stack>
