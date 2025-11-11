@@ -17,7 +17,9 @@ Fidus UI Component Library - A modern, accessible React component library built 
 2. **Framework**: React 18+ with TypeScript
 3. **Styling**: Tailwind CSS + CSS Variables
 4. **Component Primitives**: Radix UI
-5. **Import Pattern**: Named imports from `@fidus/ui`
+5. **Import Pattern**:
+   - **Production (Recommended)**: Subpath imports for tree-shaking → `import { Button } from '@fidus/ui/button'`
+   - **Development**: Barrel imports for convenience → `import { Button } from '@fidus/ui'`
 
 ### Required Setup Steps (IMPORTANT!)
 
@@ -44,11 +46,17 @@ When helping users integrate `@fidus/ui` into a new project, **always** follow t
 - ❌ **Don't** forget to import `@fidus/ui/styles.css` - components won't style correctly
 - ❌ **Don't** use `import * as` - always use named imports
 - ❌ **Don't** customize colors in `tailwind.config.ts` - override CSS variables instead
+- ⚠️ **Tip**: Use subpath imports (`@fidus/ui/button`) instead of barrel imports (`@fidus/ui`) in production for 95% smaller bundles
 
 ### Component Import Examples
 
 ```typescript
-// ✅ Correct - Named imports
+// ✅ BEST - Subpath imports (production, 95% smaller bundles)
+import { Button } from '@fidus/ui/button';
+import { TextInput } from '@fidus/ui/text-input';
+import { Modal } from '@fidus/ui/modal';
+
+// ✅ OK - Barrel imports (development, convenient but larger bundles)
 import { Button, TextInput, Modal } from '@fidus/ui';
 
 // ❌ Wrong - Default import
@@ -57,6 +65,11 @@ import FidusUI from '@fidus/ui';
 // ❌ Wrong - Wildcard import
 import * as FidusUI from '@fidus/ui';
 ```
+
+**Bundle Size Comparison:**
+- Subpath import (`from '@fidus/ui/button'`): ~4KB
+- Barrel import (`from '@fidus/ui'`): ~370KB
+- **Recommendation**: Use subpath imports in production builds for 95% bundle size reduction
 
 ### Available Components by Category
 
@@ -68,11 +81,18 @@ import * as FidusUI from '@fidus/ui';
 **Navigation**: Tabs, Breadcrumbs, Pagination, Header, Sidebar
 **Chat**: MessageBubble, ChatInterface, ConfidenceIndicator
 
+**All 45 components support subpath imports** for optimal tree-shaking. See the [Tree-Shaking section](#tree-shaking--bundle-optimization) for the complete list.
+
 ### TypeScript Usage
 
 All components are fully typed. Import types:
 
 ```typescript
+// Subpath imports (recommended)
+import type { ButtonProps } from '@fidus/ui/button';
+import type { ModalProps } from '@fidus/ui/modal';
+
+// Barrel imports (also works)
 import type { ButtonProps, ModalProps } from '@fidus/ui';
 ```
 
