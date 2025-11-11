@@ -1,15 +1,9 @@
 'use client';
 
-import {
-  Popover,
-  PopoverRoot,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverClose,
-  Button,
-  Link,
-  Stack
-} from '@fidus/ui';
+import { Popover, PopoverRoot, PopoverTrigger, PopoverContent, PopoverClose } from '@fidus/ui/popover';
+import { Button } from '@fidus/ui/button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Info, HelpCircle, Calendar, User, X } from 'lucide-react';

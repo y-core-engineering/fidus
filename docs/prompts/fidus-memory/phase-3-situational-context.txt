@@ -1,0 +1,2579 @@
+===========================================
+FIDUS MEMORY - PHASE 3: SITUATIONAL CONTEXT
+===========================================
+
+VERSION: 3.0
+PHASE: 3 of 4
+ESTIMATED DURATION: 5-6 days
+PREREQUISITE: Phase 2 complete (Neo4j persistence)
+DELIVERABLE: Context-aware learning with dynamic context extraction and vector search
+
+---
+
+ROLE & CONTEXT
+
+You are a Senior Full-Stack Engineer implementing the Fidus Memory prototype.
+
+EXPERTISE REQUIRED:
+- Python: FastAPI, LangGraph, async/await, type hints
+- TypeScript: Next.js 14 App Router, React 18, strict types
+- Qdrant: Vector database, similarity search, payload filtering
+- Neo4j: Graph relationships, Cypher queries
+- LiteLLM: Ollama embeddings (nomic-embed-text)
+- Domain-Driven Design (DDD)
+- Multi-tenant architecture
+- Privacy-first design principles
+
+PROJECT CONTEXT
+Fidus Memory is a domain-agnostic conversational learning agent that demonstrates core learning capabilities of the Fidus system. It learns user preferences implicitly from conversations, stores them with confidence scores, and adapts to situational context.
+
+This is a PROTOTYPE with:
+- Fixed tenant_id = "prototype-tenant" (no login UI)
+- Multi-tenancy by design (ready for production scaling)
+- 100% @fidus/ui component usage (no custom CSS)
+- Local-first privacy (Ollama default)
+
+WHAT WAS BUILT PREVIOUSLY
+Phase 1: In-memory chat agent with basic implicit learning
+Phase 2: Neo4j persistence with preference storage and confidence scoring
+
+WHAT THIS PHASE ADDS
+Phase 3 introduces dynamic situational context awareness. The LLM extracts context factors organically from conversation (no predefined schema), stores them as embeddings in Qdrant, and retrieves preferences based on context similarity. This enables "I like cappuccino in the morning" vs "I like espresso in the afternoon" differentiation.
+
+Key Innovation: Schema-less context - new factors can emerge during conversation ("first_coffee_of_day", "deadline_pressure", "post_workout").
+
+---
+
+SUCCESS CRITERIA
+
+At the end of this phase, you must be able to demonstrate:
+
+DYNAMIC CONTEXT EXTRACTION:
+- LLM extracts context factors from conversation (time_of_day, activity, stress_level, etc.)
+- New factors can be discovered organically (not limited to predefined schema)
+- Factors validated as snake_case with reasonable values
+
+CONTEXT STORAGE:
+- Situations stored in Neo4j with context factors as JSON
+- Embeddings stored in Qdrant (768-dim for nomic-embed-text, configurable)
+- Preferences linked to multiple situations (IN_SITUATION relationship)
+
+CONTEXT RETRIEVAL:
+- Vector similarity search finds similar situations (>70% cosine similarity)
+- User isolation enforced via tenant_id in Qdrant payload filtering
+- Top-K similar situations retrieved (default K=5)
+
+CONTEXT-AWARE SUGGESTIONS:
+- Bot suggests different preferences based on current context
+- "Coffee?" returns cappuccino in morning, espresso in afternoon
+- Weekday vs weekend preferences distinguished
+- User can explicitly state situational preferences: "I like X when Y"
+
+DOMAIN EVENTS & ERROR HANDLING:
+- PreferenceExtracted, PreferenceReinforced, PreferenceWeakened events defined
+- LLM calls wrapped in retry logic (tenacity library)
+- Database failures have fallback strategies (Redis cache)
+- Input sanitization implemented (bleach.clean)
+- Rate limiting considered (slowapi)
+
+TECHNICAL REQUIREMENTS:
+- All tests passing (unit tests at minimum)
+- Lint checks passing (pnpm lint)
+- Type checks passing (pnpm typecheck)
+- Multi-tenancy verified (tenant_id in ALL queries)
+- @fidus/ui components used exclusively
+- Error handling implemented
+- No security vulnerabilities
+
+---
+
+IMPLEMENTATION TASKS
+
+---
+
+TASK 3.1: Setup Qdrant + Embedding Model
+
+GOAL
+Add vector database (Qdrant) and embedding model (nomic-embed-text via Ollama) to infrastructure.
+
+ACCEPTANCE CRITERIA
+- [ ] Qdrant service running in Docker Compose
+- [ ] nomic-embed-text model pulled in Ollama
+- [ ] Qdrant collection "situations" created with configurable dimensions
+- [ ] Collection configured for cosine similarity search
+- [ ] Setup script can be run idempotently
+
+IMPLEMENTATION STEPS
+
+Step 1: Add Qdrant to Docker Compose
+File: docker-compose.yml
+Action: modify existing
+
+Add Qdrant service:
+
+```yaml
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: fidus-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"  # GRPC port
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - fidus-network
+
+volumes:
+  qdrant_data:
+    driver: local
+
+networks:
+  fidus-network:
+    driver: bridge
+```
+
+Validation:
+```bash
+docker-compose up -d qdrant
+docker-compose ps | grep qdrant
+# Should show qdrant running on port 6333
+```
+
+Step 2: Pull nomic-embed-text Model
+File: N/A (command line)
+Action: pull Ollama model
+
+```bash
+# Pull embedding model
+docker exec fidus-ollama ollama pull nomic-embed-text
+
+# Verify
+docker exec fidus-ollama ollama list | grep nomic-embed-text
+```
+
+Validation:
+```bash
+# Test embedding generation
+curl http://localhost:11434/api/embeddings -d '{
+  "model": "nomic-embed-text",
+  "prompt": "test"
+}'
+# Should return 768-dim vector
+```
+
+Step 3: Create Setup Script for Qdrant Collection
+File: packages/api/fidus/memory/context/setup_qdrant.py
+Action: create new
+
+```python
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+from fidus.config import PrototypeConfig
+
+async def setup_qdrant_collection():
+    """Initialize Qdrant collection for situations.
+
+    Embedding Dimensions: Configurable to support different models.
+    Multi-Tenancy: Situations include tenant_id in payload for filtering.
+    """
+    client = QdrantClient(host="localhost", port=6333)
+
+    # Get embedding dimensions from config
+    model = PrototypeConfig.EMBEDDING_MODEL
+    dims = PrototypeConfig.EMBEDDING_DIMENSIONS.get(model)
+
+    if not dims:
+        raise ValueError(f"Unknown embedding model: {model}")
+
+    # Check if collection exists
+    collections = client.get_collections().collections
+    if any(c.name == "situations" for c in collections):
+        print(f"✅ Qdrant collection 'situations' already exists")
+        return
+
+    # Create collection with dynamic dimensions
+    client.create_collection(
+        collection_name="situations",
+        vectors_config=VectorParams(
+            size=dims,  # 768 for nomic-embed-text, 1536/3072 for OpenAI
+            distance=Distance.COSINE
+        )
+    )
+
+    print(f"✅ Qdrant collection 'situations' created (dims={dims})")
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(setup_qdrant_collection())
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run python fidus/memory/context/setup_qdrant.py
+popd
+
+# Verify collection exists
+curl http://localhost:6333/collections/situations
+```
+
+Step 4: Update Config with Embedding Dimensions
+File: packages/api/fidus/config.py
+Action: modify existing
+
+Add embedding configuration:
+
+```python
+class PrototypeConfig:
+    PROTOTYPE_TENANT_ID = "prototype-tenant"
+    EMBEDDING_MODEL = "ollama/nomic-embed-text"
+    EMBEDDING_DIMENSIONS = {
+        "ollama/nomic-embed-text": 768,
+        "openai/text-embedding-3-small": 1536,
+        "openai/text-embedding-3-large": 3072,
+    }
+```
+
+Validation:
+```python
+from fidus.config import PrototypeConfig
+print(PrototypeConfig.EMBEDDING_DIMENSIONS["ollama/nomic-embed-text"])
+# Should print 768
+```
+
+TESTING
+
+Unit Tests:
+No unit tests needed for infrastructure setup.
+
+Manual Testing:
+```bash
+# Start all services
+docker-compose up -d
+
+# Check Qdrant status
+curl http://localhost:6333/collections/situations
+
+# Expected output: Collection info with 768 dimensions
+```
+
+VERIFICATION CHECKLIST
+- [ ] Qdrant service running on port 6333
+- [ ] nomic-embed-text model available in Ollama
+- [ ] "situations" collection created with 768 dimensions
+- [ ] Config specifies EMBEDDING_DIMENSIONS dictionary
+- [ ] Setup script is idempotent (can run multiple times)
+
+---
+
+TASK 3.2: Dynamic Context Extraction
+
+GOAL
+Implement LLM-based context extraction that discovers context factors organically from conversation without predefined schema.
+
+ACCEPTANCE CRITERIA
+- [ ] DynamicContextExtractor class extracts factors from text
+- [ ] LLM can discover novel factors (not limited to predefined list)
+- [ ] Factors validated as snake_case keys
+- [ ] Returns empty dict if no context found
+- [ ] Unit tests cover temporal, spatial, and custom factor extraction
+
+IMPLEMENTATION STEPS
+
+Step 1: Create DynamicContextExtractor
+File: packages/api/fidus/memory/context/extractor.py
+Action: create new
+
+```python
+from typing import Dict, Any
+from litellm import acompletion
+import json
+
+class DynamicContextExtractor:
+    """Extracts context factors from conversation using LLM."""
+
+    EXTRACTION_PROMPT = """Extract all relevant situational context factors from this conversation.
+
+Conversation: "{conversation}"
+
+Extract ANY context factors that might influence user preferences.
+
+Common categories (NOT exhaustive - invent new factors if relevant):
+- Temporal: time_of_day, day_of_week, is_weekend, season
+- Spatial: location_type, is_familiar, indoors
+- Social: alone, with_people, group_size
+- Activity: current_activity, intensity, duration
+- Cognitive: energy_level, stress_level, mood, focus_required
+- Physical: weather, temperature, noise_level
+
+IMPORTANT: You can create NEW factor names!
+Examples: "coffee_already_consumed", "first_task_of_day", "deadline_pressure"
+
+Return as JSON object. Only include factors clearly stated or implied.
+Use snake_case for keys.
+
+Example output:
+{{
+  "time_of_day": "morning",
+  "activity": "working",
+  "energy_level": "low",
+  "first_coffee": false
+}}
+"""
+
+    def __init__(self, litellm_model: str = "ollama/llama3.2"):
+        self.model = litellm_model
+
+    async def extract(self, conversation_snippet: str) -> Dict[str, Any]:
+        """Extract context factors from conversation."""
+
+        prompt = self.EXTRACTION_PROMPT.format(conversation=conversation_snippet)
+
+        response = await acompletion(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": "You are a context extraction assistant. Return only valid JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"}
+        )
+
+        extracted = json.loads(response.choices[0].message.content)
+
+        # Validate snake_case keys
+        for key in extracted.keys():
+            if not key.islower() or not key.replace("_", "").isalnum():
+                raise ValueError(f"Invalid factor key: {key}. Must be snake_case.")
+
+        return extracted
+```
+
+Validation:
+```python
+extractor = DynamicContextExtractor()
+result = await extractor.extract("I always drink cappuccino in the morning")
+print(result)
+# Expected: {"time_of_day": "morning", "activity": "pre_work", ...}
+```
+
+Step 2: Add Unit Tests
+File: packages/api/tests/memory/context/test_extractor.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context.extractor import DynamicContextExtractor
+
+@pytest.mark.asyncio
+async def test_extract_temporal_context():
+    """Should extract time-related factors."""
+    extractor = DynamicContextExtractor()
+
+    conversation = "I always drink cappuccino in the morning before work"
+
+    result = await extractor.extract(conversation)
+
+    assert "time_of_day" in result
+    assert result["time_of_day"] == "morning"
+    assert "activity" in result
+    assert result["activity"] in ["pre_work", "working", "commuting"]
+
+@pytest.mark.asyncio
+async def test_extract_custom_factors():
+    """Should extract novel context factors."""
+    extractor = DynamicContextExtractor()
+
+    conversation = "I already had 3 coffees today, but I need another one"
+
+    result = await extractor.extract(conversation)
+
+    # LLM should invent new factor
+    assert any(k in result for k in ["coffees_consumed", "coffee_count", "caffeine_intake"])
+
+@pytest.mark.asyncio
+async def test_returns_empty_dict_for_no_context():
+    """Should return empty dict if no context factors found."""
+    extractor = DynamicContextExtractor()
+
+    conversation = "Hello"
+
+    result = await extractor.extract(conversation)
+
+    assert isinstance(result, dict)
+    # May be empty or have minimal system context
+
+@pytest.mark.asyncio
+async def test_validates_snake_case_keys():
+    """Should reject non-snake_case keys."""
+    # This test verifies validation logic exists
+    extractor = DynamicContextExtractor()
+
+    # Manually test validation
+    with pytest.raises(ValueError, match="Invalid factor key"):
+        extractor._validate_key("TimeOfDay")  # camelCase - invalid
+
+    with pytest.raises(ValueError, match="Invalid factor key"):
+        extractor._validate_key("time-of-day")  # kebab-case - invalid
+```
+
+Step 3: Add Validation Helper
+File: packages/api/fidus/memory/context/extractor.py
+Action: modify existing (add method)
+
+Add validation helper:
+
+```python
+def _validate_key(self, key: str) -> None:
+    """Validate that key is snake_case."""
+    if not key.islower() or not key.replace("_", "").isalnum():
+        raise ValueError(f"Invalid factor key: {key}. Must be snake_case.")
+```
+
+Use in extract() method after JSON parsing:
+
+```python
+for key in extracted.keys():
+    self._validate_key(key)
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/context/test_extractor.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_extractor.py above
+
+Manual Testing:
+```python
+# Test in Python REPL
+from fidus.memory.context.extractor import DynamicContextExtractor
+import asyncio
+
+extractor = DynamicContextExtractor()
+
+# Test 1: Temporal context
+result = asyncio.run(extractor.extract("I drink coffee every morning"))
+print(result)  # Should include time_of_day
+
+# Test 2: Novel factors
+result = asyncio.run(extractor.extract("After my workout I always eat eggs"))
+print(result)  # Should include post_workout or exercise_recovery
+
+# Test 3: Empty context
+result = asyncio.run(extractor.extract("Hi"))
+print(result)  # Should return {}
+```
+
+VERIFICATION CHECKLIST
+- [ ] DynamicContextExtractor extracts temporal factors
+- [ ] LLM discovers novel factors not in common list
+- [ ] snake_case validation rejects invalid keys
+- [ ] Unit tests pass (pytest)
+- [ ] Manual testing confirms extraction works
+
+---
+
+TASK 3.3: System Context Provider
+
+GOAL
+Provide system-level context factors (current time, date, day of week) that complement LLM-extracted context.
+
+ACCEPTANCE CRITERIA
+- [ ] SystemContextProvider returns current system context
+- [ ] Context includes: time_of_day, day_of_week, hour, is_weekend, is_work_hours, season
+- [ ] Time classification: morning (5-12), afternoon (12-17), evening (17-21), night (21-5)
+- [ ] Season detection for Northern Hemisphere
+- [ ] Unit tests with mocked datetime
+
+IMPLEMENTATION STEPS
+
+Step 1: Create SystemContextProvider
+File: packages/api/fidus/memory/context/system_provider.py
+Action: create new
+
+```python
+from datetime import datetime
+from typing import Dict, Any
+
+class SystemContextProvider:
+    """Provides system-level context factors."""
+
+    def get_current_context(self) -> Dict[str, Any]:
+        """Get current system context."""
+        now = datetime.now()
+
+        return {
+            "time_of_day": self._classify_time(now.hour),
+            "day_of_week": now.strftime("%A").lower(),
+            "hour": now.hour,
+            "is_weekend": now.weekday() >= 5,
+            "is_work_hours": 9 <= now.hour < 17 and now.weekday() < 5,
+            "season": self._get_season(now.month)
+        }
+
+    def _classify_time(self, hour: int) -> str:
+        """Classify hour into time of day."""
+        if 5 <= hour < 12:
+            return "morning"
+        elif 12 <= hour < 17:
+            return "afternoon"
+        elif 17 <= hour < 21:
+            return "evening"
+        else:
+            return "night"
+
+    def _get_season(self, month: int) -> str:
+        """Get season from month (Northern Hemisphere)."""
+        if month in [12, 1, 2]:
+            return "winter"
+        elif month in [3, 4, 5]:
+            return "spring"
+        elif month in [6, 7, 8]:
+            return "summer"
+        else:
+            return "autumn"
+```
+
+Validation:
+```python
+provider = SystemContextProvider()
+context = provider.get_current_context()
+print(context)
+# Should show current system context
+```
+
+Step 2: Add Unit Tests
+File: packages/api/tests/memory/context/test_system_provider.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context.system_provider import SystemContextProvider
+from unittest.mock import patch
+from datetime import datetime
+
+def test_get_current_context():
+    """Should return system context."""
+    provider = SystemContextProvider()
+
+    with patch('fidus.memory.context.system_provider.datetime') as mock_datetime:
+        mock_datetime.now.return_value = datetime(2025, 11, 3, 10, 30)  # Monday morning
+
+        context = provider.get_current_context()
+
+        assert context["time_of_day"] == "morning"
+        assert context["day_of_week"] == "monday"
+        assert context["hour"] == 10
+        assert context["is_weekend"] is False
+        assert context["is_work_hours"] is True
+        assert context["season"] == "autumn"
+
+def test_classify_time_morning():
+    """Should classify 9 AM as morning."""
+    provider = SystemContextProvider()
+    assert provider._classify_time(9) == "morning"
+
+def test_classify_time_afternoon():
+    """Should classify 2 PM as afternoon."""
+    provider = SystemContextProvider()
+    assert provider._classify_time(14) == "afternoon"
+
+def test_classify_time_evening():
+    """Should classify 7 PM as evening."""
+    provider = SystemContextProvider()
+    assert provider._classify_time(19) == "evening"
+
+def test_classify_time_night():
+    """Should classify 11 PM as night."""
+    provider = SystemContextProvider()
+    assert provider._classify_time(23) == "night"
+
+def test_weekend_detection():
+    """Should detect Saturday as weekend."""
+    provider = SystemContextProvider()
+
+    with patch('fidus.memory.context.system_provider.datetime') as mock_datetime:
+        mock_datetime.now.return_value = datetime(2025, 11, 8, 10, 0)  # Saturday
+
+        context = provider.get_current_context()
+
+        assert context["is_weekend"] is True
+        assert context["is_work_hours"] is False
+
+def test_season_detection():
+    """Should detect seasons correctly."""
+    provider = SystemContextProvider()
+
+    assert provider._get_season(1) == "winter"
+    assert provider._get_season(4) == "spring"
+    assert provider._get_season(7) == "summer"
+    assert provider._get_season(10) == "autumn"
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/context/test_system_provider.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_system_provider.py above
+
+Manual Testing:
+```python
+from fidus.memory.context.system_provider import SystemContextProvider
+
+provider = SystemContextProvider()
+print(provider.get_current_context())
+# Should show current date/time context
+```
+
+VERIFICATION CHECKLIST
+- [ ] SystemContextProvider returns current context
+- [ ] Time classification works for all 4 periods
+- [ ] Weekend detection works
+- [ ] Work hours detection works (9-5 weekdays)
+- [ ] Season detection works
+- [ ] Unit tests pass with mocked datetime
+
+---
+
+TASK 3.4: Context Merger
+
+GOAL
+Merge LLM-extracted context with system context, preferring LLM values when keys overlap.
+
+ACCEPTANCE CRITERIA
+- [ ] ContextMerger combines two context dicts
+- [ ] LLM context overrides system context for duplicate keys
+- [ ] New factors from LLM are added to merged context
+- [ ] format_for_display() converts snake_case to readable text
+- [ ] Unit tests verify merge logic
+
+IMPLEMENTATION STEPS
+
+Step 1: Create ContextMerger
+File: packages/api/fidus/memory/context/merger.py
+Action: create new
+
+```python
+from typing import Dict, Any
+
+class ContextMerger:
+    """Merges context from multiple sources."""
+
+    def merge(
+        self,
+        llm_context: Dict[str, Any],
+        system_context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Merge contexts, preferring LLM-extracted values."""
+
+        # Start with system context as base
+        merged = system_context.copy()
+
+        # Override with LLM context (more specific)
+        for key, value in llm_context.items():
+            if key in merged:
+                # LLM extracted it explicitly - trust that over system
+                merged[key] = value
+            else:
+                # New factor from LLM
+                merged[key] = value
+
+        return merged
+
+    def format_for_display(self, context: Dict[str, Any]) -> str:
+        """Format context as human-readable string."""
+        parts = []
+        for key, value in context.items():
+            # Convert snake_case to Title Case
+            label = key.replace("_", " ").title()
+            parts.append(f"{label}: {value}")
+
+        return ", ".join(parts)
+```
+
+Validation:
+```python
+merger = ContextMerger()
+merged = merger.merge(
+    {"time_of_day": "early_morning", "stress_level": "high"},
+    {"time_of_day": "morning", "is_weekend": False}
+)
+print(merged)
+# Should prefer "early_morning" from LLM
+```
+
+Step 2: Add Unit Tests
+File: packages/api/tests/memory/context/test_merger.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context.merger import ContextMerger
+
+def test_merge_contexts():
+    """Should merge LLM and system contexts."""
+    merger = ContextMerger()
+
+    system = {
+        "time_of_day": "morning",
+        "is_weekend": False,
+        "hour": 10
+    }
+
+    llm = {
+        "time_of_day": "early_morning",  # More specific
+        "activity": "commuting",  # New factor
+        "stress_level": "high"  # New factor
+    }
+
+    result = merger.merge(llm, system)
+
+    # LLM context should override
+    assert result["time_of_day"] == "early_morning"
+
+    # New factors should be added
+    assert result["activity"] == "commuting"
+    assert result["stress_level"] == "high"
+
+    # System context should be preserved
+    assert result["is_weekend"] is False
+    assert result["hour"] == 10
+
+def test_merge_empty_llm_context():
+    """Should return system context when LLM context is empty."""
+    merger = ContextMerger()
+
+    system = {"time_of_day": "morning"}
+    llm = {}
+
+    result = merger.merge(llm, system)
+
+    assert result == system
+
+def test_format_for_display():
+    """Should format context as readable string."""
+    merger = ContextMerger()
+
+    context = {
+        "time_of_day": "morning",
+        "activity": "working",
+        "stress_level": "low"
+    }
+
+    result = merger.format_for_display(context)
+
+    assert "Time Of Day: morning" in result
+    assert "Activity: working" in result
+    assert "Stress Level: low" in result
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/context/test_merger.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_merger.py above
+
+Manual Testing:
+```python
+from fidus.memory.context.merger import ContextMerger
+
+merger = ContextMerger()
+
+system = {"time_of_day": "morning", "hour": 9}
+llm = {"time_of_day": "early_morning", "energy": "low"}
+
+merged = merger.merge(llm, system)
+print(merged)  # Should prefer LLM value for time_of_day
+
+print(merger.format_for_display(merged))
+# Should show readable text
+```
+
+VERIFICATION CHECKLIST
+- [ ] ContextMerger merges two dicts correctly
+- [ ] LLM values override system values
+- [ ] New factors from LLM are added
+- [ ] format_for_display() produces readable output
+- [ ] Unit tests pass
+
+---
+
+TASK 3.5: Context Embedding Service
+
+GOAL
+Generate vector embeddings for context dictionaries using nomic-embed-text model via LiteLLM.
+
+ACCEPTANCE CRITERIA
+- [ ] ContextEmbeddingService generates embeddings
+- [ ] Context dict formatted as text before embedding
+- [ ] Embedding dimensions validated against config
+- [ ] Similar contexts produce similar embeddings (cosine > 0.8)
+- [ ] Unit tests verify embedding generation
+
+IMPLEMENTATION STEPS
+
+Step 1: Create ContextEmbeddingService
+File: packages/api/fidus/memory/context/embedding_service.py
+Action: create new
+
+```python
+from typing import Dict, Any, List
+from litellm import aembedding
+
+class ContextEmbeddingService:
+    """Generates embeddings for situational contexts."""
+
+    def __init__(self, embedding_model: str = "ollama/nomic-embed-text"):
+        self.embedding_model = embedding_model
+
+    def format_context_as_text(self, context: Dict[str, Any]) -> str:
+        """Convert context dict to text for embedding."""
+
+        # Sort keys for consistency
+        sorted_keys = sorted(context.keys())
+
+        parts = []
+        for key in sorted_keys:
+            value = context[key]
+            # Convert snake_case to natural language
+            label = key.replace("_", " ")
+            parts.append(f"{label}: {value}")
+
+        return "\n".join(parts)
+
+    async def generate_embedding(self, context: Dict[str, Any]) -> List[float]:
+        """Generate embedding for context.
+
+        Embedding Dimensions: Validated against config (not hardcoded).
+        """
+        from fidus.config import PrototypeConfig
+
+        text = self.format_context_as_text(context)
+
+        response = await aembedding(
+            model=self.embedding_model,
+            input=[text]
+        )
+
+        embedding = response.data[0]["embedding"]
+
+        # Validate dimensionality (configurable)
+        expected_dims = PrototypeConfig.EMBEDDING_DIMENSIONS.get(self.embedding_model)
+        if not expected_dims:
+            raise ValueError(f"Unknown embedding model: {self.embedding_model}")
+
+        if len(embedding) != expected_dims:
+            raise ValueError(f"Expected {expected_dims}-dim embedding, got {len(embedding)}")
+
+        return embedding
+```
+
+Validation:
+```python
+service = ContextEmbeddingService()
+context = {"time_of_day": "morning", "activity": "working"}
+embedding = await service.generate_embedding(context)
+print(len(embedding))  # Should be 768
+```
+
+Step 2: Add Unit Tests
+File: packages/api/tests/memory/context/test_embedding_service.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context.embedding_service import ContextEmbeddingService
+
+def test_format_context_as_text():
+    """Should format context as text."""
+    service = ContextEmbeddingService()
+
+    context = {
+        "time_of_day": "morning",
+        "activity": "working",
+        "stress_level": "low"
+    }
+
+    text = service.format_context_as_text(context)
+
+    # Should be sorted and formatted
+    assert "activity: working" in text
+    assert "stress level: low" in text
+    assert "time of day: morning" in text
+
+@pytest.mark.asyncio
+async def test_generate_embedding():
+    """Should generate 768-dim embedding."""
+    service = ContextEmbeddingService()
+
+    context = {
+        "time_of_day": "morning",
+        "activity": "working"
+    }
+
+    embedding = await service.generate_embedding(context)
+
+    # nomic-embed-text produces 768-dim vectors
+    assert len(embedding) == 768
+    assert all(isinstance(x, float) for x in embedding)
+
+@pytest.mark.asyncio
+async def test_similar_contexts_have_similar_embeddings():
+    """Should produce similar embeddings for similar contexts."""
+    service = ContextEmbeddingService()
+
+    context1 = {"time_of_day": "morning", "activity": "working"}
+    context2 = {"time_of_day": "early_morning", "activity": "working"}
+    context3 = {"time_of_day": "night", "activity": "sleeping"}
+
+    emb1 = await service.generate_embedding(context1)
+    emb2 = await service.generate_embedding(context2)
+    emb3 = await service.generate_embedding(context3)
+
+    # Cosine similarity
+    def cosine(a, b):
+        import numpy as np
+        return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+    # Similar contexts should have high similarity
+    sim_12 = cosine(emb1, emb2)
+    assert sim_12 > 0.8
+
+    # Different contexts should have lower similarity
+    sim_13 = cosine(emb1, emb3)
+    assert sim_13 < 0.6
+
+@pytest.mark.asyncio
+async def test_validates_embedding_dimensions():
+    """Should validate embedding dimensions match config."""
+    service = ContextEmbeddingService()
+
+    context = {"time_of_day": "morning"}
+
+    # This should not raise
+    embedding = await service.generate_embedding(context)
+    assert len(embedding) == 768
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/context/test_embedding_service.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_embedding_service.py above
+
+Manual Testing:
+```python
+from fidus.memory.context.embedding_service import ContextEmbeddingService
+import asyncio
+
+service = ContextEmbeddingService()
+
+context = {"time_of_day": "morning", "activity": "working"}
+embedding = asyncio.run(service.generate_embedding(context))
+
+print(f"Embedding length: {len(embedding)}")  # 768
+print(f"Sample values: {embedding[:5]}")  # First 5 values
+```
+
+VERIFICATION CHECKLIST
+- [ ] ContextEmbeddingService generates embeddings
+- [ ] format_context_as_text() sorts keys consistently
+- [ ] Embedding dimensions validated (768 for nomic-embed-text)
+- [ ] Similar contexts produce similar embeddings
+- [ ] Unit tests pass
+
+---
+
+TASK 3.6: Context Storage Service
+
+GOAL
+Store situational contexts in both Neo4j (graph relationships) and Qdrant (vector search).
+
+ACCEPTANCE CRITERIA
+- [ ] Situations stored in Neo4j with tenant_id
+- [ ] Embeddings stored in Qdrant with tenant_id in payload
+- [ ] Preferences can be linked to situations (IN_SITUATION relationship)
+- [ ] Multi-tenancy enforced in both databases
+- [ ] Python uuid4() used for all ID generation
+- [ ] Integration tests verify dual storage
+
+IMPLEMENTATION STEPS
+
+Step 1: Update Neo4j Schema
+File: N/A (Cypher script)
+Action: Run in Neo4j browser
+
+```cypher
+// Add Situation node type
+
+CREATE CONSTRAINT situation_id_unique IF NOT EXISTS
+FOR (s:Situation) REQUIRE s.situation_id IS UNIQUE;
+
+// Situation node structure:
+// (:Situation {
+//   situation_id: string,
+//   user_id: string,
+//   tenant_id: string,
+//   embedding_id: string,  // Points to Qdrant
+//   factors: json,
+//   description: string,
+//   created_at: datetime
+// })
+
+// Relationship: Preference applies in Situation
+// (:Preference)-[:IN_SITUATION {
+//   added_at: datetime,
+//   confidence_at_time: float
+// }]->(:Situation)
+```
+
+Validation:
+```cypher
+SHOW CONSTRAINTS
+// Should include situation_id_unique
+```
+
+Step 2: Create ContextStorageService
+File: packages/api/fidus/memory/context/storage_service.py
+Action: create new
+
+```python
+from typing import Dict, Any
+from uuid import uuid4
+from datetime import datetime
+from qdrant_client import QdrantClient
+from neo4j import AsyncGraphDatabase
+
+class ContextStorageService:
+    """Stores situational contexts in Neo4j + Qdrant.
+
+    Multi-Tenancy: All situations scoped to tenant_id.
+    UUID Generation: Standardized to Python uuid4().
+    """
+
+    def __init__(self, neo4j_driver, qdrant_client: QdrantClient):
+        from fidus.config import PrototypeConfig
+        self.neo4j = neo4j_driver
+        self.qdrant = qdrant_client
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+    async def store_situation(
+        self,
+        user_id: str,
+        factors: Dict[str, Any],
+        embedding: list[float],
+        description: str
+    ) -> str:
+        """Store situation in both Neo4j and Qdrant.
+
+        Multi-Tenancy: Situations include tenant_id in both databases.
+        """
+
+        situation_id = str(uuid4())  # Standardized UUID generation
+        embedding_id = str(uuid4())
+
+        # 1. Store embedding in Qdrant
+        self.qdrant.upsert(
+            collection_name="situations",
+            points=[{
+                "id": embedding_id,
+                "vector": embedding,
+                "payload": {
+                    "user_id": user_id,
+                    "tenant_id": self.tenant_id,  # Multi-tenancy
+                    "situation_id": situation_id,
+                    "factors": factors
+                }
+            }]
+        )
+
+        # 2. Store situation in Neo4j
+        async with self.neo4j.session() as session:
+            await session.run(
+                """
+                CREATE (s:Situation {
+                    situation_id: $situation_id,
+                    user_id: $user_id,
+                    tenant_id: $tenant_id,
+                    embedding_id: $embedding_id,
+                    factors: $factors,
+                    description: $description,
+                    created_at: datetime()
+                })
+                """,
+                situation_id=situation_id,
+                user_id=user_id,
+                tenant_id=self.tenant_id,
+                embedding_id=embedding_id,
+                factors=factors,
+                description=description
+            )
+
+        return situation_id
+
+    async def link_preference_to_situation(
+        self,
+        preference_id: str,
+        situation_id: str,
+        confidence: float
+    ):
+        """Create relationship between preference and situation.
+
+        Multi-Tenancy: Validates both preference and situation belong to same tenant.
+        """
+        async with self.neo4j.session() as session:
+            await session.run(
+                """
+                MATCH (p:Preference {id: $preference_id, tenant_id: $tenant_id})
+                MATCH (s:Situation {situation_id: $situation_id, tenant_id: $tenant_id})
+                CREATE (p)-[:IN_SITUATION {
+                    added_at: datetime(),
+                    confidence_at_time: $confidence
+                }]->(s)
+                """,
+                preference_id=preference_id,
+                situation_id=situation_id,
+                confidence=confidence,
+                tenant_id=self.tenant_id
+            )
+```
+
+Validation:
+```python
+service = ContextStorageService(neo4j_driver, qdrant_client)
+situation_id = await service.store_situation(
+    user_id="user123",
+    factors={"time_of_day": "morning"},
+    embedding=[0.1] * 768,
+    description="Morning context"
+)
+print(situation_id)  # Should be UUID
+```
+
+Step 3: Add Integration Tests
+File: packages/api/tests/memory/context/test_storage_service.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context.storage_service import ContextStorageService
+from qdrant_client import QdrantClient
+
+@pytest.mark.asyncio
+async def test_store_situation(neo4j_driver, qdrant_client):
+    """Should store situation in both databases."""
+    service = ContextStorageService(neo4j_driver, qdrant_client)
+
+    factors = {
+        "time_of_day": "morning",
+        "activity": "working"
+    }
+    embedding = [0.1] * 768  # Mock embedding
+    description = "Morning work context"
+
+    situation_id = await service.store_situation(
+        user_id="user123",
+        factors=factors,
+        embedding=embedding,
+        description=description
+    )
+
+    # Verify in Neo4j
+    async with neo4j_driver.session() as session:
+        result = await session.run(
+            "MATCH (s:Situation {situation_id: $sid}) RETURN s",
+            sid=situation_id
+        )
+        record = await result.single()
+        assert record is not None
+        assert record["s"]["user_id"] == "user123"
+        assert record["s"]["description"] == description
+        assert record["s"]["tenant_id"] == "prototype-tenant"
+
+    # Verify in Qdrant
+    points = qdrant_client.scroll(
+        collection_name="situations",
+        scroll_filter={"must": [{"key": "situation_id", "match": {"value": situation_id}}]},
+        limit=1
+    )
+    assert len(points[0]) == 1
+    assert points[0][0].payload["user_id"] == "user123"
+    assert points[0][0].payload["tenant_id"] == "prototype-tenant"
+
+@pytest.mark.asyncio
+async def test_link_preference_to_situation(neo4j_driver, qdrant_client):
+    """Should create relationship between preference and situation."""
+    service = ContextStorageService(neo4j_driver, qdrant_client)
+
+    # Setup
+    preference_id = "pref123"
+    situation_id = "sit456"
+    tenant_id = "prototype-tenant"
+
+    # Create nodes first
+    async with neo4j_driver.session() as session:
+        await session.run(
+            """
+            CREATE (p:Preference {id: $pid, tenant_id: $tid, domain: 'coffee', key: 'type', value: 'cappuccino'})
+            CREATE (s:Situation {situation_id: $sid, user_id: 'user123', tenant_id: $tid})
+            """,
+            pid=preference_id,
+            sid=situation_id,
+            tid=tenant_id
+        )
+
+    # Link them
+    await service.link_preference_to_situation(preference_id, situation_id, 0.8)
+
+    # Verify relationship
+    async with neo4j_driver.session() as session:
+        result = await session.run(
+            """
+            MATCH (p:Preference {id: $pid})-[r:IN_SITUATION]->(s:Situation {situation_id: $sid})
+            RETURN r
+            """,
+            pid=preference_id,
+            sid=situation_id
+        )
+        record = await result.single()
+        assert record is not None
+        assert record["r"]["confidence_at_time"] == 0.8
+
+@pytest.mark.asyncio
+async def test_tenant_isolation(neo4j_driver, qdrant_client):
+    """Should enforce tenant isolation."""
+    service = ContextStorageService(neo4j_driver, qdrant_client)
+
+    # Create situation for tenant1
+    situation_id = await service.store_situation(
+        user_id="user123",
+        factors={"time_of_day": "morning"},
+        embedding=[0.1] * 768,
+        description="Test"
+    )
+
+    # Verify tenant_id is set
+    async with neo4j_driver.session() as session:
+        result = await session.run(
+            "MATCH (s:Situation {situation_id: $sid}) RETURN s.tenant_id as tid",
+            sid=situation_id
+        )
+        record = await result.single()
+        assert record["tid"] == "prototype-tenant"
+
+    # Verify in Qdrant
+    points = qdrant_client.scroll(
+        collection_name="situations",
+        scroll_filter={"must": [{"key": "situation_id", "match": {"value": situation_id}}]},
+        limit=1
+    )
+    assert points[0][0].payload["tenant_id"] == "prototype-tenant"
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/context/test_storage_service.py -v
+popd
+```
+
+TESTING
+
+Integration Tests:
+See test_storage_service.py above
+
+Manual Testing:
+```bash
+# Store situation via Python REPL
+# Verify in Neo4j browser
+MATCH (s:Situation) RETURN s LIMIT 5
+
+# Verify in Qdrant
+curl http://localhost:6333/collections/situations/points/scroll
+```
+
+VERIFICATION CHECKLIST
+- [ ] Situations stored in Neo4j with all required fields
+- [ ] Embeddings stored in Qdrant with payload
+- [ ] tenant_id present in both databases
+- [ ] Python uuid4() used for all IDs
+- [ ] IN_SITUATION relationship created
+- [ ] Integration tests pass
+
+---
+
+TASK 3.7: Context Retrieval Service
+
+GOAL
+Retrieve similar situations using Qdrant vector similarity search with user filtering.
+
+ACCEPTANCE CRITERIA
+- [ ] find_similar_situations() returns top-K similar contexts
+- [ ] Cosine similarity threshold enforced (default 0.7)
+- [ ] User isolation via user_id filtering in Qdrant
+- [ ] Returns (situation_id, similarity_score) tuples
+- [ ] Unit tests verify similarity search and filtering
+
+IMPLEMENTATION STEPS
+
+Step 1: Create ContextRetrievalService
+File: packages/api/fidus/memory/context/retrieval_service.py
+Action: create new
+
+```python
+from typing import Dict, Any, List, Tuple
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
+
+class ContextRetrievalService:
+    """Retrieves similar situations from Qdrant."""
+
+    def __init__(self, qdrant_client: QdrantClient):
+        self.qdrant = qdrant_client
+
+    async def find_similar_situations(
+        self,
+        user_id: str,
+        current_embedding: List[float],
+        min_similarity: float = 0.7,
+        limit: int = 5
+    ) -> List[Tuple[str, float]]:
+        """
+        Find situations similar to current context.
+
+        Returns: List of (situation_id, similarity_score) tuples
+
+        Multi-Tenancy: Filters by user_id in Qdrant payload.
+        """
+
+        # Search Qdrant with user_id filter
+        results = self.qdrant.search(
+            collection_name="situations",
+            query_vector=current_embedding,
+            query_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="user_id",
+                        match=MatchValue(value=user_id)
+                    )
+                ]
+            ),
+            limit=limit,
+            score_threshold=min_similarity
+        )
+
+        return [
+            (hit.payload["situation_id"], hit.score)
+            for hit in results
+        ]
+
+    async def get_situation_factors(
+        self,
+        situation_id: str
+    ) -> Dict[str, Any]:
+        """Retrieve factors for a specific situation."""
+
+        results = self.qdrant.scroll(
+            collection_name="situations",
+            scroll_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="situation_id",
+                        match=MatchValue(value=situation_id)
+                    )
+                ]
+            ),
+            limit=1
+        )
+
+        if not results[0]:
+            raise ValueError(f"Situation {situation_id} not found")
+
+        return results[0][0].payload["factors"]
+```
+
+Validation:
+```python
+service = ContextRetrievalService(qdrant_client)
+similar = await service.find_similar_situations(
+    user_id="user123",
+    current_embedding=[0.1] * 768,
+    min_similarity=0.7
+)
+print(similar)  # List of (situation_id, score) tuples
+```
+
+Step 2: Add Unit Tests
+File: packages/api/tests/memory/context/test_retrieval_service.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context.retrieval_service import ContextRetrievalService
+from qdrant_client import QdrantClient
+
+@pytest.mark.asyncio
+async def test_find_similar_situations(qdrant_client):
+    """Should find similar situations."""
+    service = ContextRetrievalService(qdrant_client)
+
+    # Setup: Add situations to Qdrant
+    qdrant_client.upsert(
+        collection_name="situations",
+        points=[
+            {
+                "id": "emb1",
+                "vector": [0.9] * 768,  # Very similar
+                "payload": {"user_id": "user123", "tenant_id": "prototype-tenant", "situation_id": "sit1"}
+            },
+            {
+                "id": "emb2",
+                "vector": [0.8] * 768,  # Similar
+                "payload": {"user_id": "user123", "tenant_id": "prototype-tenant", "situation_id": "sit2"}
+            },
+            {
+                "id": "emb3",
+                "vector": [-0.9] * 768,  # Very different
+                "payload": {"user_id": "user123", "tenant_id": "prototype-tenant", "situation_id": "sit3"}
+            }
+        ]
+    )
+
+    # Query with similar vector
+    current_embedding = [0.85] * 768
+
+    results = await service.find_similar_situations(
+        user_id="user123",
+        current_embedding=current_embedding,
+        min_similarity=0.7,
+        limit=5
+    )
+
+    # Should find sit1 and sit2 (not sit3)
+    assert len(results) == 2
+    situation_ids = [sit_id for sit_id, _ in results]
+    assert "sit1" in situation_ids
+    assert "sit2" in situation_ids
+    assert "sit3" not in situation_ids
+
+    # Should be sorted by similarity score
+    assert all(score >= 0.7 for _, score in results)
+
+@pytest.mark.asyncio
+async def test_filters_by_user_id(qdrant_client):
+    """Should only return situations for specified user."""
+    service = ContextRetrievalService(qdrant_client)
+
+    # Setup: Add situations for different users
+    qdrant_client.upsert(
+        collection_name="situations",
+        points=[
+            {
+                "id": "emb1",
+                "vector": [0.9] * 768,
+                "payload": {"user_id": "user123", "tenant_id": "prototype-tenant", "situation_id": "sit1"}
+            },
+            {
+                "id": "emb2",
+                "vector": [0.9] * 768,  # Same vector
+                "payload": {"user_id": "user456", "tenant_id": "prototype-tenant", "situation_id": "sit2"}
+            }
+        ]
+    )
+
+    results = await service.find_similar_situations(
+        user_id="user123",
+        current_embedding=[0.9] * 768,
+        min_similarity=0.7,
+        limit=5
+    )
+
+    # Should only find sit1
+    assert len(results) == 1
+    assert results[0][0] == "sit1"
+
+@pytest.mark.asyncio
+async def test_get_situation_factors(qdrant_client):
+    """Should retrieve factors for a specific situation."""
+    service = ContextRetrievalService(qdrant_client)
+
+    # Setup
+    factors = {"time_of_day": "morning", "activity": "working"}
+    qdrant_client.upsert(
+        collection_name="situations",
+        points=[{
+            "id": "emb1",
+            "vector": [0.1] * 768,
+            "payload": {
+                "user_id": "user123",
+                "tenant_id": "prototype-tenant",
+                "situation_id": "sit123",
+                "factors": factors
+            }
+        }]
+    )
+
+    # Retrieve factors
+    retrieved = await service.get_situation_factors("sit123")
+
+    assert retrieved == factors
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/context/test_retrieval_service.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_retrieval_service.py above
+
+Manual Testing:
+```python
+from fidus.memory.context.retrieval_service import ContextRetrievalService
+from qdrant_client import QdrantClient
+import asyncio
+
+qdrant = QdrantClient(host="localhost", port=6333)
+service = ContextRetrievalService(qdrant)
+
+# Find similar situations
+embedding = [0.5] * 768
+results = asyncio.run(service.find_similar_situations(
+    user_id="user123",
+    current_embedding=embedding
+))
+
+print(results)  # List of (situation_id, score)
+```
+
+VERIFICATION CHECKLIST
+- [ ] find_similar_situations() returns top-K results
+- [ ] Similarity threshold filters results (>= 0.7)
+- [ ] User isolation enforced via user_id filter
+- [ ] Results sorted by similarity score
+- [ ] get_situation_factors() retrieves factors
+- [ ] Unit tests pass
+
+---
+
+TASK 3.8: Context-Aware Agent Integration
+
+GOAL
+Integrate all context services into a unified ContextAwareAgent that retrieves preferences based on current situation.
+
+ACCEPTANCE CRITERIA
+- [ ] ContextAwareAgent orchestrates all context services
+- [ ] get_relevant_preferences() uses context similarity to find preferences
+- [ ] record_preference_with_context() stores preference with situation
+- [ ] Different contexts retrieve different preferences
+- [ ] Integration tests verify end-to-end flow
+
+IMPLEMENTATION STEPS
+
+Step 1: Create ContextAwareAgent
+File: packages/api/fidus/memory/context_aware_agent.py
+Action: create new
+
+```python
+from typing import Dict, Any, List
+from fidus.memory.context.extractor import DynamicContextExtractor
+from fidus.memory.context.system_provider import SystemContextProvider
+from fidus.memory.context.merger import ContextMerger
+from fidus.memory.context.embedding_service import ContextEmbeddingService
+from fidus.memory.context.storage_service import ContextStorageService
+from fidus.memory.context.retrieval_service import ContextRetrievalService
+from fidus.memory.neo4j_client import Neo4jClient
+
+class ContextAwareAgent:
+    """Agent with situational awareness."""
+
+    def __init__(
+        self,
+        extractor: DynamicContextExtractor,
+        system_provider: SystemContextProvider,
+        merger: ContextMerger,
+        embedding_service: ContextEmbeddingService,
+        storage_service: ContextStorageService,
+        retrieval_service: ContextRetrievalService,
+        neo4j_client: Neo4jClient
+    ):
+        self.extractor = extractor
+        self.system_provider = system_provider
+        self.merger = merger
+        self.embedding_service = embedding_service
+        self.storage_service = storage_service
+        self.retrieval_service = retrieval_service
+        self.neo4j = neo4j_client
+
+    async def get_relevant_preferences(
+        self,
+        user_id: str,
+        conversation_snippet: str,
+        min_confidence: float = 0.3
+    ) -> List[Dict[str, Any]]:
+        """Get preferences relevant to current context."""
+
+        # 1. Extract context from conversation
+        llm_context = await self.extractor.extract(conversation_snippet)
+
+        # 2. Get system context
+        system_context = self.system_provider.get_current_context()
+
+        # 3. Merge contexts
+        merged_context = self.merger.merge(llm_context, system_context)
+
+        # 4. Generate embedding for current context
+        current_embedding = await self.embedding_service.generate_embedding(merged_context)
+
+        # 5. Find similar situations
+        similar_situations = await self.retrieval_service.find_similar_situations(
+            user_id=user_id,
+            current_embedding=current_embedding,
+            min_similarity=0.7,
+            limit=5
+        )
+
+        if not similar_situations:
+            return []
+
+        # 6. Query Neo4j for preferences in those situations
+        situation_ids = [sit_id for sit_id, _ in similar_situations]
+
+        preferences = await self.neo4j.get_preferences_for_situations(
+            user_id=user_id,
+            situation_ids=situation_ids,
+            min_confidence=min_confidence
+        )
+
+        return preferences
+
+    async def record_preference_with_context(
+        self,
+        user_id: str,
+        domain: str,
+        key: str,
+        value: Any,
+        conversation_snippet: str,
+        confidence: float = 0.75
+    ) -> str:
+        """Record a preference with situational context."""
+
+        # 1. Extract and merge context
+        llm_context = await self.extractor.extract(conversation_snippet)
+        system_context = self.system_provider.get_current_context()
+        merged_context = self.merger.merge(llm_context, system_context)
+
+        # 2. Generate embedding
+        embedding = await self.embedding_service.generate_embedding(merged_context)
+
+        # 3. Generate description
+        description = self.merger.format_for_display(merged_context)
+
+        # 4. Store situation
+        situation_id = await self.storage_service.store_situation(
+            user_id=user_id,
+            factors=merged_context,
+            embedding=embedding,
+            description=description
+        )
+
+        # 5. Store preference in Neo4j
+        preference_id = await self.neo4j.create_preference(
+            user_id=user_id,
+            domain=domain,
+            key=key,
+            value=value,
+            confidence=confidence,
+            source="conversation"
+        )
+
+        # 6. Link preference to situation
+        await self.storage_service.link_preference_to_situation(
+            preference_id=preference_id,
+            situation_id=situation_id,
+            confidence=confidence
+        )
+
+        return preference_id
+```
+
+Validation:
+```python
+agent = ContextAwareAgent(...)
+preference_id = await agent.record_preference_with_context(
+    user_id="user123",
+    domain="coffee",
+    key="type",
+    value="cappuccino",
+    conversation_snippet="I drink cappuccino every morning"
+)
+print(preference_id)  # UUID
+```
+
+Step 2: Update Neo4jClient with Situation Query
+File: packages/api/fidus/memory/neo4j_client.py
+Action: modify existing (add method)
+
+Add method to query preferences by situation:
+
+```python
+async def get_preferences_for_situations(
+    self,
+    user_id: str,
+    situation_ids: List[str],
+    min_confidence: float = 0.3
+) -> List[Dict[str, Any]]:
+    """Get preferences that apply in given situations.
+
+    Multi-Tenancy: Filters by tenant_id.
+    """
+    async with self.driver.session() as session:
+        result = await session.run(
+            """
+            MATCH (u:User {id: $user_id, tenant_id: $tenant_id})-[:HAS_PREFERENCE]->(p:Preference {tenant_id: $tenant_id})
+            WHERE p.confidence >= $min_confidence
+            AND EXISTS {
+                MATCH (p)-[:IN_SITUATION]->(s:Situation)
+                WHERE s.situation_id IN $situation_ids
+            }
+            RETURN p.id as id, p.domain as domain, p.key as key, p.value as value, p.confidence as confidence
+            ORDER BY p.confidence DESC
+            """,
+            user_id=user_id,
+            tenant_id=self.tenant_id,
+            situation_ids=situation_ids,
+            min_confidence=min_confidence
+        )
+
+        preferences = []
+        async for record in result:
+            preferences.append({
+                "id": record["id"],
+                "domain": record["domain"],
+                "key": record["key"],
+                "value": record["value"],
+                "confidence": record["confidence"]
+            })
+
+        return preferences
+```
+
+Validation:
+```python
+prefs = await neo4j_client.get_preferences_for_situations(
+    user_id="user123",
+    situation_ids=["sit1", "sit2"],
+    min_confidence=0.3
+)
+print(prefs)  # List of preferences
+```
+
+Step 3: Add Integration Tests
+File: packages/api/tests/memory/test_context_aware_agent.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.context_aware_agent import ContextAwareAgent
+
+@pytest.mark.asyncio
+async def test_get_relevant_preferences_for_morning_context(
+    context_aware_agent,
+    neo4j_client,
+    qdrant_client
+):
+    """Should retrieve morning preferences when context is morning."""
+
+    user_id = "user123"
+
+    # Record a morning coffee preference
+    await context_aware_agent.record_preference_with_context(
+        user_id=user_id,
+        domain="coffee",
+        key="type",
+        value="cappuccino",
+        conversation_snippet="I always drink cappuccino in the morning",
+        confidence=0.8
+    )
+
+    # Query in morning context
+    preferences = await context_aware_agent.get_relevant_preferences(
+        user_id=user_id,
+        conversation_snippet="Coffee?",  # Will extract morning context from system
+        min_confidence=0.3
+    )
+
+    # Should find the cappuccino preference
+    assert len(preferences) > 0
+    assert any(p["key"] == "type" and p["value"] == "cappuccino" for p in preferences)
+
+@pytest.mark.asyncio
+async def test_different_preferences_for_different_contexts(
+    context_aware_agent
+):
+    """Should retrieve different preferences for different contexts."""
+
+    user_id = "user123"
+
+    # Record morning preference
+    await context_aware_agent.record_preference_with_context(
+        user_id=user_id,
+        domain="coffee",
+        key="type",
+        value="cappuccino",
+        conversation_snippet="I drink cappuccino in the morning before work",
+        confidence=0.8
+    )
+
+    # Record afternoon preference
+    await context_aware_agent.record_preference_with_context(
+        user_id=user_id,
+        domain="coffee",
+        key="type",
+        value="espresso",
+        conversation_snippet="I prefer espresso in the afternoon when I'm tired",
+        confidence=0.8
+    )
+
+    # Query in morning context (mock time to 9 AM)
+    morning_prefs = await context_aware_agent.get_relevant_preferences(
+        user_id=user_id,
+        conversation_snippet="Coffee? It's 9 AM",
+        min_confidence=0.3
+    )
+
+    # Query in afternoon context (mock time to 3 PM)
+    afternoon_prefs = await context_aware_agent.get_relevant_preferences(
+        user_id=user_id,
+        conversation_snippet="Coffee? It's 3 PM and I'm exhausted",
+        min_confidence=0.3
+    )
+
+    # Should get different preferences
+    morning_coffee = next((p for p in morning_prefs if p["domain"] == "coffee"), None)
+    afternoon_coffee = next((p for p in afternoon_prefs if p["domain"] == "coffee"), None)
+
+    assert morning_coffee is not None
+    assert afternoon_coffee is not None
+    assert morning_coffee["value"] == "cappuccino"
+    assert afternoon_coffee["value"] == "espresso"
+
+@pytest.mark.asyncio
+async def test_no_preferences_for_unfamiliar_context(
+    context_aware_agent
+):
+    """Should return empty list for context with no stored preferences."""
+
+    user_id = "user123"
+
+    # Query in novel context (no stored preferences)
+    preferences = await context_aware_agent.get_relevant_preferences(
+        user_id=user_id,
+        conversation_snippet="What should I eat at 2 AM?",
+        min_confidence=0.3
+    )
+
+    # Should return empty (no similar situations)
+    assert len(preferences) == 0
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/test_context_aware_agent.py -v
+popd
+```
+
+TESTING
+
+Integration Tests:
+See test_context_aware_agent.py above
+
+Manual Testing:
+```python
+# Create agent with all services
+agent = ContextAwareAgent(...)
+
+# Record preference
+await agent.record_preference_with_context(
+    user_id="user123",
+    domain="coffee",
+    key="type",
+    value="cappuccino",
+    conversation_snippet="I like cappuccino in the morning"
+)
+
+# Query later
+prefs = await agent.get_relevant_preferences(
+    user_id="user123",
+    conversation_snippet="Coffee?"
+)
+print(prefs)  # Should include cappuccino if morning
+```
+
+VERIFICATION CHECKLIST
+- [ ] ContextAwareAgent orchestrates all services
+- [ ] get_relevant_preferences() uses context similarity
+- [ ] record_preference_with_context() stores in both databases
+- [ ] Different contexts retrieve different preferences
+- [ ] Integration tests pass
+
+---
+
+TASK 3.9: Domain Events & Error Handling
+
+GOAL
+Define domain event schemas for system integration and implement robust error handling strategies.
+
+ACCEPTANCE CRITERIA
+- [ ] Domain event classes defined (PreferenceExtracted, PreferenceReinforced, etc.)
+- [ ] Events include tenant_id for multi-tenancy
+- [ ] Error handling with retry logic (tenacity library)
+- [ ] LLM calls wrapped with exponential backoff
+- [ ] Database failures have fallback strategies
+- [ ] Input sanitization implemented (bleach library)
+- [ ] Rate limiting considered (slowapi)
+
+IMPLEMENTATION STEPS
+
+Step 1: Define Domain Event Schemas
+File: packages/api/fidus/memory/events.py
+Action: create new
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict
+from uuid import uuid4
+
+@dataclass
+class DomainEvent:
+    """Base class for all domain events."""
+    event_id: str
+    event_type: str
+    aggregate_type: str
+    aggregate_id: str
+    tenant_id: str
+    user_id: str
+    timestamp: datetime
+    payload: Dict[str, Any]
+
+    def __init__(self, **kwargs):
+        self.event_id = str(uuid4())
+        self.timestamp = datetime.now()
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+@dataclass
+class PreferenceExtracted(DomainEvent):
+    """Emitted when preference is extracted from conversation."""
+    event_type = "PreferenceExtracted"
+    aggregate_type = "Preference"
+
+    def __init__(self, preference_id: str, user_id: str, tenant_id: str,
+                 domain: str, key: str, value: Any, confidence: float):
+        super().__init__(
+            aggregate_id=preference_id,
+            user_id=user_id,
+            tenant_id=tenant_id,
+            payload={
+                "domain": domain,
+                "key": key,
+                "value": value,
+                "confidence": confidence
+            }
+        )
+
+
+@dataclass
+class PreferenceReinforced(DomainEvent):
+    """Emitted when preference confidence increases."""
+    event_type = "PreferenceReinforced"
+    aggregate_type = "Preference"
+
+    def __init__(self, preference_id: str, user_id: str, tenant_id: str,
+                 old_confidence: float, new_confidence: float):
+        super().__init__(
+            aggregate_id=preference_id,
+            user_id=user_id,
+            tenant_id=tenant_id,
+            payload={
+                "old_confidence": old_confidence,
+                "new_confidence": new_confidence
+            }
+        )
+
+
+@dataclass
+class PreferenceWeakened(DomainEvent):
+    """Emitted when preference confidence decreases."""
+    event_type = "PreferenceWeakened"
+    aggregate_type = "Preference"
+
+    def __init__(self, preference_id: str, user_id: str, tenant_id: str,
+                 old_confidence: float, new_confidence: float):
+        super().__init__(
+            aggregate_id=preference_id,
+            user_id=user_id,
+            tenant_id=tenant_id,
+            payload={
+                "old_confidence": old_confidence,
+                "new_confidence": new_confidence
+            }
+        )
+
+
+@dataclass
+class PreferenceDeleted(DomainEvent):
+    """Emitted when all user preferences are deleted."""
+    event_type = "PreferenceDeleted"
+    aggregate_type = "Preference"
+
+    def __init__(self, user_id: str, tenant_id: str):
+        super().__init__(
+            aggregate_id=user_id,  # No specific preference
+            user_id=user_id,
+            tenant_id=tenant_id,
+            payload={}
+        )
+```
+
+Validation:
+```python
+event = PreferenceExtracted(
+    preference_id="pref123",
+    user_id="user123",
+    tenant_id="prototype-tenant",
+    domain="coffee",
+    key="type",
+    value="cappuccino",
+    confidence=0.8
+)
+print(event.event_id)  # UUID
+print(event.timestamp)  # Current datetime
+```
+
+Step 2: Implement Error Handling Utilities
+File: packages/api/fidus/memory/error_handling.py
+Action: create new
+
+```python
+from tenacity import retry, stop_after_attempt, wait_exponential
+from litellm.exceptions import RateLimitError
+import logging
+import json
+from json.decoder import JSONDecodeError
+
+logger = logging.getLogger(__name__)
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10)
+)
+async def extract_preference_with_retry(llm_func, message: str):
+    """Extract preference with retry on LLM failures."""
+    try:
+        result = await llm_func(message)
+        return json.loads(result.content)
+    except RateLimitError as e:
+        logger.warning(f"Rate limit hit: {e}")
+        raise  # Retry via tenacity
+    except JSONDecodeError as e:
+        logger.error(f"Invalid JSON from LLM: {e}")
+        return []  # Fallback: Return empty preference list
+
+
+async def get_preferences_with_fallback(neo4j, redis, user_id: str, tenant_id: str):
+    """Get preferences with Redis cache fallback."""
+    try:
+        return await neo4j.get_all_preferences(user_id, tenant_id)
+    except Exception as e:
+        logger.error(f"Neo4j failure: {e}")
+        # Fallback: Return cached preferences from Redis
+        cached = await redis.get(f"prefs:{tenant_id}:{user_id}")
+        if cached:
+            return json.loads(cached)
+        return []  # Graceful degradation
+
+
+def sanitize_input(text: str) -> str:
+    """Sanitize user input to prevent injection."""
+    import bleach
+
+    # Remove HTML tags
+    clean = bleach.clean(text, tags=[], strip=True)
+
+    # Limit length
+    if len(clean) > 5000:
+        clean = clean[:5000]
+
+    return clean
+```
+
+Validation:
+```python
+from fidus.memory.error_handling import sanitize_input
+
+dirty = "<script>alert('xss')</script>Hello"
+clean = sanitize_input(dirty)
+print(clean)  # "Hello" (script removed)
+```
+
+Step 3: Add Rate Limiting Middleware
+File: packages/api/fidus/api/middleware/security.py
+Action: create new
+
+```python
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from fastapi import Request
+from fidus.config import PrototypeConfig
+from fidus.memory.error_handling import sanitize_input
+
+limiter = Limiter(key_func=get_remote_address)
+
+# Rate limiting per tenant
+@app.post("/api/memory/chat")
+@limiter.limit("100/hour")  # Per IP
+async def chat(request: Request):
+    tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+    # Sanitize input
+    message = sanitize_input(request.json["message"])
+
+    # Process
+    return await agent.chat(request.json["user_id"], message)
+```
+
+Validation:
+Test rate limiting manually by sending 100+ requests in an hour.
+
+Step 4: Add Unit Tests for Error Handling
+File: packages/api/tests/memory/test_error_handling.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.error_handling import sanitize_input, extract_preference_with_retry
+from litellm.exceptions import RateLimitError
+from unittest.mock import AsyncMock, MagicMock
+
+def test_sanitize_input_removes_html():
+    """Should remove HTML tags."""
+    dirty = "<script>alert('xss')</script>Hello"
+    clean = sanitize_input(dirty)
+    assert clean == "Hello"
+
+def test_sanitize_input_limits_length():
+    """Should limit to 5000 characters."""
+    long_text = "a" * 6000
+    clean = sanitize_input(long_text)
+    assert len(clean) == 5000
+
+@pytest.mark.asyncio
+async def test_extract_preference_retries_on_rate_limit():
+    """Should retry on rate limit error."""
+    llm_func = AsyncMock()
+    llm_func.side_effect = [
+        RateLimitError("Rate limit"),
+        RateLimitError("Rate limit"),
+        MagicMock(content='{"domain": "coffee"}')
+    ]
+
+    result = await extract_preference_with_retry(llm_func, "test")
+
+    # Should retry 3 times
+    assert llm_func.call_count == 3
+    assert result == {"domain": "coffee"}
+
+@pytest.mark.asyncio
+async def test_extract_preference_fallback_on_json_error():
+    """Should return empty list on JSON decode error."""
+    llm_func = AsyncMock()
+    llm_func.return_value = MagicMock(content="invalid json")
+
+    result = await extract_preference_with_retry(llm_func, "test")
+
+    assert result == []
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/memory/test_error_handling.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_error_handling.py above
+
+Manual Testing:
+Test sanitization and retry logic in Python REPL.
+
+VERIFICATION CHECKLIST
+- [ ] Domain events defined with tenant_id
+- [ ] Error handling utilities implemented
+- [ ] LLM calls wrapped with retry logic
+- [ ] Input sanitization removes HTML and limits length
+- [ ] Rate limiting middleware added
+- [ ] Unit tests pass
+
+---
+
+ARCHITECTURE CONSTRAINTS (CRITICAL - DO NOT VIOLATE)
+
+MULTI-TENANCY (MUST FOLLOW)
+- ALL database queries MUST include tenant_id filter
+- Use PrototypeConfig.PROTOTYPE_TENANT_ID ("prototype-tenant")
+- Scope Neo4j queries: MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
+- Scope Qdrant payloads: payload: {"tenant_id": self.tenant_id, ...}
+- Scope Qdrant filters: Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))])
+- Test tenant isolation: verify user A cannot access user B's data
+
+TYPE SAFETY (MUST FOLLOW)
+- TypeScript: NO 'any' types, use strict mode
+- TypeScript: NO type casting with 'as' (use type guards)
+- TypeScript: Use Zod schemas at ALL API boundaries
+- Python: Type hints on ALL functions
+- Python: Use dataclasses or Pydantic for data structures
+- Validate runtime types with Zod (TypeScript) or Pydantic (Python)
+
+@fidus/ui COMPONENTS (MUST FOLLOW)
+- Use ONLY @fidus/ui components
+- Available components: ChatInterface, MessageBubble, ConfidenceIndicator, Card, Stack, Heading, Text, Button, Divider, EmptyState
+- NO custom HTML tags: NO <div>, <p>, <span>, <h1-6>
+- NO Tailwind classes: NO className="text-xs text-gray-500"
+- NO custom CSS or styled-components
+- If you need a component not in @fidus/ui, use an existing one creatively or ask for guidance
+
+UUID GENERATION (MUST FOLLOW)
+- Use Python uuid4() for ALL ID generation
+- Generate IDs in Python, then pass to database queries
+- DO NOT use database UUID functions (randomUUID() in Cypher, gen_random_uuid() in PostgreSQL)
+- Consistency: str(uuid4()) everywhere
+
+ERROR HANDLING (MUST FOLLOW)
+- Wrap ALL LLM API calls in retry logic (use tenacity library)
+- Provide fallbacks for database failures (e.g., Redis cache)
+- Sanitize ALL user input (use bleach.clean())
+- Validate input length (max 5000 characters)
+- Log errors with context (user_id, tenant_id, operation)
+- Return user-friendly error messages (not raw exceptions)
+
+EMBEDDING DIMENSIONS (MUST FOLLOW)
+- Use PrototypeConfig.EMBEDDING_DIMENSIONS (configurable)
+- DO NOT hardcode 768 dimensions
+- Validate embedding dimensions against config
+- Support multiple models (nomic-embed-text: 768, OpenAI: 1536/3072)
+
+---
+
+COMMON PITFALLS (AVOID THESE)
+
+AVOID DO NOT skip tenant_id in Qdrant payload or filters
+AVOID DO NOT hardcode embedding dimensions (768)
+AVOID DO NOT create custom UI components
+AVOID DO NOT use type casting (as) in TypeScript
+AVOID DO NOT skip error handling on LLM calls
+AVOID DO NOT use database UUID generation (use Python uuid4)
+AVOID DO NOT commit without running tests
+AVOID DO NOT use Tailwind classes or custom CSS
+AVOID DO NOT create <div> or <p> tags (use @fidus/ui Text/Stack)
+AVOID DO NOT skip input sanitization
+AVOID DO NOT ignore CLAUDE.md conventions
+AVOID DO NOT forget tenant_id in Qdrant filters (user isolation fails)
+
+---
+
+TESTING STRATEGY
+
+UNIT TESTS (REQUIRED)
+Each service must have unit tests:
+- DynamicContextExtractor: test_extractor.py
+- SystemContextProvider: test_system_provider.py
+- ContextMerger: test_merger.py
+- ContextEmbeddingService: test_embedding_service.py
+- ContextStorageService: test_storage_service.py
+- ContextRetrievalService: test_retrieval_service.py
+- Error handling: test_error_handling.py
+
+Example test structure:
+```python
+# packages/api/tests/memory/context/test_[component].py
+
+import pytest
+from fidus.memory.context.[component] import [Class]
+
+@pytest.mark.asyncio
+async def test_[functionality]():
+    # Arrange
+    [setup test data]
+
+    # Act
+    result = await [call function]
+
+    # Assert
+    assert [expected outcome]
+    assert [tenant isolation if applicable]
+```
+
+INTEGRATION TESTS (REQUIRED)
+- test_context_aware_agent.py: End-to-end context-aware preference retrieval
+- Test morning vs afternoon preference distinction
+- Test user isolation (user A cannot see user B's contexts)
+
+MANUAL TESTING STEPS
+1. Start services: docker-compose up -d
+2. Pull models: docker exec fidus-ollama ollama pull nomic-embed-text
+3. Setup Qdrant: python packages/api/fidus/memory/context/setup_qdrant.py
+4. Test extraction:
+   ```python
+   from fidus.memory.context.extractor import DynamicContextExtractor
+   extractor = DynamicContextExtractor()
+   result = await extractor.extract("I drink coffee every morning")
+   print(result)
+   ```
+5. Test embedding:
+   ```python
+   from fidus.memory.context.embedding_service import ContextEmbeddingService
+   service = ContextEmbeddingService()
+   emb = await service.generate_embedding({"time_of_day": "morning"})
+   print(len(emb))  # Should be 768
+   ```
+6. Test storage:
+   ```python
+   from fidus.memory.context.storage_service import ContextStorageService
+   service = ContextStorageService(neo4j_driver, qdrant_client)
+   sit_id = await service.store_situation(
+       user_id="user123",
+       factors={"time_of_day": "morning"},
+       embedding=[0.1] * 768,
+       description="Morning"
+   )
+   print(sit_id)
+   ```
+7. Verify in Neo4j browser: MATCH (s:Situation) RETURN s LIMIT 5
+8. Verify in Qdrant: curl http://localhost:6333/collections/situations/points/scroll
+
+---
+
+PHASE COMPLETION CHECKLIST
+
+Before marking this phase as COMPLETE, verify ALL of the following:
+
+FUNCTIONALITY
+- [ ] All tasks completed (3.1 through 3.9)
+- [ ] All success criteria met
+- [ ] Demo scenario works end-to-end:
+  - Record "I drink cappuccino in the morning"
+  - Record "I drink espresso in the afternoon"
+  - Query "Coffee?" at 9 AM → cappuccino
+  - Query "Coffee?" at 3 PM → espresso
+
+CODE QUALITY
+- [ ] Unit tests passing (poetry run pytest or pnpm test)
+- [ ] Lint checks passing (pnpm lint)
+- [ ] Type checks passing (pnpm typecheck)
+- [ ] No console errors in browser
+- [ ] No Python exceptions in logs
+
+ARCHITECTURE COMPLIANCE
+- [ ] Multi-tenancy: tenant_id in ALL Qdrant payloads and filters
+- [ ] Multi-tenancy: tenant_id in ALL Neo4j queries
+- [ ] Type safety: No 'any' types, Zod schemas at API boundaries
+- [ ] @fidus/ui: No custom divs, only @fidus/ui components
+- [ ] UUID: Python uuid4() used consistently
+- [ ] Error handling: LLM calls wrapped, fallbacks in place
+- [ ] Embedding dimensions: Config-driven (not hardcoded 768)
+
+SECURITY
+- [ ] Input sanitization implemented (bleach.clean)
+- [ ] No SQL/Cypher injection vulnerabilities
+- [ ] Rate limiting considered (slowapi)
+- [ ] No secrets in code (use environment variables)
+
+DOCUMENTATION
+- [ ] Code comments for complex logic
+- [ ] README updated if needed
+- [ ] No TODOs left in code
+
+---
+
+RESOURCES & DOCUMENTATION
+
+MUST READ BEFORE STARTING:
+1. docs/prototypes/fidus-memory/implementation-plan.md (Phase 3 section)
+2. CLAUDE.md (Development conventions - Multi-tenancy, Type Safety, @fidus/ui)
+3. Qdrant documentation: https://qdrant.tech/documentation/
+4. LiteLLM embeddings: https://docs.litellm.ai/docs/embedding/supported_embedding
+
+REFERENCE ARCHITECTURE:
+- docs/architecture/README.md (System overview)
+- docs/domain-model/README.md (DDD patterns)
+- packages/ui/README.md (@fidus/ui component library)
+
+CONFIGURATION:
+- packages/api/fidus/config.py (PrototypeConfig - tenant_id, embedding config)
+- packages/shared/src/schemas/memory.ts (Zod schemas for type safety)
+
+KEY FILES IN THIS PHASE:
+Backend (Python):
+- packages/api/fidus/memory/context/extractor.py
+- packages/api/fidus/memory/context/system_provider.py
+- packages/api/fidus/memory/context/merger.py
+- packages/api/fidus/memory/context/embedding_service.py
+- packages/api/fidus/memory/context/storage_service.py
+- packages/api/fidus/memory/context/retrieval_service.py
+- packages/api/fidus/memory/context_aware_agent.py
+- packages/api/fidus/memory/events.py
+- packages/api/fidus/memory/error_handling.py
+
+Infrastructure:
+- docker-compose.yml (add Qdrant)
+- packages/api/fidus/config.py (EMBEDDING_DIMENSIONS)
+
+USEFUL COMMANDS:
+```
+# Start all services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f qdrant
+
+# Pull embedding model
+docker exec fidus-ollama ollama pull nomic-embed-text
+
+# Setup Qdrant collection
+pushd packages/api
+poetry run python fidus/memory/context/setup_qdrant.py
+popd
+
+# Backend tests
+pushd packages/api
+poetry run pytest tests/memory/context/ -v
+popd
+
+# Type check entire monorepo
+pnpm typecheck
+
+# Lint entire monorepo
+pnpm lint
+
+# Build (redirect to log)
+pnpm build > build.log 2>&1
+tail -n 30 build.log
+
+# Verify Qdrant collection
+curl http://localhost:6333/collections/situations
+
+# Verify Neo4j situations
+# Open http://localhost:7474
+MATCH (s:Situation) RETURN s LIMIT 10
+```
+
+---
+
+DEVELOPMENT WORKFLOW
+
+RECOMMENDED APPROACH:
+1. Read implementation-plan.md Phase 3 section thoroughly
+2. Set up environment (docker-compose up -d)
+3. Work through tasks sequentially (Task 3.1, 3.2, ...)
+4. After EACH task: run tests, verify functionality
+5. Before moving to next task: commit working code
+6. After ALL tasks: run full phase completion checklist
+7. Demo the deliverable to confirm phase success
+
+GIT WORKFLOW:
+- Create feature branch: git checkout -b feature/phase-3-situational-context
+- Commit after each completed task
+- Before final commit: run lint, typecheck, tests
+- Create PR when phase complete (even if working alone - for CI/CD)
+
+DEBUGGING TIPS:
+- Check docker-compose logs for service errors
+- Verify services are running: docker-compose ps
+- Test API directly: curl http://localhost:8000/[endpoint]
+- Check Neo4j browser: http://localhost:7474
+- Check Qdrant: curl http://localhost:6333/collections/situations
+- Use Python debugger: import pdb; pdb.set_trace()
+- Check browser console for frontend errors
+- Test embedding generation: docker exec fidus-ollama ollama run nomic-embed-text "test"
+
+---
+
+QUESTIONS OR BLOCKERS?
+
+If you encounter issues:
+1. Re-read implementation-plan.md for this task
+2. Check CLAUDE.md for conventions
+3. Verify all services running: docker-compose ps
+4. Check logs: docker-compose logs [service]
+5. Review error messages carefully (often point to exact issue)
+6. If requirements ambiguous: ask for clarification
+7. If stuck: break task into smaller steps
+
+DO NOT:
+- Skip steps hoping it will work
+- Ignore test failures
+- Proceed if architecture constraints violated
+- Commit broken code
+
+---
+
+NEXT PHASE PREVIEW
+
+Phase 4 will add MCP server interface, PostgreSQL conversation storage, Redis caching, and multi-user support with basic authentication. This will make Fidus Memory ready for integration into the full Fidus system as a standalone MCP server that domain supervisors can query.
+
+---
+
+BEGIN IMPLEMENTATION
+
+Start with Task 3.1 (Setup Qdrant + Embedding Model) and work sequentially through all tasks.
+
+REMEMBER:
+- Read implementation-plan.md section for this phase FIRST
+- Follow architecture constraints (multi-tenancy, type safety, @fidus/ui)
+- Test after EACH task
+- Verify phase completion checklist before marking complete
+
+Good luck!
+
+===========================================
+END OF PHASE 3 PROMPT
+===========================================

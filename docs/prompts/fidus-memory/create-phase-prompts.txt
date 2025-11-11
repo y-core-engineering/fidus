@@ -1,0 +1,591 @@
+===========================================
+FIDUS MEMORY - PHASE PROMPT GENERATOR
+===========================================
+
+ROLE & CONTEXT
+You are a Senior Prompt Engineering Specialist with deep expertise in:
+- Software architecture (Domain-Driven Design, Multi-Tenant systems)
+- Full-stack development (Python/FastAPI, TypeScript/React, Next.js)
+- LLM-based development workflows and prompt engineering
+- The Fidus Memory prototype and Fidus system architecture
+
+You are thoroughly familiar with:
+- docs/prototypes/fidus-memory/implementation-plan.md (v3)
+- docs/architecture/README.md (Fidus architecture)
+- CLAUDE.md (development conventions)
+- docs/domain-model/README.md (DDD patterns)
+
+TASK
+Create 4 standalone, comprehensive implementation prompts - one for each phase of the Fidus Memory prototype. Each prompt must guide Claude Code through implementing that specific phase from start to finish.
+
+INPUT DOCUMENTS
+Primary: docs/prototypes/fidus-memory/implementation-plan.md (v3)
+References:
+- docs/architecture/README.md
+- CLAUDE.md
+- docs/domain-model/README.md
+- docs/ux-ui-design/00-ai-driven-ui-paradigm.md
+
+OUTPUT FILES
+Create these 4 plain-text files (NO markdown formatting):
+1. docs/prompts/fidus-memory/phase-1-in-memory-agent.txt
+2. docs/prompts/fidus-memory/phase-2-persistent-preferences.txt
+3. docs/prompts/fidus-memory/phase-3-situational-context.txt
+4. docs/prompts/fidus-memory/phase-4-mcp-interface.txt
+
+---
+
+PROMPT STRUCTURE TEMPLATE
+Use this exact structure for each phase prompt:
+
+===========================================
+FIDUS MEMORY - PHASE [N]: [PHASE NAME]
+===========================================
+
+VERSION: 3.0
+PHASE: [N] of 4
+ESTIMATED DURATION: [X-Y] days
+PREREQUISITE: [Previous phase or "None"]
+DELIVERABLE: [What you can demo at the end]
+
+---
+
+ROLE & CONTEXT
+
+You are a Senior Full-Stack Engineer implementing the Fidus Memory prototype.
+
+EXPERTISE REQUIRED:
+- Python: FastAPI, LangGraph, async/await, type hints
+- TypeScript: Next.js 14 App Router, React 18, strict types
+- [Phase-specific tech: Neo4j/Qdrant/PostgreSQL/Redis/MCP]
+- Domain-Driven Design (DDD)
+- Multi-tenant architecture
+- Privacy-first design principles
+
+PROJECT CONTEXT
+Fidus Memory is a domain-agnostic conversational learning agent that demonstrates core learning capabilities of the Fidus system. It learns user preferences implicitly from conversations, stores them with confidence scores, and adapts to situational context.
+
+This is a PROTOTYPE with:
+- Fixed tenant_id = "prototype-tenant" (no login UI)
+- Multi-tenancy by design (ready for production scaling)
+- 100% @fidus/ui component usage (no custom CSS)
+- Local-first privacy (Ollama default)
+
+WHAT WAS BUILT PREVIOUSLY
+[List completed phases or "None - this is Phase 1"]
+
+WHAT THIS PHASE ADDS
+[2-3 sentences about this phase's new capabilities]
+
+---
+
+SUCCESS CRITERIA
+
+At the end of this phase, you must be able to demonstrate:
+[Copy exact success criteria from implementation-plan.md for this phase]
+
+TECHNICAL REQUIREMENTS:
+- All tests passing (unit tests at minimum)
+- Lint checks passing (pnpm lint)
+- Type checks passing (pnpm typecheck)
+- Multi-tenancy verified (tenant_id in all queries)
+- @fidus/ui components used exclusively
+- Error handling implemented
+- No security vulnerabilities
+
+---
+
+IMPLEMENTATION TASKS
+
+[For EACH task in the phase (e.g., Task 1.1, 1.2, 1.3)]
+
+---
+
+TASK [X.Y]: [Task Name from implementation-plan.md]
+
+GOAL
+[What this task achieves - from implementation-plan.md]
+
+ACCEPTANCE CRITERIA
+- [ ] [Specific, testable criterion]
+- [ ] [Specific, testable criterion]
+- [ ] [Specific, testable criterion]
+
+IMPLEMENTATION STEPS
+
+[Extract from implementation-plan.md and expand with:]
+
+Step 1: [Action]
+File: [exact/path/to/file.py or .tsx]
+Action: [create new / modify existing]
+
+[Code example from implementation-plan.md or new if needed]
+
+Validation:
+[How to verify this step worked]
+
+Step 2: [Action]
+File: [exact/path]
+Action: [action]
+
+[Code example]
+
+Validation:
+[How to verify]
+
+[Continue for all steps needed to complete this task]
+
+TESTING
+
+Unit Tests:
+[List test files to create/modify with example test cases]
+
+Manual Testing:
+```
+# Command to run
+[exact command]
+
+# Expected output
+[what success looks like]
+```
+
+VERIFICATION CHECKLIST
+- [ ] Code compiles/runs without errors
+- [ ] Tests pass
+- [ ] Functionality works as described
+- [ ] Follows architecture constraints (see below)
+
+---
+
+[Repeat TASK section for ALL tasks in this phase]
+
+---
+
+ARCHITECTURE CONSTRAINTS (CRITICAL - DO NOT VIOLATE)
+
+MULTI-TENANCY (MUST FOLLOW)
+- ALL database queries MUST include tenant_id filter
+- Use PrototypeConfig.PROTOTYPE_TENANT_ID ("prototype-tenant")
+- Scope Neo4j queries: MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
+- Scope Qdrant payloads: payload: {"tenant_id": self.tenant_id, ...}
+- Scope PostgreSQL queries: WHERE tenant_id = $tenant_id
+- Test tenant isolation: verify user A cannot access user B's data
+
+TYPE SAFETY (MUST FOLLOW)
+- TypeScript: NO 'any' types, use strict mode
+- TypeScript: NO type casting with 'as' (use type guards)
+- TypeScript: Use Zod schemas at ALL API boundaries
+- Python: Type hints on ALL functions
+- Python: Use dataclasses or Pydantic for data structures
+- Validate runtime types with Zod (TypeScript) or Pydantic (Python)
+
+@fidus/ui COMPONENTS (MUST FOLLOW)
+- Use ONLY @fidus/ui components
+- Available components: ChatInterface, MessageBubble, ConfidenceIndicator, Card, Stack, Heading, Text, Button, Divider, EmptyState
+- NO custom HTML tags: NO <div>, <p>, <span>, <h1-6>
+- NO Tailwind classes: NO className="text-xs text-gray-500"
+- NO custom CSS or styled-components
+- If you need a component not in @fidus/ui, use an existing one creatively or ask for guidance
+
+UUID GENERATION (MUST FOLLOW)
+- Use Python uuid4() for ALL ID generation
+- Generate IDs in Python, then pass to database queries
+- DO NOT use database UUID functions (randomUUID() in Cypher, gen_random_uuid() in PostgreSQL)
+- Consistency: str(uuid4()) everywhere
+
+ERROR HANDLING (MUST FOLLOW)
+- Wrap ALL LLM API calls in retry logic (use tenacity library)
+- Provide fallbacks for database failures (e.g., Redis cache)
+- Sanitize ALL user input (use bleach.clean())
+- Validate input length (max 5000 characters)
+- Log errors with context (user_id, tenant_id, operation)
+- Return user-friendly error messages (not raw exceptions)
+
+EMBEDDING DIMENSIONS (MUST FOLLOW)
+- Use PrototypeConfig.EMBEDDING_DIMENSIONS (configurable)
+- DO NOT hardcode 768 dimensions
+- Validate embedding dimensions against config
+- Support multiple models (nomic-embed-text, OpenAI models)
+
+---
+
+COMMON PITFALLS (AVOID THESE)
+
+❌ DON'T skip tenant_id in database queries
+❌ DON'T hardcode embedding dimensions (768)
+❌ DON'T create custom UI components
+❌ DON'T use type casting (as) in TypeScript
+❌ DON'T skip error handling on LLM calls
+❌ DON'T use database UUID generation (use Python uuid4)
+❌ DON'T commit without running tests
+❌ DON'T use Tailwind classes or custom CSS
+❌ DON'T create <div> or <p> tags (use @fidus/ui Text/Stack)
+❌ DON'T skip input sanitization
+❌ DON'T ignore CLAUDE.md conventions
+
+---
+
+TESTING STRATEGY
+
+UNIT TESTS (REQUIRED)
+[Phase-specific unit test requirements from implementation-plan.md]
+
+Example test structure:
+```python
+# packages/api/tests/memory/test_[component].py
+
+import pytest
+from fidus.memory.[component] import [Class]
+
+@pytest.mark.asyncio
+async def test_[functionality]():
+    # Arrange
+    [setup test data]
+
+    # Act
+    result = await [call function]
+
+    # Assert
+    assert [expected outcome]
+    assert [tenant isolation if applicable]
+```
+
+INTEGRATION TESTS (if applicable in this phase)
+[Phase-specific integration test requirements]
+
+MANUAL TESTING STEPS
+1. Start services: docker-compose up -d
+2. [Specific manual test for this phase]
+3. [Specific manual test for this phase]
+4. [Specific manual test for this phase]
+5. Verify in browser/API: [what to check]
+
+---
+
+PHASE COMPLETION CHECKLIST
+
+Before marking this phase as COMPLETE, verify ALL of the following:
+
+FUNCTIONALITY
+- [ ] All tasks completed (see task list above)
+- [ ] All success criteria met
+- [ ] Demo scenario works end-to-end
+
+CODE QUALITY
+- [ ] Unit tests passing (poetry run pytest or pnpm test)
+- [ ] Lint checks passing (pnpm lint)
+- [ ] Type checks passing (pnpm typecheck)
+- [ ] No console errors in browser
+- [ ] No Python exceptions in logs
+
+ARCHITECTURE COMPLIANCE
+- [ ] Multi-tenancy: tenant_id in ALL database queries
+- [ ] Type safety: No 'any' types, Zod schemas at API boundaries
+- [ ] @fidus/ui: No custom divs, only @fidus/ui components
+- [ ] UUID: Python uuid4() used consistently
+- [ ] Error handling: LLM calls wrapped, fallbacks in place
+- [ ] Embedding dimensions: Config-driven, not hardcoded
+
+SECURITY
+- [ ] Input sanitization implemented
+- [ ] No SQL/Cypher injection vulnerabilities
+- [ ] Rate limiting considered (if applicable)
+- [ ] No secrets in code (use environment variables)
+
+DOCUMENTATION
+- [ ] Code comments for complex logic
+- [ ] README updated if needed
+- [ ] No TODOs left in code
+
+---
+
+RESOURCES & DOCUMENTATION
+
+MUST READ BEFORE STARTING:
+1. docs/prototypes/fidus-memory/implementation-plan.md (Phase [N] section)
+2. CLAUDE.md (Development conventions - Multi-tenancy, Type Safety, @fidus/ui)
+3. [Phase-specific docs, e.g., Neo4j setup, Qdrant docs, MCP spec]
+
+REFERENCE ARCHITECTURE:
+- docs/architecture/README.md (System overview)
+- docs/domain-model/README.md (DDD patterns)
+- packages/ui/README.md (@fidus/ui component library)
+
+CONFIGURATION:
+- packages/api/fidus/config.py (PrototypeConfig - tenant_id, embedding config)
+- packages/shared/src/schemas/memory.ts (Zod schemas for type safety)
+
+KEY FILES IN THIS PHASE:
+[List main files to create/modify in this phase]
+
+USEFUL COMMANDS:
+```
+# Start all services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f [service_name]
+
+# Backend tests
+pushd packages/api
+poetry run pytest tests/ -v
+popd
+
+# Frontend dev server
+pushd packages/web
+pnpm dev
+popd
+
+# Type check entire monorepo
+pnpm typecheck
+
+# Lint entire monorepo
+pnpm lint
+
+# Build (redirect to log)
+pnpm build > build.log 2>&1
+tail -n 30 build.log
+```
+
+---
+
+DEVELOPMENT WORKFLOW
+
+RECOMMENDED APPROACH:
+1. Read implementation-plan.md Phase [N] section thoroughly
+2. Set up environment (docker-compose up -d)
+3. Work through tasks sequentially (Task [X].1, [X].2, ...)
+4. After EACH task: run tests, verify functionality
+5. Before moving to next task: commit working code
+6. After ALL tasks: run full phase completion checklist
+7. Demo the deliverable to confirm phase success
+
+GIT WORKFLOW:
+- Create feature branch: git checkout -b feature/phase-[N]-[task-name]
+- Commit after each completed task
+- Before final commit: run lint, typecheck, tests
+- Create PR when phase complete (even if working alone - for CI/CD)
+
+DEBUGGING TIPS:
+- Check docker-compose logs for service errors
+- Verify services are running: docker-compose ps
+- Test API directly: curl http://localhost:8000/[endpoint]
+- Check Neo4j browser: http://localhost:7474
+- Use Python debugger: import pdb; pdb.set_trace()
+- Check browser console for frontend errors
+
+---
+
+QUESTIONS OR BLOCKERS?
+
+If you encounter issues:
+1. Re-read implementation-plan.md for this task
+2. Check CLAUDE.md for conventions
+3. Verify all services running: docker-compose ps
+4. Check logs: docker-compose logs [service]
+5. Review error messages carefully (often point to exact issue)
+6. If requirements ambiguous: ask for clarification
+7. If stuck: break task into smaller steps
+
+DO NOT:
+- Skip steps hoping it will work
+- Ignore test failures
+- Proceed if architecture constraints violated
+- Commit broken code
+
+---
+
+NEXT PHASE PREVIEW
+
+[Brief 2-3 sentence summary of what Phase N+1 will build on top of this phase]
+
+---
+
+BEGIN IMPLEMENTATION
+
+Start with Task [X].1 and work sequentially through all tasks.
+
+REMEMBER:
+- Read implementation-plan.md section for this phase FIRST
+- Follow architecture constraints (multi-tenancy, type safety, @fidus/ui)
+- Test after EACH task
+- Verify phase completion checklist before marking complete
+
+Good luck! 🚀
+
+===========================================
+END OF PHASE [N] PROMPT
+===========================================
+
+---
+
+CONTENT EXTRACTION RULES
+
+When creating each phase prompt, extract from implementation-plan.md:
+
+PHASE OVERVIEW:
+- Phase number and name (e.g., "Phase 1: In-Memory Chat Agent")
+- Time estimate
+- "What You Can Demo" section
+- "New Capabilities vs Previous Phase" section
+- Success criteria
+
+TASKS:
+- All task numbers (e.g., Task 1.1, 1.2, 1.3)
+- Task names and goals
+- Code examples from implementation-plan.md
+- Testing sections
+- Time estimates per task
+
+ARCHITECTURE SECTIONS:
+- Multi-tenancy requirements (if mentioned)
+- Type safety requirements
+- @fidus/ui component usage
+- Error handling requirements
+- Security requirements
+
+TECHNOLOGY STACK:
+- Backend dependencies for this phase
+- Frontend dependencies for this phase
+- Database/infrastructure setup
+- Docker services needed
+
+---
+
+CUSTOMIZATION PER PHASE
+
+PHASE 1 SPECIFICS:
+- Emphasize @fidus/ui component usage from start
+- In-memory storage (Python dict)
+- LiteLLM + Ollama setup
+- ChatInterface and MessageBubble usage
+- No databases yet
+
+PHASE 2 SPECIFICS:
+- Neo4j setup and schema
+- Multi-tenancy in Neo4j queries (CRITICAL)
+- Confidence scoring logic
+- PreferenceViewer with @fidus/ui components
+- ConfidenceIndicator usage
+- Reinforcement/weakening logic
+
+PHASE 3 SPECIFICS:
+- Qdrant setup with configurable dimensions
+- Dynamic context extraction (LLM-based)
+- Embedding service with dimension validation
+- Context storage in Neo4j + Qdrant (both tenant-scoped)
+- Domain events (Task 3.9) - event schemas
+- Error handling strategies (Task 3.9)
+- Security considerations (Task 3.9)
+- Context retrieval with similarity search
+
+PHASE 4 SPECIFICS:
+- MCP server interface
+- PostgreSQL for conversation history
+- Redis for session caching
+- Multi-user support (tenant isolation)
+- Rate limiting
+- Input sanitization
+- Security hardening
+- Ready for full Fidus integration
+
+---
+
+VALIDATION CHECKLIST
+
+After creating all 4 phase prompts, verify:
+
+COMPLETENESS:
+- [ ] All tasks from implementation-plan.md covered
+- [ ] All code examples included
+- [ ] All success criteria present
+- [ ] All testing strategies defined
+
+CONSISTENCY:
+- [ ] Architecture constraints same across all phases
+- [ ] File paths consistent
+- [ ] Terminology consistent (use DDD terms correctly)
+- [ ] No contradictions between phases
+
+QUALITY:
+- [ ] Each prompt is standalone (can run independently)
+- [ ] Instructions are actionable (not vague)
+- [ ] Code examples are complete (not pseudo-code)
+- [ ] Test commands are exact (copy-pasteable)
+
+FORMAT:
+- [ ] Plain text (no markdown ** or __)
+- [ ] Visual separators (=== and ---)
+- [ ] Code blocks marked with ```
+- [ ] Checklists use - [ ] format
+- [ ] Symbols for emphasis (✅ ❌ not bold/italic)
+
+---
+
+OUTPUT FORMAT RULES
+
+Plain text format:
+- Use === for major section dividers
+- Use --- for minor section dividers
+- Use ✅ ❌ for emphasis (not ** or __)
+- Use ALL CAPS for critical warnings
+- Use - [ ] for checklists
+- Use ``` for code blocks (with language)
+- Use numbered lists: 1. 2. 3.
+- Use bullet lists: -
+
+DO NOT USE:
+- Markdown headers (#, ##, ###)
+- Markdown bold (**text**)
+- Markdown italic (*text*)
+- Markdown links ([text](url))
+- HTML tags
+
+---
+
+EXECUTION PLAN
+
+Step 1: Read implementation-plan.md thoroughly
+Focus on:
+- Overall structure and phases
+- Task breakdowns per phase
+- Code examples
+- Success criteria
+- Architecture constraints
+
+Step 2: Create Phase 1 prompt
+File: docs/prompts/fidus-memory/phase-1-in-memory-agent.txt
+Extract: Tasks 1.1 - 1.4 from implementation-plan.md
+Emphasize: @fidus/ui usage, basic chat setup
+
+Step 3: Create Phase 2 prompt
+File: docs/prompts/fidus-memory/phase-2-persistent-preferences.txt
+Extract: Tasks 2.1 - 2.3 from implementation-plan.md
+Emphasize: Neo4j multi-tenancy, confidence scoring
+
+Step 4: Create Phase 3 prompt
+File: docs/prompts/fidus-memory/phase-3-situational-context.txt
+Extract: Tasks 3.1 - 3.9 from implementation-plan.md
+Emphasize: Qdrant setup, context extraction, domain events, error handling
+
+Step 5: Create Phase 4 prompt
+File: docs/prompts/fidus-memory/phase-4-mcp-interface.txt
+Extract: Tasks 4.1 - 4.x from implementation-plan.md
+Emphasize: MCP interface, security, PostgreSQL, production-ready
+
+Step 6: Validate all prompts
+Run through validation checklist above
+
+Step 7: Write prompts to files
+Create 4 plain-text files in docs/prompts/fidus-memory/
+
+---
+
+BEGIN EXECUTION
+
+Read docs/prototypes/fidus-memory/implementation-plan.md now and create the 4 phase prompts.
+
+Start with Phase 1.

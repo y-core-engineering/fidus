@@ -1,6 +1,11 @@
 'use client';
 
-import { EmptyCard, Button, Alert, TextInput, Link, Stack } from '@fidus/ui';
+import { EmptyCard } from '@fidus/ui/empty-card';
+import { Button } from '@fidus/ui/button';
+import { Alert } from '@fidus/ui/alert';
+import { TextInput } from '@fidus/ui/text-input';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

@@ -1,17 +1,9 @@
 'use client';
 
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableCaption,
-  Badge,
-  Link,
-  Stack,
-} from '@fidus/ui';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from '@fidus/ui/table';
+import { Badge } from '@fidus/ui/badge';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 

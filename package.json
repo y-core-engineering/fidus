@@ -26,8 +26,9 @@
     "typecheck": "turbo run typecheck",
     "prepare": "husky || true",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm build && changeset publish"
+    "version-packages": "changeset version && node scripts/sync-design-system-version.js",
+    "release": "pnpm build && changeset publish",
+    "sync-versions": "node scripts/sync-design-system-version.js"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",

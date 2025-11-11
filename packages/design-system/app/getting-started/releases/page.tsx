@@ -1,6 +1,10 @@
 'use client';
 
-import { Link, Stack, Badge, Divider, Container } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
+import { Badge } from '@fidus/ui/badge';
+import { Divider } from '@fidus/ui/divider';
+import { Container } from '@fidus/ui/container';
 import { Calendar, Package, GitBranch, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function ReleasesPage() {
@@ -17,11 +21,70 @@ export default function ReleasesPage() {
 
         <Divider />
 
-        {/* Version 1.6.1 */}
+        {/* Version 1.7.2 */}
         <Stack direction="vertical" spacing="lg" className="border-2 border-primary rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
           <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
-            <h2 className="text-3xl font-bold text-foreground">v1.6.1</h2>
+            <h2 className="text-3xl font-bold text-foreground">v1.7.2</h2>
             <Badge variant="success">Latest</Badge>
+          </Stack>
+
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Calendar className="w-4 h-4" />
+              <span>November 11, 2025</span>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <GitBranch className="w-4 h-4" />
+              <Link
+                href="https://github.com/y-core-engineering/fidus/pull/70"
+                target="_blank"
+              >
+                PR #70
+              </Link>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Package className="w-4 h-4" />
+              <Link
+                href="https://www.npmjs.com/package/@fidus/ui"
+                target="_blank"
+              >
+                NPM Package
+              </Link>
+            </Stack>
+          </Stack>
+
+          <Divider />
+
+          {/* Fixes */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Bug Fixes
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7 text-sm text-muted-foreground">
+              <p>✅ Fixed missing <code className="bg-muted px-1 py-0.5 rounded text-xs">Message</code> type imports in design system pages</p>
+              <p>✅ Removed double semicolons from import statements across design system</p>
+              <p>✅ Design system now builds successfully with all 97 pages</p>
+            </Stack>
+          </Stack>
+
+          {/* Migration */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground">Migration</h3>
+            <div className="ml-7 p-4 bg-success/10 border border-success/20 rounded-lg">
+              <p className="text-sm font-medium text-success-foreground">✅ Zero breaking changes</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                This is a patch release that fixes build errors. No changes required for existing code.
+              </p>
+            </div>
+          </Stack>
+        </Stack>
+
+        {/* Version 1.7.1 */}
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
+            <h2 className="text-3xl font-bold text-foreground">v1.7.1</h2>
             <Badge variant="info">
               <Sparkles className="w-3 h-3 mr-1" />
               Phase 3 Tree-Shaking
@@ -100,7 +163,9 @@ import { Stack } from '@fidus/ui/stack';
 import { Alert } from '@fidus/ui/alert';
 
 // ✅ Still works (development)
-import { Button, Stack, Alert } from '@fidus/ui';`}</code>
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';
+import { Alert } from '@fidus/ui/alert';`}</code>
                 </pre>
               </div>
             </Stack>

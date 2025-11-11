@@ -1,0 +1,1335 @@
+===========================================
+FIDUS MEMORY - PHASE 2: PERSISTENT PREFERENCES WITH NEO4J
+===========================================
+
+VERSION: 3.0
+PHASE: 2 of 4
+ESTIMATED DURATION: 4-5 days
+PREREQUISITE: Phase 1 completed (in-memory chat agent working)
+DELIVERABLE: Preferences persist across sessions, confidence scores update on reinforcement/rejection
+
+---
+
+ROLE & CONTEXT
+
+You are a Senior Full-Stack Engineer implementing the Fidus Memory prototype.
+
+EXPERTISE REQUIRED:
+- Python: FastAPI, async/await, type hints, Neo4j driver
+- TypeScript: Next.js 14 App Router, React 18, strict types
+- Neo4j: Cypher queries, graph data modeling
+- @fidus/ui: ConfidenceIndicator, Card, Stack, EmptyState components
+- Multi-tenant architecture
+- Domain-Driven Design (DDD)
+
+PROJECT CONTEXT
+Fidus Memory is a domain-agnostic conversational learning agent that demonstrates core learning capabilities of the Fidus system. It learns user preferences implicitly from conversations, stores them with confidence scores, and adapts to situational context.
+
+This is a PROTOTYPE with:
+- Fixed tenant_id = "prototype-tenant" (no login UI)
+- Multi-tenancy by design (ready for production scaling)
+- 100% @fidus/ui component usage (no custom CSS)
+- Local-first privacy (Ollama default)
+
+WHAT WAS BUILT PREVIOUSLY
+Phase 1 delivered:
+- Working chat interface using @fidus/ui ChatInterface
+- In-memory preference learning (Python dict)
+- LLM-based preference extraction
+- LiteLLM + Ollama integration
+- Preferences reset on page reload (expected in Phase 1)
+
+WHAT THIS PHASE ADDS
+Phase 2 adds persistence using Neo4j graph database. Preferences are now stored permanently with multi-tenant isolation. Each preference has a confidence score that increases when user accepts suggestions (+0.1, max 0.95) and decreases when user rejects them (-0.15, min 0.0). A PreferenceViewer UI component displays all learned preferences grouped by domain, showing confidence levels and reinforcement counts. Users can delete all memories with a single button.
+
+---
+
+SUCCESS CRITERIA
+
+At the end of this phase, you must be able to demonstrate:
+
+USER EXPERIENCE:
+- Preferences survive page reload
+- User can view all learned preferences in sidebar/panel
+- Confidence increases when user accepts suggestion (+0.1)
+- Confidence decreases when user rejects suggestion (-0.15)
+- "Delete All Memories" button clears all preferences
+- Preferences grouped by domain in viewer
+
+TECHNICAL REQUIREMENTS:
+- All tests passing (unit tests at minimum)
+- Lint checks passing (pnpm lint)
+- Type checks passing (pnpm typecheck)
+- Multi-tenancy verified (tenant_id in ALL Neo4j queries)
+- @fidus/ui components used exclusively
+- Neo4j database persists data across restarts
+- Confidence scores update correctly
+
+---
+
+IMPLEMENTATION TASKS
+
+---
+
+TASK 2.1: Neo4j Schema & Client
+
+GOAL
+Set up Neo4j graph database with multi-tenant schema and implement a client for CRUD operations on preferences.
+
+ACCEPTANCE CRITERIA
+- [ ] Neo4j running in Docker
+- [ ] User and Preference nodes defined
+- [ ] All queries include tenant_id filter
+- [ ] Neo4jPreferenceStore class implemented
+- [ ] CRUD operations work (create, get, reinforce, weaken, delete)
+- [ ] Python uuid4() used for ID generation
+- [ ] Type hints on all methods
+
+IMPLEMENTATION STEPS
+
+Step 1: Add Neo4j to docker-compose.yml
+File: docker-compose.yml
+Action: modify existing
+
+Add Neo4j service:
+
+```yaml
+services:
+  # ... existing services (ollama, litellm, api, web)
+
+  neo4j:
+    image: neo4j:5.13
+    container_name: fidus-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_PLUGINS=["apoc"]
+    volumes:
+      - neo4j_data:/data
+    networks:
+      - fidus-network
+
+volumes:
+  ollama_data:
+    driver: local
+  neo4j_data:  # Add this
+    driver: local
+```
+
+Validation:
+- Start services: docker-compose up -d
+- Check Neo4j browser: http://localhost:7474
+- Login with neo4j/password123
+
+Step 2: Create PrototypeConfig
+File: packages/api/fidus/config.py
+Action: create new
+
+```python
+class PrototypeConfig:
+    """Configuration for Fidus Memory prototype."""
+
+    # Multi-tenancy
+    PROTOTYPE_TENANT_ID = "prototype-tenant"
+
+    # Neo4j
+    NEO4J_URI = "bolt://localhost:7687"
+    NEO4J_USER = "neo4j"
+    NEO4J_PASSWORD = "password123"
+
+    # Embedding configuration
+    EMBEDDING_MODEL = "ollama/nomic-embed-text"
+    EMBEDDING_DIMENSIONS = {
+        "ollama/nomic-embed-text": 768,
+        "openai/text-embedding-3-small": 1536,
+        "openai/text-embedding-3-large": 3072,
+    }
+
+    # LLM
+    DEFAULT_LLM_PROVIDER = "ollama"
+    DEFAULT_LLM_MODEL = "llama3.1:8b"
+```
+
+Validation:
+- File exists
+- Can be imported: from fidus.config import PrototypeConfig
+
+Step 3: Create Neo4jPreferenceStore
+File: packages/api/fidus/infrastructure/neo4j_client.py
+Action: create new
+
+```python
+from typing import Dict, Any, List
+from uuid import uuid4
+import neo4j
+from fidus.config import PrototypeConfig
+
+
+class Neo4jPreferenceStore:
+    """Neo4j client for preference storage.
+
+    Multi-Tenancy: All preferences scoped to tenant_id.
+    UUID Generation: Standardized to Python uuid4() for consistency.
+    """
+
+    def __init__(self, uri: str, user: str, password: str):
+        self.driver = neo4j.GraphDatabase.driver(uri, auth=(user, password))
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+    async def create_preference(self, user_id: str, pref: Dict[str, Any]) -> str:
+        """Create new preference node.
+
+        Multi-Tenancy: All preferences scoped to tenant_id.
+        UUID Generation: Standardized to Python uuid4() for consistency.
+        """
+        preference_id = str(uuid4())  # Standardized UUID generation
+
+        query = """
+        MERGE (u:User {id: $user_id, tenant_id: $tenant_id})
+        CREATE (p:Preference {
+            id: $preference_id,
+            tenant_id: $tenant_id,
+            domain: $domain,
+            key: $key,
+            value: $value,
+            confidence: $confidence,
+            learned_at: datetime(),
+            last_reinforced: datetime(),
+            reinforcement_count: 1,
+            rejection_count: 0
+        })
+        CREATE (u)-[:HAS_PREFERENCE]->(p)
+        RETURN p.id AS id
+        """
+
+        async with self.driver.session() as session:
+            result = await session.run(
+                query,
+                user_id=user_id,
+                tenant_id=self.tenant_id,
+                preference_id=preference_id,
+                domain=pref['domain'],
+                key=pref['key'],
+                value=pref['value'],
+                confidence=pref.get('confidence', 0.7)
+            )
+            await result.consume()
+
+        return preference_id
+
+    async def reinforce_preference(self, pref_id: str, user_id: str) -> None:
+        """Increase confidence on acceptance.
+
+        Multi-Tenancy: Validate preference belongs to user's tenant.
+        Confidence: +0.1 per reinforcement, max 0.95
+        """
+        query = """
+        MATCH (p:Preference {id: $pref_id, tenant_id: $tenant_id})
+        SET p.confidence = CASE
+            WHEN p.confidence + 0.1 > 0.95 THEN 0.95
+            ELSE p.confidence + 0.1
+        END,
+        p.last_reinforced = datetime(),
+        p.reinforcement_count = p.reinforcement_count + 1
+        """
+
+        async with self.driver.session() as session:
+            await session.run(
+                query,
+                pref_id=pref_id,
+                tenant_id=self.tenant_id
+            )
+
+    async def weaken_preference(self, pref_id: str, user_id: str) -> None:
+        """Decrease confidence on rejection.
+
+        Multi-Tenancy: Validate preference belongs to user's tenant.
+        Confidence: -0.15 per rejection, min 0.0
+        """
+        query = """
+        MATCH (p:Preference {id: $pref_id, tenant_id: $tenant_id})
+        SET p.confidence = CASE
+            WHEN p.confidence - 0.15 < 0 THEN 0
+            ELSE p.confidence - 0.15
+        END,
+        p.rejection_count = p.rejection_count + 1
+        """
+
+        async with self.driver.session() as session:
+            await session.run(
+                query,
+                pref_id=pref_id,
+                tenant_id=self.tenant_id
+            )
+
+    async def get_all_preferences(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all preferences for user.
+
+        Multi-Tenancy: Only return preferences in user's tenant.
+        """
+        query = """
+        MATCH (u:User {id: $user_id, tenant_id: $tenant_id})-[:HAS_PREFERENCE]->(p:Preference {tenant_id: $tenant_id})
+        RETURN p
+        ORDER BY p.confidence DESC, p.last_reinforced DESC
+        """
+
+        async with self.driver.session() as session:
+            result = await session.run(
+                query,
+                user_id=user_id,
+                tenant_id=self.tenant_id
+            )
+            records = await result.data()
+            return [dict(record['p']) for record in records]
+
+    async def delete_all_preferences(self, user_id: str) -> None:
+        """Delete all user preferences.
+
+        Multi-Tenancy: Only delete preferences in user's tenant.
+        """
+        query = """
+        MATCH (u:User {id: $user_id, tenant_id: $tenant_id})-[:HAS_PREFERENCE]->(p:Preference {tenant_id: $tenant_id})
+        DETACH DELETE p
+        """
+
+        async with self.driver.session() as session:
+            await session.run(
+                query,
+                user_id=user_id,
+                tenant_id=self.tenant_id
+            )
+
+    async def close(self):
+        """Close database connection."""
+        await self.driver.close()
+```
+
+Validation:
+- Class can be instantiated
+- All methods have type hints
+- All queries include tenant_id
+
+TESTING
+
+Unit Tests:
+File: packages/api/tests/infrastructure/test_neo4j_client.py
+Action: create new
+
+```python
+import pytest
+from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
+from fidus.config import PrototypeConfig
+
+
+@pytest.fixture
+async def neo4j_store():
+    """Fixture for Neo4j store."""
+    store = Neo4jPreferenceStore(
+        PrototypeConfig.NEO4J_URI,
+        PrototypeConfig.NEO4J_USER,
+        PrototypeConfig.NEO4J_PASSWORD
+    )
+    yield store
+    await store.close()
+
+
+@pytest.mark.asyncio
+async def test_create_preference(neo4j_store):
+    """Should create preference in Neo4j."""
+    user_id = "test-user-1"
+    pref = {
+        "domain": "coffee",
+        "key": "type",
+        "value": "cappuccino",
+        "confidence": 0.8
+    }
+
+    pref_id = await neo4j_store.create_preference(user_id, pref)
+
+    assert pref_id is not None
+    assert len(pref_id) == 36  # UUID format
+
+
+@pytest.mark.asyncio
+async def test_get_all_preferences(neo4j_store):
+    """Should retrieve all user preferences."""
+    user_id = "test-user-2"
+
+    # Create preference
+    pref = {
+        "domain": "coding",
+        "key": "time",
+        "value": "morning",
+        "confidence": 0.7
+    }
+    await neo4j_store.create_preference(user_id, pref)
+
+    # Retrieve
+    prefs = await neo4j_store.get_all_preferences(user_id)
+
+    assert len(prefs) >= 1
+    assert prefs[0]['domain'] == "coding"
+
+
+@pytest.mark.asyncio
+async def test_reinforce_preference(neo4j_store):
+    """Should increase confidence by 0.1."""
+    user_id = "test-user-3"
+
+    # Create preference
+    pref = {
+        "domain": "test",
+        "key": "test_key",
+        "value": "test_value",
+        "confidence": 0.5
+    }
+    pref_id = await neo4j_store.create_preference(user_id, pref)
+
+    # Reinforce
+    await neo4j_store.reinforce_preference(pref_id, user_id)
+
+    # Check confidence increased
+    prefs = await neo4j_store.get_all_preferences(user_id)
+    assert prefs[0]['confidence'] == 0.6  # 0.5 + 0.1
+
+
+@pytest.mark.asyncio
+async def test_weaken_preference(neo4j_store):
+    """Should decrease confidence by 0.15."""
+    user_id = "test-user-4"
+
+    # Create preference
+    pref = {
+        "domain": "test",
+        "key": "test_key",
+        "value": "test_value",
+        "confidence": 0.5
+    }
+    pref_id = await neo4j_store.create_preference(user_id, pref)
+
+    # Weaken
+    await neo4j_store.weaken_preference(pref_id, user_id)
+
+    # Check confidence decreased
+    prefs = await neo4j_store.get_all_preferences(user_id)
+    assert prefs[0]['confidence'] == 0.35  # 0.5 - 0.15
+
+
+@pytest.mark.asyncio
+async def test_delete_all_preferences(neo4j_store):
+    """Should delete all user preferences."""
+    user_id = "test-user-5"
+
+    # Create preferences
+    pref1 = {"domain": "d1", "key": "k1", "value": "v1"}
+    pref2 = {"domain": "d2", "key": "k2", "value": "v2"}
+    await neo4j_store.create_preference(user_id, pref1)
+    await neo4j_store.create_preference(user_id, pref2)
+
+    # Delete all
+    await neo4j_store.delete_all_preferences(user_id)
+
+    # Verify empty
+    prefs = await neo4j_store.get_all_preferences(user_id)
+    assert len(prefs) == 0
+```
+
+Run tests:
+```
+pushd packages/api
+poetry run pytest tests/infrastructure/test_neo4j_client.py -v
+popd
+```
+
+Manual Testing:
+```
+# Start Neo4j
+docker-compose up -d neo4j
+
+# Open Neo4j browser
+http://localhost:7474
+
+# Login: neo4j/password123
+
+# Run test query
+MATCH (u:User)-[:HAS_PREFERENCE]->(p:Preference)
+RETURN u, p
+LIMIT 10
+```
+
+VERIFICATION CHECKLIST
+- [ ] Neo4j service running
+- [ ] Neo4jPreferenceStore implemented
+- [ ] All queries include tenant_id
+- [ ] Python uuid4() used for IDs
+- [ ] Unit tests pass
+- [ ] Multi-tenancy enforced
+
+---
+
+TASK 2.2: Update Agent to Use Neo4j
+
+GOAL
+Replace in-memory dict storage with Neo4j persistence in the chat agent.
+
+ACCEPTANCE CRITERIA
+- [ ] PersistentAgent class implemented
+- [ ] Loads preferences from Neo4j on each chat
+- [ ] Stores new preferences in Neo4j
+- [ ] Provides accept/reject methods for suggestions
+- [ ] Type hints on all methods
+
+IMPLEMENTATION STEPS
+
+Step 1: Create PersistentAgent
+File: packages/api/fidus/memory/persistent_agent.py
+Action: create new
+
+```python
+from typing import Dict, Any, List
+from litellm import acompletion
+import json
+from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
+
+
+class PersistentAgent:
+    """Chat agent with Neo4j preference persistence."""
+
+    def __init__(self, llm_model: str, neo4j_store: Neo4jPreferenceStore):
+        self.llm_model = llm_model
+        self.store = neo4j_store
+
+    async def chat(self, user_id: str, message: str) -> Dict[str, Any]:
+        """Process message and return response with suggestions.
+
+        Returns:
+            {
+                "response": str,
+                "suggestions": List[Dict],
+                "learned_preferences": List[Dict]
+            }
+        """
+
+        # 1. Load existing preferences from Neo4j
+        preferences = await self.store.get_all_preferences(user_id)
+
+        # 2. Build system prompt with preferences
+        system_prompt = self._build_prompt(preferences)
+
+        # 3. Generate response
+        response_obj = await acompletion(
+            model=self.llm_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ]
+        )
+        response = response_obj.choices[0].message.content
+
+        # 4. Extract new preferences from message
+        extracted = await self._extract_preferences(message)
+
+        # 5. Store new preferences in Neo4j
+        for pref in extracted:
+            await self.store.create_preference(user_id, pref)
+
+        # 6. Identify suggestions in response (simplified for Phase 2)
+        suggestions = []
+
+        return {
+            "response": response,
+            "suggestions": suggestions,
+            "learned_preferences": extracted
+        }
+
+    async def _extract_preferences(self, text: str) -> List[Dict[str, Any]]:
+        """Use LLM to extract preferences from text."""
+        prompt = f"""Extract user preferences from this text.
+
+        Text: "{text}"
+
+        Return JSON with "preferences" array:
+        {{
+            "preferences": [
+                {{"domain": "...", "key": "...", "value": "...", "confidence": 0.0-1.0}}
+            ]
+        }}
+
+        If no preferences found, return {{"preferences": []}}.
+        """
+
+        response = await acompletion(
+            model=self.llm_model,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"}
+        )
+
+        try:
+            result = json.loads(response.choices[0].message.content)
+            return result.get("preferences", [])
+        except json.JSONDecodeError:
+            return []
+
+    def _build_prompt(self, preferences: List[Dict[str, Any]]) -> str:
+        """Build system prompt with learned preferences."""
+        base = "You are Fidus Memory, a conversational AI that learns user preferences.\n\n"
+
+        if preferences:
+            base += "What you've learned about the user:\n"
+            for pref in preferences:
+                base += f"- {pref['domain']}.{pref['key']}: {pref['value']} "
+                base += f"(confidence: {pref['confidence']:.0%})\n"
+
+        return base
+
+    async def accept_suggestion(self, user_id: str, pref_id: str) -> None:
+        """User accepted suggestion - reinforce preference."""
+        await self.store.reinforce_preference(pref_id, user_id)
+
+    async def reject_suggestion(self, user_id: str, pref_id: str) -> None:
+        """User rejected suggestion - weaken preference."""
+        await self.store.weaken_preference(pref_id, user_id)
+```
+
+Validation:
+- Class can be instantiated
+- chat() method returns expected structure
+- Preferences are loaded from Neo4j
+
+Step 2: Update API route to use PersistentAgent
+File: packages/api/fidus/api/routes/memory.py
+Action: modify existing
+
+```python
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from fidus.memory.persistent_agent import PersistentAgent
+from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
+from fidus.config import PrototypeConfig
+
+router = APIRouter(prefix="/memory", tags=["memory"])
+
+# Initialize Neo4j store
+neo4j_store = Neo4jPreferenceStore(
+    PrototypeConfig.NEO4J_URI,
+    PrototypeConfig.NEO4J_USER,
+    PrototypeConfig.NEO4J_PASSWORD
+)
+
+# Initialize persistent agent
+agent = PersistentAgent(
+    llm_model=PrototypeConfig.DEFAULT_LLM_MODEL,
+    neo4j_store=neo4j_store
+)
+
+
+class ChatRequest(BaseModel):
+    user_id: str
+    message: str
+
+
+class ChatResponse(BaseModel):
+    response: str
+    suggestions: list = []
+    learned_preferences: list = []
+
+
+class FeedbackRequest(BaseModel):
+    user_id: str
+    pref_id: str
+    action: str  # "accept" or "reject"
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    """Chat endpoint with Neo4j persistence."""
+    try:
+        result = await agent.chat(request.user_id, request.message)
+        return ChatResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/feedback")
+async def feedback(request: FeedbackRequest):
+    """Handle user feedback on suggestions."""
+    try:
+        if request.action == "accept":
+            await agent.accept_suggestion(request.user_id, request.pref_id)
+        elif request.action == "reject":
+            await agent.reject_suggestion(request.user_id, request.pref_id)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid action")
+
+        return {"status": "ok"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/preferences/{user_id}")
+async def delete_preferences(user_id: str):
+    """Delete all preferences for user."""
+    try:
+        await neo4j_store.delete_all_preferences(user_id)
+        return {"status": "ok"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/preferences/{user_id}")
+async def get_preferences(user_id: str):
+    """Get all preferences for user."""
+    try:
+        prefs = await neo4j_store.get_all_preferences(user_id)
+        return {"preferences": prefs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+Validation:
+- All endpoints defined
+- Routes work with PersistentAgent
+- Error handling in place
+
+TESTING
+
+Unit Tests:
+File: packages/api/tests/memory/test_persistent_agent.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.persistent_agent import PersistentAgent
+from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
+from fidus.config import PrototypeConfig
+
+
+@pytest.fixture
+async def agent():
+    """Fixture for persistent agent."""
+    store = Neo4jPreferenceStore(
+        PrototypeConfig.NEO4J_URI,
+        PrototypeConfig.NEO4J_USER,
+        PrototypeConfig.NEO4J_PASSWORD
+    )
+    agent = PersistentAgent(PrototypeConfig.DEFAULT_LLM_MODEL, store)
+    yield agent
+    await store.close()
+
+
+@pytest.mark.asyncio
+async def test_agent_chat_stores_preferences(agent):
+    """Should store preferences in Neo4j."""
+    user_id = "test-user-persist"
+    message = "I prefer coding in the morning"
+
+    result = await agent.chat(user_id, message)
+
+    assert "response" in result
+    assert isinstance(result["response"], str)
+
+
+@pytest.mark.asyncio
+async def test_agent_loads_preferences(agent):
+    """Should load preferences from Neo4j."""
+    user_id = "test-user-load"
+
+    # Store preference
+    await agent.chat(user_id, "I like cappuccino")
+
+    # Chat again - should load preference
+    result = await agent.chat(user_id, "What do I like?")
+
+    # Response should mention cappuccino (if LLM extracts correctly)
+    assert isinstance(result["response"], str)
+```
+
+Manual Testing:
+```
+# Start services
+docker-compose up -d
+
+# Test chat
+curl -X POST http://localhost:8000/memory/chat \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "user-1", "message": "I prefer coding in the morning"}'
+
+# Test get preferences
+curl http://localhost:8000/memory/preferences/user-1
+
+# Test delete preferences
+curl -X DELETE http://localhost:8000/memory/preferences/user-1
+```
+
+VERIFICATION CHECKLIST
+- [ ] PersistentAgent works
+- [ ] Preferences stored in Neo4j
+- [ ] Preferences loaded from Neo4j
+- [ ] Accept/reject methods work
+- [ ] API endpoints respond correctly
+
+---
+
+TASK 2.3: Preference Viewer UI
+
+GOAL
+Create a UI component to display all learned preferences grouped by domain, using ONLY @fidus/ui components.
+
+ACCEPTANCE CRITERIA
+- [ ] PreferenceViewer component implemented
+- [ ] Uses ONLY @fidus/ui components (NO custom divs)
+- [ ] Displays preferences grouped by domain
+- [ ] Shows ConfidenceIndicator for each preference
+- [ ] "Delete All Memories" button works
+- [ ] EmptyState shown when no preferences
+- [ ] Type-safe with Zod schema
+
+IMPLEMENTATION STEPS
+
+Step 1: Create Zod schema for Preference type
+File: packages/shared/src/schemas/memory.ts
+Action: create new
+
+```typescript
+import { z } from 'zod';
+
+export const PreferenceSchema = z.object({
+  id: z.string().uuid(),
+  tenant_id: z.string(),
+  domain: z.string(),
+  key: z.string(),
+  value: z.any(),
+  confidence: z.number().min(0).max(1),
+  learned_at: z.date(),
+  last_reinforced: z.date(),
+  reinforcement_count: z.number().int().nonnegative(),
+  rejection_count: z.number().int().nonnegative(),
+});
+
+export type Preference = z.infer<typeof PreferenceSchema>;
+```
+
+Validation:
+- Schema exports correctly
+- Type inference works
+
+Step 2: Create PreferenceViewer component
+File: packages/web/app/fidus-memory/components/preference-viewer.tsx
+Action: create new
+
+```typescript
+import {
+  Stack,
+  Card,
+  ConfidenceIndicator,
+  EmptyState,
+  Divider,
+  Heading,
+  Text,
+  Button
+} from '@fidus/ui';
+import { Preference } from '@fidus/shared/schemas/memory';
+
+interface PreferenceViewerProps {
+  preferences: Preference[];
+  onDelete?: () => void;
+}
+
+function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
+  return array.reduce((result, item) => {
+    const group = String(item[key]);
+    if (!result[group]) {
+      result[group] = [];
+    }
+    result[group].push(item);
+    return result;
+  }, {} as Record<string, T[]>);
+}
+
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString();
+}
+
+export function PreferenceViewer({ preferences, onDelete }: PreferenceViewerProps) {
+  if (preferences.length === 0) {
+    return (
+      <EmptyState
+        title="No Preferences Yet"
+        description="Start chatting to teach Fidus Memory about your preferences"
+        icon="brain"
+      />
+    );
+  }
+
+  // Group by domain
+  const grouped = groupBy(preferences, 'domain');
+
+  return (
+    <Stack spacing="lg">
+      <Stack spacing="sm" direction="row" justify="between" align="center">
+        <Heading level={2}>Learned Preferences</Heading>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={onDelete}
+        >
+          Delete All Memories
+        </Button>
+      </Stack>
+
+      <Text variant="secondary">
+        {preferences.length} preferences across {Object.keys(grouped).length} domains
+      </Text>
+
+      <Divider />
+
+      {Object.entries(grouped).map(([domain, prefs]) => (
+        <Stack key={domain} spacing="md">
+          <Heading level={3}>{domain}</Heading>
+
+          {prefs.map(pref => (
+            <Card key={pref.id} variant="outlined">
+              <Stack spacing="sm">
+                <Heading level={4}>{pref.key}</Heading>
+                <Text>{String(pref.value)}</Text>
+
+                <ConfidenceIndicator
+                  value={pref.confidence}
+                  variant="detailed"
+                  size="sm"
+                />
+
+                <Text variant="caption">
+                  Learned {formatDate(pref.learned_at)} •
+                  Reinforced {pref.reinforcement_count}x
+                </Text>
+              </Stack>
+            </Card>
+          ))}
+        </Stack>
+      ))}
+    </Stack>
+  );
+}
+```
+
+Validation:
+- Component renders without errors
+- Only @fidus/ui components used
+- No custom divs or styled components
+
+Step 3: Integrate PreferenceViewer into main page
+File: packages/web/app/fidus-memory/page.tsx
+Action: modify existing
+
+```typescript
+'use client';
+
+import { ChatInterface } from '@fidus/ui';
+import { PreferenceViewer } from './components/preference-viewer';
+import { useState, useEffect } from 'react';
+import { Preference, PreferenceSchema } from '@fidus/shared/schemas/memory';
+import { z } from 'zod';
+
+export default function FidusMemoryPage() {
+  const [messages, setMessages] = useState([]);
+  const [preferences, setPreferences] = useState<Preference[]>([]);
+
+  // Load preferences on mount
+  useEffect(() => {
+    loadPreferences();
+  }, []);
+
+  const loadPreferences = async () => {
+    const response = await fetch('/api/memory/preferences/user-1');
+    const data = await response.json();
+
+    // Validate with Zod
+    const validated = z.array(PreferenceSchema).parse(data.preferences);
+    setPreferences(validated);
+  };
+
+  const handleSendMessage = async (content: string) => {
+    // Add user message
+    const userMessage = {
+      id: crypto.randomUUID(),
+      role: 'user' as const,
+      content,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Call backend
+    const response = await fetch('/api/memory/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: 'user-1', message: content }),
+    });
+
+    const data = await response.json();
+
+    // Add bot message
+    const botMessage = {
+      id: crypto.randomUUID(),
+      role: 'assistant' as const,
+      content: data.response,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, botMessage]);
+
+    // Reload preferences
+    await loadPreferences();
+  };
+
+  const handleDeleteAll = async () => {
+    await fetch('/api/memory/preferences/user-1', {
+      method: 'DELETE',
+    });
+    await loadPreferences();
+  };
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', height: '100vh' }}>
+      <ChatInterface
+        messages={messages}
+        onSendMessage={handleSendMessage}
+        placeholder="Chat with Fidus Memory..."
+        isLoading={false}
+      />
+      <div style={{ padding: '1rem', overflowY: 'auto' }}>
+        <PreferenceViewer
+          preferences={preferences}
+          onDelete={handleDeleteAll}
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+Validation:
+- Page renders with chat and preference viewer
+- Preferences load on mount
+- "Delete All" button works
+
+Step 4: Create Next.js API routes for preferences
+File: packages/web/app/api/memory/preferences/[userId]/route.ts
+Action: create new
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
+  const response = await fetch(`http://localhost:8000/memory/preferences/${params.userId}`);
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
+  const response = await fetch(`http://localhost:8000/memory/preferences/${params.userId}`, {
+    method: 'DELETE',
+  });
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+```
+
+Validation:
+- GET /api/memory/preferences/[userId] works
+- DELETE /api/memory/preferences/[userId] works
+
+TESTING
+
+Manual Testing:
+```
+# Start all services
+docker-compose up -d
+
+# Open browser
+http://localhost:3000/fidus-memory
+
+# Test workflow:
+1. Chat: "I prefer coding in the morning"
+2. Verify preference appears in sidebar
+3. Reload page
+4. Verify preference still there (persistence)
+5. Click "Delete All Memories"
+6. Verify EmptyState shown
+```
+
+VERIFICATION CHECKLIST
+- [ ] PreferenceViewer renders correctly
+- [ ] Only @fidus/ui components used
+- [ ] Preferences grouped by domain
+- [ ] ConfidenceIndicator shows confidence
+- [ ] Delete All button works
+- [ ] EmptyState shown when no preferences
+- [ ] Zod validation works
+
+---
+
+ARCHITECTURE CONSTRAINTS (CRITICAL - DO NOT VIOLATE)
+
+MULTI-TENANCY (MUST FOLLOW)
+- ALL Neo4j queries MUST include tenant_id filter
+- Use PrototypeConfig.PROTOTYPE_TENANT_ID ("prototype-tenant")
+- Scope queries: MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
+- Test tenant isolation: verify user A cannot access user B's data
+
+TYPE SAFETY (MUST FOLLOW)
+- TypeScript: NO 'any' types, use strict mode
+- TypeScript: NO type casting with 'as' (use type guards)
+- TypeScript: Use Zod schemas at ALL API boundaries
+- Python: Type hints on ALL functions
+- Python: Use Pydantic for request/response models
+- Validate runtime types with Zod (TypeScript)
+
+@fidus/ui COMPONENTS (MUST FOLLOW)
+- Use ONLY @fidus/ui components
+- Available: ChatInterface, MessageBubble, ConfidenceIndicator, Card, Stack, Heading, Text, Button, Divider, EmptyState
+- NO custom HTML tags: NO <div>, <p>, <span>, <h1-6>
+- NO Tailwind classes: NO className="text-xs text-gray-500"
+- NO custom CSS or styled-components
+- Exception: Layout divs with inline styles (e.g., grid layout) acceptable
+
+UUID GENERATION (MUST FOLLOW)
+- Use Python uuid4() for ALL ID generation
+- Generate IDs in Python, pass to database queries
+- DO NOT use database UUID functions (randomUUID() in Cypher)
+- Consistency: str(uuid4()) everywhere
+
+ERROR HANDLING (MUST FOLLOW)
+- Wrap ALL LLM API calls in try-except
+- Provide fallbacks for database failures
+- Return user-friendly error messages
+- Log errors with context (user_id, tenant_id, operation)
+
+---
+
+COMMON PITFALLS (AVOID THESE)
+
+❌ DON'T skip tenant_id in Neo4j queries
+❌ DON'T use database UUID generation (use Python uuid4)
+❌ DON'T create custom UI components (use @fidus/ui)
+❌ DON'T use type casting (as) in TypeScript
+❌ DON'T skip error handling on LLM calls
+❌ DON'T use Tailwind classes or custom CSS
+❌ DON'T create <div> or <p> tags (use @fidus/ui Text/Stack)
+❌ DON'T commit without running tests
+❌ DON'T ignore CLAUDE.md conventions
+
+---
+
+TESTING STRATEGY
+
+UNIT TESTS (REQUIRED)
+
+Backend Tests:
+File: packages/api/tests/infrastructure/test_neo4j_client.py (see Task 2.1)
+File: packages/api/tests/memory/test_persistent_agent.py (see Task 2.2)
+
+Run tests:
+```
+pushd packages/api
+poetry run pytest tests/ -v
+popd
+```
+
+MANUAL TESTING STEPS
+1. Start services: docker-compose up -d
+2. Open http://localhost:3000/fidus-memory
+3. Test preference learning: "I prefer coding in the morning"
+4. Verify preference appears in sidebar
+5. Reload page
+6. Verify preference persists
+7. Test another preference: "I like cappuccino"
+8. Verify both preferences shown, grouped by domain
+9. Click "Delete All Memories"
+10. Verify EmptyState shown
+11. Add preference again
+12. Verify it appears
+
+Expected Behavior:
+- Preferences persist across page reloads
+- Preferences grouped by domain
+- ConfidenceIndicator shows confidence level
+- Delete All clears all preferences
+- EmptyState shown when no preferences
+
+---
+
+PHASE COMPLETION CHECKLIST
+
+Before marking this phase as COMPLETE, verify ALL of the following:
+
+FUNCTIONALITY
+- [ ] Preferences persist across page reloads
+- [ ] Preferences visible in PreferenceViewer sidebar
+- [ ] Preferences grouped by domain
+- [ ] ConfidenceIndicator shows confidence
+- [ ] "Delete All Memories" button works
+- [ ] EmptyState shown when no preferences
+- [ ] Confidence updates on accept/reject (if implemented)
+
+CODE QUALITY
+- [ ] Unit tests passing (poetry run pytest)
+- [ ] Lint checks passing (pnpm lint)
+- [ ] Type checks passing (pnpm typecheck)
+- [ ] No console errors in browser
+- [ ] No Python exceptions in logs
+
+ARCHITECTURE COMPLIANCE
+- [ ] Multi-tenancy: tenant_id in ALL Neo4j queries
+- [ ] Type safety: No 'any' types, Zod schemas at API boundaries
+- [ ] @fidus/ui: No custom divs, only @fidus/ui components
+- [ ] UUID: Python uuid4() used consistently
+- [ ] Error handling: LLM calls wrapped, fallbacks in place
+
+SECURITY
+- [ ] Input sanitization implemented
+- [ ] No Cypher injection vulnerabilities
+- [ ] No secrets in code (use environment variables)
+
+SERVICES
+- [ ] docker-compose up starts all services
+- [ ] Neo4j accessible at http://localhost:7474
+- [ ] Backend API responds
+- [ ] Frontend loads without errors
+
+DOCUMENTATION
+- [ ] Code comments for complex logic
+- [ ] No TODOs left in code
+
+---
+
+RESOURCES & DOCUMENTATION
+
+MUST READ BEFORE STARTING:
+1. docs/prototypes/fidus-memory/implementation-plan.md (Phase 2 section)
+2. CLAUDE.md (Multi-tenancy, Type Safety, @fidus/ui)
+3. Neo4j Cypher manual: https://neo4j.com/docs/cypher-manual/current/
+4. @fidus/ui ConfidenceIndicator docs
+
+REFERENCE ARCHITECTURE:
+- docs/architecture/README.md (System overview)
+- docs/domain-model/README.md (DDD patterns)
+- packages/ui/README.md (@fidus/ui component library)
+
+CONFIGURATION:
+- packages/api/fidus/config.py (PrototypeConfig)
+- packages/shared/src/schemas/memory.ts (Zod schemas)
+
+KEY FILES IN THIS PHASE:
+- packages/api/fidus/infrastructure/neo4j_client.py (Neo4j client)
+- packages/api/fidus/memory/persistent_agent.py (Persistent agent)
+- packages/api/fidus/api/routes/memory.py (API routes)
+- packages/web/app/fidus-memory/components/preference-viewer.tsx (UI component)
+- packages/shared/src/schemas/memory.ts (Zod schemas)
+
+USEFUL COMMANDS:
+```
+# Start all services
+docker-compose up -d
+
+# Check Neo4j browser
+http://localhost:7474
+
+# Run Cypher queries
+MATCH (u:User)-[:HAS_PREFERENCE]->(p:Preference)
+RETURN u, p
+
+# Backend tests
+pushd packages/api
+poetry run pytest tests/ -v
+popd
+
+# Type check
+pnpm typecheck
+
+# Lint
+pnpm lint
+```
+
+---
+
+DEVELOPMENT WORKFLOW
+
+RECOMMENDED APPROACH:
+1. Read implementation-plan.md Phase 2 section thoroughly
+2. Verify Phase 1 is complete and working
+3. Set up Neo4j (docker-compose up -d neo4j)
+4. Work through tasks sequentially (Task 2.1, 2.2, 2.3)
+5. After EACH task: run tests, verify functionality
+6. Before moving to next task: commit working code
+7. After ALL tasks: run full phase completion checklist
+8. Demo the deliverable to confirm phase success
+
+GIT WORKFLOW:
+- Create feature branch: git checkout -b feature/phase-2-persistent-preferences
+- Commit after each completed task
+- Before final commit: run lint, typecheck, tests
+- Create PR when phase complete
+
+DEBUGGING TIPS:
+- Check Neo4j browser for data: http://localhost:7474
+- Run Cypher queries manually to verify data
+- Check docker-compose logs: docker-compose logs neo4j
+- Verify services running: docker-compose ps
+- Test API directly: curl http://localhost:8000/memory/preferences/user-1
+- Use Python debugger: import pdb; pdb.set_trace()
+- Check browser console for frontend errors
+
+---
+
+QUESTIONS OR BLOCKERS?
+
+If you encounter issues:
+1. Re-read implementation-plan.md Phase 2 section
+2. Check CLAUDE.md for multi-tenancy requirements
+3. Verify Neo4j is running: docker-compose ps
+4. Check Neo4j logs: docker-compose logs neo4j
+5. Test Cypher queries in Neo4j browser
+6. Review error messages carefully
+7. If requirements ambiguous: ask for clarification
+8. If stuck: break task into smaller steps
+
+DO NOT:
+- Skip steps hoping it will work
+- Ignore test failures
+- Proceed if architecture constraints violated
+- Commit broken code
+- Skip tenant_id in queries
+
+---
+
+NEXT PHASE PREVIEW
+
+Phase 3 will add dynamic situational context using Qdrant vector database. The system will learn context-dependent preferences (e.g., "cappuccino in the morning" vs "espresso in the afternoon"). An LLM will dynamically extract context factors from conversations, and embedding-based similarity search will retrieve preferences for similar situations. Domain events will be added for integration with the full Fidus system.
+
+---
+
+BEGIN IMPLEMENTATION
+
+Start with Task 2.1 and work sequentially through all tasks.
+
+REMEMBER:
+- Read implementation-plan.md Phase 2 section FIRST
+- Include tenant_id in ALL Neo4j queries
+- Use ONLY @fidus/ui components (NO custom divs)
+- Use Python uuid4() for ALL ID generation
+- Test after EACH task
+- Verify phase completion checklist before marking complete
+
+Good luck! 🚀
+
+===========================================
+END OF PHASE 2 PROMPT
+===========================================

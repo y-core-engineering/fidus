@@ -1,15 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import {
-  Button,
-  Stack,
-  TextInput,
-  Select,
-  ProgressBar,
-  Alert,
-  Badge
-} from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';
+import { TextInput } from '@fidus/ui/text-input';
+import { Select } from '@fidus/ui/select';
+import { ProgressBar } from '@fidus/ui/progress-bar';
+import { Alert } from '@fidus/ui/alert';
+import { Badge } from '@fidus/ui/badge';;
 import { Calendar, TrendingUp, DollarSign, Clock } from 'lucide-react';
 
 type UIForm = 'chat' | 'form' | 'widget' | 'wizard';

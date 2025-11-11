@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Button, Stack, TextInput } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';
+import { TextInput } from '@fidus/ui/text-input';;
 import { Search, Check, Copy } from 'lucide-react';
 import { CodeBlock } from './code-block';
 

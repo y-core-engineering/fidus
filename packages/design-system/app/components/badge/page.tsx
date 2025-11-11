@@ -1,6 +1,8 @@
 'use client';
 
-import { Badge, Link, Stack } from '@fidus/ui';
+import { Badge } from '@fidus/ui/badge';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 

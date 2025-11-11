@@ -1,6 +1,12 @@
 'use client';
 
-import { Select, Button, Alert, Badge, Avatar, Link, Stack } from '@fidus/ui';
+import { Select } from '@fidus/ui/select';
+import { Button } from '@fidus/ui/button';
+import { Alert } from '@fidus/ui/alert';
+import { Badge } from '@fidus/ui/badge';
+import { Avatar } from '@fidus/ui/avatar';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 

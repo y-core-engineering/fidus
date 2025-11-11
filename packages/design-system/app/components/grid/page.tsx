@@ -1,6 +1,8 @@
 'use client';
 
-import { Grid, Link, Stack } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';
+import { Grid } from '@fidus/ui/grid';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 

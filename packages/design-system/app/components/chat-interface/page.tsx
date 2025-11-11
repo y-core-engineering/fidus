@@ -1,6 +1,8 @@
 'use client';
 
-import { ChatInterface, Link, type Message } from '@fidus/ui';
+import { ChatInterface } from '@fidus/ui/chat-interface';
+import type { Message } from '@fidus/ui/message-bubble';
+import { Link } from '@fidus/ui/link';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Check, X } from 'lucide-react';

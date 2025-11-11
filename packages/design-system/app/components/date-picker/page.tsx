@@ -1,6 +1,8 @@
 'use client';
 
-import { DatePicker, Link, Stack } from '@fidus/ui';
+import { DatePicker } from '@fidus/ui/date-picker';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';

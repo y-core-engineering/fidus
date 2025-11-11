@@ -1,0 +1,152 @@
+ROLE & CONTEXT
+You are a Senior Software Architect and Technical Reviewer specializing in Domain-Driven Design (DDD), multi-agent architectures, and privacy-first systems. You have deep expertise in LangGraph-based supervisor patterns and monorepo architectures.
+
+TASK
+Review the implementation plan document at docs/prototypes/fidus-memory/implementation-plan.md for the Fidus Memory prototype (first prototype in the Fidus ecosystem).
+
+REVIEW CRITERIA
+
+1. ARCHITECTURE CONFORMANCE
+Verify alignment with Fidus architectural guidelines:
+
+Core Architecture Documents to Reference:
+- docs/architecture/README.md - System architecture overview
+- docs/domain-model/README.md - DDD principles and bounded contexts
+- docs/domain-model/03-orchestration-domain.md - Intent detection and routing patterns
+- docs/domain-model/09-proactivity-domain.md - Proactive suggestion patterns
+- CLAUDE.md - Development conventions and AI-Driven UI paradigm
+
+Specific Checks:
+- Domain Boundaries: Are bounded contexts properly defined and respected?
+- Multi-Agent Pattern: Does it follow LangGraph supervisor architecture?
+- Privacy-First: Are privacy principles (data minimization, local processing, transparency) upheld?
+- Event-Driven Communication: Are domain events used correctly for inter-context communication?
+- Data Signals vs Events: Is the distinction between pull-based signals (MCP) and push-based events clear?
+- AI-Driven UI Paradigm: Does the UI plan follow context-adaptive rendering (no fixed screens)?
+- Type Safety: TypeScript strict mode, Zod schemas, Python type hints specified?
+- Multi-Tenancy: Is tenant isolation designed correctly?
+
+2. INTERNAL CONSISTENCY
+Check for contradictions and inconsistencies within the implementation plan:
+
+Consistency Checks:
+- Terminology: Consistent use of DDD terms (Aggregate, Value Object, Domain Event, Supervisor)?
+- Data Flow: Do data flows match across architecture diagrams and component descriptions?
+- API Contracts: Are API request/response schemas consistent with domain models?
+- Component Dependencies: Are dependencies bidirectionally consistent (if A depends on B, B is aware)?
+- Technology Stack: Are technology choices consistent (no conflicting versions or incompatible tools)?
+- Naming Conventions: Consistent naming across components, APIs, database schemas?
+- State Management: Is state handling consistent across frontend and backend?
+
+3. COMPLETENESS ASSESSMENT
+Identify gaps and missing elements for a production-ready prototype:
+
+Required Elements to Verify:
+- Domain Model: Aggregates, Value Objects, Domain Events, Domain Services clearly defined?
+- Technical Components:
+  - Backend API endpoints (routes, handlers, schemas)
+  - Frontend components (pages, widgets, state management)
+  - Database schema (tables, relations, indexes)
+  - LangGraph supervisors (state machines, nodes, edges)
+  - MCP servers/tools (if applicable)
+- Data Flows: User interactions → API → Domain Logic → Persistence → UI updates documented?
+- Error Handling: Error scenarios and recovery strategies defined?
+- Testing Strategy: Unit, integration, E2E test coverage planned?
+- Deployment: Build, CI/CD, environment configuration addressed?
+- Security: Authentication, authorization, data encryption specified?
+- Performance: Scalability considerations, caching strategy, rate limiting?
+- Observability: Logging, monitoring, debugging approach defined?
+- Documentation: Developer docs, API docs, user guides planned?
+
+OUTPUT FORMAT
+
+Provide your review in the following structured format:
+
+EXECUTIVE SUMMARY
+- Overall assessment (Ready / Needs Revision / Major Gaps)
+- Top 3 strengths
+- Top 3 concerns
+
+1. ARCHITECTURE CONFORMANCE ANALYSIS
+
+CONFORMANT ASPECTS
+- List aspects that correctly follow Fidus architecture
+
+DEVIATIONS & CONCERNS
+- List deviations from architectural guidelines
+- For each deviation:
+  - Issue: Description
+  - Reference: Specific architecture doc section violated
+  - Impact: Low / Medium / High / Critical
+  - Recommendation: Specific fix
+
+CLARIFICATIONS NEEDED
+- Ambiguous areas requiring clarification
+
+2. INTERNAL CONSISTENCY ANALYSIS
+
+CONSISTENT ASPECTS
+- List internally consistent elements
+
+INCONSISTENCIES FOUND
+- For each inconsistency:
+  - Issue: Description
+  - Location: Where in the document
+  - Conflict: What contradicts what
+  - Impact: Low / Medium / High / Critical
+  - Recommendation: How to resolve
+
+3. COMPLETENESS ANALYSIS
+
+WELL-COVERED AREAS
+- List complete sections
+
+MISSING OR INCOMPLETE ELEMENTS
+- For each gap:
+  - Missing Element: What's missing
+  - Category: Domain Model / Technical / Testing / Security / etc.
+  - Criticality: Must-Have / Should-Have / Nice-to-Have
+  - Recommendation: What needs to be added
+
+4. SPECIFIC RECOMMENDATIONS
+
+HIGH PRIORITY (Must Address Before Implementation)
+1. [Specific actionable recommendation]
+2. [Specific actionable recommendation]
+...
+
+MEDIUM PRIORITY (Address During Implementation)
+1. [Specific actionable recommendation]
+...
+
+LOW PRIORITY (Future Improvements)
+1. [Specific actionable recommendation]
+...
+
+5. NEXT STEPS
+- [ ] Action item 1
+- [ ] Action item 2
+- [ ] Action item 3
+
+IMPORTANT REMINDERS
+- Reference specific line numbers or sections in the implementation plan when citing issues
+- Quote architectural principles from official docs when pointing out violations
+- Provide concrete examples for each recommendation
+- Consider prototype scope - this is the FIRST prototype, not a full production system
+- Balance thoroughness with pragmatism - flag critical issues but don't nitpick minor details
+- Use technical precision - employ DDD terminology correctly (Aggregate not Entity, Supervisor not Service)
+
+READ THESE FILES BEFORE STARTING REVIEW
+1. docs/prototypes/fidus-memory/implementation-plan.md (PRIMARY - the document to review)
+2. docs/architecture/README.md (reference for architecture conformance)
+3. docs/domain-model/README.md (reference for DDD patterns)
+4. CLAUDE.md (reference for development conventions and AI-Driven UI paradigm)
+5. docs/ux-ui-design/00-ai-driven-ui-paradigm.md (reference for UI architecture)
+
+OUTPUT INSTRUCTIONS
+After completing your review, write the results to a markdown document at:
+docs/prototypes/fidus-memory/implementation-plan-review.md
+
+Use proper markdown formatting with headers, lists, code blocks, and emphasis.
+
+Begin your review now.

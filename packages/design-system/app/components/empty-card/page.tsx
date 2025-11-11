@@ -1,6 +1,8 @@
 'use client';
 
-import { EmptyCard, Stack, Link } from '@fidus/ui';
+import { EmptyCard } from '@fidus/ui/empty-card';
+import { Stack } from '@fidus/ui/stack';
+import { Link } from '@fidus/ui/link';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Inbox, FileText, Users, Calendar, Package } from 'lucide-react';

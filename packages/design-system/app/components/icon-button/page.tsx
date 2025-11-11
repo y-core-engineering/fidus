@@ -1,6 +1,8 @@
 'use client';
 
-import { IconButton, Link, Stack } from '@fidus/ui';
+import { IconButton } from '@fidus/ui/icon-button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Search, Heart, Share2, Trash2 } from 'lucide-react';

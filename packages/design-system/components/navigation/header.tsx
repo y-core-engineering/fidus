@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Moon, Sun, Menu } from 'lucide-react';
-import { IconButton } from '@fidus/ui';
+import { IconButton } from '@fidus/ui/icon-button';;
 import { useState } from 'react';
 
 export function Header({

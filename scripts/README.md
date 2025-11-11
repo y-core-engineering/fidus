@@ -286,6 +286,51 @@ The script needs to create/modify your Claude Desktop config. Make sure:
 - [MCP Server Implementation](../packages/api/fidus/memory/mcp_server.py) - Server code
 - [Architecture Overview](../docs/prototypes/fidus-memory/architecture-overview.md) - System design
 
+## sync-design-system-version.js
+
+Synchronizes the `@fidus/design-system` version to match the `@fidus/ui` version.
+
+### Purpose
+
+The design system showcases @fidus/ui components, so its version should always match the UI library version for consistency and clarity. This script ensures both packages stay in sync.
+
+### Usage
+
+**Manual sync:**
+```bash
+pnpm sync-versions
+```
+
+**Automatic sync (after version bump):**
+```bash
+pnpm version-packages
+```
+
+### How It Works
+
+1. Reads the version from `packages/ui/package.json`
+2. Updates `packages/design-system/package.json` to match
+3. Skips update if versions are already in sync
+
+### Integration
+
+This script runs automatically:
+- After `pnpm version-packages` (via changeset)
+- The design system is in the changeset ignore list to prevent double versioning
+
+### Example Output
+
+```bash
+$ pnpm sync-versions
+
+> fidus@0.1.0 sync-versions
+> node scripts/sync-design-system-version.js
+
+📦 @fidus/ui version: 1.7.2
+📦 @fidus/design-system current version: 1.7.1
+✅ Updated @fidus/design-system to version 1.7.2
+```
+
 ## Development
 
 The scripts in this directory are self-contained and have no external dependencies beyond Node.js built-ins.

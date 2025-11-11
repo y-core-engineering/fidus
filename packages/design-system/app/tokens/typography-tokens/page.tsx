@@ -3,7 +3,8 @@
 import { TokenDisplay } from '../../../components/helpers/color-swatch';
 import { TokenInspector } from '../../../components/helpers/token-inspector';
 import { CodeBlock } from '../../../components/helpers/code-block';
-import { Link, ProgressBar } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';
+import { ProgressBar } from '@fidus/ui/progress-bar';;
 import { useState, useEffect } from 'react';
 import { getAllTokens, type DesignToken } from '../../../components/helpers/get-tokens';
 

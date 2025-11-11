@@ -1,6 +1,9 @@
 'use client';
 
-import { Button, ButtonGroup, Link, Stack } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { ButtonGroup } from '@fidus/ui/button-group';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';

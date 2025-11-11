@@ -1,6 +1,8 @@
 'use client';
 
-import { RadioButton, RadioGroup, Link, Stack } from '@fidus/ui';
+import { RadioButton, RadioGroup } from '@fidus/ui/radio-button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';

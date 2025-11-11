@@ -1,6 +1,8 @@
 'use client';
 
-import { ToggleSwitch, Link, Stack } from '@fidus/ui';
+import { ToggleSwitch } from '@fidus/ui/toggle-switch';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { useState } from 'react';

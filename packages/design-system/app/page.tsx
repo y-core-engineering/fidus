@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';;
 import Link from 'next/link';
 import { Code, Palette, Book, ArrowRight, Sparkles, Shield, Network, Zap } from 'lucide-react';
 
@@ -317,7 +317,7 @@ export default function HomePage() {
           <div className="p-6 border-2 border-primary rounded-lg bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold">@fidus/ui v1.6.1 - Tree-Shaking</h3>
+                <h3 className="text-lg font-semibold">@fidus/ui v1.7.1 - Tree-Shaking</h3>
                 <span className="px-2 py-0.5 text-xs font-bold rounded bg-success text-black">
                   Latest
                 </span>

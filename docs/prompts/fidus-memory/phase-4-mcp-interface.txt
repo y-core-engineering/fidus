@@ -1,0 +1,2002 @@
+===========================================
+FIDUS MEMORY - PHASE 4: MCP INTERFACE
+===========================================
+
+VERSION: 3.0
+PHASE: 4 of 4
+ESTIMATED DURATION: 4-5 days
+PREREQUISITE: Phase 3 complete (Qdrant context storage)
+DELIVERABLE: Fidus Memory exposed as MCP server, ready for integration into full Fidus system
+
+---
+
+ROLE & CONTEXT
+
+You are a Senior Full-Stack Engineer implementing the Fidus Memory prototype.
+
+EXPERTISE REQUIRED:
+- Python: FastAPI, LangGraph, async/await, type hints
+- TypeScript: Next.js 14 App Router, React 18, strict types
+- MCP (Model Context Protocol): Server implementation, tools, resources
+- PostgreSQL: asyncpg, conversation storage, time-series queries
+- Redis: Session caching, TTL management
+- Domain-Driven Design (DDD)
+- Multi-tenant architecture
+- Privacy-first design principles
+- API security (rate limiting, authentication)
+
+PROJECT CONTEXT
+Fidus Memory is a domain-agnostic conversational learning agent that demonstrates core learning capabilities of the Fidus system. It learns user preferences implicitly from conversations, stores them with confidence scores, and adapts to situational context.
+
+This is a PROTOTYPE with:
+- Fixed tenant_id = "prototype-tenant" (no login UI)
+- Multi-tenancy by design (ready for production scaling)
+- 100% @fidus/ui component usage (no custom CSS)
+- Local-first privacy (Ollama default)
+
+WHAT WAS BUILT PREVIOUSLY
+Phase 1: In-memory chat agent with basic implicit learning
+Phase 2: Neo4j persistence with preference storage and confidence scoring
+Phase 3: Dynamic context extraction with Qdrant vector search
+
+WHAT THIS PHASE ADDS
+Phase 4 makes Fidus Memory production-ready by exposing it as an MCP server. External tools and domain supervisors can query preferences, record interactions, and learn from conversations via MCP protocol. Adds PostgreSQL for conversation history, Redis for caching, and basic authentication for multi-user support.
+
+Key Innovation: MCP server interface enables Fidus Memory to be called by any domain supervisor in the full Fidus system.
+
+---
+
+SUCCESS CRITERIA
+
+At the end of this phase, you must be able to demonstrate:
+
+MCP SERVER INTERFACE:
+- PreferenceMCPServer implements MCP protocol
+- Tools exposed: user.get_preferences, user.record_interaction, user.learn_preference
+- Resources exposed: user://{user_id}/preferences
+- External tools can query preferences via MCP
+
+MULTI-USER SUPPORT:
+- Multiple users can use system simultaneously with isolated data
+- Simple authentication via X-User-ID header
+- Guest users created if no user_id provided
+- All database queries enforce tenant_id + user_id isolation
+
+POSTGRESQL CONVERSATION STORAGE:
+- Conversation history stored in PostgreSQL
+- Messages include: id, user_id, tenant_id, role, content, metadata, created_at
+- Conversations auto-deleted after 7 days (privacy)
+- Efficient queries for recent conversation history
+
+REDIS SESSION CACHE:
+- User preferences cached in Redis (5 min TTL)
+- Cache invalidated on preference updates
+- Fallback to database if cache miss
+- Performance improvement for repeated queries
+
+SECURITY & ROBUSTNESS:
+- Rate limiting (100 requests/hour per IP)
+- Input sanitization on all endpoints
+- Error handling with user-friendly messages
+- Health check endpoint for monitoring
+
+TECHNICAL REQUIREMENTS:
+- All tests passing (unit tests at minimum)
+- Lint checks passing (pnpm lint)
+- Type checks passing (pnpm typecheck)
+- Multi-tenancy verified (tenant_id + user_id in all queries)
+- @fidus/ui components used exclusively
+- Error handling implemented
+- No security vulnerabilities
+
+---
+
+IMPLEMENTATION TASKS
+
+---
+
+TASK 4.1: MCP Server Interface
+
+GOAL
+Implement MCP server that exposes Fidus Memory capabilities as tools and resources.
+
+ACCEPTANCE CRITERIA
+- [ ] PreferenceMCPServer class implements MCP protocol
+- [ ] Tools registered: user.get_preferences, user.record_interaction, user.learn_preference
+- [ ] Resources registered: user://{user_id}/preferences
+- [ ] Server can be started and responds to MCP requests
+- [ ] Integration tests verify MCP tool calls
+
+IMPLEMENTATION STEPS
+
+Step 1: Install MCP SDK
+File: packages/api/pyproject.toml
+Action: modify existing
+
+Add MCP SDK dependency:
+
+```toml
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+# ... existing dependencies ...
+mcp = "^1.0.0"  # Add MCP SDK
+```
+
+Then run:
+```bash
+pushd packages/api
+poetry install
+popd
+```
+
+Validation:
+```python
+import mcp
+print(mcp.__version__)
+```
+
+Step 2: Create MCP Server
+File: packages/api/fidus/memory/mcp_server.py
+Action: create new
+
+```python
+from mcp import MCPServer, Tool, Resource
+from typing import Optional, Dict, Any
+from fidus.memory.context_aware_agent import ContextAwareAgent
+from fidus.config import PrototypeConfig
+
+class PreferenceMCPServer(MCPServer):
+    """MCP server for preference service.
+
+    Exposes Fidus Memory capabilities as MCP tools and resources.
+
+    Multi-Tenancy: All operations scoped to tenant_id + user_id.
+    """
+
+    def __init__(self, preference_service: ContextAwareAgent):
+        super().__init__(name="fidus-memory", version="1.0.0")
+        self.service = preference_service
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+        self.register_tools()
+        self.register_resources()
+
+    def register_tools(self):
+        """Register MCP tools."""
+
+        @self.tool(
+            name="user.get_preferences",
+            description="Get user preferences, optionally filtered by domain"
+        )
+        async def get_preferences(
+            user_id: str,
+            domain: Optional[str] = None,
+            min_confidence: float = 0.3
+        ) -> Dict[str, Any]:
+            """Get user preferences.
+
+            Args:
+                user_id: User identifier
+                domain: Optional domain filter (e.g., 'coffee', 'food')
+                min_confidence: Minimum confidence threshold (0.0-1.0)
+
+            Returns:
+                {"preferences": [...]}
+            """
+            preferences = await self.service.neo4j.get_all_preferences(
+                user_id=user_id,
+                tenant_id=self.tenant_id
+            )
+
+            # Filter by domain if specified
+            if domain:
+                preferences = [p for p in preferences if p["domain"] == domain]
+
+            # Filter by confidence
+            preferences = [p for p in preferences if p["confidence"] >= min_confidence]
+
+            return {"preferences": preferences}
+
+        @self.tool(
+            name="user.record_interaction",
+            description="Record user interaction with preference suggestion"
+        )
+        async def record_interaction(
+            user_id: str,
+            preference_id: str,
+            accepted: bool
+        ) -> Dict[str, Any]:
+            """Record user interaction with preference suggestion.
+
+            Args:
+                user_id: User identifier
+                preference_id: Preference that was suggested
+                accepted: Whether user accepted the suggestion
+
+            Returns:
+                {"status": "recorded", "new_confidence": float}
+            """
+            if accepted:
+                new_conf = await self.service.neo4j.reinforce_preference(preference_id)
+            else:
+                new_conf = await self.service.neo4j.weaken_preference(preference_id)
+
+            return {
+                "status": "recorded",
+                "new_confidence": new_conf
+            }
+
+        @self.tool(
+            name="user.learn_preference",
+            description="Manually add a preference"
+        )
+        async def learn_preference(
+            user_id: str,
+            domain: str,
+            key: str,
+            value: str,
+            context: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
+            """Manually add a preference.
+
+            Args:
+                user_id: User identifier
+                domain: Preference domain (e.g., 'coffee')
+                key: Preference key (e.g., 'type')
+                value: Preference value (e.g., 'cappuccino')
+                context: Optional situational context
+
+            Returns:
+                {"preference_id": str}
+            """
+            # If context provided, use context-aware recording
+            if context:
+                # Convert context dict to conversation snippet for extraction
+                context_text = ", ".join([f"{k}: {v}" for k, v in context.items()])
+                pref_id = await self.service.record_preference_with_context(
+                    user_id=user_id,
+                    domain=domain,
+                    key=key,
+                    value=value,
+                    conversation_snippet=context_text,
+                    confidence=0.5
+                )
+            else:
+                # No context - store preference directly
+                pref_id = await self.service.neo4j.create_preference(
+                    user_id=user_id,
+                    domain=domain,
+                    key=key,
+                    value=value,
+                    confidence=0.5,
+                    source="mcp_tool"
+                )
+
+            return {"preference_id": pref_id}
+
+        @self.tool(
+            name="user.delete_all_preferences",
+            description="Delete all preferences for a user (privacy feature)"
+        )
+        async def delete_all_preferences(user_id: str) -> Dict[str, Any]:
+            """Delete all preferences for a user.
+
+            Args:
+                user_id: User identifier
+
+            Returns:
+                {"status": "deleted", "count": int}
+            """
+            count = await self.service.neo4j.delete_all_preferences(
+                user_id=user_id,
+                tenant_id=self.tenant_id
+            )
+
+            return {
+                "status": "deleted",
+                "count": count
+            }
+
+    def register_resources(self):
+        """Register MCP resources."""
+
+        @self.resource("user://{user_id}/preferences")
+        async def user_preferences(user_id: str) -> Dict[str, Any]:
+            """Get all preferences for a user.
+
+            Resource URI: user://{user_id}/preferences
+
+            Returns:
+                {"preferences": [...]}
+            """
+            preferences = await self.service.neo4j.get_all_preferences(
+                user_id=user_id,
+                tenant_id=self.tenant_id
+            )
+
+            return {"preferences": preferences}
+
+        @self.resource("user://{user_id}/contexts")
+        async def user_contexts(user_id: str) -> Dict[str, Any]:
+            """Get all stored contexts for a user.
+
+            Resource URI: user://{user_id}/contexts
+
+            Returns:
+                {"contexts": [...]}
+            """
+            # Query Neo4j for all situations
+            async with self.service.neo4j.driver.session() as session:
+                result = await session.run(
+                    """
+                    MATCH (s:Situation {user_id: $user_id, tenant_id: $tenant_id})
+                    RETURN s.situation_id as id, s.factors as factors, s.description as description
+                    ORDER BY s.created_at DESC
+                    LIMIT 50
+                    """,
+                    user_id=user_id,
+                    tenant_id=self.tenant_id
+                )
+
+                contexts = []
+                async for record in result:
+                    contexts.append({
+                        "id": record["id"],
+                        "factors": record["factors"],
+                        "description": record["description"]
+                    })
+
+            return {"contexts": contexts}
+```
+
+Validation:
+```python
+mcp_server = PreferenceMCPServer(context_aware_agent)
+print(mcp_server.name)  # "fidus-memory"
+print(len(mcp_server.tools))  # Should have 4 tools
+```
+
+Step 3: Add FastAPI Endpoint for MCP
+File: packages/api/fidus/api/routes/mcp.py
+Action: create new
+
+```python
+from fastapi import APIRouter, Request
+from fidus.memory.mcp_server import PreferenceMCPServer
+
+router = APIRouter(prefix="/mcp", tags=["mcp"])
+
+# Initialize MCP server (inject dependencies)
+mcp_server: PreferenceMCPServer = None
+
+def init_mcp_server(server: PreferenceMCPServer):
+    """Initialize MCP server (called from main.py)."""
+    global mcp_server
+    mcp_server = server
+
+@router.post("/call")
+async def mcp_call(request: Request):
+    """Handle MCP tool calls.
+
+    Body:
+        {
+            "tool": "user.get_preferences",
+            "arguments": {"user_id": "user123", "domain": "coffee"}
+        }
+    """
+    data = await request.json()
+    tool_name = data.get("tool")
+    arguments = data.get("arguments", {})
+
+    # Call MCP tool
+    result = await mcp_server.call_tool(tool_name, **arguments)
+
+    return result
+
+@router.get("/resource/{resource_uri:path}")
+async def mcp_resource(resource_uri: str):
+    """Handle MCP resource requests.
+
+    Example: /mcp/resource/user://user123/preferences
+    """
+    result = await mcp_server.get_resource(resource_uri)
+
+    return result
+```
+
+Validation:
+```bash
+# Start API
+poetry run uvicorn fidus.main:app --reload
+
+# Test MCP endpoint
+curl -X POST http://localhost:8000/mcp/call \
+  -H "Content-Type: application/json" \
+  -d '{"tool": "user.get_preferences", "arguments": {"user_id": "user123"}}'
+```
+
+Step 4: Update main.py to Initialize MCP Server
+File: packages/api/fidus/main.py
+Action: modify existing
+
+Add MCP server initialization:
+
+```python
+from fidus.memory.mcp_server import PreferenceMCPServer
+from fidus.api.routes import mcp
+
+# ... existing code ...
+
+# Initialize MCP server
+context_aware_agent = ContextAwareAgent(...)  # Initialize with dependencies
+mcp_server = PreferenceMCPServer(context_aware_agent)
+mcp.init_mcp_server(mcp_server)
+
+# Include MCP routes
+app.include_router(mcp.router)
+```
+
+Validation:
+```bash
+# Check that /mcp/call endpoint exists
+curl http://localhost:8000/docs
+# Should show /mcp/call and /mcp/resource endpoints
+```
+
+Step 5: Add Integration Tests
+File: packages/api/tests/mcp/test_mcp_server.py
+Action: create new
+
+```python
+import pytest
+from fidus.memory.mcp_server import PreferenceMCPServer
+
+@pytest.mark.asyncio
+async def test_get_preferences_tool(context_aware_agent):
+    """Should retrieve preferences via MCP tool."""
+    mcp_server = PreferenceMCPServer(context_aware_agent)
+
+    # Create test preference
+    await context_aware_agent.neo4j.create_preference(
+        user_id="user123",
+        domain="coffee",
+        key="type",
+        value="cappuccino",
+        confidence=0.8,
+        source="test"
+    )
+
+    # Call MCP tool
+    result = await mcp_server.call_tool(
+        "user.get_preferences",
+        user_id="user123",
+        domain="coffee"
+    )
+
+    assert "preferences" in result
+    assert len(result["preferences"]) > 0
+    assert result["preferences"][0]["value"] == "cappuccino"
+
+@pytest.mark.asyncio
+async def test_record_interaction_tool(context_aware_agent):
+    """Should record interaction via MCP tool."""
+    mcp_server = PreferenceMCPServer(context_aware_agent)
+
+    # Create test preference
+    pref_id = await context_aware_agent.neo4j.create_preference(
+        user_id="user123",
+        domain="coffee",
+        key="type",
+        value="cappuccino",
+        confidence=0.5,
+        source="test"
+    )
+
+    # Record acceptance
+    result = await mcp_server.call_tool(
+        "user.record_interaction",
+        user_id="user123",
+        preference_id=pref_id,
+        accepted=True
+    )
+
+    assert result["status"] == "recorded"
+    assert result["new_confidence"] > 0.5
+
+@pytest.mark.asyncio
+async def test_user_preferences_resource(context_aware_agent):
+    """Should retrieve preferences via MCP resource."""
+    mcp_server = PreferenceMCPServer(context_aware_agent)
+
+    # Create test preference
+    await context_aware_agent.neo4j.create_preference(
+        user_id="user123",
+        domain="coffee",
+        key="type",
+        value="cappuccino",
+        confidence=0.8,
+        source="test"
+    )
+
+    # Get resource
+    result = await mcp_server.get_resource("user://user123/preferences")
+
+    assert "preferences" in result
+    assert len(result["preferences"]) > 0
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/mcp/test_mcp_server.py -v
+popd
+```
+
+TESTING
+
+Integration Tests:
+See test_mcp_server.py above
+
+Manual Testing:
+```bash
+# Call MCP tool via API
+curl -X POST http://localhost:8000/mcp/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool": "user.get_preferences",
+    "arguments": {"user_id": "user123", "min_confidence": 0.3}
+  }'
+
+# Get MCP resource
+curl http://localhost:8000/mcp/resource/user://user123/preferences
+```
+
+VERIFICATION CHECKLIST
+- [ ] PreferenceMCPServer implements MCP protocol
+- [ ] Tools registered and callable
+- [ ] Resources registered and accessible
+- [ ] FastAPI endpoints expose MCP interface
+- [ ] Integration tests pass
+- [ ] Manual testing via curl works
+
+---
+
+TASK 4.2: PostgreSQL Conversation Storage
+
+GOAL
+Store conversation history in PostgreSQL with automatic 7-day retention for privacy.
+
+ACCEPTANCE CRITERIA
+- [ ] PostgreSQL added to Docker Compose
+- [ ] conversations table created with schema
+- [ ] ConversationStore class handles message storage
+- [ ] Messages auto-deleted after 7 days
+- [ ] Multi-tenancy enforced (tenant_id + user_id)
+- [ ] Integration tests verify storage and retrieval
+
+IMPLEMENTATION STEPS
+
+Step 1: Add PostgreSQL to Docker Compose
+File: docker-compose.yml
+Action: modify existing
+
+Add PostgreSQL service:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16
+    container_name: fidus-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=fidus
+      - POSTGRES_PASSWORD=fidus_memory
+      - POSTGRES_DB=fidus_memory
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fidus-network
+
+volumes:
+  postgres_data:
+    driver: local
+```
+
+Validation:
+```bash
+docker-compose up -d postgres
+docker-compose ps | grep postgres
+# Should show postgres running on port 5432
+```
+
+Step 2: Create Database Schema
+File: packages/api/fidus/infrastructure/postgres/schema.sql
+Action: create new
+
+```sql
+-- Conversations table
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id VARCHAR(255) NOT NULL,
+    tenant_id VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
+    content TEXT NOT NULL,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for efficient queries
+CREATE INDEX idx_conversations_user_tenant ON conversations(user_id, tenant_id, created_at DESC);
+CREATE INDEX idx_conversations_created_at ON conversations(created_at);
+
+-- Function to auto-delete old conversations
+CREATE OR REPLACE FUNCTION delete_old_conversations()
+RETURNS void AS $$
+BEGIN
+    DELETE FROM conversations
+    WHERE created_at < NOW() - INTERVAL '7 days';
+END;
+$$ LANGUAGE plpgsql;
+
+-- Optional: Schedule auto-deletion (requires pg_cron extension)
+-- SELECT cron.schedule('delete_old_conversations', '0 2 * * *', 'SELECT delete_old_conversations()');
+```
+
+Run schema:
+```bash
+docker exec -i fidus-postgres psql -U fidus -d fidus_memory < packages/api/fidus/infrastructure/postgres/schema.sql
+```
+
+Validation:
+```bash
+docker exec -it fidus-postgres psql -U fidus -d fidus_memory -c "\d conversations"
+# Should show table structure
+```
+
+Step 3: Install asyncpg Dependency
+File: packages/api/pyproject.toml
+Action: modify existing
+
+Add asyncpg:
+
+```toml
+[tool.poetry.dependencies]
+# ... existing ...
+asyncpg = "^0.29.0"
+```
+
+Then run:
+```bash
+pushd packages/api
+poetry install
+popd
+```
+
+Step 4: Create ConversationStore
+File: packages/api/fidus/infrastructure/postgres/conversation_store.py
+Action: create new
+
+```python
+import asyncpg
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+from fidus.config import PrototypeConfig
+
+class ConversationStore:
+    """Store conversation history in PostgreSQL.
+
+    Multi-Tenancy: All messages scoped to tenant_id + user_id.
+    Privacy: Auto-deletes messages older than 7 days.
+    """
+
+    def __init__(self, connection_string: str):
+        self.connection_string = connection_string
+        self.pool: Optional[asyncpg.Pool] = None
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+    async def connect(self):
+        """Initialize connection pool."""
+        self.pool = await asyncpg.create_pool(self.connection_string)
+
+    async def close(self):
+        """Close connection pool."""
+        if self.pool:
+            await self.pool.close()
+
+    async def save_message(
+        self,
+        user_id: str,
+        role: str,
+        content: str,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """Save message to conversation history.
+
+        Args:
+            user_id: User identifier
+            role: Message role ('user', 'assistant', 'system')
+            content: Message content
+            metadata: Optional metadata (JSON)
+
+        Returns:
+            Message ID (UUID)
+        """
+        query = """
+        INSERT INTO conversations (user_id, tenant_id, role, content, metadata)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id
+        """
+
+        message_id = await self.pool.fetchval(
+            query,
+            user_id,
+            self.tenant_id,
+            role,
+            content,
+            metadata or {}
+        )
+
+        return str(message_id)
+
+    async def get_conversation_history(
+        self,
+        user_id: str,
+        limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """Get recent conversation history.
+
+        Multi-Tenancy: Filters by tenant_id + user_id.
+
+        Args:
+            user_id: User identifier
+            limit: Max number of messages to return
+
+        Returns:
+            List of messages (oldest first)
+        """
+        query = """
+        SELECT id, role, content, metadata, created_at
+        FROM conversations
+        WHERE user_id = $1
+        AND tenant_id = $2
+        AND created_at > NOW() - INTERVAL '7 days'
+        ORDER BY created_at DESC
+        LIMIT $3
+        """
+
+        rows = await self.pool.fetch(query, user_id, self.tenant_id, limit)
+
+        # Reverse to get chronological order (oldest first)
+        messages = []
+        for row in reversed(rows):
+            messages.append({
+                "id": str(row["id"]),
+                "role": row["role"],
+                "content": row["content"],
+                "metadata": row["metadata"],
+                "created_at": row["created_at"].isoformat()
+            })
+
+        return messages
+
+    async def cleanup_old_conversations(self) -> int:
+        """Delete conversations older than 7 days.
+
+        Returns:
+            Number of deleted messages
+        """
+        query = """
+        DELETE FROM conversations
+        WHERE created_at < NOW() - INTERVAL '7 days'
+        """
+
+        result = await self.pool.execute(query)
+
+        # Parse result: "DELETE N"
+        count = int(result.split()[-1])
+        return count
+
+    async def delete_user_conversations(self, user_id: str) -> int:
+        """Delete all conversations for a user (privacy feature).
+
+        Multi-Tenancy: Filters by tenant_id + user_id.
+
+        Args:
+            user_id: User identifier
+
+        Returns:
+            Number of deleted messages
+        """
+        query = """
+        DELETE FROM conversations
+        WHERE user_id = $1
+        AND tenant_id = $2
+        """
+
+        result = await self.pool.execute(query, user_id, self.tenant_id)
+
+        count = int(result.split()[-1])
+        return count
+```
+
+Validation:
+```python
+store = ConversationStore("postgresql://fidus:fidus_memory@localhost:5432/fidus_memory")
+await store.connect()
+
+message_id = await store.save_message(
+    user_id="user123",
+    role="user",
+    content="Hello"
+)
+print(message_id)  # UUID
+```
+
+Step 5: Add Integration Tests
+File: packages/api/tests/infrastructure/test_conversation_store.py
+Action: create new
+
+```python
+import pytest
+from fidus.infrastructure.postgres.conversation_store import ConversationStore
+
+@pytest.mark.asyncio
+async def test_save_and_retrieve_message(postgres_connection_string):
+    """Should save and retrieve conversation message."""
+    store = ConversationStore(postgres_connection_string)
+    await store.connect()
+
+    # Save message
+    message_id = await store.save_message(
+        user_id="user123",
+        role="user",
+        content="Hello, bot!",
+        metadata={"source": "web"}
+    )
+
+    assert message_id is not None
+
+    # Retrieve history
+    history = await store.get_conversation_history(user_id="user123")
+
+    assert len(history) >= 1
+    assert history[-1]["content"] == "Hello, bot!"
+    assert history[-1]["role"] == "user"
+    assert history[-1]["metadata"]["source"] == "web"
+
+    await store.close()
+
+@pytest.mark.asyncio
+async def test_conversation_history_limit(postgres_connection_string):
+    """Should respect limit parameter."""
+    store = ConversationStore(postgres_connection_string)
+    await store.connect()
+
+    # Save 10 messages
+    for i in range(10):
+        await store.save_message(
+            user_id="user123",
+            role="user",
+            content=f"Message {i}"
+        )
+
+    # Get only 5
+    history = await store.get_conversation_history(user_id="user123", limit=5)
+
+    assert len(history) == 5
+    # Should be oldest 5 (chronological order)
+    assert "Message 5" in history[-1]["content"] or "Message 9" in history[-1]["content"]
+
+    await store.close()
+
+@pytest.mark.asyncio
+async def test_user_isolation(postgres_connection_string):
+    """Should isolate conversations by user_id."""
+    store = ConversationStore(postgres_connection_string)
+    await store.connect()
+
+    # Save messages for two users
+    await store.save_message(user_id="user123", role="user", content="User A message")
+    await store.save_message(user_id="user456", role="user", content="User B message")
+
+    # Get history for user123
+    history = await store.get_conversation_history(user_id="user123")
+
+    # Should only contain user123's messages
+    assert all("User A" in msg["content"] or msg["role"] == "assistant" for msg in history)
+    assert not any("User B" in msg["content"] for msg in history)
+
+    await store.close()
+
+@pytest.mark.asyncio
+async def test_delete_user_conversations(postgres_connection_string):
+    """Should delete all conversations for a user."""
+    store = ConversationStore(postgres_connection_string)
+    await store.connect()
+
+    # Save messages
+    await store.save_message(user_id="user123", role="user", content="Message 1")
+    await store.save_message(user_id="user123", role="user", content="Message 2")
+
+    # Delete
+    count = await store.delete_user_conversations(user_id="user123")
+
+    assert count >= 2
+
+    # Verify deletion
+    history = await store.get_conversation_history(user_id="user123")
+    assert len(history) == 0
+
+    await store.close()
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/infrastructure/test_conversation_store.py -v
+popd
+```
+
+TESTING
+
+Integration Tests:
+See test_conversation_store.py above
+
+Manual Testing:
+```python
+from fidus.infrastructure.postgres.conversation_store import ConversationStore
+import asyncio
+
+store = ConversationStore("postgresql://fidus:fidus_memory@localhost:5432/fidus_memory")
+asyncio.run(store.connect())
+
+# Save message
+asyncio.run(store.save_message("user123", "user", "Test message"))
+
+# Get history
+history = asyncio.run(store.get_conversation_history("user123"))
+print(history)
+```
+
+VERIFICATION CHECKLIST
+- [ ] PostgreSQL running in Docker
+- [ ] conversations table created
+- [ ] ConversationStore saves messages
+- [ ] Messages retrieved in chronological order
+- [ ] Multi-tenancy enforced (tenant_id + user_id)
+- [ ] Integration tests pass
+
+---
+
+TASK 4.3: Redis Session Cache
+
+GOAL
+Cache user preferences in Redis for performance with 5-minute TTL.
+
+ACCEPTANCE CRITERIA
+- [ ] Redis added to Docker Compose
+- [ ] SessionCache class handles caching
+- [ ] Preferences cached with 5-minute TTL
+- [ ] Cache invalidated on preference updates
+- [ ] Fallback to database on cache miss
+- [ ] Unit tests verify caching logic
+
+IMPLEMENTATION STEPS
+
+Step 1: Add Redis to Docker Compose
+File: docker-compose.yml
+Action: modify existing
+
+Add Redis service:
+
+```yaml
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: fidus-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fidus-network
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:
+    driver: local
+```
+
+Validation:
+```bash
+docker-compose up -d redis
+docker-compose ps | grep redis
+# Should show redis running on port 6379
+```
+
+Step 2: Install redis-py Dependency
+File: packages/api/pyproject.toml
+Action: modify existing
+
+Add redis:
+
+```toml
+[tool.poetry.dependencies]
+# ... existing ...
+redis = "^5.0.0"
+```
+
+Then run:
+```bash
+pushd packages/api
+poetry install
+popd
+```
+
+Step 3: Create SessionCache
+File: packages/api/fidus/infrastructure/redis/session_cache.py
+Action: create new
+
+```python
+import redis.asyncio as redis
+import json
+from typing import List, Dict, Any, Optional
+from fidus.config import PrototypeConfig
+
+class SessionCache:
+    """Redis cache for session data.
+
+    Multi-Tenancy: Keys include tenant_id + user_id.
+    """
+
+    def __init__(self, redis_url: str):
+        self.redis = redis.from_url(redis_url, decode_responses=True)
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+
+    async def close(self):
+        """Close Redis connection."""
+        await self.redis.close()
+
+    def _preference_key(self, user_id: str) -> str:
+        """Generate cache key for user preferences.
+
+        Multi-Tenancy: Key includes tenant_id.
+        """
+        return f"prefs:{self.tenant_id}:{user_id}"
+
+    async def cache_preferences(
+        self,
+        user_id: str,
+        preferences: List[Dict[str, Any]],
+        ttl: int = 300
+    ):
+        """Cache user preferences (5 min TTL by default).
+
+        Args:
+            user_id: User identifier
+            preferences: List of preference dicts
+            ttl: Time to live in seconds (default 300 = 5 min)
+        """
+        key = self._preference_key(user_id)
+        value = json.dumps(preferences)
+
+        await self.redis.setex(key, ttl, value)
+
+    async def get_cached_preferences(
+        self,
+        user_id: str
+    ) -> Optional[List[Dict[str, Any]]]:
+        """Get cached preferences.
+
+        Args:
+            user_id: User identifier
+
+        Returns:
+            List of preferences or None if cache miss
+        """
+        key = self._preference_key(user_id)
+        data = await self.redis.get(key)
+
+        if data:
+            return json.loads(data)
+
+        return None
+
+    async def invalidate_preferences(self, user_id: str):
+        """Invalidate preference cache.
+
+        Call this when preferences are updated.
+
+        Args:
+            user_id: User identifier
+        """
+        key = self._preference_key(user_id)
+        await self.redis.delete(key)
+
+    async def cache_context_retrieval(
+        self,
+        user_id: str,
+        context_hash: str,
+        similar_situations: List[str],
+        ttl: int = 600
+    ):
+        """Cache context retrieval results (10 min TTL).
+
+        Args:
+            user_id: User identifier
+            context_hash: Hash of current context
+            similar_situations: List of similar situation IDs
+            ttl: Time to live in seconds
+        """
+        key = f"context:{self.tenant_id}:{user_id}:{context_hash}"
+        value = json.dumps(similar_situations)
+
+        await self.redis.setex(key, ttl, value)
+
+    async def get_cached_context_retrieval(
+        self,
+        user_id: str,
+        context_hash: str
+    ) -> Optional[List[str]]:
+        """Get cached context retrieval results.
+
+        Args:
+            user_id: User identifier
+            context_hash: Hash of current context
+
+        Returns:
+            List of situation IDs or None if cache miss
+        """
+        key = f"context:{self.tenant_id}:{user_id}:{context_hash}"
+        data = await self.redis.get(key)
+
+        if data:
+            return json.loads(data)
+
+        return None
+```
+
+Validation:
+```python
+cache = SessionCache("redis://localhost:6379")
+
+# Cache preferences
+await cache.cache_preferences(
+    user_id="user123",
+    preferences=[{"domain": "coffee", "key": "type", "value": "cappuccino"}]
+)
+
+# Retrieve
+prefs = await cache.get_cached_preferences("user123")
+print(prefs)  # Should match cached data
+```
+
+Step 4: Integrate Cache with Neo4jClient
+File: packages/api/fidus/memory/neo4j_client.py
+Action: modify existing (add caching)
+
+Add cache integration:
+
+```python
+class Neo4jClient:
+    def __init__(self, uri: str, user: str, password: str, cache: SessionCache = None):
+        self.driver = neo4j.GraphDatabase.driver(uri, auth=(user, password))
+        self.tenant_id = PrototypeConfig.PROTOTYPE_TENANT_ID
+        self.cache = cache  # Optional cache
+
+    async def get_all_preferences(
+        self,
+        user_id: str,
+        tenant_id: str = None
+    ) -> List[Dict[str, Any]]:
+        """Get all preferences for a user.
+
+        Uses Redis cache if available.
+        """
+        # Try cache first
+        if self.cache:
+            cached = await self.cache.get_cached_preferences(user_id)
+            if cached:
+                return cached
+
+        # Cache miss - query database
+        preferences = await self._query_preferences(user_id, tenant_id)
+
+        # Update cache
+        if self.cache:
+            await self.cache.cache_preferences(user_id, preferences)
+
+        return preferences
+
+    async def create_preference(self, **kwargs) -> str:
+        """Create preference and invalidate cache."""
+        preference_id = await self._create_preference_in_db(**kwargs)
+
+        # Invalidate cache
+        if self.cache:
+            await self.cache.invalidate_preferences(kwargs["user_id"])
+
+        return preference_id
+
+    # Similar for reinforce_preference, weaken_preference, delete_all_preferences
+```
+
+Validation:
+```python
+# First call: cache miss, queries DB
+prefs1 = await neo4j_client.get_all_preferences("user123")
+
+# Second call: cache hit, no DB query
+prefs2 = await neo4j_client.get_all_preferences("user123")
+
+# Should be identical
+assert prefs1 == prefs2
+```
+
+Step 5: Add Unit Tests
+File: packages/api/tests/infrastructure/test_session_cache.py
+Action: create new
+
+```python
+import pytest
+from fidus.infrastructure.redis.session_cache import SessionCache
+
+@pytest.mark.asyncio
+async def test_cache_and_retrieve_preferences():
+    """Should cache and retrieve preferences."""
+    cache = SessionCache("redis://localhost:6379")
+
+    preferences = [
+        {"domain": "coffee", "key": "type", "value": "cappuccino"},
+        {"domain": "food", "key": "cuisine", "value": "italian"}
+    ]
+
+    # Cache
+    await cache.cache_preferences("user123", preferences, ttl=60)
+
+    # Retrieve
+    cached = await cache.get_cached_preferences("user123")
+
+    assert cached == preferences
+
+    await cache.close()
+
+@pytest.mark.asyncio
+async def test_cache_miss():
+    """Should return None on cache miss."""
+    cache = SessionCache("redis://localhost:6379")
+
+    cached = await cache.get_cached_preferences("nonexistent_user")
+
+    assert cached is None
+
+    await cache.close()
+
+@pytest.mark.asyncio
+async def test_invalidate_preferences():
+    """Should invalidate cached preferences."""
+    cache = SessionCache("redis://localhost:6379")
+
+    preferences = [{"domain": "coffee", "key": "type", "value": "cappuccino"}]
+
+    # Cache
+    await cache.cache_preferences("user123", preferences)
+
+    # Invalidate
+    await cache.invalidate_preferences("user123")
+
+    # Should be cache miss now
+    cached = await cache.get_cached_preferences("user123")
+    assert cached is None
+
+    await cache.close()
+
+@pytest.mark.asyncio
+async def test_ttl_expiration():
+    """Should expire after TTL."""
+    cache = SessionCache("redis://localhost:6379")
+
+    preferences = [{"domain": "coffee", "key": "type", "value": "cappuccino"}]
+
+    # Cache with 1 second TTL
+    await cache.cache_preferences("user123", preferences, ttl=1)
+
+    # Immediate retrieval should work
+    cached = await cache.get_cached_preferences("user123")
+    assert cached == preferences
+
+    # Wait 2 seconds
+    import asyncio
+    await asyncio.sleep(2)
+
+    # Should be expired
+    cached = await cache.get_cached_preferences("user123")
+    assert cached is None
+
+    await cache.close()
+
+@pytest.mark.asyncio
+async def test_multi_tenancy_isolation():
+    """Should isolate cache keys by tenant_id."""
+    cache1 = SessionCache("redis://localhost:6379")
+    cache1.tenant_id = "tenant1"
+
+    cache2 = SessionCache("redis://localhost:6379")
+    cache2.tenant_id = "tenant2"
+
+    # Cache for tenant1
+    await cache1.cache_preferences("user123", [{"domain": "coffee"}])
+
+    # Try to retrieve with tenant2
+    cached = await cache2.get_cached_preferences("user123")
+
+    # Should be cache miss (different tenant)
+    assert cached is None
+
+    await cache1.close()
+    await cache2.close()
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/infrastructure/test_session_cache.py -v
+popd
+```
+
+TESTING
+
+Unit Tests:
+See test_session_cache.py above
+
+Manual Testing:
+```bash
+# Test Redis connection
+redis-cli -h localhost -p 6379 PING
+# Should return PONG
+
+# Set test key
+redis-cli -h localhost -p 6379 SET test "value"
+redis-cli -h localhost -p 6379 GET test
+# Should return "value"
+```
+
+VERIFICATION CHECKLIST
+- [ ] Redis running in Docker
+- [ ] SessionCache caches preferences
+- [ ] Cache returns None on miss
+- [ ] Cache can be invalidated
+- [ ] TTL expiration works
+- [ ] Multi-tenancy isolation verified
+- [ ] Unit tests pass
+
+---
+
+TASK 4.4: Multi-User Support & Authentication
+
+GOAL
+Add simple authentication and multi-user support with user isolation.
+
+ACCEPTANCE CRITERIA
+- [ ] SimpleAuthMiddleware extracts user_id from header
+- [ ] Guest users created if no user_id provided
+- [ ] All API endpoints enforce user authentication
+- [ ] User isolation tested (user A cannot access user B's data)
+- [ ] Health check endpoint for monitoring
+
+IMPLEMENTATION STEPS
+
+Step 1: Create Authentication Middleware
+File: packages/api/fidus/api/middleware/auth.py
+Action: create new
+
+```python
+from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from uuid import uuid4
+
+class SimpleAuthMiddleware(BaseHTTPMiddleware):
+    """Simple user authentication for prototype.
+
+    Production: Replace with proper JWT/OAuth authentication.
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        # Skip auth for health check and docs
+        if request.url.path in ["/health", "/docs", "/openapi.json"]:
+            return await call_next(request)
+
+        # Get user_id from header or create guest user
+        user_id = request.headers.get("X-User-ID")
+
+        if not user_id:
+            # Create guest user (stored in session)
+            user_id = f"guest-{uuid4()}"
+
+        # Store in request state
+        request.state.user_id = user_id
+
+        response = await call_next(request)
+
+        # Return user_id in response header
+        response.headers["X-User-ID"] = user_id
+
+        return response
+```
+
+Validation:
+```python
+# Will be tested via integration tests
+```
+
+Step 2: Update FastAPI App to Use Middleware
+File: packages/api/fidus/main.py
+Action: modify existing
+
+Add middleware:
+
+```python
+from fidus.api.middleware.auth import SimpleAuthMiddleware
+
+app = FastAPI(title="Fidus Memory API")
+
+# Add authentication middleware
+app.add_middleware(SimpleAuthMiddleware)
+
+# ... rest of app setup ...
+```
+
+Validation:
+```bash
+# Test without user_id header
+curl http://localhost:8000/api/memory/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello"}'
+
+# Response should include X-User-ID header with guest user
+```
+
+Step 3: Add Health Check Endpoint
+File: packages/api/fidus/api/routes/health.py
+Action: create new
+
+```python
+from fastapi import APIRouter
+from datetime import datetime
+
+router = APIRouter(tags=["health"])
+
+@router.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring."""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "service": "fidus-memory",
+        "version": "1.0.0"
+    }
+
+@router.get("/health/db")
+async def health_check_db(neo4j_client, postgres_store, qdrant_client, redis_cache):
+    """Health check for all databases."""
+    status = {
+        "neo4j": "unknown",
+        "postgres": "unknown",
+        "qdrant": "unknown",
+        "redis": "unknown"
+    }
+
+    # Check Neo4j
+    try:
+        async with neo4j_client.driver.session() as session:
+            await session.run("RETURN 1")
+        status["neo4j"] = "healthy"
+    except Exception as e:
+        status["neo4j"] = f"unhealthy: {str(e)}"
+
+    # Check PostgreSQL
+    try:
+        await postgres_store.pool.fetchval("SELECT 1")
+        status["postgres"] = "healthy"
+    except Exception as e:
+        status["postgres"] = f"unhealthy: {str(e)}"
+
+    # Check Qdrant
+    try:
+        qdrant_client.get_collections()
+        status["qdrant"] = "healthy"
+    except Exception as e:
+        status["qdrant"] = f"unhealthy: {str(e)}"
+
+    # Check Redis
+    try:
+        await redis_cache.redis.ping()
+        status["redis"] = "healthy"
+    except Exception as e:
+        status["redis"] = f"unhealthy: {str(e)}"
+
+    overall_healthy = all(v == "healthy" for v in status.values())
+
+    return {
+        "status": "healthy" if overall_healthy else "degraded",
+        "databases": status,
+        "timestamp": datetime.now().isoformat()
+    }
+```
+
+Include router in main.py:
+
+```python
+from fidus.api.routes import health
+
+app.include_router(health.router)
+```
+
+Validation:
+```bash
+curl http://localhost:8000/health
+# Should return {"status": "healthy", ...}
+
+curl http://localhost:8000/health/db
+# Should show status of all databases
+```
+
+Step 4: Add Integration Tests
+File: packages/api/tests/api/test_auth_middleware.py
+Action: create new
+
+```python
+import pytest
+from fastapi.testclient import TestClient
+
+def test_auth_middleware_creates_guest_user(client):
+    """Should create guest user if no X-User-ID header."""
+    response = client.get("/api/memory/preferences")
+
+    assert response.status_code in [200, 404]  # May not exist yet
+    assert "X-User-ID" in response.headers
+    assert response.headers["X-User-ID"].startswith("guest-")
+
+def test_auth_middleware_preserves_user_id(client):
+    """Should preserve X-User-ID from request."""
+    response = client.get(
+        "/api/memory/preferences",
+        headers={"X-User-ID": "user123"}
+    )
+
+    assert "X-User-ID" in response.headers
+    assert response.headers["X-User-ID"] == "user123"
+
+def test_health_check_no_auth_required(client):
+    """Health check should not require authentication."""
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "healthy"
+
+def test_user_isolation(client, neo4j_client):
+    """User A should not access User B's data."""
+    # Create preference for user A
+    client.post(
+        "/api/memory/preferences",
+        headers={"X-User-ID": "userA"},
+        json={"domain": "coffee", "key": "type", "value": "cappuccino"}
+    )
+
+    # Try to get preferences as user B
+    response = client.get(
+        "/api/memory/preferences",
+        headers={"X-User-ID": "userB"}
+    )
+
+    # Should not see user A's preferences
+    prefs = response.json().get("preferences", [])
+    assert all(p["value"] != "cappuccino" for p in prefs)
+```
+
+Validation:
+```bash
+pushd packages/api
+poetry run pytest tests/api/test_auth_middleware.py -v
+popd
+```
+
+TESTING
+
+Integration Tests:
+See test_auth_middleware.py above
+
+Manual Testing:
+```bash
+# Test with explicit user_id
+curl http://localhost:8000/api/memory/preferences \
+  -H "X-User-ID: user123"
+
+# Test without user_id (should create guest)
+curl http://localhost:8000/api/memory/preferences
+
+# Test health check
+curl http://localhost:8000/health
+```
+
+VERIFICATION CHECKLIST
+- [ ] SimpleAuthMiddleware extracts user_id
+- [ ] Guest users created automatically
+- [ ] Health check endpoint works
+- [ ] Database health check works
+- [ ] User isolation verified
+- [ ] Integration tests pass
+
+---
+
+ARCHITECTURE CONSTRAINTS (CRITICAL - DO NOT VIOLATE)
+
+MULTI-TENANCY (MUST FOLLOW)
+- ALL database queries MUST include tenant_id filter
+- Use PrototypeConfig.PROTOTYPE_TENANT_ID ("prototype-tenant")
+- Scope Neo4j queries: MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
+- Scope PostgreSQL queries: WHERE tenant_id = $tenant_id AND user_id = $user_id
+- Scope Qdrant filters: Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))])
+- Scope Redis keys: prefs:{tenant_id}:{user_id}
+- Test tenant isolation: verify user A cannot access user B's data
+
+TYPE SAFETY (MUST FOLLOW)
+- TypeScript: NO 'any' types, use strict mode
+- TypeScript: NO type casting with 'as' (use type guards)
+- TypeScript: Use Zod schemas at ALL API boundaries
+- Python: Type hints on ALL functions
+- Python: Use dataclasses or Pydantic for data structures
+- Validate runtime types with Zod (TypeScript) or Pydantic (Python)
+
+@fidus/ui COMPONENTS (MUST FOLLOW)
+- Use ONLY @fidus/ui components
+- Available components: ChatInterface, MessageBubble, ConfidenceIndicator, Card, Stack, Heading, Text, Button, Divider, EmptyState
+- NO custom HTML tags: NO <div>, <p>, <span>, <h1-6>
+- NO Tailwind classes: NO className="text-xs text-gray-500"
+- NO custom CSS or styled-components
+- If you need a component not in @fidus/ui, use an existing one creatively or ask for guidance
+
+UUID GENERATION (MUST FOLLOW)
+- Use Python uuid4() for ALL ID generation
+- Generate IDs in Python, then pass to database queries
+- DO NOT use database UUID functions (except PostgreSQL gen_random_uuid() for conversations)
+- Consistency: str(uuid4()) everywhere
+
+ERROR HANDLING (MUST FOLLOW)
+- Wrap ALL LLM API calls in retry logic (use tenacity library)
+- Provide fallbacks for database failures (e.g., Redis cache)
+- Sanitize ALL user input (use bleach.clean())
+- Validate input length (max 5000 characters)
+- Log errors with context (user_id, tenant_id, operation)
+- Return user-friendly error messages (not raw exceptions)
+
+MCP PROTOCOL (MUST FOLLOW)
+- Tools must return Dict[str, Any]
+- Resources must return Dict[str, Any]
+- Tool names follow convention: {entity}.{action}
+- Resource URIs follow convention: {entity}://{id}/{subresource}
+- All tools must include user_id parameter
+- All tools must validate tenant_id
+
+---
+
+COMMON PITFALLS (AVOID THESE)
+
+AVOID DO NOT skip tenant_id in database queries
+AVOID DO NOT skip user_id in API endpoints
+AVOID DO NOT hardcode tenant_id (use PrototypeConfig)
+AVOID DO NOT create custom UI components
+AVOID DO NOT use type casting (as) in TypeScript
+AVOID DO NOT skip error handling on LLM calls
+AVOID DO NOT use database UUID generation (use Python uuid4)
+AVOID DO NOT commit without running tests
+AVOID DO NOT use Tailwind classes or custom CSS
+AVOID DO NOT create <div> or <p> tags (use @fidus/ui Text/Stack)
+AVOID DO NOT skip input sanitization
+AVOID DO NOT ignore CLAUDE.md conventions
+AVOID DO NOT forget to invalidate cache on updates
+AVOID DO NOT skip health checks for production readiness
+
+---
+
+TESTING STRATEGY
+
+UNIT TESTS (REQUIRED)
+Each component must have unit tests:
+- PreferenceMCPServer: test_mcp_server.py
+- ConversationStore: test_conversation_store.py
+- SessionCache: test_session_cache.py
+- SimpleAuthMiddleware: test_auth_middleware.py
+
+Example test structure:
+```python
+# packages/api/tests/[component]/test_[component].py
+
+import pytest
+
+@pytest.mark.asyncio
+async def test_[functionality]():
+    # Arrange
+    [setup test data]
+
+    # Act
+    result = await [call function]
+
+    # Assert
+    assert [expected outcome]
+    assert [multi-tenancy enforced]
+```
+
+INTEGRATION TESTS (REQUIRED)
+- End-to-end MCP tool calls
+- Multi-user isolation
+- Cache hit/miss scenarios
+- Database health checks
+
+MANUAL TESTING STEPS
+1. Start all services: docker-compose up -d
+2. Check all services running:
+   ```bash
+   docker-compose ps
+   # Should show: ollama, litellm, neo4j, qdrant, postgres, redis, api
+   ```
+3. Test MCP interface:
+   ```bash
+   curl -X POST http://localhost:8000/mcp/call \
+     -H "Content-Type: application/json" \
+     -d '{"tool": "user.get_preferences", "arguments": {"user_id": "user123"}}'
+   ```
+4. Test authentication:
+   ```bash
+   curl http://localhost:8000/api/memory/preferences
+   # Should return X-User-ID header
+   ```
+5. Test caching:
+   ```python
+   # First call - cache miss
+   prefs1 = await get_preferences("user123")
+
+   # Second call - cache hit (faster)
+   prefs2 = await get_preferences("user123")
+   ```
+6. Test conversation storage:
+   ```python
+   await store.save_message("user123", "user", "Hello")
+   history = await store.get_conversation_history("user123")
+   print(history)
+   ```
+7. Test health checks:
+   ```bash
+   curl http://localhost:8000/health
+   curl http://localhost:8000/health/db
+   ```
+
+---
+
+PHASE COMPLETION CHECKLIST
+
+Before marking this phase as COMPLETE, verify ALL of the following:
+
+FUNCTIONALITY
+- [ ] All tasks completed (4.1 through 4.4)
+- [ ] All success criteria met
+- [ ] Demo scenario works end-to-end:
+  - Call MCP tool to get preferences
+  - Call MCP tool to record interaction
+  - Call MCP tool to learn preference
+  - Access MCP resource for user preferences
+  - Multi-user access with isolation
+
+CODE QUALITY
+- [ ] Unit tests passing (poetry run pytest)
+- [ ] Integration tests passing
+- [ ] Lint checks passing (pnpm lint)
+- [ ] Type checks passing (pnpm typecheck)
+- [ ] No console errors
+- [ ] No Python exceptions in logs
+
+ARCHITECTURE COMPLIANCE
+- [ ] Multi-tenancy: tenant_id + user_id in ALL queries
+- [ ] Type safety: No 'any' types, Zod schemas at API boundaries
+- [ ] @fidus/ui: No custom divs, only @fidus/ui components
+- [ ] UUID: Python uuid4() used consistently
+- [ ] Error handling: LLM calls wrapped, fallbacks in place
+- [ ] MCP protocol: Tools and resources follow convention
+
+SECURITY
+- [ ] Input sanitization implemented (bleach.clean)
+- [ ] Rate limiting configured (slowapi)
+- [ ] No SQL/Cypher/XSS injection vulnerabilities
+- [ ] Authentication middleware enforced
+- [ ] User isolation verified
+- [ ] No secrets in code (use environment variables)
+
+PRODUCTION READINESS
+- [ ] Health check endpoints working
+- [ ] Database health checks implemented
+- [ ] Conversation auto-deletion configured (7 days)
+- [ ] Redis caching working with TTL
+- [ ] Error messages are user-friendly
+- [ ] Logs include context (user_id, tenant_id)
+
+DOCUMENTATION
+- [ ] MCP tools documented in code
+- [ ] API endpoints documented (OpenAPI/Swagger)
+- [ ] Code comments for complex logic
+- [ ] README updated with MCP usage
+- [ ] No TODOs left in code
+
+---
+
+RESOURCES & DOCUMENTATION
+
+MUST READ BEFORE STARTING:
+1. docs/prototypes/fidus-memory/implementation-plan.md (Phase 4 section)
+2. CLAUDE.md (Development conventions)
+3. MCP specification: https://modelcontextprotocol.io/
+4. FastAPI docs: https://fastapi.tiangolo.com/
+
+REFERENCE ARCHITECTURE:
+- docs/architecture/README.md (System overview)
+- docs/domain-model/README.md (DDD patterns)
+- packages/ui/README.md (@fidus/ui component library)
+
+CONFIGURATION:
+- packages/api/fidus/config.py (PrototypeConfig)
+- packages/shared/src/schemas/memory.ts (Zod schemas)
+
+KEY FILES IN THIS PHASE:
+Backend (Python):
+- packages/api/fidus/memory/mcp_server.py
+- packages/api/fidus/infrastructure/postgres/conversation_store.py
+- packages/api/fidus/infrastructure/redis/session_cache.py
+- packages/api/fidus/api/middleware/auth.py
+- packages/api/fidus/api/routes/mcp.py
+- packages/api/fidus/api/routes/health.py
+
+Infrastructure:
+- docker-compose.yml (add PostgreSQL, Redis)
+- packages/api/fidus/infrastructure/postgres/schema.sql
+
+USEFUL COMMANDS:
+```
+# Start all services
+docker-compose up -d
+
+# Check all services
+docker-compose ps
+
+# View logs
+docker-compose logs -f api
+
+# Test MCP endpoint
+curl -X POST http://localhost:8000/mcp/call \
+  -H "Content-Type: application/json" \
+  -d '{"tool": "user.get_preferences", "arguments": {"user_id": "user123"}}'
+
+# Test health
+curl http://localhost:8000/health
+curl http://localhost:8000/health/db
+
+# Backend tests
+pushd packages/api
+poetry run pytest tests/ -v
+popd
+
+# Type check
+pnpm typecheck
+
+# Lint
+pnpm lint
+
+# Build
+pnpm build > build.log 2>&1
+tail -n 30 build.log
+
+# Check PostgreSQL
+docker exec -it fidus-postgres psql -U fidus -d fidus_memory -c "SELECT COUNT(*) FROM conversations"
+
+# Check Redis
+redis-cli -h localhost -p 6379 KEYS "*"
+
+# Initialize databases
+python packages/api/scripts/init_databases.py
+```
+
+---
+
+DEVELOPMENT WORKFLOW
+
+RECOMMENDED APPROACH:
+1. Read implementation-plan.md Phase 4 section thoroughly
+2. Set up environment (docker-compose up -d)
+3. Work through tasks sequentially (Task 4.1, 4.2, 4.3, 4.4)
+4. After EACH task: run tests, verify functionality
+5. Before moving to next task: commit working code
+6. After ALL tasks: run full phase completion checklist
+7. Demo the deliverable to confirm phase success
+
+GIT WORKFLOW:
+- Create feature branch: git checkout -b feature/phase-4-mcp-interface
+- Commit after each completed task
+- Before final commit: run lint, typecheck, tests
+- Create PR when phase complete
+
+DEBUGGING TIPS:
+- Check docker-compose logs for service errors
+- Verify services running: docker-compose ps
+- Test MCP directly: curl http://localhost:8000/mcp/call
+- Check PostgreSQL: docker exec -it fidus-postgres psql ...
+- Check Redis: redis-cli -h localhost -p 6379 KEYS "*"
+- Check Neo4j browser: http://localhost:7474
+- Check Qdrant: curl http://localhost:6333/collections/situations
+- Use Python debugger: import pdb; pdb.set_trace()
+- Check API docs: http://localhost:8000/docs
+
+---
+
+QUESTIONS OR BLOCKERS?
+
+If you encounter issues:
+1. Re-read implementation-plan.md for this task
+2. Check CLAUDE.md for conventions
+3. Verify all services running: docker-compose ps
+4. Check logs: docker-compose logs [service]
+5. Review error messages carefully
+6. If requirements ambiguous: ask for clarification
+7. If stuck: break task into smaller steps
+
+DO NOT:
+- Skip steps hoping it will work
+- Ignore test failures
+- Proceed if architecture constraints violated
+- Commit broken code
+- Skip security checks
+
+---
+
+CONGRATULATIONS!
+
+This is the FINAL phase of Fidus Memory prototype. Upon completion:
+
+PROTOTYPE IS PRODUCTION-READY:
+- MCP server interface for external integration
+- Multi-user support with authentication
+- Conversation storage (PostgreSQL)
+- Performance optimization (Redis cache)
+- Health monitoring
+- Security hardening
+
+INTEGRATION WITH FIDUS SYSTEM:
+- Domain supervisors can query preferences via MCP
+- Calendar supervisor can check food preferences for meeting times
+- Finance supervisor can learn budget preferences
+- Travel supervisor can remember booking preferences
+- All supervisors can record user interactions
+
+NEXT STEPS (OUTSIDE THIS PROMPT):
+1. Deploy to production environment
+2. Integrate with domain supervisors
+3. Add monitoring and alerting
+4. Collect user feedback
+5. Iterate on preference extraction accuracy
+
+---
+
+BEGIN IMPLEMENTATION
+
+Start with Task 4.1 (MCP Server Interface) and work sequentially through all tasks.
+
+REMEMBER:
+- Read implementation-plan.md section for this phase FIRST
+- Follow architecture constraints (multi-tenancy, type safety, @fidus/ui)
+- Test after EACH task
+- Verify phase completion checklist before marking complete
+
+This is the final phase - make it count!
+
+===========================================
+END OF PHASE 4 PROMPT
+===========================================

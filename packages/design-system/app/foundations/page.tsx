@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@fidus/ui';
+import { Link } from '@fidus/ui/link';;
 
 interface Foundation {
   name: string;

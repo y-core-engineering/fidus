@@ -156,7 +156,7 @@ module.exports = {
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-3">Import and Use Button</h3>
           <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
-            <code>{`import { Button } from '@fidus/ui';
+            <code>{`import { Button } from '@fidus/ui/button';;
 
 export default function HomePage() {
   const handleClick = () => {
@@ -208,7 +208,9 @@ export default function HomePage() {
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-3">Named Imports (Recommended)</h3>
           <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
-            <code>{`import { Button, Input, Card, Alert } from '@fidus/ui';`}</code>
+            <code>{`import { Button } from '@fidus/ui/button';
+import { Card } from '@fidus/ui/card';
+import { Alert } from '@fidus/ui/alert';;`}</code>
           </pre>
         </div>
 
@@ -237,7 +239,7 @@ export default function HomePage() {
         </p>
 
         <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto mb-4">
-          <code>{`import { Button, ButtonProps } from '@fidus/ui';
+          <code>{`import { Button } from '@fidus/ui/button';;
 
 // Component with typed props
 interface MyComponentProps {
@@ -298,7 +300,7 @@ export function CustomButton(props: ButtonProps) {
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-3">Extending Component Styles</h3>
           <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
-            <code>{`import { Button } from '@fidus/ui';
+            <code>{`import { Button } from '@fidus/ui/button';;
 
 // Add additional classes to components
 <Button
@@ -378,7 +380,8 @@ module.exports = {
 
         <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
           <code>{`import { useState } from 'react';
-import { Button, Input, Textarea, Alert } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';
+import { Alert } from '@fidus/ui/alert';;
 
 export function ContactForm() {
   const [formData, setFormData] = useState({
@@ -451,7 +454,7 @@ export function ContactForm() {
           <h3 className="text-lg font-semibold mb-3">Using Vitest and React Testing Library</h3>
           <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
             <code>{`import { render, screen, fireEvent } from '@testing-library/react';
-import { Button } from '@fidus/ui';
+import { Button } from '@fidus/ui/button';;
 import { describe, it, expect, vi } from 'vitest';
 
 describe('Button', () => {

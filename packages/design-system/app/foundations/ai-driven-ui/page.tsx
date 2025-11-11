@@ -1,13 +1,11 @@
 'use client';
 
-import {
-  OpportunityCard,
-  Button,
-  DetailCard,
-  TextInput,
-  Alert,
-  Badge,
-} from '@fidus/ui';
+import { OpportunityCard } from '@fidus/ui/opportunity-card';
+import { Button } from '@fidus/ui/button';
+import { DetailCard } from '@fidus/ui/detail-card';
+import { TextInput } from '@fidus/ui/text-input';
+import { Alert } from '@fidus/ui/alert';
+import { Badge } from '@fidus/ui/badge';;
 import { useState, useEffect, useRef } from 'react';
 import { CodeBlock } from '../../../components/helpers/code-block';
 

@@ -1,6 +1,8 @@
 'use client';
 
-import { TextInput, Link, Stack } from '@fidus/ui';
+import { TextInput } from '@fidus/ui/text-input';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Search, Mail, Lock } from 'lucide-react';

@@ -1,6 +1,14 @@
 'use client';
 
-import { TextInput, TextArea, Checkbox, RadioGroup, RadioButton, Link, Stack, Button, Alert } from '@fidus/ui';
+import { TextInput } from '@fidus/ui/text-input';
+import { TextArea } from '@fidus/ui/text-area';
+import { Checkbox } from '@fidus/ui/checkbox';
+import { RadioButton } from '@fidus/ui/radio-button';
+import { RadioGroup } from '@fidus/ui/radio-button';
+import { Link } from '@fidus/ui/link';
+import { Stack } from '@fidus/ui/stack';
+import { Button } from '@fidus/ui/button';
+import { Alert } from '@fidus/ui/alert';;
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { useState } from 'react';
 
