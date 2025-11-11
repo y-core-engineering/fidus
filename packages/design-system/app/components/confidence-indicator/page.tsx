@@ -2,8 +2,9 @@
 
 import { ConfidenceIndicator } from '@fidus/ui/confidence-indicator';
 import { MessageBubble } from '@fidus/ui/message-bubble';
+import type { Message } from '@fidus/ui/message-bubble';
 import { Link } from '@fidus/ui/link';
-import { Stack } from '@fidus/ui/stack';;
+import { Stack } from '@fidus/ui/stack';
 import { ComponentPreview } from '../../../components/helpers/component-preview';
 import { PropsTable } from '../../../components/helpers/props-table';
 import { Check, X } from 'lucide-react';
@@ -233,7 +234,7 @@ export default function ConfidenceIndicatorPage() {
       <h3>Minimal Variant (Badge Only)</h3>
       <ComponentPreview
         code={`import { ConfidenceIndicator } from '@fidus/ui/confidence-indicator';
-import { Stack } from '@fidus/ui/stack';;
+import { Stack } from '@fidus/ui/stack';
 
 <Stack direction="horizontal" spacing="md" align="center">
   <ConfidenceIndicator confidence={0.95} variant="minimal" size="sm" />
@@ -251,7 +252,7 @@ import { Stack } from '@fidus/ui/stack';;
       <h3>Detailed Variant (With Progress Bar)</h3>
       <ComponentPreview
         code={`import { ConfidenceIndicator } from '@fidus/ui/confidence-indicator';
-import { Stack } from '@fidus/ui/stack';;
+import { Stack } from '@fidus/ui/stack';
 
 <Stack direction="vertical" spacing="md">
   <ConfidenceIndicator confidence={0.92} variant="detailed" />
