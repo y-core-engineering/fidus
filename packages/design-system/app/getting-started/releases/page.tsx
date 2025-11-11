@@ -17,10 +17,10 @@ export default function ReleasesPage() {
 
         <Divider />
 
-        {/* Version 1.6.1 */}
+        {/* Version 1.7.1 */}
         <Stack direction="vertical" spacing="lg" className="border-2 border-primary rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
           <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
-            <h2 className="text-3xl font-bold text-foreground">v1.6.1</h2>
+            <h2 className="text-3xl font-bold text-foreground">v1.7.1</h2>
             <Badge variant="success">Latest</Badge>
             <Badge variant="info">
               <Sparkles className="w-3 h-3 mr-1" />
