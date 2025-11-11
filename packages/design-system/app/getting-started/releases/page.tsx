@@ -17,11 +17,128 @@ export default function ReleasesPage() {
 
         <Divider />
 
-        {/* Version 1.6.0 */}
+        {/* Version 1.6.1 */}
         <Stack direction="vertical" spacing="lg" className="border-2 border-primary rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
           <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
-            <h2 className="text-3xl font-bold text-foreground">v1.6.0</h2>
+            <h2 className="text-3xl font-bold text-foreground">v1.6.1</h2>
             <Badge variant="success">Latest</Badge>
+            <Badge variant="info">
+              <Sparkles className="w-3 h-3 mr-1" />
+              Phase 3 Tree-Shaking
+            </Badge>
+          </Stack>
+
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Calendar className="w-4 h-4" />
+              <span>November 11, 2025</span>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <GitBranch className="w-4 h-4" />
+              <Link
+                href="https://github.com/y-core-engineering/fidus/pull/70"
+                target="_blank"
+              >
+                PR #70
+              </Link>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Package className="w-4 h-4" />
+              <Link
+                href="https://www.npmjs.com/package/@fidus/ui"
+                target="_blank"
+              >
+                NPM Package
+              </Link>
+            </Stack>
+          </Stack>
+
+          <Divider />
+
+          {/* Tree-Shaking Configuration */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Tree-Shaking Configuration
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7">
+              <div className="flex items-center gap-4 mb-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-semibold text-3xl text-error">~370KB</span>
+                  <span className="text-sm text-muted-foreground">before</span>
+                </div>
+                <span className="text-2xl">→</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-semibold text-3xl text-success">~4KB</span>
+                  <span className="text-sm text-muted-foreground">after</span>
+                </div>
+                <Badge variant="success">95% reduction</Badge>
+              </div>
+
+              <Stack direction="vertical" spacing="xs">
+                <p className="text-sm text-muted-foreground">
+                  ✅ <strong>47 subpath exports</strong> configured (45 components + index + tailwind)
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  ✅ <strong>sideEffects: false</strong> for aggressive tree-shaking
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  ✅ <strong>Automated export generation</strong> script at <code className="bg-muted px-1 py-0.5 rounded text-xs">scripts/generate-exports.ts</code>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  ✅ <strong>Per-component bundles</strong> with TypeScript definitions (.d.ts, .d.mts)
+                </p>
+              </Stack>
+
+              <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                <p className="text-sm font-medium mb-2">Recommended Usage:</p>
+                <pre className="bg-background p-2 rounded text-xs overflow-x-auto">
+                  <code>{`// ✅ Optimized (production)
+import { Button } from '@fidus/ui/button';
+import { Stack } from '@fidus/ui/stack';
+import { Alert } from '@fidus/ui/alert';
+
+// ✅ Still works (development)
+import { Button, Stack, Alert } from '@fidus/ui';`}</code>
+                </pre>
+              </div>
+            </Stack>
+          </Stack>
+
+          {/* Documentation */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Documentation & Integration
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7 text-sm text-muted-foreground">
+              <p>✅ Comprehensive tree-shaking guide in README with bundle size comparison</p>
+              <p>✅ React Hook Form integration examples with basic validation</p>
+              <p>✅ Zod schema validation examples for type-safe forms</p>
+              <p>✅ Subpath import reference for all 45 components</p>
+              <p>✅ Form component compatibility documentation</p>
+            </Stack>
+          </Stack>
+
+          {/* Migration */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground">Migration</h3>
+            <div className="ml-7 p-4 bg-success/10 border border-success/20 rounded-lg">
+              <p className="text-sm font-medium text-success-foreground">✅ Zero breaking changes</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Existing barrel imports continue to work. Gradually adopt subpath imports for production builds
+                to benefit from tree-shaking. All components remain fully backward compatible.
+              </p>
+            </div>
+          </Stack>
+        </Stack>
+
+        {/* Version 1.6.0 */}
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
+            <h2 className="text-3xl font-bold text-foreground">v1.6.0</h2>
             <Badge variant="info">
               <Sparkles className="w-3 h-3 mr-1" />
               Phase 2 SSR Enhancements

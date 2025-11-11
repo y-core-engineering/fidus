@@ -317,22 +317,34 @@ export default function HomePage() {
           <div className="p-6 border-2 border-primary rounded-lg bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold">@fidus/ui v1.6.0 Release</h3>
+                <h3 className="text-lg font-semibold">@fidus/ui v1.6.1 - Tree-Shaking</h3>
                 <span className="px-2 py-0.5 text-xs font-bold rounded bg-success text-black">
                   Latest
                 </span>
               </div>
-              <span className="text-sm text-muted-foreground">2025-11-10</span>
+              <span className="text-sm text-muted-foreground">2025-11-11</span>
             </div>
             <p className="text-muted-foreground mb-3">
-              Phase 2 SSR Enhancements: 3 complete example projects (Next.js App Router, Pages Router, Vite),
-              133 SSR compatibility tests (142% increase), comprehensive documentation for SSR integration.
-              All 40+ components tested for server-side rendering safety.
+              Phase 3 Tree-Shaking Optimization: 95% bundle size reduction for single component imports
+              (from ~370KB to ~4KB). 47 subpath exports, automated export generation, React Hook Form
+              integration docs. Production-ready tree-shaking with zero breaking changes.
             </p>
             <Link href="/getting-started/releases" className="inline-flex items-center text-primary font-medium hover:underline">
               View release details
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
+          </div>
+
+          <div className="p-6 border border-border rounded-lg bg-card">
+            <div className="flex items-start justify-between mb-2">
+              <h3 className="text-lg font-semibold">@fidus/ui v1.6.0 - SSR Enhancements</h3>
+              <span className="text-sm text-muted-foreground">2025-11-10</span>
+            </div>
+            <p className="text-muted-foreground">
+              Phase 2 SSR Enhancements: 3 complete example projects (Next.js App Router, Pages Router, Vite),
+              133 SSR compatibility tests (142% increase), comprehensive documentation for SSR integration.
+              All 40+ components tested for server-side rendering safety.
+            </p>
           </div>
 
           <div className="p-6 border border-border rounded-lg bg-card">
