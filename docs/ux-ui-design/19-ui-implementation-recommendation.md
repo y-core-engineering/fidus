@@ -29,21 +29,21 @@ Fidus has a **unique AI-driven UI paradigm** where the backend LLM decides which
 ### My Recommendation: Hybrid Approach
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  RECOMMENDED: "Dynamic Component Rendering"             │
-│  with Server-Driven UI + Static Type Safety             │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Backend (LLM)           Frontend (React)               │
-│  ─────────────           ──────────────                 │
-│  Decides WHAT    ───→    Renders HOW                    │
-│  (component_id)          (React component)              │
-│                                                         │
-│  + Server Components (React Server Components)          │
-│  + Type-Safe UI Metadata (Zod schemas)                  │
-│  + Progressive Enhancement (works without JS)           │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
++---------------------------------------------------------+
+|  RECOMMENDED: "Dynamic Component Rendering"             |
+|  with Server-Driven UI + Static Type Safety             |
++---------------------------------------------------------+
+|                                                         |
+|  Backend (LLM)           Frontend (React)               |
+|  -------------           --------------                 |
+|  Decides WHAT    ---→    Renders HOW                    |
+|  (component_id)          (React component)              |
+|                                                         |
+|  + Server Components (React Server Components)          |
+|  + Type-Safe UI Metadata (Zod schemas)                  |
+|  + Progressive Enhancement (works without JS)           |
+|                                                         |
++---------------------------------------------------------+
 ```
 
 **Why this approach wins:**
@@ -166,62 +166,62 @@ function OpportunitySurface({ opportunities }) {
 ### Three-Layer Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  LAYER 1: Backend (Python)                             │
-│  ────────────────────────────────────────               │
-│  Orchestrator + Domain Supervisors                      │
-│       ↓                                                 │
-│  Opportunity Detection                                  │
-│       ↓                                                 │
-│  UI Decision Layer (LLM)                                │
-│       ↓                                                 │
-│  API Response + UI Metadata                             │
-│       │                                                 │
-│       │ {                                               │
-│       │   ui_metadata: {                                │
-│       │     component_id: "opportunity-card",           │
-│       │     props: { ... },                             │
-│       │     fallback: { ... }                           │
-│       │   }                                             │
-│       │ }                                               │
-└───────┼─────────────────────────────────────────────────┘
-        │
-        │ HTTP (JSON with UI metadata)
++---------------------------------------------------------+
+|  LAYER 1: Backend (Python)                             |
+|  ----------------------------------------               |
+|  Orchestrator + Domain Supervisors                      |
+|       ↓                                                 |
+|  Opportunity Detection                                  |
+|       ↓                                                 |
+|  UI Decision Layer (LLM)                                |
+|       ↓                                                 |
+|  API Response + UI Metadata                             |
+|       |                                                 |
+|       | {                                               |
+|       |   ui_metadata: {                                |
+|       |     component_id: "opportunity-card",           |
+|       |     props: { ... },                             |
+|       |     fallback: { ... }                           |
+|       |   }                                             |
+|       | }                                               |
++-------+-------------------------------------------------+
+        |
+        | HTTP (JSON with UI metadata)
         ↓
-┌─────────────────────────────────────────────────────────┐
-│  LAYER 2: Next.js App Router (React Server Components) │
-│  ────────────────────────────────────────────────       │
-│  Server Component (RSC)                                 │
-│    - Fetches data from backend                          │
-│    - Receives UI metadata                               │
-│    - Passes to client components                        │
-│       ↓                                                 │
-│  Client Component (UIDecisionLayer)                     │
-│    - Validates UI metadata (Zod)                        │
-│    - Looks up component in registry                     │
-│    - Renders with props                                 │
-│       ↓                                                 │
-│  Component Library (Design System)                      │
-│    - OpportunityCard.tsx                                │
-│    - FormModal.tsx                                      │
-│    - ChatInterface.tsx                                  │
-└─────────────────────────────────────────────────────────┘
-        │
-        │ User Interaction
++---------------------------------------------------------+
+|  LAYER 2: Next.js App Router (React Server Components) |
+|  ------------------------------------------------       |
+|  Server Component (RSC)                                 |
+|    - Fetches data from backend                          |
+|    - Receives UI metadata                               |
+|    - Passes to client components                        |
+|       ↓                                                 |
+|  Client Component (UIDecisionLayer)                     |
+|    - Validates UI metadata (Zod)                        |
+|    - Looks up component in registry                     |
+|    - Renders with props                                 |
+|       ↓                                                 |
+|  Component Library (Design System)                      |
+|    - OpportunityCard.tsx                                |
+|    - FormModal.tsx                                      |
+|    - ChatInterface.tsx                                  |
++---------------------------------------------------------+
+        |
+        | User Interaction
         ↓
-┌─────────────────────────────────────────────────────────┐
-│  LAYER 3: User Actions → Backend Loop                   │
-│  ───────────────────────────────────────                │
-│  User clicks [Reschedule]                               │
-│       ↓                                                 │
-│  POST /api/calendar/appointments/456/reschedule         │
-│       ↓                                                 │
-│  Backend processes action                               │
-│       ↓                                                 │
-│  Returns success + new UI metadata                      │
-│       ↓                                                 │
-│  Frontend updates (optimistic or refetch)               │
-└─────────────────────────────────────────────────────────┘
++---------------------------------------------------------+
+|  LAYER 3: User Actions → Backend Loop                   |
+|  ---------------------------------------                |
+|  User clicks [Reschedule]                               |
+|       ↓                                                 |
+|  POST /api/calendar/appointments/456/reschedule         |
+|       ↓                                                 |
+|  Backend processes action                               |
+|       ↓                                                 |
+|  Returns success + new UI metadata                      |
+|       ↓                                                 |
+|  Frontend updates (optimistic or refetch)               |
++---------------------------------------------------------+
 ```
 
 ---
@@ -924,7 +924,7 @@ Next.js 14 (RSC)
   + Tailwind (styling)
   + UIDecisionLayer (bridge)
   + Component Registry (extensibility)
-─────────────────────────────────
+---------------------------------
 = Type-safe, AI-driven, performant,
   maintainable, scalable UI
 ```

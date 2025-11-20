@@ -54,11 +54,11 @@ graph TB
 **Top-right corner, always visible:**
 
 ```
-┌──────────────────────────────────────────┐
-│ [Fidus Logo]        [🔔] [⚙️] [👤▾]     │
-│                                    ↑     │
-│                          Tenant Switcher │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| [Fidus Logo]        [🔔] [⚙️] [👤▾]     |
+|                                    ↑     |
+|                          Tenant Switcher |
++------------------------------------------+
 ```
 
 ---
@@ -68,26 +68,26 @@ graph TB
 **User taps profile icon (👤▾):**
 
 ```
-┌────────────────────────────────┐
-│ Switch Context                 │
-├────────────────────────────────┤
-│ ● Personal                     │  ← Currently active
-│   You                          │
-│                                │
-│ ○ Family                       │
-│   The Herdens (4 members)      │
-│                                │
-│ ○ Work Team                    │
-│   Engineering (12 members)     │
-│                                │
-│ ○ Company                      │
-│   Acme Corp (256 members)      │
-│                                │
-├────────────────────────────────┤
-│ [+ Create New Tenant]          │
-│                                │
-│ [Manage Tenants]               │
-└────────────────────────────────┘
++--------------------------------+
+| Switch Context                 |
++--------------------------------+
+| ● Personal                     |  ← Currently active
+|   You                          |
+|                                |
+| ○ Family                       |
+|   The Herdens (4 members)      |
+|                                |
+| ○ Work Team                    |
+|   Engineering (12 members)     |
+|                                |
+| ○ Company                      |
+|   Acme Corp (256 members)      |
+|                                |
++--------------------------------+
+| [+ Create New Tenant]          |
+|                                |
+| [Manage Tenants]               |
++--------------------------------+
 ```
 
 ---
@@ -97,19 +97,19 @@ graph TB
 **User switches to Family context:**
 
 ```
-┌────────────────────────────────┐
-│ Switched to Family             │
-├────────────────────────────────┤
-│ Now viewing:                   │
-│ • Shared family calendar       │
-│ • Shared shopping lists        │
-│ • Family budget (if shared)    │
-│                                │
-│ Your personal data remains     │
-│ private in Personal context.   │
-│                                │
-│ [Got It]                       │
-└────────────────────────────────┘
++--------------------------------+
+| Switched to Family             |
++--------------------------------+
+| Now viewing:                   |
+| • Shared family calendar       |
+| • Shared shopping lists        |
+| • Family budget (if shared)    |
+|                                |
+| Your personal data remains     |
+| private in Personal context.   |
+|                                |
+| [Got It]                       |
++--------------------------------+
 ```
 
 ---
@@ -165,33 +165,33 @@ graph TB
 **Shows merged view: shared + personal events:**
 
 ```
-┌──────────────────────────────────────────┐
-│ Family Calendar            🏠 Family   ✕ │
-├──────────────────────────────────────────┤
-│ Today - October 28                       │
-│                                          │
-│ 🏠 School Drop-off (9:00 AM)             │
-│    Shared • Sarah                        │
-│                                          │
-│ 👤 Your: Team Meeting (10:00 AM)         │
-│    Private                               │
-│                                          │
-│ 🏠 Soccer Practice (4:00 PM)             │
-│    Shared • Kids                         │
-│                                          │
-│ 👤 Your: Client Call (5:00 PM)           │
-│    Private                               │
-│                                          │
-│ 🏠 Family Dinner (7:00 PM)               │
-│    Shared • Everyone                     │
-│                                          │
-├──────────────────────────────────────────┤
-│ Legend:                                  │
-│ 🏠 Shared events (visible to family)     │
-│ 👤 Your private events (only you)        │
-│                                          │
-│ [Add Family Event] [Add Private Event]   │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Family Calendar            🏠 Family   ✕ |
++------------------------------------------+
+| Today - October 28                       |
+|                                          |
+| 🏠 School Drop-off (9:00 AM)             |
+|    Shared • Sarah                        |
+|                                          |
+| 👤 Your: Team Meeting (10:00 AM)         |
+|    Private                               |
+|                                          |
+| 🏠 Soccer Practice (4:00 PM)             |
+|    Shared • Kids                         |
+|                                          |
+| 👤 Your: Client Call (5:00 PM)           |
+|    Private                               |
+|                                          |
+| 🏠 Family Dinner (7:00 PM)               |
+|    Shared • Everyone                     |
+|                                          |
++------------------------------------------+
+| Legend:                                  |
+| 🏠 Shared events (visible to family)     |
+| 👤 Your private events (only you)        |
+|                                          |
+| [Add Family Event] [Add Private Event]   |
++------------------------------------------+
 ```
 
 **Key:** Private events show as "Busy" to family, no details shared
@@ -201,23 +201,23 @@ graph TB
 ### Shared Shopping List
 
 ```
-┌──────────────────────────────────────────┐
-│ Family Shopping List       🏠 Family   ✕ │
-├──────────────────────────────────────────┤
-│ Groceries                                │
-│ ☑ Milk (2L) • Added by Sarah             │
-│ □ Bread • Added by You                   │
-│ □ Eggs (dozen) • Added by John           │
-│                                          │
-│ Household                                │
-│ □ Dish soap • Added by Sarah             │
-│ □ Laundry detergent • Added by You       │
-│                                          │
-│ Last Updated: 10 minutes ago by Sarah    │
-│                                          │
-├──────────────────────────────────────────┤
-│ [+ Add Item]  [Share List]  [Clear Done] │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Family Shopping List       🏠 Family   ✕ |
++------------------------------------------+
+| Groceries                                |
+| ☑ Milk (2L) • Added by Sarah             |
+| □ Bread • Added by You                   |
+| □ Eggs (dozen) • Added by John           |
+|                                          |
+| Household                                |
+| □ Dish soap • Added by Sarah             |
+| □ Laundry detergent • Added by You       |
+|                                          |
+| Last Updated: 10 minutes ago by Sarah    |
+|                                          |
++------------------------------------------+
+| [+ Add Item]  [Share List]  [Clear Done] |
++------------------------------------------+
 ```
 
 **Real-time Sync:** Changes visible to all family members instantly
@@ -268,32 +268,32 @@ graph TB
 **Settings → Family → Members:**
 
 ```
-┌──────────────────────────────────────────┐
-│ Family Members             🏠 Family   ✕ │
-├──────────────────────────────────────────┤
-│ Sarah Herden (You)                       │
-│ Role: Owner                              │
-│ Access: Full access                      │
-│                                          │
-│ John Herden                              │
-│ Role: Admin                              │
-│ Access: Can manage family settings       │
-│ [Edit Role] [Remove]                     │
-│                                          │
-│ Emma Herden (12)                         │
-│ Role: Child                              │
-│ Access: Limited (parent-controlled)      │
-│ Restrictions: Cannot delete shared events│
-│ [Edit Role] [Remove]                     │
-│                                          │
-│ Max Herden (9)                           │
-│ Role: Child                              │
-│ Access: Limited (parent-controlled)      │
-│ [Edit Role] [Remove]                     │
-│                                          │
-├──────────────────────────────────────────┤
-│ [+ Invite Family Member]                 │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Family Members             🏠 Family   ✕ |
++------------------------------------------+
+| Sarah Herden (You)                       |
+| Role: Owner                              |
+| Access: Full access                      |
+|                                          |
+| John Herden                              |
+| Role: Admin                              |
+| Access: Can manage family settings       |
+| [Edit Role] [Remove]                     |
+|                                          |
+| Emma Herden (12)                         |
+| Role: Child                              |
+| Access: Limited (parent-controlled)      |
+| Restrictions: Cannot delete shared events|
+| [Edit Role] [Remove]                     |
+|                                          |
+| Max Herden (9)                           |
+| Role: Child                              |
+| Access: Limited (parent-controlled)      |
+| [Edit Role] [Remove]                     |
+|                                          |
++------------------------------------------+
+| [+ Invite Family Member]                 |
++------------------------------------------+
 ```
 
 **Roles:**
@@ -333,36 +333,36 @@ graph TB
 **Shows team events + projects:**
 
 ```
-┌──────────────────────────────────────────┐
-│ Team Calendar              👥 Team     ✕ │
-├──────────────────────────────────────────┤
-│ This Week - Nov 4-8                      │
-│                                          │
-│ Monday, Nov 4                            │
-│ 👥 Sprint Planning (9:00 AM - 11:00 AM) │
-│    All Team • Zoom                       │
-│                                          │
-│ 👤 Your: Client Call (2:00 PM)           │
-│    Private                               │
-│                                          │
-│ Tuesday, Nov 5                           │
-│ 👥 Design Review (10:00 AM)              │
-│    Design Team • Office                  │
-│                                          │
-│ 👤 Your: Busy (2:00 PM - 3:00 PM)        │
-│    Details hidden                        │
-│                                          │
-│ Friday, Nov 8                            │
-│ 👥 Demo Day (3:00 PM)                    │
-│    All Team • Auditorium                 │
-│                                          │
-├──────────────────────────────────────────┤
-│ Legend:                                  │
-│ 👥 Team events (visible to team)         │
-│ 👤 Your events (private or "Busy")       │
-│                                          │
-│ [Add Team Event] [Add Private Event]     │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Team Calendar              👥 Team     ✕ |
++------------------------------------------+
+| This Week - Nov 4-8                      |
+|                                          |
+| Monday, Nov 4                            |
+| 👥 Sprint Planning (9:00 AM - 11:00 AM) |
+|    All Team • Zoom                       |
+|                                          |
+| 👤 Your: Client Call (2:00 PM)           |
+|    Private                               |
+|                                          |
+| Tuesday, Nov 5                           |
+| 👥 Design Review (10:00 AM)              |
+|    Design Team • Office                  |
+|                                          |
+| 👤 Your: Busy (2:00 PM - 3:00 PM)        |
+|    Details hidden                        |
+|                                          |
+| Friday, Nov 8                            |
+| 👥 Demo Day (3:00 PM)                    |
+|    All Team • Auditorium                 |
+|                                          |
++------------------------------------------+
+| Legend:                                  |
+| 👥 Team events (visible to team)         |
+| 👤 Your events (private or "Busy")       |
+|                                          |
+| [Add Team Event] [Add Private Event]     |
++------------------------------------------+
 ```
 
 ---
@@ -370,32 +370,32 @@ graph TB
 ### Shared Project Budget
 
 ```
-┌──────────────────────────────────────────┐
-│ Project Budget             👥 Team     ✕ │
-├──────────────────────────────────────────┤
-│ Project: Website Redesign                │
-│                                          │
-│ Budget: 50,000 EUR                       │
-│ Spent: 32,500 EUR (65%)                  │
-│ Remaining: 17,500 EUR                    │
-│                                          │
-│ Breakdown:                               │
-│ • Design: 15,000 EUR (100% used)         │
-│ • Development: 12,500 EUR (50% used)     │
-│ • Marketing: 5,000 EUR (0% used)         │
-│                                          │
-│ Recent Expenses:                         │
-│ • Oct 27: Freelancer payment - 2,500 EUR │
-│   Added by Sarah                         │
-│ • Oct 25: Software license - 500 EUR     │
-│   Added by John                          │
-│                                          │
-│ 💡 Team members can view, only admins   │
-│    can edit budget.                      │
-│                                          │
-├──────────────────────────────────────────┤
-│ [View Transactions] [Add Expense]        │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Project Budget             👥 Team     ✕ |
++------------------------------------------+
+| Project: Website Redesign                |
+|                                          |
+| Budget: 50,000 EUR                       |
+| Spent: 32,500 EUR (65%)                  |
+| Remaining: 17,500 EUR                    |
+|                                          |
+| Breakdown:                               |
+| • Design: 15,000 EUR (100% used)         |
+| • Development: 12,500 EUR (50% used)     |
+| • Marketing: 5,000 EUR (0% used)         |
+|                                          |
+| Recent Expenses:                         |
+| • Oct 27: Freelancer payment - 2,500 EUR |
+|   Added by Sarah                         |
+| • Oct 25: Software license - 500 EUR     |
+|   Added by John                          |
+|                                          |
+| 💡 Team members can view, only admins   |
+|    can edit budget.                      |
+|                                          |
++------------------------------------------+
+| [View Transactions] [Add Expense]        |
++------------------------------------------+
 ```
 
 ---
@@ -405,43 +405,43 @@ graph TB
 **Role-Based Access Control (RBAC):**
 
 ```
-┌──────────────────────────────────────────┐
-│ Team Roles                 👥 Team     ✕ │
-├──────────────────────────────────────────┤
-│ Sarah Herden (You)                       │
-│ Role: Owner                              │
-│ Permissions: Full access                 │
-│                                          │
-│ John Smith                               │
-│ Role: Admin                              │
-│ Permissions:                             │
-│ • View team calendar ✅                  │
-│ • Edit team calendar ✅                  │
-│ • View budgets ✅                        │
-│ • Edit budgets ✅                        │
-│ • Manage members ✅                      │
-│ [Edit Role]                              │
-│                                          │
-│ Emma Johnson                             │
-│ Role: Member                             │
-│ Permissions:                             │
-│ • View team calendar ✅                  │
-│ • Edit team calendar ❌                  │
-│ • View budgets ✅                        │
-│ • Edit budgets ❌                        │
-│ [Edit Role]                              │
-│                                          │
-│ Max Lee                                  │
-│ Role: Viewer                             │
-│ Permissions:                             │
-│ • View team calendar ✅                  │
-│ • Edit team calendar ❌                  │
-│ • View budgets ❌                        │
-│ [Edit Role]                              │
-│                                          │
-├──────────────────────────────────────────┤
-│ [+ Invite Team Member]                   │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Team Roles                 👥 Team     ✕ |
++------------------------------------------+
+| Sarah Herden (You)                       |
+| Role: Owner                              |
+| Permissions: Full access                 |
+|                                          |
+| John Smith                               |
+| Role: Admin                              |
+| Permissions:                             |
+| • View team calendar ✅                  |
+| • Edit team calendar ✅                  |
+| • View budgets ✅                        |
+| • Edit budgets ✅                        |
+| • Manage members ✅                      |
+| [Edit Role]                              |
+|                                          |
+| Emma Johnson                             |
+| Role: Member                             |
+| Permissions:                             |
+| • View team calendar ✅                  |
+| • Edit team calendar ❌                  |
+| • View budgets ✅                        |
+| • Edit budgets ❌                        |
+| [Edit Role]                              |
+|                                          |
+| Max Lee                                  |
+| Role: Viewer                             |
+| Permissions:                             |
+| • View team calendar ✅                  |
+| • Edit team calendar ❌                  |
+| • View budgets ❌                        |
+| [Edit Role]                              |
+|                                          |
++------------------------------------------+
+| [+ Invite Team Member]                   |
++------------------------------------------+
 ```
 
 ---
@@ -474,21 +474,21 @@ graph TB
 **In Company context:**
 
 ```
-┌────────────────────────────────┐
-│ Switch Department              │
-├────────────────────────────────┤
-│ ● Engineering                  │  ← Current
-│   Your department (50 members) │
-│                                │
-│ ○ Sales                        │
-│   View-only (30 members)       │
-│                                │
-│ ○ Marketing                    │
-│   View-only (20 members)       │
-│                                │
-│ ○ Company-Wide                 │
-│   All departments (256 members)│
-└────────────────────────────────┘
++--------------------------------+
+| Switch Department              |
++--------------------------------+
+| ● Engineering                  |  ← Current
+|   Your department (50 members) |
+|                                |
+| ○ Sales                        |
+|   View-only (30 members)       |
+|                                |
+| ○ Marketing                    |
+|   View-only (20 members)       |
+|                                |
+| ○ Company-Wide                 |
+|   All departments (256 members)|
++--------------------------------+
 ```
 
 ---
@@ -498,22 +498,22 @@ graph TB
 **Company Edition uses Single Sign-On:**
 
 ```
-┌────────────────────────────────┐
-│ Sign In to Acme Corp           │
-├────────────────────────────────┤
-│ [Sign In with Okta]            │
-│                                │
-│ [Sign In with Azure AD]        │
-│                                │
-│ [Sign In with Google Workspace]│
-│                                │
-│ ─────────── or ────────────    │
-│                                │
-│ Email                          │
-│ [your.email@acmecorp.com    ]  │
-│                                │
-│ [Continue]                     │
-└────────────────────────────────┘
++--------------------------------+
+| Sign In to Acme Corp           |
++--------------------------------+
+| [Sign In with Okta]            |
+|                                |
+| [Sign In with Azure AD]        |
+|                                |
+| [Sign In with Google Workspace]|
+|                                |
+| ----------- or ------------    |
+|                                |
+| Email                          |
+| [your.email@acmecorp.com    ]  |
+|                                |
+| [Continue]                     |
++--------------------------------+
 ```
 
 ---
@@ -523,35 +523,35 @@ graph TB
 **Hierarchical view:**
 
 ```
-┌──────────────────────────────────────────┐
-│ Company Calendar           🏢 Acme     ✕ │
-├──────────────────────────────────────────┤
-│ View: [Engineering ▼]                    │
-│                                          │
-│ This Week - Nov 4-8                      │
-│                                          │
-│ 🏢 All-Hands Meeting (Mon 9:00 AM)       │
-│    Company-wide • Main Auditorium        │
-│                                          │
-│ 🔧 Engineering Sync (Mon 10:00 AM)       │
-│    Engineering Dept • Zoom               │
-│                                          │
-│ 👥 Frontend Sprint Planning (Tue 9:00 AM)│
-│    Your team • Room 301                  │
-│                                          │
-│ 👤 Your: Busy (Tue 2:00 PM)              │
-│    Details hidden                        │
-│                                          │
-│ 🏢 Q4 Review (Fri 3:00 PM)               │
-│    Company-wide • Auditorium             │
-│                                          │
-├──────────────────────────────────────────┤
-│ Legend:                                  │
-│ 🏢 Company-wide (all employees)          │
-│ 🔧 Department (Engineering)              │
-│ 👥 Team (Frontend Team)                  │
-│ 👤 Personal (private)                    │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Company Calendar           🏢 Acme     ✕ |
++------------------------------------------+
+| View: [Engineering ▼]                    |
+|                                          |
+| This Week - Nov 4-8                      |
+|                                          |
+| 🏢 All-Hands Meeting (Mon 9:00 AM)       |
+|    Company-wide • Main Auditorium        |
+|                                          |
+| 🔧 Engineering Sync (Mon 10:00 AM)       |
+|    Engineering Dept • Zoom               |
+|                                          |
+| 👥 Frontend Sprint Planning (Tue 9:00 AM)|
+|    Your team • Room 301                  |
+|                                          |
+| 👤 Your: Busy (Tue 2:00 PM)              |
+|    Details hidden                        |
+|                                          |
+| 🏢 Q4 Review (Fri 3:00 PM)               |
+|    Company-wide • Auditorium             |
+|                                          |
++------------------------------------------+
+| Legend:                                  |
+| 🏢 Company-wide (all employees)          |
+| 🔧 Department (Engineering)              |
+| 👥 Team (Frontend Team)                  |
+| 👤 Personal (private)                    |
++------------------------------------------+
 ```
 
 ---
@@ -563,39 +563,39 @@ graph TB
 **Settings → Family → Invite Member:**
 
 ```
-┌──────────────────────────────────────────┐
-│ Invite Family Member       🏠 Family   ✕ │
-├──────────────────────────────────────────┤
-│ Email or Phone                           │
-│ [john@example.com                     ]  │
-│                                          │
-│ Role                                     │
-│ (● Adult  ○ Child)                       │
-│                                          │
-│ Permissions                              │
-│ [✓] Can view shared calendar             │
-│ [✓] Can edit shared calendar             │
-│ [✓] Can add to shopping list             │
-│ [ ] Can manage family settings (Admin)   │
-│                                          │
-│ 💡 Invited member will receive email    │
-│    and must accept to join.              │
-│                                          │
-│ Privacy Notice:                          │
-│ Family members can see:                  │
-│ • Shared calendar events                 │
-│ • Shared shopping lists                  │
-│ • Shared home tasks                      │
-│                                          │
-│ They CANNOT see:                         │
-│ • Your private calendar events           │
-│ • Your personal finance                  │
-│ • Your health records                    │
-│ • Your personal email                    │
-│                                          │
-│              [Send Invitation]           │
-│                 Cancel                   │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Invite Family Member       🏠 Family   ✕ |
++------------------------------------------+
+| Email or Phone                           |
+| [john@example.com                     ]  |
+|                                          |
+| Role                                     |
+| (● Adult  ○ Child)                       |
+|                                          |
+| Permissions                              |
+| [✓] Can view shared calendar             |
+| [✓] Can edit shared calendar             |
+| [✓] Can add to shopping list             |
+| [ ] Can manage family settings (Admin)   |
+|                                          |
+| 💡 Invited member will receive email    |
+|    and must accept to join.              |
+|                                          |
+| Privacy Notice:                          |
+| Family members can see:                  |
+| • Shared calendar events                 |
+| • Shared shopping lists                  |
+| • Shared home tasks                      |
+|                                          |
+| They CANNOT see:                         |
+| • Your private calendar events           |
+| • Your personal finance                  |
+| • Your health records                    |
+| • Your personal email                    |
+|                                          |
+|              [Send Invitation]           |
+|                 Cancel                   |
++------------------------------------------+
 ```
 
 ---
@@ -605,30 +605,30 @@ graph TB
 **Invitee receives email → clicks link:**
 
 ```
-┌────────────────────────────────┐
-│ Join Family                    │
-├────────────────────────────────┤
-│ Sarah Herden invited you to    │
-│ join "The Herdens" family.     │
-│                                │
-│ You'll be able to:             │
-│ • View and edit family calendar│
-│ • Access shared shopping list  │
-│ • Collaborate on home tasks    │
-│                                │
-│ Your Privacy:                  │
-│ ✅ Your personal data stays    │
-│    private in your Personal    │
-│    context.                    │
-│                                │
-│ ✅ You control what to share   │
-│    with family.                │
-│                                │
-│ ✅ You can leave family anytime│
-│                                │
-│        [Accept Invitation]     │
-│              Decline           │
-└────────────────────────────────┘
++--------------------------------+
+| Join Family                    |
++--------------------------------+
+| Sarah Herden invited you to    |
+| join "The Herdens" family.     |
+|                                |
+| You'll be able to:             |
+| • View and edit family calendar|
+| • Access shared shopping list  |
+| • Collaborate on home tasks    |
+|                                |
+| Your Privacy:                  |
+| ✅ Your personal data stays    |
+|    private in your Personal    |
+|    context.                    |
+|                                |
+| ✅ You control what to share   |
+|    with family.                |
+|                                |
+| ✅ You can leave family anytime|
+|                                |
+|        [Accept Invitation]     |
+|              Decline           |
++--------------------------------+
 ```
 
 ---
@@ -640,17 +640,17 @@ graph TB
 **Notification when family member modifies shared resource:**
 
 ```
-┌──────────────────────────────────────────┐
-│ 🏠 Family Calendar Update                │
-├──────────────────────────────────────────┤
-│ John added a new event:                  │
-│                                          │
-│ "Family Dinner"                          │
-│ Nov 10, 7:00 PM - 9:00 PM                │
-│ Location: Home                           │
-│                                          │
-│ [View Event]  [Dismiss]                  │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| 🏠 Family Calendar Update                |
++------------------------------------------+
+| John added a new event:                  |
+|                                          |
+| "Family Dinner"                          |
+| Nov 10, 7:00 PM - 9:00 PM                |
+| Location: Home                           |
+|                                          |
+| [View Event]  [Dismiss]                  |
++------------------------------------------+
 ```
 
 **Transparency: Users always see WHO made changes.**
@@ -664,11 +664,11 @@ graph TB
 **Top-left corner shows current context:**
 
 ```
-┌──────────────────────────────────────────┐
-│ [🏠 Family] [Fidus Logo] [🔔] [⚙️] [👤▾]│
-│    ↑                                     │
-│  Context indicator                       │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| [🏠 Family] [Fidus Logo] [🔔] [⚙️] [👤▾]|
+|    ↑                                     |
+|  Context indicator                       |
++------------------------------------------+
 ```
 
 **Changes color based on context:**
@@ -684,26 +684,26 @@ graph TB
 ### Clear Visual Separation
 
 ```
-┌────────────────────────────────┐
-│ Personal Context (Blue)        │
-├────────────────────────────────┤
-│ • Your calendar                │
-│ • Your budget                  │
-│ • Your health                  │
-│ • Your email                   │
-│                                │
-│ 🔒 100% Private                │
-└────────────────────────────────┘
++--------------------------------+
+| Personal Context (Blue)        |
++--------------------------------+
+| • Your calendar                |
+| • Your budget                  |
+| • Your health                  |
+| • Your email                   |
+|                                |
+| 🔒 100% Private                |
++--------------------------------+
 
-┌────────────────────────────────┐
-│ Family Context (Yellow)        │
-├────────────────────────────────┤
-│ • Shared calendar              │
-│ • Shared shopping list         │
-│ • Shared home tasks            │
-│                                │
-│ 🔓 Shared with 4 family members│
-└────────────────────────────────┘
++--------------------------------+
+| Family Context (Yellow)        |
++--------------------------------+
+| • Shared calendar              |
+| • Shared shopping list         |
+| • Shared home tasks            |
+|                                |
+| 🔓 Shared with 4 family members|
++--------------------------------+
 ```
 
 ---

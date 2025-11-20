@@ -17,10 +17,10 @@ The **PluginManager** is the central instance that manages and coordinates all r
 graph TB
     PM["PluginManager<br/>━━━━━━━━━━━━━━━━<br/>Responsibilities:<br/>- Plugin Discovery (File-based, NPM)<br/>- Dependency Resolution<br/>- Plugin Lifecycle (initialize, shutdown)<br/>- Registry Coordination"]
 
-    PM --> SR["SupervisorRegistry<br/>└─ Manages Supervisors"]
-    PM --> SigR["SignalRegistry<br/>└─ Manages Signal Providers"]
-    PM --> ER["EventRegistry<br/>└─ Manages Event Types"]
-    PM --> ServR["ServiceRegistry<br/>└─ Manages Services (UserProfile, etc.)"]
+    PM --> SR["SupervisorRegistry<br/>+- Manages Supervisors"]
+    PM --> SigR["SignalRegistry<br/>+- Manages Signal Providers"]
+    PM --> ER["EventRegistry<br/>+- Manages Event Types"]
+    PM --> ServR["ServiceRegistry<br/>+- Manages Services (UserProfile, etc.)"]
 ```
 
 ### 0.2 PluginManager Responsibilities
@@ -51,31 +51,31 @@ graph TB
 
 ```
 1. PluginManager.discoverPlugins()
-   ├─ Scans file system: plugins/**/*.plugin.ts
-   ├─ Scans NPM: node_modules/@fidus-community/*
-   └─ List of plugin classes
+   +- Scans file system: plugins/**/*.plugin.ts
+   +- Scans NPM: node_modules/@fidus-community/*
+   +- List of plugin classes
 
 2. Create dependency graph
-   ├─ Plugin A depends on []
-   ├─ Plugin B depends on ['A']
-   └─ Plugin C depends on ['A', 'B']
+   +- Plugin A depends on []
+   +- Plugin B depends on ['A']
+   +- Plugin C depends on ['A', 'B']
 
 3. Topological sorting
-   └─ Order: A → B → C
+   +- Order: A → B → C
 
 4. Load plugins sequentially
-   ├─ A.initialize()
-   │  └─ Services registered with ServiceRegistry
-   ├─ B.initialize() (can now use A services)
-   │  └─ Services registered
-   └─ C.initialize() (can use A+B services)
-      └─ Services registered
+   +- A.initialize()
+   |  +- Services registered with ServiceRegistry
+   +- B.initialize() (can now use A services)
+   |  +- Services registered
+   +- C.initialize() (can use A+B services)
+      +- Services registered
 
 5. Registries are filled
-   ├─ SupervisorRegistry: [CalendarSupervisor, HealthSupervisor, ...]
-   ├─ SignalRegistry: [calendar.free_slots, health.workout_progress, ...]
-   ├─ EventRegistry: [calendar.meeting_cancelled, ...]
-   └─ ServiceRegistry: [userProfile, calendarSupervisor, ...]
+   +- SupervisorRegistry: [CalendarSupervisor, HealthSupervisor, ...]
+   +- SignalRegistry: [calendar.free_slots, health.workout_progress, ...]
+   +- EventRegistry: [calendar.meeting_cancelled, ...]
+   +- ServiceRegistry: [userProfile, calendarSupervisor, ...]
 ```
 
 ### 0.4 Example: PluginManager Concept

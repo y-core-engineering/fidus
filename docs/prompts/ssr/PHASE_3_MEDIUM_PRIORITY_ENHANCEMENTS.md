@@ -187,17 +187,17 @@ Diese Phase liefert **keine Features für End-User**, sondern verbessert **Devel
    **Erwartete Ordnerstruktur:**
    ```
    dist/
-   ├── index.js
-   ├── index.mjs
-   ├── index.d.ts
-   ├── button/
-   │   ├── index.js
-   │   ├── index.mjs
-   │   └── index.d.ts
-   ├── stack/
-   │   ├── index.js
-   │   └── ...
-   └── ...
+   +-- index.js
+   +-- index.mjs
+   +-- index.d.ts
+   +-- button/
+   |   +-- index.js
+   |   +-- index.mjs
+   |   +-- index.d.ts
+   +-- stack/
+   |   +-- index.js
+   |   +-- ...
+   +-- ...
    ```
 
 6. **TypeScript Resolution testen**

@@ -535,27 +535,27 @@ class Orchestrator {
 
 ```
 User Request
-     │
+     |
      ▼
-┌──────────────────────────────────┐
-│ Orchestrator                     │
-│                                  │
-│ 1. Generate Tools (dynamic)      │
-│    → All Supervisors → Tools     │
-│                                  │
-│ 2. LLM + Tool Calling            │
-│    → Understand intent           │
-│    → Select tools                │
-│    → Parallel/Sequential         │
-│                                  │
-│ 3. Execute Tool Calls            │
-│    → Supervisor.callTool()       │
-│    → Collect results             │
-│                                  │
-│ 4. Synthesis (optional)          │
-│    → LLM combines results        │
-└──────────────────────────────────┘
-     │
++----------------------------------+
+| Orchestrator                     |
+|                                  |
+| 1. Generate Tools (dynamic)      |
+|    → All Supervisors → Tools     |
+|                                  |
+| 2. LLM + Tool Calling            |
+|    → Understand intent           |
+|    → Select tools                |
+|    → Parallel/Sequential         |
+|                                  |
+| 3. Execute Tool Calls            |
+|    → Supervisor.callTool()       |
+|    → Collect results             |
+|                                  |
+| 4. Synthesis (optional)          |
+|    → LLM combines results        |
++----------------------------------+
+     |
      ▼
 User Response
 ```

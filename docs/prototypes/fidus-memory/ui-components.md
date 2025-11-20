@@ -158,22 +158,22 @@ interface MessageBubbleProps {
 **Visual Design:**
 ```
 User Message:
-┌─────────────────────────────────────────┐
-│                         "I always have  │
-│                         cappuccino in   │ [User Avatar]
-│                         the morning"    │
-│                         2 min ago    ───┘
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|                         "I always have  |
+|                         cappuccino in   | [User Avatar]
+|                         the morning"    |
+|                         2 min ago    ---+
++-----------------------------------------+
 
 AI Message:
-┌─────────────────────────────────────────┐
-│ [AI Avatar]  "Noted! Cappuccino in the  │
-│              morning seems to be        │
-│              important to you."         │
-│              Just now                   │
-│                                         │
-│  [Chip: cappuccino (confidence: 80%)]  │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+| [AI Avatar]  "Noted! Cappuccino in the  |
+|              morning seems to be        |
+|              important to you."         |
+|              Just now                   |
+|                                         |
+|  [Chip: cappuccino (confidence: 80%)]  |
++-----------------------------------------+
 ```
 
 **Composition:**
@@ -217,7 +217,7 @@ interface ConfidenceIndicatorProps {
 **Detailed Variant:**
 ```
 Confidence: 80%
-[████████████████────────] High
+[████████████████--------] High
 ```
 
 **Composition:**

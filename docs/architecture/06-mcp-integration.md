@@ -285,35 +285,35 @@ class MCPMarketplace {
 await marketplace.install('@modelcontextprotocol/server-notion');
 
 // System Flow
-// ┌──────────────────────────────────────┐
-// │ 1. npm install                       │
-// └──────────────┬───────────────────────┘
-//                │
+// +--------------------------------------+
+// | 1. npm install                       |
+// +--------------+-----------------------+
+//                |
 //                ▼
-// ┌──────────────────────────────────────┐
-// │ 2. Read package.json (MCP Config)    │
-// │    - transport: "stdio"              │
-// │    - command: "node dist/index.js"   │
-// └──────────────┬───────────────────────┘
-//                │
+// +--------------------------------------+
+// | 2. Read package.json (MCP Config)    |
+// |    - transport: "stdio"              |
+// |    - command: "node dist/index.js"   |
+// +--------------+-----------------------+
+//                |
 //                ▼
-// ┌──────────────────────────────────────┐
-// │ 3. Start MCP Server                  │
-// │    - Spawn process                   │
-// │    - Connect MCP Client              │
-// └──────────────┬───────────────────────┘
-//                │
+// +--------------------------------------+
+// | 3. Start MCP Server                  |
+// |    - Spawn process                   |
+// |    - Connect MCP Client              |
+// +--------------+-----------------------+
+//                |
 //                ▼
-// ┌──────────────────────────────────────┐
-// │ 4. Register in MCP Registry          │
-// │    - tools: search_pages, get_page   │
-// └──────────────┬───────────────────────┘
-//                │
+// +--------------------------------------+
+// | 4. Register in MCP Registry          |
+// |    - tools: search_pages, get_page   |
+// +--------------+-----------------------+
+//                |
 //                ▼
-// ┌──────────────────────────────────────┐
-// │ 5. Orchestrator Prompt Update        │
-// │    → "notion" tools now available    │
-// └──────────────────────────────────────┘
+// +--------------------------------------+
+// | 5. Orchestrator Prompt Update        |
+// |    → "notion" tools now available    |
+// +--------------------------------------+
 
 // User can immediately use
 "Search Notion for meeting notes from last week"
@@ -859,16 +859,16 @@ class MCPMonitoringService {
 
 ```
 Community develops MCP server
-           │
+           |
            ▼
 User installs via marketplace
-           │
+           |
            ▼
 MCP Registry detects server
-           │
+           |
            ▼
 Orchestrator prompt regenerates
-           │
+           |
            ▼
 User can immediately use
 ```

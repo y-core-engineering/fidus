@@ -104,16 +104,17 @@ graph TB
 
 **All interactive elements MUST show focus state:**
 
-```
-Unfocused Button:
-┌────────────────┐
-│ Primary Action │
-└────────────────┘
+```mermaid
+graph LR
+    subgraph UNFOCUSED["Unfocused Button"]
+        A["Primary Action"]
+    end
 
-Focused Button (Tab):
-┌────────────────┐
-│ Primary Action │ ← 2px blue outline
-└────────────────┘
+    subgraph FOCUSED["Focused Button (Tab)"]
+        B["Primary Action<br/>← 2px blue outline"]
+    end
+
+    UNFOCUSED -.Tab.-> FOCUSED
 ```
 
 **CSS:**

@@ -53,23 +53,23 @@ The Fidus Design System implementation has **significant structural misalignment
 
 ```
 📁 Fidus Design System
-├─ 🏠 Home
-├─ 📖 Getting Started
-├─ 🎨 Foundations
-├─ 🧩 Components                    ← DIESE GRUPPIERUNG FEHLT!
-│   ├─ Actions
-│   ├─ Forms & Inputs
-│   ├─ Feedback
-│   ├─ Navigation
-│   ├─ Layout
-│   ├─ Cards
-│   ├─ Data Display
-│   └─ Overlays
-├─ 📐 Patterns
-├─ 🎭 Tokens
-├─ 🏗️ Architecture
-├─ 📝 Content Guidelines
-└─ 📚 Resources
++- 🏠 Home
++- 📖 Getting Started
++- 🎨 Foundations
++- 🧩 Components                    ← DIESE GRUPPIERUNG FEHLT!
+|   +- Actions
+|   +- Forms & Inputs
+|   +- Feedback
+|   +- Navigation
+|   +- Layout
+|   +- Cards
+|   +- Data Display
+|   +- Overlays
++- 📐 Patterns
++- 🎭 Tokens
++- 🏗️ Architecture
++- 📝 Content Guidelines
++- 📚 Resources
 ```
 
 **Struktur:** 9 Top-Level-Abschnitte, wobei "Components" 8 Unter-Kategorien enthält.
@@ -78,21 +78,21 @@ The Fidus Design System implementation has **significant structural misalignment
 
 ```
 Fidus Design System
-├─ Getting Started ✅
-├─ Design Tokens ⚠️ (Name: "Tokens" im Konzept)
-├─ Foundations ✅
-├─ Layout ❌ (sollte unter "Components" sein)
-├─ Actions ❌ (sollte unter "Components" sein)
-├─ Data Display ❌ (sollte unter "Components" sein)
-├─ Cards ❌ (sollte unter "Components" sein)
-├─ Forms ❌ (sollte unter "Components" sein)
-├─ Feedback ❌ (sollte unter "Components" sein)
-├─ Overlays ❌ (sollte unter "Components" sein)
-├─ Navigation ❌ (sollte unter "Components" sein)
-├─ Patterns ✅
-├─ Architecture ✅
-├─ Content ✅
-└─ Resources ✅
++- Getting Started ✅
++- Design Tokens ⚠️ (Name: "Tokens" im Konzept)
++- Foundations ✅
++- Layout ❌ (sollte unter "Components" sein)
++- Actions ❌ (sollte unter "Components" sein)
++- Data Display ❌ (sollte unter "Components" sein)
++- Cards ❌ (sollte unter "Components" sein)
++- Forms ❌ (sollte unter "Components" sein)
++- Feedback ❌ (sollte unter "Components" sein)
++- Overlays ❌ (sollte unter "Components" sein)
++- Navigation ❌ (sollte unter "Components" sein)
++- Patterns ✅
++- Architecture ✅
++- Content ✅
++- Resources ✅
 ```
 
 **Struktur:** 16 Top-Level-Abschnitte (flat), keine "Components"-Gruppierung.

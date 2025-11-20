@@ -49,10 +49,8 @@ graph TB
 
 ```typescript
 class CalendarSupervisor {
-  // ┌──────────────────────────────────────┐
-  // │  LAYER 1: MCP SERVER INTERFACE       │
-  // │  (Standard, exposed outward)         │
-  // └──────────────────────────────────────┘
+  // === LAYER 1: MCP SERVER INTERFACE ===
+  // (Standard, exposed outward)
 
   name = "calendar_supervisor";
   tools = [
@@ -63,10 +61,8 @@ class CalendarSupervisor {
     { uri: "calendar://events/today", name: "Today's appointments", ... }
   ];
 
-  // ┌──────────────────────────────────────┐
-  // │  LAYER 2: LANGGRAPH STATE MACHINE    │
-  // │  (Multi-Step Reasoning)              │
-  // └──────────────────────────────────────┘
+  // === LAYER 2: LANGGRAPH STATE MACHINE ===
+  // (Multi-Step Reasoning)
 
   private graph: StateGraph;
 
@@ -90,10 +86,8 @@ class CalendarSupervisor {
     this.compiledGraph = this.graph.compile();
   }
 
-  // ┌──────────────────────────────────────┐
-  // │  LAYER 3: MCP CLIENT                 │
-  // │  (Calls external MCP servers)        │
-  // └──────────────────────────────────────┘
+  // === LAYER 3: MCP CLIENT ===
+  // (Calls external MCP servers)
 
   private googleCalendarMCP: MCPClient;
 
@@ -103,10 +97,8 @@ class CalendarSupervisor {
     });
   }
 
-  // ┌──────────────────────────────────────┐
-  // │  LAYER 4: FIDUS EXTENSIONS           │
-  // │  (Signal Providers, Event Emitters)  │
-  // └──────────────────────────────────────┘
+  // === LAYER 4: FIDUS EXTENSIONS ===
+  // (Signal Providers, Event Emitters)
 
   async registerSignals() {
     await signalRegistry.registerProvider('calendar', [
@@ -131,10 +123,8 @@ class CalendarSupervisor {
     ]);
   }
 
-  // ┌──────────────────────────────────────┐
-  // │  LAYER 5: SUB-AGENTS                 │
-  // │  (Specialized Agents)                │
-  // └──────────────────────────────────────┘
+  // === LAYER 5: SUB-AGENTS ===
+  // (Specialized Agents)
 
   private subAgents = {
     meetingPreparation: new MeetingPreparationAgent(),
@@ -142,10 +132,8 @@ class CalendarSupervisor {
     smartScheduling: new SmartSchedulingAgent()
   };
 
-  // ┌──────────────────────────────────────┐
-  // │  PUBLIC API                          │
-  // │  (Called by Orchestrator)            │
-  // └──────────────────────────────────────┘
+  // === PUBLIC API ===
+  // (Called by Orchestrator)
 
   async execute(userMessage: string, userContext: UserContext) {
     // Execute LangGraph State Machine

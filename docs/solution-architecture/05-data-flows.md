@@ -1,10 +1,12 @@
 # Data Flows
 
-**Version:** 1.0
-**Date:** 2025-10-27
+**Version:** 1.1
+**Date:** 2025-11-20
 **Status:** Draft (Awaiting Human Review)
 **Part of:** Fidus Solution Architecture
 **Author:** AI-Generated
+**Supersedes:** v1.0 (2025-10-27) - Basic preference flows only
+**Migration:** Added Entity Creation & Relationship Management flows (v3.0 architecture with Qdrant-first pattern)
 
 ---
 
@@ -16,14 +18,15 @@
 4. [Event-Driven Communication Flows](#event-driven-communication-flows)
 5. [Data Persistence Flows](#data-persistence-flows)
 6. [External Integration Flows](#external-integration-flows)
-7. [Proactivity Flows](#proactivity-flows)
-8. [Authentication & Authorization Flows](#authentication--authorization-flows)
-9. [Multi-Agent Coordination Flows](#multi-agent-coordination-flows)
-10. [State Management Flows](#state-management-flows)
-11. [Error Handling & Recovery Flows](#error-handling--recovery-flows)
-12. [Monitoring & Observability Flows](#monitoring--observability-flows)
-13. [Privacy & Compliance Flows](#privacy--compliance-flows)
-14. [Data Flow Patterns Reference](#data-flow-patterns-reference)
+7. [Memory & Entity Management Flows](#memory--entity-management-flows) ⭐ **NEW (v3.0)**
+8. [Proactivity Flows](#proactivity-flows)
+9. [Authentication & Authorization Flows](#authentication--authorization-flows)
+10. [Multi-Agent Coordination Flows](#multi-agent-coordination-flows)
+11. [State Management Flows](#state-management-flows)
+12. [Error Handling & Recovery Flows](#error-handling--recovery-flows)
+13. [Monitoring & Observability Flows](#monitoring--observability-flows)
+14. [Privacy & Compliance Flows](#privacy--compliance-flows)
+15. [Data Flow Patterns Reference](#data-flow-patterns-reference)
 
 ---
 
@@ -961,6 +964,397 @@ sequenceDiagram
 - **Rate Limiting:** Respect external API limits
 - **Per-User Polling:** Each user's integrations polled separately
 - **Exponential Backoff:** On API errors, increase polling interval
+
+---
+
+## Memory & Entity Management Flows
+
+⭐ **NEW in v3.0** - Entity-Relationship Model with Situational Context
+
+This section documents flows for managing entities, relationships, and context-aware memory based on ADR-0001 (Situational Context as Relationship Qualifier) and the Entity-Relationship Model v3.0.
+
+**Architecture Pattern:** Qdrant-First Insert with Neo4j Rollback
+
+### Flow 13a: Entity Extraction from Conversation
+
+Memory Context Agent extracts entities from natural conversation using LLM.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Memory Agent
+    participant LLM
+    participant Extractor
+    participant Neo4j
+    participant Dedup Service
+
+    User->>Memory Agent: "I met Anna Schmidt today.<br/>She's a software engineer at Anthropic.<br/>We discussed Claude's architecture."
+
+    Memory Agent->>Extractor: Extract entities from message
+
+    Extractor->>LLM: Analyze conversation<br/>Prompt: "Extract Person entities"
+
+    LLM-->>Extractor: {<br/>  "entity_type": "person",<br/>  "name": "Anna Schmidt",<br/>  "ai_properties": {<br/>    "profession": "software engineer",<br/>    "topics": ["Claude", "architecture"]<br/>  }<br/>}
+
+    Extractor->>Dedup Service: Find similar persons<br/>Name: "Anna Schmidt"
+
+    Dedup Service->>Neo4j: MATCH (p:Person)<br/>WHERE p.name CONTAINS "Anna"<br/>RETURN p
+
+    alt Exact match found
+        Neo4j-->>Dedup Service: Person exists (id: person-789)
+        Dedup Service-->>Extractor: Existing entity
+        Extractor->>Extractor: Merge ai_properties
+    else No match
+        Dedup Service-->>Extractor: New entity
+        Extractor->>Neo4j: CREATE (:Person {<br/>  id: uuid(),<br/>  tenant_id: $tenant_id,<br/>  name: "Anna Schmidt",<br/>  ai_properties: {...}<br/>})
+        Neo4j-->>Extractor: person-123 created
+    end
+
+    Extractor-->>Memory Agent: Entity ready for relationship
+```
+
+**Key Points:**
+- **LLM-Driven:** Entity properties discovered organically from conversation
+- **Flexible Schema:** `ai_properties` stores any discovered attributes
+- **Deduplication:** Name similarity check before creating new entity
+- **Incremental Learning:** Existing entity properties merged with new discoveries
+
+---
+
+### Flow 13b: Relationship Creation with Situational Context (Qdrant-First Pattern)
+
+Create KNOWS relationship with context-aware metadata.
+
+```mermaid
+sequenceDiagram
+    participant Memory Agent
+    participant Context Extractor
+    participant Embedding Service
+    participant Qdrant as Qdrant (PRIMARY)
+    participant Neo4j as Neo4j (SECONDARY)
+
+    Memory Agent->>Context Extractor: Extract situational context<br/>Message: "I met Anna... we discussed..."
+
+    Context Extractor->>Context Extractor: Extract factors:<br/>{<br/>  "time_of_day": "afternoon",<br/>  "location": "conference",<br/>  "emotion": "excited",<br/>  "topics": ["architecture"]<br/>}
+
+    Context Extractor->>Embedding Service: Embed context
+
+    Embedding Service-->>Context Extractor: Vector (768-dim)
+
+    Memory Agent->>Memory Agent: Generate IDs:<br/>situation_id = uuid()<br/>relationship_instance_id = uuid()
+
+    Note over Memory Agent,Neo4j: ⭐ QDRANT-FIRST PATTERN
+
+    Memory Agent->>Qdrant: upsert(collection="situations")<br/>{<br/>  "id": situation_id,<br/>  "vector": [0.23, -0.45, ...],<br/>  "payload": {<br/>    "tenant_id": "...",<br/>    "user_id": "...",<br/>    "entity_type": "person",<br/>    "entity_id": "person-123",<br/>    "relationship_type": "KNOWS",<br/>    "relationship_instance_id": "...",<br/>    "context": {<br/>      "time_of_day": "afternoon",<br/>      "location": "conference",<br/>      "emotion": "excited"<br/>    }<br/>  }<br/>}
+
+    Qdrant-->>Memory Agent: Qdrant insert SUCCESS
+
+    Memory Agent->>Neo4j: CREATE relationship<br/>(user)-[:KNOWS {<br/>  relationship_instance_id: "...",<br/>  role: "colleague",  # STABLE<br/>  relationship_type: "professional",<br/>  situation_id: situation_id,  # Reference!<br/>  confidence: 0.9,<br/>  source: "explicit",<br/>  observed_at: now()<br/>}]->(person)
+
+    alt Neo4j Success
+        Neo4j-->>Memory Agent: Neo4j insert SUCCESS
+        Memory Agent-->>Memory Agent: Transaction complete
+    else Neo4j Failure
+        Neo4j-->>Memory Agent: Neo4j insert FAILED
+        Memory Agent->>Qdrant: DELETE situation_id<br/>(ROLLBACK!)
+        Qdrant-->>Memory Agent: Deleted
+        Memory Agent-->>Memory Agent: Error: Transaction rolled back
+    end
+```
+
+**Critical Pattern - Qdrant-First:**
+1. **Insert Qdrant FIRST** (PRIMARY storage for context)
+2. **Then insert Neo4j** (SECONDARY storage with reference)
+3. **On Neo4j failure:** Rollback Qdrant (delete situation)
+
+**Why Qdrant-First?**
+- Qdrant is the SOURCE OF TRUTH for situational context
+- Neo4j only stores a `situation_id` reference property
+- Deleting from Qdrant is easier than deleting from Neo4j (no cascades)
+
+---
+
+### Flow 13c: Context-Aware Preference Learning
+
+Learn user preference with situational context.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Memory Agent
+    participant Context Extractor
+    participant Embedding Service
+    participant Qdrant
+    participant Neo4j
+
+    User->>Memory Agent: "I always drink cappuccino<br/>in the morning when I'm at the office"
+
+    Memory Agent->>Context Extractor: Extract preference + context
+
+    Context Extractor-->>Memory Agent: {<br/>  "domain": "coffee",<br/>  "key": "morning_drink",<br/>  "value": "cappuccino",<br/>  "context": {<br/>    "time_of_day": "morning",<br/>    "location": "office",<br/>    "day_type": "workday"<br/>  },<br/>  "source": "explicit",<br/>  "confidence": 0.9<br/>}
+
+    Memory Agent->>Embedding Service: Embed context
+
+    Embedding Service-->>Memory Agent: Vector
+
+    Note over Memory Agent,Neo4j: Qdrant-First Pattern
+
+    Memory Agent->>Qdrant: Insert situation + context
+
+    Qdrant-->>Memory Agent: situation_id
+
+    Memory Agent->>Neo4j: Check if preference exists<br/>MATCH (u:User)-[r:HAS_PREFERENCE]->(p:Preference)<br/>WHERE p.domain = "coffee"<br/>AND p.key = "morning_drink"
+
+    alt Preference exists
+        Neo4j-->>Memory Agent: Preference found (pref-456)
+        Memory Agent->>Neo4j: CREATE new relationship instance<br/>(user)-[:HAS_PREFERENCE {<br/>  relationship_instance_id: uuid(),<br/>  situation_id: situation_id,<br/>  confidence: 0.9,<br/>  source: "explicit",<br/>  observed_at: now()<br/>}]->(pref-456)
+    else New preference
+        Neo4j-->>Memory Agent: Not found
+        Memory Agent->>Neo4j: CREATE (:Preference {<br/>  id: uuid(),<br/>  domain: "coffee",<br/>  key: "morning_drink",<br/>  value: "cappuccino"<br/>})
+        Memory Agent->>Neo4j: CREATE relationship
+    end
+
+    Neo4j-->>Memory Agent: Success
+
+    Memory Agent-->>User: "Got it! I'll remember you like<br/>cappuccino in the morning at the office."
+```
+
+**Key Points:**
+- **Multiple Contexts:** Same preference can exist with different contexts (different `situation_id` values)
+- **Confidence Evolution:** Each observation has its own confidence score
+- **Context Factors:** Flexible - AI discovers what matters (time_of_day, location, mood, etc.)
+
+---
+
+### Flow 13d: Context-Aware Preference Retrieval
+
+Retrieve best-matching preference for current context.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Memory Agent
+    participant Context Extractor
+    participant Embedding Service
+    participant Qdrant
+    participant Neo4j
+
+    User->>Memory Agent: "What should I order for coffee?"
+
+    Memory Agent->>Context Extractor: Extract current context
+
+    Context Extractor-->>Memory Agent: {<br/>  "time_of_day": "morning",<br/>  "location": "office",<br/>  "day_of_week": "Tuesday",<br/>  "energy_level": "low"<br/>}
+
+    Memory Agent->>Embedding Service: Embed current context
+
+    Embedding Service-->>Memory Agent: Query vector
+
+    Memory Agent->>Qdrant: search(collection="situations")<br/>filter: {<br/>  "user_id": "...",<br/>  "entity_type": "preference",<br/>  "relationship_type": "HAS_PREFERENCE"<br/>}<br/>query_vector: [...]<br/>top_k: 10
+
+    Qdrant-->>Memory Agent: Top 10 similar situations:<br/>[<br/>  {id: "sit-123", score: 0.95, payload: {...}},<br/>  {id: "sit-456", score: 0.89, payload: {...}},<br/>  ...<br/>]
+
+    Memory Agent->>Neo4j: Fetch preferences for situations<br/>MATCH (u:User)-[r:HAS_PREFERENCE]->(p:Preference)<br/>WHERE r.situation_id IN [<br/>  "sit-123", "sit-456", ...<br/>]<br/>RETURN p, r.confidence, r.situation_id
+
+    Neo4j-->>Memory Agent: [{<br/>  preference: {domain: "coffee", value: "cappuccino"},<br/>  confidence: 0.9,<br/>  situation_id: "sit-123"<br/>}]
+
+    Memory Agent->>Memory Agent: Rank by:<br/>confidence × context_similarity<br/>Best: "cappuccino" (0.9 × 0.95 = 0.855)
+
+    Memory Agent-->>User: "Based on your preference,<br/>I'd suggest a cappuccino"
+```
+
+**Ranking Formula:**
+```
+Score = confidence × context_similarity × relevance_weight
+
+Where:
+- confidence: stored in Neo4j relationship (0.0 - 1.0)
+- context_similarity: Qdrant cosine similarity (0.0 - 1.0)
+- relevance_weight: learned factor importance (optional)
+```
+
+**Query Performance:**
+- Qdrant search: ~10-50ms (10K situations)
+- Neo4j lookup: ~5-20ms (1-hop query with `situation_id` index)
+- Total: <100ms
+
+---
+
+### Flow 13e: Entity Deduplication Strategy
+
+Prevent duplicate entities using embedding similarity.
+
+```mermaid
+sequenceDiagram
+    participant Extractor
+    participant Dedup Service
+    participant Embedding Service
+    participant Qdrant
+    participant Neo4j
+
+    Extractor->>Dedup Service: Check for duplicate<br/>Name: "Anna Schmidt"
+
+    Dedup Service->>Embedding Service: Embed name
+
+    Embedding Service-->>Dedup Service: Vector
+
+    Dedup Service->>Qdrant: search(collection="person_names")<br/>query_vector: [...]<br/>score_threshold: 0.85
+
+    Qdrant-->>Dedup Service: Similar names:<br/>[<br/>  {person_id: "person-123", score: 0.92, name: "Anna Schmidt"},<br/>  {person_id: "person-456", score: 0.87, name: "Ana Schmitt"}<br/>]
+
+    Dedup Service->>Neo4j: Fetch full entities<br/>MATCH (p:Person)<br/>WHERE p.id IN ["person-123", "person-456"]
+
+    Neo4j-->>Dedup Service: Full Person records
+
+    Dedup Service->>Dedup Service: Fuzzy match on properties:<br/>- Name similarity: 0.92<br/>- Profession match: YES<br/>- Context overlap: 80%
+
+    alt Confidence > 0.90 (Exact match)
+        Dedup Service-->>Extractor: DUPLICATE FOUND<br/>Use person-123
+    else Confidence 0.75-0.90 (Likely duplicate)
+        Dedup Service-->>Extractor: POSSIBLE DUPLICATE<br/>Prompt user for confirmation
+    else Confidence < 0.75
+        Dedup Service-->>Extractor: NEW ENTITY<br/>Create new person
+    end
+```
+
+**Deduplication Thresholds:**
+
+| Similarity Score | Action | Reason |
+|-----------------|--------|--------|
+| **>= 0.90** | Auto-merge | Very high confidence |
+| **0.75 - 0.90** | Ask user | Possible duplicate |
+| **< 0.75** | Create new | Likely different person |
+
+**Deduplication Factors:**
+- Name embedding similarity (primary)
+- Profession/topic overlap
+- Shared relationships (knows same people)
+- Context overlap (seen in similar situations)
+
+---
+
+### Flow 13f: Entity Relationship Query Patterns
+
+Common query patterns for entity relationships.
+
+**Query 1: Get all people user knows in professional context**
+
+```cypher
+// Neo4j: Get relationship instances
+MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
+      -[r:KNOWS {relationship_type: "professional"}]->(p:Person)
+RETURN r.situation_id, p.name, p.ai_properties
+
+// Then: Fetch context from Qdrant
+qdrant.retrieve(ids=[situation_ids...])
+```
+
+**Query 2: Find colleagues user feels friendly towards**
+
+```python
+# 1. Qdrant: Find situations with "emotion: friendly"
+results = qdrant.search(
+    collection_name="situations",
+    query_filter={
+        "must": [
+            {"key": "user_id", "match": {"value": user_id}},
+            {"key": "relationship_type", "match": {"value": "KNOWS"}},
+            {"key": "context.emotion", "match": {"value": "friendly"}}
+        ]
+    },
+    limit=100
+)
+
+situation_ids = [r.id for r in results]
+
+# 2. Neo4j: Get persons from those situations
+persons = neo4j.execute_query("""
+    MATCH (u:User)-[r:KNOWS {role: "colleague"}]->(p:Person)
+    WHERE r.situation_id IN $situation_ids
+    RETURN DISTINCT p.name, p.id
+""", situation_ids=situation_ids)
+```
+
+**Query 3: Context-aware entity retrieval (hybrid query)**
+
+```python
+# Current context
+current_context = {
+    "time_of_day": "morning",
+    "location": "office",
+    "day_of_week": "Monday"
+}
+
+# 1. Embed current context
+embedding = embedding_service.embed_context(current_context)
+
+# 2. Find similar past situations (Qdrant)
+similar_situations = qdrant.search(
+    collection_name="situations",
+    query_vector=embedding,
+    query_filter={
+        "must": [
+            {"key": "user_id", "match": {"value": user_id}},
+            {"key": "relationship_type", "match": {"value": "HAS_PREFERENCE"}}
+        ]
+    },
+    score_threshold=0.7,
+    limit=10
+)
+
+# 3. Get preferences from Neo4j (1-hop query)
+preferences = neo4j.execute_query("""
+    MATCH (u:User)-[r:HAS_PREFERENCE]->(pref:Preference)
+    WHERE r.situation_id IN $situation_ids
+    RETURN pref.domain, pref.key, pref.value,
+           r.confidence, r.situation_id
+    ORDER BY r.confidence DESC
+""", situation_ids=[s.id for s in similar_situations])
+
+# 4. Rank by confidence × similarity
+ranked = [
+    {
+        **pref,
+        "score": pref["confidence"] * similarity_map[pref["situation_id"]]
+    }
+    for pref in preferences
+]
+```
+
+**Performance Characteristics:**
+
+| Query Type | Qdrant Time | Neo4j Time | Total |
+|------------|------------|-----------|-------|
+| **Exact match** (no context) | 0ms | 5-10ms | <10ms |
+| **Context-aware** (embedding search) | 10-50ms | 5-20ms | <100ms |
+| **Cross-domain** (multiple entities) | 30-80ms | 10-30ms | <150ms |
+
+---
+
+### Key Architectural Decisions (v3.0)
+
+**✅ What Goes in Qdrant (PRIMARY):**
+- Full situational context (flexible key-value)
+- Context embeddings (768-dim vectors)
+- AI-discovered context factors
+- Timestamp of observation
+
+**✅ What Goes in Neo4j (SECONDARY):**
+- Entities (User, Person, Organization, etc.)
+- Relationships with STABLE properties only (role, relationship_type)
+- Minimal `situation_id` reference property
+- Confidence scores (meta-property)
+
+**❌ Deprecated Patterns (v2.0):**
+- Situation as Neo4j Node (removed!)
+- `IN_SITUATION` relationship (removed!)
+- Fixed context schema (removed!)
+- Emotion/mood as relationship property (moved to Qdrant!)
+
+**Implementation References:**
+- **Complete Guide:** [15-entity-management.md](15-entity-management.md)
+- **Architecture Decision:** [ADR-0001](../../docs/adr/ADR-0001-situational-context-as-relationship-qualifier.md)
+- **Context Architecture:** [14-situational-context.md](14-situational-context.md)
+- **Domain Model:** [15-memory-entity-model.md](../../docs/domain-model/15-memory-entity-model.md)
 
 ---
 
@@ -2218,7 +2612,7 @@ sequenceDiagram
 
     API Gateway-->>Client: HTTP 200 OK
 
-    Note over Telemetry: Full trace available:<br/>trc-999<br/>├─ spn-001 (http.request) 2200ms<br/>│  └─ spn-002 (orchestrator) 2100ms<br/>│     ├─ spn-002a (detect_intent) 450ms<br/>│     ├─ spn-003 (travel) 1200ms<br/>│     └─ spn-004 (finance) 80ms
+    Note over Telemetry: Full trace available:<br/>trc-999<br/>• spn-001 (http.request) 2200ms<br/>  • spn-002 (orchestrator) 2100ms<br/>    • spn-002a (detect_intent) 450ms<br/>    • spn-003 (travel) 1200ms<br/>    • spn-004 (finance) 80ms
 ```
 
 **OpenTelemetry Span Attributes:**
@@ -2624,7 +3018,7 @@ sequenceDiagram
 
     Export Service->>Export Service: Structure data in JSON<br/>{<br/>  user: {...},<br/>  appointments: [...],<br/>  transactions: [...],<br/>  ...<br/>}
 
-    Export Service->>Export Service: Generate ZIP archive<br/>├─ user_data.json<br/>├─ appointments.csv<br/>├─ transactions.csv<br/>├─ audit_log.csv<br/>└─ README.txt
+    Export Service->>Export Service: Generate ZIP archive<br/>• user_data.json<br/>• appointments.csv<br/>• transactions.csv<br/>• audit_log.csv<br/>• README.txt
 
     Export Service->>Storage: Upload to secure storage<br/>Key: "exports/user-123/export-456.zip"<br/>Signed URL TTL: 7 days
 

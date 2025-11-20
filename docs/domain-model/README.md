@@ -1,8 +1,12 @@
 # Domain Model (DDD)
 
-**Version:** 1.0
-**Date:** 2025-10-27
-**Status:** Draft
+**Version:** 1.1
+**Date:** 2025-11-19
+**Status:** Active
+
+**Changelog:**
+- 2025-11-19: Added Memory Entity-Relationship Model (v3.0) - Major refactoring of situational context
+- 2025-10-27: Initial version
 
 ## Overview
 
@@ -110,6 +114,19 @@ The domain model serves as:
     - Shopping: ShoppingList, Product
     - Learning: Course, LearningGoal, StudySession
     - Combined signals and integration patterns
+
+11. **[11-profile-domain.md](11-profile-domain.md)**
+    - Profile Domain Model v2.0 (DEPRECATED - see v3.0 below)
+    - Preference learning and storage
+    - Situational context (old approach with Situation as entity)
+
+12. **[15-memory-entity-model.md](15-memory-entity-model.md)** ⭐ **NEW v3.0**
+    - **Complete Memory Domain refactoring** (supersedes Profile Domain v2.0)
+    - **3-Layer Architecture:** Entities (Neo4j) + Relationships + Situational Context (Qdrant)
+    - **7 New Entity Types:** Person, Organization, Goal, Habit, Event, Object, Location
+    - **9 Relationship Types:** KNOWS, WORKS_AT, PURSUES, HAS_HABIT, ATTENDS, OWNS, FREQUENTS, HAS_PREFERENCE
+    - **AI-Driven Context:** Flexible, schema-less situational metadata
+    - **Critical Changes:** Situation is now Value Object (NOT entity), Role is relationship property (NOT entity), Emotion is context factor (NOT entity)
 
 ## Quick Start
 

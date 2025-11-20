@@ -1305,21 +1305,21 @@ While Fidus Memory is **standalone**, it's designed to integrate with the broade
 ### Current: Standalone Prototype
 
 ```
-┌──────────────────────────────┐
-│   Fidus Memory Service       │
-│                              │
-│  ┌─────────┐   ┌──────────┐ │
-│  │REST API │   │   MCP    │ │
-│  └────┬────┘   └────┬─────┘ │
-│       │             │        │
-│    ┌──┴─────────────┴─────┐ │
-│    │   Memory Agent        │ │
-│    └──┬──────────┬─────────┘ │
-│       │          │            │
-│   ┌───▼────┐ ┌──▼──────┐    │
-│   │ Neo4j  │ │ Qdrant  │    │
-│   └────────┘ └─────────┘    │
-└──────────────────────────────┘
++------------------------------+
+|   Fidus Memory Service       |
+|                              |
+|  +---------+   +----------+ |
+|  |REST API |   |   MCP    | |
+|  +----+----+   +----+-----+ |
+|       |             |        |
+|    +--+-------------+-----+ |
+|    |   Memory Agent        | |
+|    +--+----------+---------+ |
+|       |          |            |
+|   +---▼----+ +--▼------+    |
+|   | Neo4j  | | Qdrant  |    |
+|   +--------+ +---------+    |
++------------------------------+
 ```
 
 ### Future: Fidus Multi-Domain System
@@ -1393,18 +1393,18 @@ Fidus Memory is independently packageable:
 
 ```
 packages/
-├── memory/                    # Standalone Memory Service
-│   ├── api/                   # REST + MCP interfaces
-│   ├── agent/                 # Core memory logic
-│   ├── integrations/          # Database clients
-│   ├── tests/
-│   ├── Dockerfile
-│   ├── pyproject.toml         # Poetry dependencies
-│   └── README.md              # Standalone docs
-│
-├── web/                       # Fidus Web UI (optional)
-├── cli/                       # Fidus CLI (optional)
-└── orchestration/             # Fidus Orchestrator (future)
++-- memory/                    # Standalone Memory Service
+|   +-- api/                   # REST + MCP interfaces
+|   +-- agent/                 # Core memory logic
+|   +-- integrations/          # Database clients
+|   +-- tests/
+|   +-- Dockerfile
+|   +-- pyproject.toml         # Poetry dependencies
+|   +-- README.md              # Standalone docs
+|
++-- web/                       # Fidus Web UI (optional)
++-- cli/                       # Fidus CLI (optional)
++-- orchestration/             # Fidus Orchestrator (future)
 ```
 
 **Standalone Installation:**
