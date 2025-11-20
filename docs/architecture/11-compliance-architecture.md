@@ -142,25 +142,25 @@ interface AIDecisionLog {
 
 ```
 1. User sends request to Orchestrator
-   └─ Create log entry (status: in_progress)
+   +- Create log entry (status: in_progress)
 
 2. Orchestrator delegates to Supervisor
-   └─ Update log entry (supervisor, action)
+   +- Update log entry (supervisor, action)
 
 3. Supervisor executes LangGraph
-   └─ Collect reasoning (written to reasoning field)
-   └─ Collect signals (written to signalsUsed array)
-   └─ Collect tool calls (written to toolCallsMade array)
+   +- Collect reasoning (written to reasoning field)
+   +- Collect signals (written to signalsUsed array)
+   +- Collect tool calls (written to toolCallsMade array)
 
 4. Supervisor returns response
-   └─ Finalize log entry:
+   +- Finalize log entry:
       - Set agentResponse
       - Set reasoning
       - Set confidenceScore
       - Status: completed
 
 5. Store log entry (Database)
-   └─ User can retrieve logs anytime
+   +- User can retrieve logs anytime
 ```
 
 **Example flow:**
@@ -205,17 +205,17 @@ User receives response + can retrieve log
 
 ```
 1. Log entry is created
-   └─ expiresAt = timestamp + retention_days
+   +- expiresAt = timestamp + retention_days
 
 2. Daily cleanup job
-   └─ Finds all logs with expiresAt < now()
-   └─ Options:
+   +- Finds all logs with expiresAt < now()
+   +- Options:
       a) Delete (default)
       b) Anonymize (userId → "anonymized-user")
 
 3. User can delete anytime
-   └─ API: DELETE /api/logs?userId=...
-   └─ Immediate deletion (no waiting for retention)
+   +- API: DELETE /api/logs?userId=...
+   +- Immediate deletion (no waiting for retention)
 ```
 
 **User rights interface:**
@@ -257,10 +257,10 @@ System generates human-readable explanation from log entry.
 
 ```
 1. User asks: "Why?" (or clicks "Explain" button)
-   └─ UI sends request with logId
+   +- UI sends request with logId
 
 2. System retrieves log entry from database
-   └─ log = db.logs.findById(logId)
+   +- log = db.logs.findById(logId)
 
 3. LLM generates explanation from log data
    Prompt:
@@ -283,48 +283,48 @@ System generates human-readable explanation from log entry.
    "
 
 5. User receives explanation
-   └─ Optional: "Used data" link → shows signalsUsed details
+   +- Optional: "Used data" link → shows signalsUsed details
 ```
 
 **UI example:**
 
 ```
-┌──────────────────────────────────────────────┐
-│ Fidus                                        │
-├──────────────────────────────────────────────┤
-│ ✅ Appointment created:                      │
-│    Tomorrow 2-4 PM "Team Meeting"           │
-│                                              │
-│ [Why?] [Details]                            │
-└──────────────────────────────────────────────┘
++----------------------------------------------+
+| Fidus                                        |
++----------------------------------------------+
+| ✅ Appointment created:                      |
+|    Tomorrow 2-4 PM "Team Meeting"           |
+|                                              |
+| [Why?] [Details]                            |
++----------------------------------------------+
 
 [User clicks "Why?"]
 
-┌──────────────────────────────────────────────┐
-│ Explanation                                  │
-├──────────────────────────────────────────────┤
-│ I created the appointment at 2 PM because   │
-│ I analyzed your calendar data and found     │
-│ that you prefer afternoon meetings.         │
-│ Additionally, all team members were         │
-│ available at 2 PM.                          │
-│                                              │
-│ [Show used data]                            │
-└──────────────────────────────────────────────┘
++----------------------------------------------+
+| Explanation                                  |
++----------------------------------------------+
+| I created the appointment at 2 PM because   |
+| I analyzed your calendar data and found     |
+| that you prefer afternoon meetings.         |
+| Additionally, all team members were         |
+| available at 2 PM.                          |
+|                                              |
+| [Show used data]                            |
++----------------------------------------------+
 
 [User clicks "Show used data"]
 
-┌──────────────────────────────────────────────┐
-│ Used Data                                    │
-├──────────────────────────────────────────────┤
-│ • Calendar: Free slots (tomorrow)           │
-│ • Preferences: Meeting time preference      │
-│ • Calendar: Team availability               │
-│                                              │
-│ Confidence: 92%                              │
-│ LLM Model: Llama 3.1 8B                     │
-│ Timestamp: 27.10.2025 14:30                 │
-└──────────────────────────────────────────────┘
++----------------------------------------------+
+| Used Data                                    |
++----------------------------------------------+
+| • Calendar: Free slots (tomorrow)           |
+| • Preferences: Meeting time preference      |
+| • Calendar: Team availability               |
+|                                              |
+| Confidence: 92%                              |
+| LLM Model: Llama 3.1 8B                     |
+| Timestamp: 27.10.2025 14:30                 |
++----------------------------------------------+
 ```
 
 ---
@@ -438,17 +438,17 @@ async function checkAvailability(state: CalendarState): Promise<CalendarState> {
 
 1. **Initial information during onboarding:**
    ```
-   ┌────────────────────────────────────────┐
-   │ Welcome to Fidus                       │
-   ├────────────────────────────────────────┤
-   │ ℹ️ Fidus is an AI-based                │
-   │    personal assistant that uses        │
-   │    artificial intelligence to          │
-   │    proactively support you.            │
-   │                                        │
-   │ [ ] I understand                       │
-   │ [Continue]                             │
-   └────────────────────────────────────────┘
+   +----------------------------------------+
+   | Welcome to Fidus                       |
+   +----------------------------------------+
+   | ℹ️ Fidus is an AI-based                |
+   |    personal assistant that uses        |
+   |    artificial intelligence to          |
+   |    proactively support you.            |
+   |                                        |
+   | [ ] I understand                       |
+   | [Continue]                             |
+   +----------------------------------------+
    ```
 
 2. **Visible labeling in UI:**
@@ -518,16 +518,16 @@ class ComplianceGuard {
 
 **User receives warning:**
 ```
-┌────────────────────────────────────────┐
-│ ⚠️ Use case not supported              │
-├────────────────────────────────────────┤
-│ This request involves an area          │
-│ (Recruiting/HR) that has extended      │
-│ compliance requirements and is         │
-│ currently not supported.               │
-│                                        │
-│ [Understood]                           │
-└────────────────────────────────────────┘
++----------------------------------------+
+| ⚠️ Use case not supported              |
++----------------------------------------+
+| This request involves an area          |
+| (Recruiting/HR) that has extended      |
+| compliance requirements and is         |
+| currently not supported.               |
+|                                        |
+| [Understood]                           |
++----------------------------------------+
 ```
 
 ---

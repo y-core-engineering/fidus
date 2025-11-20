@@ -375,14 +375,14 @@ User: "I need to visit my client in Berlin next Tuesday.
        Book flight, hotel, and schedule the meeting."
 
 Orchestrator analyzes and coordinates:
-├── Travel Supervisor
-│   ├── Search flights to Berlin
-│   └── Book hotel near client office
-├── Calendar Supervisor
-│   ├── Check availability Tuesday
-│   └── Create meeting appointment
-└── Communication Supervisor
-    └── Send meeting invite to client
++-- Travel Supervisor
+|   +-- Search flights to Berlin
+|   +-- Book hotel near client office
++-- Calendar Supervisor
+|   +-- Check availability Tuesday
+|   +-- Create meeting appointment
++-- Communication Supervisor
+    +-- Send meeting invite to client
 ```
 
 ### Agent Patterns
@@ -589,32 +589,32 @@ async def explain_decision(decision_id: str) -> Explanation:
 ### Explainability UI
 
 ```
-┌─────────────────────────────────────────┐
-│ 🤖 Fidus suggested:                     │
-│ "Decline this meeting"                  │
-│                                         │
-│ [Why?] ← User clicks                    │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+| 🤖 Fidus suggested:                     |
+| "Decline this meeting"                  |
+|                                         |
+| [Why?] ← User clicks                    |
++-----------------------------------------+
 
-┌─────────────────────────────────────────┐
-│ 💡 Reasoning:                           │
-│                                         │
-│ 1. Meeting overlaps with high-priority │
-│    project deadline (Project X)         │
-│                                         │
-│ 2. You have 3 meetings today already   │
-│    (above your typical max of 2)        │
-│                                         │
-│ 3. This topic can be handled async     │
-│    via email (based on past patterns)  │
-│                                         │
-│ Confidence: 85%                         │
-│                                         │
-│ Data used:                              │
-│ - Calendar (today's schedule)           │
-│ - Project deadlines                     │
-│ - Past meeting patterns                 │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+| 💡 Reasoning:                           |
+|                                         |
+| 1. Meeting overlaps with high-priority |
+|    project deadline (Project X)         |
+|                                         |
+| 2. You have 3 meetings today already   |
+|    (above your typical max of 2)        |
+|                                         |
+| 3. This topic can be handled async     |
+|    via email (based on past patterns)  |
+|                                         |
+| Confidence: 85%                         |
+|                                         |
+| Data used:                              |
+| - Calendar (today's schedule)           |
+| - Project deadlines                     |
+| - Past meeting patterns                 |
++-----------------------------------------+
 ```
 
 ---

@@ -126,8 +126,8 @@ graph TB
 
 ```
 Agent (MCP Server):
-├─ GET  /sse              → Establish SSE connection
-└─ POST /messages?sessionId=<id>  → Send JSON-RPC requests
++- GET  /sse              → Establish SSE connection
++- POST /messages?sessionId=<id>  → Send JSON-RPC requests
 ```
 
 ### 2.2 Connection Establishment Flow
@@ -546,28 +546,22 @@ interface AddAgentForm {
 
 **UI Screenshot (Conceptual):**
 
-```
-┌────────────────────────────────────────────────┐
-│ Add New Agent                                  │
-├────────────────────────────────────────────────┤
-│                                                │
-│ Name: [calendar-agent________________]         │
-│       Internal identifier (no spaces)          │
-│                                                │
-│ Display Name: [Calendar Assistant_______]      │
-│               User-friendly name               │
-│                                                │
-│ Endpoint: [http://localhost:3001______]        │
-│           Agent's MCP server URL               │
-│                                                │
-│ Auth Type: [API Key ▼]                         │
-│            ○ API Key  ○ OAuth  ○ Basic Auth    │
-│                                                │
-│ API Key: [sk_prod_abc123xyz___________]        │
-│          Will be encrypted in database         │
-│                                                │
-│ [Test Connection]  [Cancel]  [Add Agent]      │
-└────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph ADD_AGENT["Add New Agent"]
+        NAME["Name: [calendar-agent]<br/><i>Internal identifier (no spaces)</i>"]
+        DISPLAY["Display Name: [Calendar Assistant]<br/><i>User-friendly name</i>"]
+        ENDPOINT["Endpoint: [http://localhost:3001]<br/><i>Agent's MCP server URL</i>"]
+        AUTH_TYPE["Auth Type: [API Key ▼]<br/>○ API Key  ○ OAuth  ○ Basic Auth"]
+        API_KEY["API Key: [sk_prod_abc123xyz]<br/><i>Will be encrypted in database</i>"]
+        BUTTONS["[Test Connection]  [Cancel]  [Add Agent]"]
+
+        NAME --> DISPLAY
+        DISPLAY --> ENDPOINT
+        ENDPOINT --> AUTH_TYPE
+        AUTH_TYPE --> API_KEY
+        API_KEY --> BUTTONS
+    end
 ```
 
 ### 3.5 Discovery Modes
@@ -608,25 +602,22 @@ Admin manually enters endpoint and credentials.
 
 Admin browses marketplace and installs with one click:
 
-```
-UI: Agent Marketplace
+```mermaid
+graph TB
+    subgraph MARKETPLACE["UI: Agent Marketplace"]
+        subgraph CARD["Google Calendar Agent<br/><i>by @fidus-community</i>"]
+            DESC["Connect your Google Calendar"]
+            PERMS["<b>Permissions:</b><br/>• Read calendar events<br/>• Create/update events"]
+            ACTIONS["[Install] [Learn More]"]
 
-┌─────────────────────────────────────┐
-│ Google Calendar Agent               │
-│ by @fidus-community                 │
-│                                     │
-│ Connect your Google Calendar        │
-│                                     │
-│ Permissions:                        │
-│ • Read calendar events              │
-│ • Create/update events              │
-│                                     │
-│ [Install] [Learn More]              │
-└─────────────────────────────────────┘
+            DESC --> PERMS
+            PERMS --> ACTIONS
+        end
 
-→ User clicks Install
-→ OAuth flow to authorize Google
-→ Agent auto-configured with OAuth token
+        CARD --> INSTALL["User clicks Install"]
+        INSTALL --> OAUTH["OAuth flow to authorize Google"]
+        OAUTH --> CONFIG["Agent auto-configured with OAuth token"]
+    end
 ```
 
 ---

@@ -142,7 +142,7 @@ Lösung: Default-Wert ist nicht identisch zu Client-Wert. Nutze useEffect für c
 
 ## Datei-Naming Convention
 
-docs/prompts/ssr/ ├── PHASE_1_CRITICAL_BUG_FIX.md ├── PHASE_2_HIGH_PRIORITY_FEATURES.md └── PHASE_3_MEDIUM_PRIORITY_ENHANCEMENTS.md
+docs/prompts/ssr/ +-- PHASE_1_CRITICAL_BUG_FIX.md +-- PHASE_2_HIGH_PRIORITY_FEATURES.md +-- PHASE_3_MEDIUM_PRIORITY_ENHANCEMENTS.md
 
 **Naming-Pattern:** `PHASE_[Nummer]_[KURZBESCHREIBUNG_IN_UPPERCASE].md`
 

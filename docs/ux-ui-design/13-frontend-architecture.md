@@ -873,50 +873,50 @@ export interface APIError {
 
 ```
 packages/web/src/
-├── app/                      # Next.js App Router
-│   ├── (dashboard)/
-│   │   ├── page.tsx          # Dashboard (Opportunity Surface)
-│   │   ├── calendar/
-│   │   ├── finance/
-│   │   └── settings/
-│   ├── api/                  # API routes (proxy to backend)
-│   └── layout.tsx
-├── components/
-│   ├── opportunities/        # Opportunity components
-│   │   ├── OpportunityCard.tsx
-│   │   ├── QuickActionToast.tsx
-│   │   └── DetailPanel.tsx
-│   ├── forms/                # Form components
-│   │   ├── FormModal.tsx
-│   │   ├── FormField.tsx
-│   │   └── FormValidation.tsx
-│   ├── layout/               # Layout components
-│   │   ├── Sidebar.tsx
-│   │   ├── Header.tsx
-│   │   └── Footer.tsx
-│   └── ui/                   # Design system components
-│       ├── Button.tsx
-│       ├── Card.tsx
-│       └── Input.tsx
-├── services/                 # Business logic
-│   ├── api-client.ts
-│   ├── ui-decision-layer.ts
-│   └── opportunity-surface-service.ts
-├── stores/                   # Zustand stores
-│   ├── app-store.ts
-│   ├── auth-store.ts
-│   └── user-store.ts
-├── registry/                 # UI Component Registry
-│   ├── ui-component-registry.ts
-│   └── component-map.tsx
-├── hooks/                    # Custom hooks
-│   ├── useOpportunities.ts
-│   ├── useAuth.ts
-│   └── useMediaQuery.ts
-└── lib/                      # Utilities
-    ├── utils.ts
-    ├── react-query.ts
-    └── validation.ts
++-- app/                      # Next.js App Router
+|   +-- (dashboard)/
+|   |   +-- page.tsx          # Dashboard (Opportunity Surface)
+|   |   +-- calendar/
+|   |   +-- finance/
+|   |   +-- settings/
+|   +-- api/                  # API routes (proxy to backend)
+|   +-- layout.tsx
++-- components/
+|   +-- opportunities/        # Opportunity components
+|   |   +-- OpportunityCard.tsx
+|   |   +-- QuickActionToast.tsx
+|   |   +-- DetailPanel.tsx
+|   +-- forms/                # Form components
+|   |   +-- FormModal.tsx
+|   |   +-- FormField.tsx
+|   |   +-- FormValidation.tsx
+|   +-- layout/               # Layout components
+|   |   +-- Sidebar.tsx
+|   |   +-- Header.tsx
+|   |   +-- Footer.tsx
+|   +-- ui/                   # Design system components
+|       +-- Button.tsx
+|       +-- Card.tsx
+|       +-- Input.tsx
++-- services/                 # Business logic
+|   +-- api-client.ts
+|   +-- ui-decision-layer.ts
+|   +-- opportunity-surface-service.ts
++-- stores/                   # Zustand stores
+|   +-- app-store.ts
+|   +-- auth-store.ts
+|   +-- user-store.ts
++-- registry/                 # UI Component Registry
+|   +-- ui-component-registry.ts
+|   +-- component-map.tsx
++-- hooks/                    # Custom hooks
+|   +-- useOpportunities.ts
+|   +-- useAuth.ts
+|   +-- useMediaQuery.ts
++-- lib/                      # Utilities
+    +-- utils.ts
+    +-- react-query.ts
+    +-- validation.ts
 ```
 
 ### Component Composition

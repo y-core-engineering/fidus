@@ -1,9 +1,11 @@
 # 03 - Component Architecture
 
-**Document Version:** 1.0
-**Date:** 2025-10-27
+**Document Version:** 1.1
+**Date:** 2025-11-20
 **Status:** Final
 **Author:** Solution Architecture Team
+**Supersedes:** v1.0 (2025-10-27) - Profile Agent with basic preferences
+**Migration:** Updated Memory Context Agent (formerly Profile Agent) to v3.0 with full entity/relationship management
 
 ---
 
@@ -25,7 +27,7 @@
   - [Learning Agent](#learning-agent)
 - [Generic Domain Components](#generic-domain-components)
   - [Identity & Access Agent](#identity--access-agent)
-  - [Profile Agent](#profile-agent)
+  - [Memory Context Agent (formerly Profile Agent)](#memory-context-agent-formerly-profile-agent)
   - [Plugin Agent](#plugin-agent)
   - [Audit & Compliance Agent](#audit--compliance-agent)
 - [Shared Infrastructure Components](#shared-infrastructure-components)
@@ -41,34 +43,31 @@ Fidus follows a **multi-agent architecture** where each Bounded Context is imple
 
 **What is an Agent?**
 
-```
-┌─────────────────────────────────────────┐
-│           FIDUS AGENT                   │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌───────────────────────────────────┐ │
-│  │   AI Agent Core (LangGraph)       │ │
-│  │   • State Machine                 │ │
-│  │   • Reasoning Engine              │ │
-│  │   • Multi-Step Workflows          │ │
-│  │   • Decision Making               │ │
-│  └───────────────────────────────────┘ │
-│                                         │
-│  ┌───────────────────────────────────┐ │
-│  │   MCP Server (Communication)      │ │
-│  │   • HTTP + SSE Transport          │ │
-│  │   • Tool Registration             │ │
-│  │   • JSON-RPC Protocol             │ │
-│  └───────────────────────────────────┘ │
-│                                         │
-│  ┌───────────────────────────────────┐ │
-│  │   Domain Logic & Persistence      │ │
-│  │   • Aggregates & Entities         │ │
-│  │   • Repositories                  │ │
-│  │   • Domain Services               │ │
-│  └───────────────────────────────────┘ │
-│                                         │
-└─────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph FIDUS_AGENT["FIDUS AGENT"]
+        subgraph AI_CORE["AI Agent Core (LangGraph)"]
+            SM["State Machine"]
+            RE["Reasoning Engine"]
+            MW["Multi-Step Workflows"]
+            DM["Decision Making"]
+        end
+
+        subgraph MCP["MCP Server (Communication)"]
+            HTTP["HTTP + SSE Transport"]
+            TR["Tool Registration"]
+            JSON["JSON-RPC Protocol"]
+        end
+
+        subgraph DOMAIN["Domain Logic & Persistence"]
+            AGG["Aggregates & Entities"]
+            REPO["Repositories"]
+            DS["Domain Services"]
+        end
+    end
+
+    AI_CORE --> MCP
+    MCP --> DOMAIN
 ```
 
 Each Agent consists of three layers:
@@ -3589,19 +3588,216 @@ const identityTools: Tool[] = [
 
 ---
 
-### Profile Agent
+### Memory Context Agent (formerly Profile Agent)
 
-**Purpose:** Manages user profiles, preferences, and personalization.
+**Purpose:** Manages user memory, entities, relationships, and context-aware personalization.
 
 **Type:** Generic Domain Agent
+
+**Architecture Version:** v3.0 (ADR-0001 - Situational Context as Relationship Qualifier)
+
+**Core Responsibilities:**
+
+1. **Entity Management** (8 entity types):
+   - User (core entity)
+   - Person (people the user knows)
+   - Organization (companies, institutions)
+   - Goal (user's objectives)
+   - Habit (recurring behaviors)
+   - Event (one-time or recurring events)
+   - Object (physical or digital items)
+   - Location (places user frequents)
+   - Preference (user preferences)
+
+2. **Relationship Management** (9 relationship types):
+   - KNOWS (User → Person)
+   - WORKS_AT (User → Organization)
+   - MEMBER_OF (User → Organization)
+   - PURSUES (User → Goal)
+   - HAS_HABIT (User → Habit)
+   - ATTENDS (User → Event)
+   - OWNS (User → Object)
+   - FREQUENTS (User → Location)
+   - HAS_PREFERENCE (User → Preference)
+
+3. **Situational Context Storage:**
+   - Primary: Qdrant (flexible, schema-less context + embeddings)
+   - Secondary: Neo4j (minimal `situation_id` reference on relationships)
+   - Pattern: Qdrant-first insert with rollback on failure (see ADR-0001)
+
+4. **Context-Aware Retrieval:**
+   - Embedding-based similarity search for current context
+   - Ranking by confidence × context similarity
+   - Dynamic context factor discovery (AI-driven)
+
+**Technology Stack:**
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| Entity Graph | Neo4j | Store entities + relationships with stable properties |
+| Context Storage | Qdrant | Store flexible situational context + embeddings |
+| Embeddings | nomic-embed-text | 768-dim vectors for context similarity |
+| LLM | LiteLLM | Entity/context extraction from conversation |
 
 **MCP Tools Exposed:**
 
 ```typescript
-const profileTools: Tool[] = [
+const memoryContextTools: Tool[] = [
+  // Entity Management
+  {
+    name: 'create_person',
+    description: 'Create a new person entity (someone the user knows)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        name: { type: 'string' },
+        properties: {
+          type: 'object',
+          description: 'AI-discovered properties (profession, topics, style, etc.)'
+        }
+      },
+      required: ['userId', 'name']
+    }
+  },
+  {
+    name: 'create_organization',
+    description: 'Create a new organization entity',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        name: { type: 'string' },
+        orgType: { type: 'string', enum: ['company', 'institution', 'nonprofit', 'other'] },
+        properties: { type: 'object' }
+      },
+      required: ['userId', 'name', 'orgType']
+    }
+  },
+  {
+    name: 'create_goal',
+    description: 'Create a new goal the user is pursuing',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        title: { type: 'string' },
+        category: { type: 'string', enum: ['personal', 'professional', 'health', 'financial', 'other'] },
+        targetDate: { type: 'string', format: 'date' },
+        properties: { type: 'object' }
+      },
+      required: ['userId', 'title', 'category']
+    }
+  },
+
+  // Relationship Management
+  {
+    name: 'create_knows_relationship',
+    description: 'Create KNOWS relationship between user and person',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        personId: { type: 'string' },
+        role: { type: 'string', description: 'Stable role: colleague, friend, family, etc.' },
+        relationshipType: { type: 'string', enum: ['professional', 'personal', 'family'] },
+        context: {
+          type: 'object',
+          description: 'Situational context (emotion, mood, time_of_day, etc.)'
+        }
+      },
+      required: ['userId', 'personId', 'role', 'relationshipType', 'context']
+    }
+  },
+  {
+    name: 'create_works_at_relationship',
+    description: 'Create WORKS_AT relationship between user and organization',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        organizationId: { type: 'string' },
+        jobTitle: { type: 'string' },
+        department: { type: 'string' },
+        startDate: { type: 'string', format: 'date' },
+        context: { type: 'object' }
+      },
+      required: ['userId', 'organizationId', 'jobTitle', 'context']
+    }
+  },
+
+  // Preference Management
+  {
+    name: 'learn_preference',
+    description: 'Learn or update a user preference with situational context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        domain: { type: 'string', description: 'Preference domain (coffee, music, etc.)' },
+        key: { type: 'string', description: 'Preference key (morning_drink, work_genre, etc.)' },
+        value: { type: 'any', description: 'Preference value' },
+        context: {
+          type: 'object',
+          description: 'Situational factors (time_of_day, location, activity, etc.)'
+        },
+        source: { type: 'string', enum: ['explicit', 'implicit', 'inferred'] },
+        confidence: { type: 'number', minimum: 0, maximum: 1 }
+      },
+      required: ['userId', 'domain', 'key', 'value', 'context', 'source']
+    }
+  },
+  {
+    name: 'get_preference',
+    description: 'Retrieve preference for current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        domain: { type: 'string' },
+        key: { type: 'string' },
+        currentContext: {
+          type: 'object',
+          description: 'Current situational context for retrieval'
+        }
+      },
+      required: ['userId', 'domain', 'key', 'currentContext']
+    }
+  },
+
+  // Context-Aware Queries
+  {
+    name: 'find_similar_contexts',
+    description: 'Find similar past contexts using embeddings',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        currentContext: { type: 'object' },
+        entityType: { type: 'string', description: 'Filter by entity type (preference, person, etc.)' },
+        topK: { type: 'number', default: 5 }
+      },
+      required: ['userId', 'currentContext']
+    }
+  },
+  {
+    name: 'get_entity_in_context',
+    description: 'Get entity with context-filtered relationships',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        entityId: { type: 'string' },
+        currentContext: { type: 'object' }
+      },
+      required: ['userId', 'entityId', 'currentContext']
+    }
+  },
+
+  // Legacy Profile Tools (backwards compatibility)
   {
     name: 'get_profile',
-    description: 'Get user profile',
+    description: 'Get user profile (legacy - use get_entity_in_context instead)',
     inputSchema: {
       type: 'object',
       properties: {
@@ -3612,7 +3808,7 @@ const profileTools: Tool[] = [
   },
   {
     name: 'update_preferences',
-    description: 'Update user preferences',
+    description: 'Update user preferences (legacy - use learn_preference instead)',
     inputSchema: {
       type: 'object',
       properties: {
@@ -3638,6 +3834,81 @@ const profileTools: Tool[] = [
   }
 ];
 ```
+
+**Data Flow (Qdrant-First Pattern):**
+
+```mermaid
+sequenceDiagram
+    participant Agent as Memory Context Agent
+    participant Qdrant as Qdrant (PRIMARY)
+    participant Neo4j as Neo4j (SECONDARY)
+    participant Emb as Embedding Service
+
+    Agent->>Agent: Extract context from conversation
+    Agent->>Emb: Generate embedding (768-dim)
+    Emb-->>Agent: Vector
+
+    Agent->>Qdrant: Insert situation + context + embedding
+    Qdrant-->>Agent: situation_id
+
+    Agent->>Neo4j: Create/Update relationship with situation_id
+    Neo4j-->>Agent: Success
+
+    Note over Agent,Neo4j: On Neo4j failure: Rollback Qdrant
+```
+
+**Storage Schema:**
+
+**Neo4j (Entity Graph + Minimal Reference):**
+```cypher
+# Entity
+(:User {id, tenant_id, name, email, created_at})
+
+# Relationship with stable properties + situation reference
+(:User)-[:KNOWS {
+  relationship_instance_id: uuid,
+  role: "colleague",              # STABLE
+  relationship_type: "professional",  # STABLE
+  situation_id: "sit-123",        # Reference to Qdrant (NOT Node!)
+  confidence: 0.9,
+  source: "explicit",
+  observed_at: datetime
+}]->(:Person {id, tenant_id, name, ai_properties})
+```
+
+**Qdrant (Flexible Context + Embeddings):**
+```python
+{
+  "id": "sit-123",
+  "vector": [0.234, -0.567, ...],  # 768-dim embedding
+  "payload": {
+    "tenant_id": "tenant-1",
+    "user_id": "user-123",
+    "entity_type": "person",
+    "entity_id": "person-456",
+    "relationship_type": "KNOWS",
+    "relationship_instance_id": "rel-123",
+
+    # FLEXIBLE CONTEXT (NO FIXED SCHEMA!)
+    "context": {
+      "time_of_day": "morning",
+      "emotion": "friendly",
+      "location": "office",
+      "energy_level": "high",
+      # ... ANY AI-discovered factors
+    },
+
+    "observed_at": "2025-11-20T10:30:00Z"
+  }
+}
+```
+
+**Implementation References:**
+
+- **Complete Implementation Guide:** [15-entity-management.md](15-entity-management.md)
+- **Architecture Decision:** [ADR-0001 - Situational Context as Relationship Qualifier](../../docs/adr/ADR-0001-situational-context-as-relationship-qualifier.md)
+- **Context Architecture:** [14-situational-context.md](14-situational-context.md)
+- **Domain Model:** [15-memory-entity-model.md](../../docs/domain-model/15-memory-entity-model.md)
 
 ---
 

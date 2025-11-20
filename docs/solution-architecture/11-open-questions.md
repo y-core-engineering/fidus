@@ -190,11 +190,11 @@ class CalendarAgent {
 **Option A: Monolith (All agents in one process)**
 ```
 fidus-backend:
-  ├─ Orchestrator
-  ├─ Calendar Agent
-  ├─ Finance Agent
-  ├─ Travel Agent
-  └─ ... (8 agents total)
+  +- Orchestrator
+  +- Calendar Agent
+  +- Finance Agent
+  +- Travel Agent
+  +- ... (8 agents total)
 ```
 - Pros: Simple deployment, shared resources
 - Cons: Scaling all-or-nothing, failure affects all
@@ -213,18 +213,18 @@ travel-agent:3003
 **Option C: Hybrid (Recommended)**
 ```
 Community Edition:
-  ├─ fidus-core (Orchestrator + Core agents)
+  +- fidus-core (Orchestrator + Core agents)
 
 Cloud Edition:
-  ├─ orchestrator:3000
-  ├─ core-agents:3001 (Calendar, Finance, Travel)
-  ├─ lifestyle-agents:3002 (Health, Home, Shopping, Learning)
+  +- orchestrator:3000
+  +- core-agents:3001 (Calendar, Finance, Travel)
+  +- lifestyle-agents:3002 (Health, Home, Shopping, Learning)
 
 Enterprise Edition:
-  ├─ orchestrator:3000
-  ├─ calendar-agent:3001
-  ├─ finance-agent:3002
-  ├─ ... (separate per domain)
+  +- orchestrator:3000
+  +- calendar-agent:3001
+  +- finance-agent:3002
+  +- ... (separate per domain)
 ```
 
 **Recommendation:** **Option C (Hybrid)**

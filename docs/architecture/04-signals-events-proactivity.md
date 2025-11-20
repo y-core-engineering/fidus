@@ -408,22 +408,22 @@ class OpportunityDetectionEngine {
 
 ```
 Scheduler (every 5 min)
-         │
+         |
          ▼
 Opportunity Detection Engine
-         │
-         ├─ Domain: fitness_opportunities
-         │  ├─ Collect: health.workout_progress  → Calls HealthSupervisor.collector()
-         │  ├─ Collect: calendar.free_slots      → Calls CalendarSupervisor.collector()
-         │  ├─ Collect: weather.forecast         → Calls WeatherSupervisor.collector()
-         │  │
-         │  └─ LLM Analysis
-         │     → "User has 2/4 workouts, tomorrow 2-4 PM free, weather good"
-         │     → Opportunity: "Outdoor workout tomorrow at 2 PM?"
-         │
-         └─ Domain: budget_alerts
-            ├─ Collect: finance.spending_this_month
-            └─ LLM Analysis
+         |
+         +- Domain: fitness_opportunities
+         |  +- Collect: health.workout_progress  → Calls HealthSupervisor.collector()
+         |  +- Collect: calendar.free_slots      → Calls CalendarSupervisor.collector()
+         |  +- Collect: weather.forecast         → Calls WeatherSupervisor.collector()
+         |  |
+         |  +- LLM Analysis
+         |     → "User has 2/4 workouts, tomorrow 2-4 PM free, weather good"
+         |     → Opportunity: "Outdoor workout tomorrow at 2 PM?"
+         |
+         +- Domain: budget_alerts
+            +- Collect: finance.spending_this_month
+            +- LLM Analysis
                → "Restaurant +30%, send alert"
 ```
 

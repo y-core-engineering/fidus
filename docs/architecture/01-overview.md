@@ -138,33 +138,33 @@ class MCPDiscoveryService {
 
 ```
 External Event (e.g. Calendar API: meeting_cancelled)
-           │
+           |
            ▼
-┌──────────────────────────────────┐
-│ Domain Supervisor                │
-│ - Receives Webhook/Poll-Event    │
-│ - Emits to Event Bus             │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Domain Supervisor                |
+| - Receives Webhook/Poll-Event    |
+| - Emits to Event Bus             |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Event Bus (Redis Pub/Sub)        │
-│ - Global Event Routing           │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Event Bus (Redis Pub/Sub)        |
+| - Global Event Routing           |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Proactivity Engine               │
-│ - Generic Event Handler          │
-│ - LLM decides: Relevant?         │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Proactivity Engine               |
+| - Generic Event Handler          |
+| - LLM decides: Relevant?         |
++----------+-----------------------+
+           |
            ▼ (if relevant)
-┌──────────────────────────────────┐
-│ Notification Agent               │
-│ - Smart Timing (Do Not Disturb)  │
-│ - Delivery to User               │
-└──────────────────────────────────┘
++----------------------------------+
+| Notification Agent               |
+| - Smart Timing (Do Not Disturb)  |
+| - Delivery to User               |
++----------------------------------+
 ```
 
 **Example: LLM-based Event Filtering**
@@ -522,20 +522,20 @@ Plugins have dependencies (e.g. `UserProfilingPlugin` needs `neo4j`, `qdrant`, `
 
 ```
 1. PluginManager.discoverPlugins()
-   └─ Scans file system + NPM packages
-   └─ Result: List of plugin instances
+   +- Scans file system + NPM packages
+   +- Result: List of plugin instances
 
 2. Create dependency graph
-   ┌─────────────────────────────────┐
-   │ Nodes = Plugins                 │
-   │ Edges = Dependencies            │
-   │                                 │
-   │ neo4j → (no dependencies)       │
-   │ qdrant → (no dependencies)      │
-   │ redis → (no dependencies)       │
-   │ user-profiling → [neo4j, qdrant, redis]  │
-   │ health-supervisor → [user-profiling]     │
-   └─────────────────────────────────┘
+   +---------------------------------+
+   | Nodes = Plugins                 |
+   | Edges = Dependencies            |
+   |                                 |
+   | neo4j → (no dependencies)       |
+   | qdrant → (no dependencies)      |
+   | redis → (no dependencies)       |
+   | user-profiling → [neo4j, qdrant, redis]  |
+   | health-supervisor → [user-profiling]     |
+   +---------------------------------+
 
 3. Topological sorting (procedure description)
    a) Find all plugins without dependencies (In-Degree = 0)
@@ -624,26 +624,26 @@ const plugins = [
 ];
 
 // Dependency Graph
-//           ┌─────────────┐
-//           │   neo4j     │
-//           └──────┬──────┘
-//                  │
-//           ┌──────▼──────┐       ┌─────────────┐
-//           │   qdrant    │       │    redis    │
-//           └──────┬──────┘       └──────┬──────┘
-//                  │                     │
-//                  └──────┬──────────────┘
-//                         │
-//                  ┌──────▼─────────┐
-//                  │ user-profiling │
-//                  └──────┬─────────┘
-//                         │
-//            ┌────────────┴────────────┐
-//            │                         │
-//     ┌──────▼─────────┐    ┌─────────▼────────┐
-//     │ health-        │    │ calendar-        │
-//     │ supervisor     │    │ supervisor       │
-//     └────────────────┘    └──────────────────┘
+//           +-------------+
+//           |   neo4j     |
+//           +------+------+
+//                  |
+//           +------▼------+       +-------------+
+//           |   qdrant    |       |    redis    |
+//           +------+------+       +------+------+
+//                  |                     |
+//                  +------+--------------+
+//                         |
+//                  +------▼---------+
+//                  | user-profiling |
+//                  +------+---------+
+//                         |
+//            +------------+------------+
+//            |                         |
+//     +------▼---------+    +---------▼--------+
+//     | health-        |    | calendar-        |
+//     | supervisor     |    | supervisor       |
+//     +----------------+    +------------------+
 
 // Resulting loading order
 1. neo4j          (In-Degree = 0)
@@ -736,42 +736,42 @@ interface DocumentDatabase {
 
 ```
 User: "Find a free 2h slot for team meeting tomorrow"
-           │
+           |
            ▼
-┌──────────────────────────────────┐
-│ Orchestrator                     │
-│ 1. Intent Detection (LLM)        │
-│    → "calendar_scheduling"       │
-│                                  │
-│ 2. Tool Selection (LLM)          │
-│    → calendar_supervisor         │
-│      .find_free_slots()         │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Orchestrator                     |
+| 1. Intent Detection (LLM)        |
+|    → "calendar_scheduling"       |
+|                                  |
+| 2. Tool Selection (LLM)          |
+|    → calendar_supervisor         |
+|      .find_free_slots()         |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Calendar Supervisor (LangGraph)  │
-│                                  │
-│ Node 1: analyze_request          │
-│ → "needs multi-person scheduling"│
-│                                  │
-│ Node 2: check_availability       │
-│ → Calls Google Calendar MCP      │
-│                                  │
-│ Node 3: find_optimal_slot        │
-│ → Sub-Agent: SmartSchedulingAgent│
-│                                  │
-│ Node 4: respond                  │
-│ → "Tomorrow 2-4pm is optimal"    │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Calendar Supervisor (LangGraph)  |
+|                                  |
+| Node 1: analyze_request          |
+| → "needs multi-person scheduling"|
+|                                  |
+| Node 2: check_availability       |
+| → Calls Google Calendar MCP      |
+|                                  |
+| Node 3: find_optimal_slot        |
+| → Sub-Agent: SmartSchedulingAgent|
+|                                  |
+| Node 4: respond                  |
+| → "Tomorrow 2-4pm is optimal"    |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Orchestrator                     │
-│ 3. Response Synthesis            │
-│    → Formulate user-friendly     │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Orchestrator                     |
+| 3. Response Synthesis            |
+|    → Formulate user-friendly     |
++----------+-----------------------+
+           |
            ▼
 User: "Tomorrow 2-4pm is optimal. Should I create the meeting?"
 ```
@@ -781,37 +781,37 @@ User: "Tomorrow 2-4pm is optimal. Should I create the meeting?"
 ```
 External System: Google Calendar sends webhook
 → "Meeting at 2pm was cancelled"
-           │
+           |
            ▼
-┌──────────────────────────────────┐
-│ Calendar Supervisor              │
-│ - Webhook handler receives event │
-│ - Emits to Event Bus             │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Calendar Supervisor              |
+| - Webhook handler receives event |
+| - Emits to Event Bus             |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Proactivity Engine               │
-│ - Event Handler (Generic)        │
-│ - LLM asks: Relevant for user?   │
-│   → YES: "2h free, user has      │
-│     workout goal 4x/week"        │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Proactivity Engine               |
+| - Event Handler (Generic)        |
+| - LLM asks: Relevant for user?   |
+|   → YES: "2h free, user has      |
+|     workout goal 4x/week"        |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Orchestrator                     │
-│ - Coordinates Health + Calendar  │
-│ - Generates suggestion           │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Orchestrator                     |
+| - Coordinates Health + Calendar  |
+| - Generates suggestion           |
++----------+-----------------------+
+           |
            ▼
-┌──────────────────────────────────┐
-│ Notification Agent               │
-│ - Smart Timing (not in meeting)  │
-│ - Delivery: Push Notification    │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Notification Agent               |
+| - Smart Timing (not in meeting)  |
+| - Delivery: Push Notification    |
++----------+-----------------------+
+           |
            ▼
 User: "You have tomorrow 2-4pm free – perfect for workout!
        (Goal: 4x/week, current: 2x)"
@@ -821,27 +821,27 @@ User: "You have tomorrow 2-4pm free – perfect for workout!
 
 ```
 Scheduler: Every day at 8:00am
-           │
+           |
            ▼
-┌──────────────────────────────────┐
-│ Proactivity Engine               │
-│ Opportunity Detection Engine     │
-│                                  │
-│ 1. Collect Signals (dynamic)     │
-│    - calendar.today_events       │
-│    - weather.forecast            │
-│    - health.workout_progress     │
-│    - finance.budget_status       │
-│                                  │
-│ 2. LLM Analysis (per domain)     │
-│    → "Generate morning brief"    │
-│                                  │
-│ 3. Multi-Domain Opportunities    │
-│    → Calendar: 3 meetings        │
-│    → Health: 2/4 workouts        │
-│    → Finance: Budget alert       │
-└──────────┬───────────────────────┘
-           │
++----------------------------------+
+| Proactivity Engine               |
+| Opportunity Detection Engine     |
+|                                  |
+| 1. Collect Signals (dynamic)     |
+|    - calendar.today_events       |
+|    - weather.forecast            |
+|    - health.workout_progress     |
+|    - finance.budget_status       |
+|                                  |
+| 2. LLM Analysis (per domain)     |
+|    → "Generate morning brief"    |
+|                                  |
+| 3. Multi-Domain Opportunities    |
+|    → Calendar: 3 meetings        |
+|    → Health: 2/4 workouts        |
+|    → Finance: Budget alert       |
++----------+-----------------------+
+           |
            ▼
 User: "Good morning! Your day:
        • 9am: Team meeting (Agenda prepared ✓)

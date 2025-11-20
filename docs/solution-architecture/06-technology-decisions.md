@@ -1,10 +1,12 @@
 # Technology Decisions
 
-**Version:** 1.0
-**Date:** 2025-10-27
+**Version:** 1.1
+**Date:** 2025-11-20
 **Status:** Draft (Awaiting Human Review)
 **Part of:** Fidus Solution Architecture
 **Author:** AI-Generated
+**Supersedes:** v1.0 (2025-10-27)
+**Updates:** Added Qdrant rationale for v3.0 architecture
 
 ---
 
@@ -2341,7 +2343,7 @@ jobs:
 |---------|---------------------|-----------|
 | **Distributed Tracing** | OpenTelemetry + Jaeger | Better debugging for multi-agent flows |
 | **Advanced Analytics** | ClickHouse | Fast analytics for usage patterns |
-| **Vector Search** | Qdrant or Weaviate | Semantic search for appointments, messages |
+| **Vector Search** | **Qdrant** ✅ SELECTED | **PRIMARY storage for situational context (v3.0)** |
 | **Real-Time Sync** | WebSockets (Socket.io) | Real-time UI updates for multi-user |
 | **Mobile App** | React Native or Flutter | Native mobile experience |
 | **Plugin Marketplace** | Custom registry + sandboxing | Community-contributed agents |
@@ -2367,12 +2369,14 @@ All technology decisions for Fidus have been carefully evaluated against the pro
 1. **Python + FastAPI** for backend (LLM ecosystem)
 2. **TypeScript + Next.js** for frontend (type safety + performance)
 3. **PostgreSQL + Redis** for data storage (mature + fast)
-4. **BullMQ + Redis Pub/Sub** for event bus (reliable + fast)
-5. **Ollama + OpenAI** for LLMs (privacy + quality)
-6. **LangGraph** for agents (LLM-native state machines)
-7. **Auth0 / Keycloak** for auth (ease of use + privacy)
-8. **Prometheus + Grafana** for observability (standard + self-hosted)
-9. **Docker + Kubernetes** for deployment (standard + scalable)
+4. **Qdrant** for situational context storage (v3.0 - flexible, schema-less, PRIMARY) ⭐ NEW
+5. **Neo4j** for entity graph (v3.0 - relationships with minimal references) ⭐ NEW
+6. **BullMQ + Redis Pub/Sub** for event bus (reliable + fast)
+7. **Ollama + OpenAI** for LLMs (privacy + quality)
+8. **LangGraph** for agents (LLM-native state machines)
+9. **Auth0 / Keycloak** for auth (ease of use + privacy)
+10. **Prometheus + Grafana** for observability (standard + self-hosted)
+11. **Docker + Kubernetes** for deployment (standard + scalable)
 
 ### Next Steps
 
@@ -2384,6 +2388,7 @@ For implementation details, see:
 ---
 
 **Version History:**
+- v1.1 (2025-11-20): Added Qdrant as PRIMARY for situational context (v3.0), Neo4j for entity graph
 - v1.0 (2025-10-27): Initial comprehensive technology decisions documentation
 
 ---

@@ -272,13 +272,13 @@ class CalendarSupervisorPlugin implements Plugin {
 
 ```
 1. Load-Time (PluginManager)
-   └─ Checks if permissions are declared
+   +- Checks if permissions are declared
 
 2. Service-Access (ServiceRegistry)
-   └─ Checks on every service call
+   +- Checks on every service call
 
 3. Runtime (LLMService, DataAccess)
-   └─ Checks on LLM calls and data access
+   +- Checks on LLM calls and data access
 ```
 
 ---
@@ -497,27 +497,27 @@ class DataAccessService {
 **When installing a community plugin:**
 
 ```
-┌────────────────────────────────────────────┐
-│ Install plugin:                            │
-│ @fidus-community/crypto-trading            │
-├────────────────────────────────────────────┤
-│ ⚠️ This plugin requires the following      │
-│    permissions:                            │
-│                                            │
-│ 📊 Data Access:                            │
-│   • Financial data (Read + Write)         │
-│   • User preferences (Read)               │
-│                                            │
-│ 🔧 Service Access:                         │
-│   • userProfile.get                        │
-│   • finance.getBalance                     │
-│                                            │
-│ 🤖 AI Usage:                               │
-│   • LLM access (10,000 tokens/day)        │
-│                                            │
-│ [ ] I understand and agree                │
-│ [Install] [Cancel]                        │
-└────────────────────────────────────────────┘
++--------------------------------------------+
+| Install plugin:                            |
+| @fidus-community/crypto-trading            |
++--------------------------------------------+
+| ⚠️ This plugin requires the following      |
+|    permissions:                            |
+|                                            |
+| 📊 Data Access:                            |
+|   • Financial data (Read + Write)         |
+|   • User preferences (Read)               |
+|                                            |
+| 🔧 Service Access:                         |
+|   • userProfile.get                        |
+|   • finance.getBalance                     |
+|                                            |
+| 🤖 AI Usage:                               |
+|   • LLM access (10,000 tokens/day)        |
+|                                            |
+| [ ] I understand and agree                |
+| [Install] [Cancel]                        |
++--------------------------------------------+
 ```
 
 **Process:**
@@ -615,16 +615,16 @@ External MCP servers have **no direct permissions**. They only get filtered data
 
 ```
 Layer 1: Load-Time Validation
-└─ Permissions must be declared
++- Permissions must be declared
 
 Layer 2: Service-Access Proxy
-└─ Permission check on every service call
++- Permission check on every service call
 
 Layer 3: Runtime Enforcement
-└─ LLM quota, data access checks
++- LLM quota, data access checks
 
 Layer 4: Audit Logging
-└─ All permission violations are logged
++- All permission violations are logged
 ```
 
 ---

@@ -1,9 +1,11 @@
 # Situational Context - Solution Architecture
 
-**Version:** 1.0
-**Date:** 2025-11-03
-**Status:** Draft
+**Version:** 2.0 (BREAKING CHANGES)
+**Date:** 2025-11-20
+**Status:** Active
 **Part of:** Fidus Solution Architecture
+**Supersedes:** v1.0 (2025-11-03) - Situation as Neo4j Node (deprecated)
+**Migration:** See [ADR-0001](../adr/ADR-0001-situational-context-as-relationship-qualifier.md) - No production data, clean slate implementation
 
 ---
 
@@ -11,7 +13,21 @@
 
 This document describes the technical implementation of **Situational Context** in the Fidus system, enabling context-aware preference learning and retrieval.
 
-**Reference:** [Architecture: Situational Context](../architecture/08-situational-context-architecture.md)
+**References:**
+- [Architecture: Situational Context](../architecture/08-situational-context-architecture.md)
+- [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)
+- [Entity-Relationship Model](../architecture/10-entity-relationship-model.md)
+- [Memory Domain Model](../domain-model/15-memory-entity-model.md)
+
+**⚠️ IMPORTANT NOTE (v2.0):**
+Some code examples in sections 5-7 below still show the **old v1.0 pattern** (Situation as Neo4j node, IN_SITUATION relationship). These are **DEPRECATED** and provided for reference only.
+
+**✅ For correct v2.0 implementation:**
+1. Use the **Data Model** section above (Neo4j + Qdrant schemas)
+2. Use the **Design Guidelines** section (What Goes Where)
+3. Follow the **Qdrant-first pattern** described in ADR-0001
+
+The code examples will be fully updated to v2.0 in the next revision.
 
 ---
 
@@ -20,105 +36,120 @@ This document describes the technical implementation of **Situational Context** 
 | Component | Technology | Rationale |
 |-----------|-----------|-----------|
 | **Context Extraction** | LLM (via LiteLLM) | Natural language understanding, flexible factor extraction |
-| **Context Storage** | Neo4j (graph properties) | Schema-less key-value storage, graph relationships |
-| **Embedding Generation** | nomic-embed-text (via Ollama) | Local, privacy-first, high-quality embeddings |
-| **Vector Search** | Qdrant | Fast similarity search, metadata filtering |
+| **Context Storage (Primary)** | Qdrant (payload) | **NEW v2.0:** Flexible, schema-less, AI-driven metadata storage |
+| **Context Storage (Secondary)** | Neo4j (situation_id property) | **NEW v2.0:** Minimal reference to Qdrant context (no context details!) |
+| **Embedding Generation** | nomic-embed-text (via Ollama) | Local, privacy-first, high-quality embeddings (768-dim) |
+| **Vector Search** | Qdrant | Fast similarity search, metadata filtering, primary context retrieval |
 | **Context Caching** | Redis | Hot-path performance optimization |
+
+**Critical Change (v2.0):** Context now lives **ONLY in Qdrant**. Neo4j stores entity graph + `situation_id` reference.
 
 ---
 
-## Architecture Diagram
+## Architecture Diagram (v2.0)
+
+**NEW:** 3-Layer Architecture - Neo4j (Entity Graph) + Qdrant (Context Storage) + Qdrant-First Pattern
 
 ```mermaid
 graph TB
-    subgraph "Context Capture"
+    subgraph "Layer 1: Context Capture"
         A[User Conversation] --> B[LLM Context Extractor]
         C[System Data] --> D[Context Merger]
         E[External APIs] -.optional.-> D
         B --> D
     end
 
-    subgraph "Context Processing"
-        D --> F[Context Object]
+    subgraph "Layer 2: Context Processing"
+        D --> F[ContextFactors Object]
         F --> G[Embedding Generator]
-        G --> H[nomic-embed-text]
+        G --> H[nomic-embed-text<br/>768-dim vector]
     end
 
-    subgraph "Context Storage"
-        F --> I[(Neo4j<br/>Graph Properties)]
-        H --> J[(Qdrant<br/>Vector DB)]
+    subgraph "Layer 3: Context Storage (Qdrant-First!)"
+        H --> J[(Qdrant PRIMARY<br/>Full Context + Embeddings)]
+        J -->|situation_id| I[(Neo4j SECONDARY<br/>situation_id reference only)]
+        J -.rollback on failure.-> I
     end
 
-    subgraph "Context Retrieval"
+    subgraph "Context Retrieval (Similarity-Based)"
         K[Current Context] --> L[Generate Embedding]
-        L --> M[Qdrant Search]
-        M --> N[Similar Context IDs]
-        N --> O[Neo4j Query]
-        O --> P[Preferences + Context]
+        L --> M[Qdrant Similarity Search<br/>Top-K similar situations]
+        M --> N[situation_ids]
+        N --> O[Neo4j Graph Query<br/>1-HOP via situation_id]
+        O --> P[Entities + Relationships]
     end
-
-    I -.reference.-> J
-    J -.IDs.-> I
 
     style B fill:#00ff94
     style H fill:#4caf50
+    style J fill:#ffd700
     style M fill:#2196f3
+    style I fill:#cccccc
 ```
+
+**Key Changes (v2.0):**
+1. ✅ **Qdrant is PRIMARY** storage for context (not Neo4j!)
+2. ✅ **Neo4j stores only `situation_id` reference** (no context details)
+3. ✅ **Qdrant-first pattern**: Insert Qdrant → Insert Neo4j → Rollback Qdrant on failure
+4. ✅ **1-Hop Query**: Direct property access `WHERE r.situation_id IN [...]` (no IN_SITUATION relationship)
 
 ---
 
 ## Data Model
 
-### Neo4j Schema
+### Neo4j Schema (v2.0)
+
+**BREAKING CHANGE:** No more `Situation` nodes! Context lives in Qdrant only.
 
 ```cypher
-# Preference with multiple situational contexts
+# v2.0: User → Preference with situation_id reference
 
-(:User {id: string, created_at: datetime})
-  -[:HAS_PREFERENCE]->
+(:User {
+  id: uuid,
+  tenant_id: uuid,
+  created_at: datetime,
+  updated_at: datetime
+})
+  -[:HAS_PREFERENCE {
+    relationship_instance_id: uuid,  # NEW: Unique ID for this relationship
+    situation_id: uuid,              # NEW: Reference to Qdrant (NOT Neo4j node!)
+    confidence: float,               # 0.0-1.0
+    source: string,                  # "explicit" | "implicit"
+    observed_at: datetime,
+    reinforcement_count: int,
+    rejection_count: int
+  }]->
 (:Preference {
   id: uuid,
-  domain: string,
-  key: string,
-  value: string,
-  confidence: float,
-  learned_at: datetime,
-  reinforcement_count: int,
-  rejection_count: int
-})
-  -[:IN_SITUATION]->
-(:Situation {
-  id: uuid,
-  embedding_id: string,           # Reference to Qdrant vector
-  factors: json,                  # Schema-less context factors
-  captured_at: datetime,
-  description: string             # Human-readable context summary
+  tenant_id: uuid,
+  value: string,                     # e.g., "Cappuccino"
+  category: string,                  # e.g., "coffee"
+  created_at: datetime,
+  updated_at: datetime
 })
 
-# Example Situation node:
-(:Situation {
-  id: "sit-123",
-  embedding_id: "qdrant-abc",
-  factors: {
-    time_of_day: "morning",
-    location: "office",
-    activity: "working",
-    energy_level: "low",
-    with_people: ["colleague"]
-  },
-  captured_at: 2025-11-03T08:30:00Z,
-  description: "Monday morning at office, working with low energy"
-})
+# Example relationship:
+(:User {id: "user-123"})-[:HAS_PREFERENCE {
+  relationship_instance_id: "rel-456",
+  situation_id: "sit-789",           # ← References Qdrant context!
+  confidence: 0.92,
+  source: "explicit",
+  observed_at: datetime("2025-11-20T08:30:00Z"),
+  reinforcement_count: 5,
+  rejection_count: 0
+}]->(:Preference {value: "Cappuccino"})
 ```
 
-**Key Design Decisions:**
+**Key Design Decisions (v2.0):**
 
-1. **`factors` as JSON:** Allows schema-less, dynamic context factors
-2. **Multiple Situations per Preference:** Same preference can apply in different contexts
-3. **`embedding_id` reference:** Links to Qdrant for similarity search
-4. **`description` for humans:** Helps with debugging and user transparency
+1. ❌ **NO Situation nodes in Neo4j!** Context is metadata, not an entity
+2. ✅ **`situation_id` as property**: Direct reference to Qdrant (faster queries)
+3. ✅ **1-Hop relationships**: `(User)-[:HAS_PREFERENCE]->(Preference)` (no IN_SITUATION)
+4. ✅ **relationship_instance_id**: Unique identifier for each relationship instance
+5. ✅ **Multiple relationships possible**: Same user-preference pair with different situations
 
-### Qdrant Schema
+### Qdrant Schema (v2.0)
+
+**NEW:** Flexible, schema-less context storage with AI-driven factor discovery
 
 ```python
 # Collection: situations
@@ -130,29 +161,113 @@ graph TB
   }
 }
 
-# Point structure
+# Point structure (v2.0)
 {
-  "id": "qdrant-abc",         # UUID
-  "vector": [0.1, 0.2, ...],  # 768-dim embedding
+  "id": "sit-789",            # UUID (situation_id referenced by Neo4j)
+  "vector": [0.1, 0.2, ...],  # 768-dim embedding of context
   "payload": {
-    # All context factors as payload (for filtering)
-    "situation_id": "sit-123",
-    "user_id": "user-456",
-    "time_of_day": "morning",
-    "location": "office",
-    "activity": "working",
-    "energy_level": "low",
-    "with_people": ["colleague"],
-    "captured_at": "2025-11-03T08:30:00Z"
+    # Fixed Metadata (for filtering)
+    "tenant_id": "tenant-1",
+    "user_id": "user-123",
+    "entity_type": "preference",           # NEW: Type of related entity
+    "entity_id": "pref-456",               # NEW: ID of related entity
+    "relationship_type": "HAS_PREFERENCE", # NEW: Type of relationship
+    "relationship_instance_id": "rel-456", # NEW: Specific relationship instance
+    "created_at": "2025-11-20T08:30:00Z",
+    "updated_at": "2025-11-20T08:30:00Z",
+
+    # FLEXIBLE CONTEXT (NO FIXED SCHEMA!)
+    # The AI determines which factors are relevant!
+    "context": {
+      # Common factors (examples, NOT required!)
+      "time_of_day": "morning",
+      "location": "office",
+      "activity": "working",
+      "mood": "focused",
+
+      # AI-discovered factors (completely flexible!)
+      "energy_level": "low",
+      "coffee_consumed": 2,
+      "deadline_pressure": "high",
+      "with_colleagues": true,
+      "first_task_of_day": true,
+
+      # Nested structures (max 2-3 levels)
+      "location_details": {
+        "type": "office",
+        "floor": 3,
+        "room": "open_space"
+      },
+
+      # ... ANY other factors the AI discovers!
+      # NO schema constraints!
+    }
   }
 }
 ```
 
-**Key Design Decisions:**
+**Key Design Decisions (v2.0):**
 
-1. **Cosine Distance:** Best for semantic similarity
-2. **Payload = full context:** Enables metadata filtering
-3. **User ID in payload:** Ensures tenant isolation in search
+1. ✅ **Cosine Distance:** Best for semantic similarity
+2. ✅ **Flexible `context` object:** AI can add ANY new factors without schema changes
+3. ✅ **Tenant + User isolation:** Filtering by `tenant_id` + `user_id`
+4. ✅ **Entity + Relationship metadata:** Links context to specific entities/relationships
+5. ✅ **Nested structures supported:** Max 2-3 levels (Qdrant native support)
+6. ✅ **NO required fields in `context`:** Completely AI-driven!
+
+---
+
+## Design Guidelines: What Goes Where? (v2.0)
+
+**CRITICAL:** Understanding the difference between **stable properties** (Neo4j) and **situational context** (Qdrant)
+
+### Stable Properties (Neo4j Relationship)
+
+Properties that describe the **permanent nature of the relationship**, NOT the current situation:
+
+✅ **Store in Neo4j:**
+- `role`: "colleague", "friend", "father" (doesn't change with mood/time/location)
+- `relationship_type`: "professional", "personal", "family"
+- `communication_frequency`: "daily", "weekly" (AI-learned stable pattern)
+- `employment_type`: "full_time", "part_time" (for WORKS_AT relationships)
+
+### Situational Context (Qdrant)
+
+Properties that describe **temporary situational conditions**, highly variable:
+
+✅ **Store in Qdrant `context`:**
+- `emotion`: "stressed", "relaxed", "excited" (changes constantly!)
+- `mood`: "energetic", "tired", "focused"
+- `time_of_day`: "morning", "afternoon", "evening"
+- `activity`: "working", "relaxing", "exercising"
+- `location`: "office", "home", "cafe" (can be situational OR stable, depending on use case)
+- `deadline_pressure`: "high", "low" (situational stress)
+- `energy_level`: "high", "low" (current state)
+
+### Anti-Pattern Examples
+
+❌ **WRONG: Emotion as Relationship Property**
+```cypher
+# NEVER do this!
+[:KNOWS {role: "colleague", emotion: "friendly"}]  # Emotion is situational!
+```
+
+✅ **CORRECT: Emotion in Qdrant Context**
+```cypher
+# Neo4j: Stable properties only
+[:KNOWS {role: "colleague", situation_id: "sit-123"}]
+
+# Qdrant: Situational context
+{
+  "id": "sit-123",
+  "payload": {
+    "context": {
+      "emotion": "friendly",      # Situational!
+      "mood": "collaborative"     # Situational!
+    }
+  }
+}
+```
 
 ---
 

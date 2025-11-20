@@ -1,9 +1,10 @@
 # Situational Context Architecture
 
-**Version:** 1.0
-**Date:** 2025-11-03
+**Version:** 1.1
+**Date:** 2025-11-19
 **Status:** Draft
 **Part of:** Fidus System Architecture
+**Last Updated:** 2025-11-19 - Added Entity-Relationship Model reference
 
 ---
 
@@ -501,15 +502,16 @@ Different domains care about different context factors:
 
 ## Related Documents
 
+- **[Entity-Relationship Model](10-entity-relationship-model.md) - Complete entity model with AI-driven context** ⭐ NEW
 - [User Profiling Architecture](07-user-profiling.md) - How preferences are stored
 - [Proactivity Architecture](04-signals-events-proactivity.md) - How context triggers proactive actions
 - [Security Architecture](09-security-architecture.md) - Privacy protection
-- [Solution Architecture: Situational Context](../solution-architecture/14-situational-context.md) - Technical implementation
+- [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md) - Technical decision
 
 ---
 
 **Maintained by:** Core Architecture Team
-**Last Updated:** 2025-11-03
+**Last Updated:** 2025-11-19
 **Next Review:** After Fidus Memory prototype completion
 
 ---

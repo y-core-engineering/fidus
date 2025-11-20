@@ -68,119 +68,119 @@ Based on analysis of **Shopify Polaris**, industry-leading design systems (Mater
 
 ```
 📁 Fidus Design System
-│
-├─ 🏠 Home
-│   ├─ What's New (Changelog highlights)
-│   ├─ Quick Start Cards (Designers, Developers, PMs)
-│   └─ Featured Components/Patterns
-│
-├─ 📖 Getting Started
-│   ├─ Overview
-│   ├─ For Designers (Figma setup, design principles)
-│   ├─ For Developers (Installation, first component)
-│   ├─ Design Philosophy (AI-Driven UI, Privacy-First)
-│   └─ Contributing
-│
-├─ 🎨 Foundations
-│   ├─ AI-Driven UI Paradigm ⭐ (Unique to Fidus)
-│   ├─ Privacy & Trust UX ⭐ (Unique to Fidus)
-│   ├─ Colors (Color system, tokens, usage)
-│   ├─ Typography (Type scale, fonts, usage)
-│   ├─ Spacing (Spacing scale, layout grid)
-│   ├─ Icons (Icon library, 400+ icons)
-│   ├─ Motion (Animation principles, timing)
-│   ├─ Accessibility (WCAG 2.1 AA guidelines)
-│   └─ Responsive Design (Breakpoints, mobile-first)
-│
-├─ 🧩 Components
-│   ├─ Actions
-│   │   ├─ Button (Primary, Secondary, Tertiary, Destructive)
-│   │   ├─ Link
-│   │   ├─ Icon Button
-│   │   └─ Button Group
-│   ├─ Forms & Inputs
-│   │   ├─ Text Input
-│   │   ├─ Text Area
-│   │   ├─ Select
-│   │   ├─ Checkbox
-│   │   ├─ Radio Button
-│   │   ├─ Toggle Switch
-│   │   ├─ Date Picker
-│   │   ├─ Time Picker
-│   │   └─ File Upload
-│   ├─ Feedback
-│   │   ├─ Toast (Success, Error, Warning, Info)
-│   │   ├─ Modal
-│   │   ├─ Alert
-│   │   ├─ Banner
-│   │   └─ Progress Bar
-│   ├─ Navigation
-│   │   ├─ Header
-│   │   ├─ Sidebar
-│   │   ├─ Tabs
-│   │   ├─ Breadcrumbs
-│   │   └─ Pagination
-│   ├─ Layout
-│   │   ├─ Container
-│   │   ├─ Grid
-│   │   ├─ Stack
-│   │   └─ Divider
-│   ├─ Cards ⭐
-│   │   ├─ Opportunity Card (Unique to Fidus)
-│   │   ├─ Detail Card
-│   │   └─ Empty Card
-│   ├─ Data Display
-│   │   ├─ Table
-│   │   ├─ List
-│   │   ├─ Badge
-│   │   ├─ Chip
-│   │   └─ Avatar
-│   └─ Overlays
-│       ├─ Dropdown
-│       ├─ Popover
-│       ├─ Tooltip
-│       └─ Drawer
-│
-├─ 📐 Patterns
-│   ├─ Onboarding (8-step wizard, privacy-first)
-│   ├─ Search & Filtering (AI-powered, traditional)
-│   ├─ Settings Interface (9 categories, privacy report)
-│   ├─ Error States (6 categories, recovery patterns)
-│   ├─ Empty States (5 patterns, educational)
-│   ├─ Loading States (5 patterns, timing rules)
-│   ├─ Form Validation (Real-time, async, cross-field)
-│   ├─ Success & Confirmation (4 patterns, undo support)
-│   ├─ Multi-Tenancy (Tenant switcher, management)
-│   └─ Opportunity Surface ⭐ (Dynamic dashboard, unique)
-│
-├─ 🎭 Tokens
-│   ├─ Color Tokens (Semantic colors, CSS variables)
-│   ├─ Spacing Tokens (Spacing scale, usage)
-│   ├─ Typography Tokens (Type scale, line heights)
-│   ├─ Shadow Tokens (Elevation system)
-│   └─ Motion Tokens (Timing, easing functions)
-│
-├─ 🏗️ Architecture ⭐ (Unique to Fidus)
-│   ├─ UI Decision Layer (LLM-based component selection)
-│   ├─ UI Component Registry (Backend-Frontend bridge)
-│   ├─ API Response Schema (UI metadata structure)
-│   ├─ Opportunity Surface Service (Dashboard management)
-│   └─ Frontend Architecture (State management, real-time)
-│
-├─ 📝 Content Guidelines
-│   ├─ Voice & Tone (Friendly, privacy-conscious, empowering)
-│   ├─ Grammar & Mechanics (Title Case, punctuation)
-│   ├─ Glossary (40+ standardized terms)
-│   └─ Writing for Privacy (Privacy-safe messages)
-│
-└─ 📚 Resources
-    ├─ Figma Library (Download link, setup guide)
-    ├─ Code Playground (Live component editor)
-    ├─ Downloads (Icons, logos, assets)
-    ├─ Changelog (Version history, updates)
-    ├─ Contributing (How to contribute)
-    ├─ GitHub Repository (Source code link)
-    └─ Support (Discord, GitHub Discussions)
+|
++- 🏠 Home
+|   +- What's New (Changelog highlights)
+|   +- Quick Start Cards (Designers, Developers, PMs)
+|   +- Featured Components/Patterns
+|
++- 📖 Getting Started
+|   +- Overview
+|   +- For Designers (Figma setup, design principles)
+|   +- For Developers (Installation, first component)
+|   +- Design Philosophy (AI-Driven UI, Privacy-First)
+|   +- Contributing
+|
++- 🎨 Foundations
+|   +- AI-Driven UI Paradigm ⭐ (Unique to Fidus)
+|   +- Privacy & Trust UX ⭐ (Unique to Fidus)
+|   +- Colors (Color system, tokens, usage)
+|   +- Typography (Type scale, fonts, usage)
+|   +- Spacing (Spacing scale, layout grid)
+|   +- Icons (Icon library, 400+ icons)
+|   +- Motion (Animation principles, timing)
+|   +- Accessibility (WCAG 2.1 AA guidelines)
+|   +- Responsive Design (Breakpoints, mobile-first)
+|
++- 🧩 Components
+|   +- Actions
+|   |   +- Button (Primary, Secondary, Tertiary, Destructive)
+|   |   +- Link
+|   |   +- Icon Button
+|   |   +- Button Group
+|   +- Forms & Inputs
+|   |   +- Text Input
+|   |   +- Text Area
+|   |   +- Select
+|   |   +- Checkbox
+|   |   +- Radio Button
+|   |   +- Toggle Switch
+|   |   +- Date Picker
+|   |   +- Time Picker
+|   |   +- File Upload
+|   +- Feedback
+|   |   +- Toast (Success, Error, Warning, Info)
+|   |   +- Modal
+|   |   +- Alert
+|   |   +- Banner
+|   |   +- Progress Bar
+|   +- Navigation
+|   |   +- Header
+|   |   +- Sidebar
+|   |   +- Tabs
+|   |   +- Breadcrumbs
+|   |   +- Pagination
+|   +- Layout
+|   |   +- Container
+|   |   +- Grid
+|   |   +- Stack
+|   |   +- Divider
+|   +- Cards ⭐
+|   |   +- Opportunity Card (Unique to Fidus)
+|   |   +- Detail Card
+|   |   +- Empty Card
+|   +- Data Display
+|   |   +- Table
+|   |   +- List
+|   |   +- Badge
+|   |   +- Chip
+|   |   +- Avatar
+|   +- Overlays
+|       +- Dropdown
+|       +- Popover
+|       +- Tooltip
+|       +- Drawer
+|
++- 📐 Patterns
+|   +- Onboarding (8-step wizard, privacy-first)
+|   +- Search & Filtering (AI-powered, traditional)
+|   +- Settings Interface (9 categories, privacy report)
+|   +- Error States (6 categories, recovery patterns)
+|   +- Empty States (5 patterns, educational)
+|   +- Loading States (5 patterns, timing rules)
+|   +- Form Validation (Real-time, async, cross-field)
+|   +- Success & Confirmation (4 patterns, undo support)
+|   +- Multi-Tenancy (Tenant switcher, management)
+|   +- Opportunity Surface ⭐ (Dynamic dashboard, unique)
+|
++- 🎭 Tokens
+|   +- Color Tokens (Semantic colors, CSS variables)
+|   +- Spacing Tokens (Spacing scale, usage)
+|   +- Typography Tokens (Type scale, line heights)
+|   +- Shadow Tokens (Elevation system)
+|   +- Motion Tokens (Timing, easing functions)
+|
++- 🏗️ Architecture ⭐ (Unique to Fidus)
+|   +- UI Decision Layer (LLM-based component selection)
+|   +- UI Component Registry (Backend-Frontend bridge)
+|   +- API Response Schema (UI metadata structure)
+|   +- Opportunity Surface Service (Dashboard management)
+|   +- Frontend Architecture (State management, real-time)
+|
++- 📝 Content Guidelines
+|   +- Voice & Tone (Friendly, privacy-conscious, empowering)
+|   +- Grammar & Mechanics (Title Case, punctuation)
+|   +- Glossary (40+ standardized terms)
+|   +- Writing for Privacy (Privacy-safe messages)
+|
++- 📚 Resources
+    +- Figma Library (Download link, setup guide)
+    +- Code Playground (Live component editor)
+    +- Downloads (Icons, logos, assets)
+    +- Changelog (Version history, updates)
+    +- Contributing (How to contribute)
+    +- GitHub Repository (Source code link)
+    +- Support (Discord, GitHub Discussions)
 ```
 
 ---
@@ -232,20 +232,20 @@ Brief description (1-2 sentences)
 
 Buttons allow users to take actions with a single tap or click.
 
-┌──────────────────────────────────────────────────────────┐
-│  Interactive Preview                      [Copy Code]   │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  Variant:  [Primary ▾]                                  │
-│  Size:     [Medium ▾]                                   │
-│  Disabled: [ ]                                          │
-│  Loading:  [ ]                                          │
-│                                                          │
-│  ┌────────────────┐                                     │
-│  │ Click Me       │                                     │
-│  └────────────────┘                                     │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Interactive Preview                      [Copy Code]   |
++----------------------------------------------------------+
+|                                                          |
+|  Variant:  [Primary ▾]                                  |
+|  Size:     [Medium ▾]                                   |
+|  Disabled: [ ]                                          |
+|  Loading:  [ ]                                          |
+|                                                          |
+|  +----------------+                                     |
+|  | Click Me       |                                     |
+|  +----------------+                                     |
+|                                                          |
++----------------------------------------------------------+
 
 ## When to Use
 
@@ -261,9 +261,9 @@ Buttons allow users to take actions with a single tap or click.
 ## Variants
 
 Primary          Secondary        Tertiary         Destructive
-┌────────────┐   ┌────────────┐   ┌────────────┐   ┌────────────┐
-│ Save       │   │ Cancel     │   │ Learn More │   │ Delete     │
-└────────────┘   └────────────┘   └────────────┘   └────────────┘
++------------+   +------------+   +------------+   +------------+
+| Save       |   | Cancel     |   | Learn More |   | Delete     |
++------------+   +------------+   +------------+   +------------+
 
 ## Props
 
@@ -318,16 +318,16 @@ import { Button } from '@fidus/design-system';
 ## Do's and Don'ts
 
 ✅ DO                              ❌ DON'T
-┌──────────────────────┐          ┌──────────────────────┐
-│ [Save Changes]       │          │ [Click Here]         │
-└──────────────────────┘          └──────────────────────┘
++----------------------+          +----------------------+
+| [Save Changes]       |          | [Click Here]         |
++----------------------+          +----------------------+
 Use action-oriented labels        Avoid vague labels
 
 ✅ DO                              ❌ DON'T
-┌──────────────────────┐          ┌──────────────────────┐
-│ [Delete Account]     │          │ [Delete Account]     │
-│ (Destructive style)  │          │ (Primary style)      │
-└──────────────────────┘          └──────────────────────┘
++----------------------+          +----------------------+
+| [Delete Account]     |          | [Delete Account]     |
+| (Destructive style)  |          | (Primary style)      |
++----------------------+          +----------------------+
 Use destructive for permanent     Don't use primary for
 actions                           destructive actions
 
@@ -354,27 +354,27 @@ actions                           destructive actions
 
 ```tsx
 // Component Playground Structure
-┌──────────────────────────────────────────────────────────┐
-│  Button                                                  │
-├──────────────────────────────────────────────────────────┤
-│  [Preview] [Code] [Props]                               │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  Controls:                                               │
-│  Variant:  [Primary ▾]                                  │
-│  Size:     [Medium ▾]                                   │
-│  Label:    [Save Changes                           ]    │
-│  Disabled: [ ]                                          │
-│  Loading:  [ ]                                          │
-│                                                          │
-│  Preview:                                                │
-│  ┌────────────────┐                                     │
-│  │ Save Changes   │                                     │
-│  └────────────────┘                                     │
-│                                                          │
-│  [Copy JSX]  [Open in CodeSandbox]                      │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Button                                                  |
++----------------------------------------------------------+
+|  [Preview] [Code] [Props]                               |
++----------------------------------------------------------+
+|                                                          |
+|  Controls:                                               |
+|  Variant:  [Primary ▾]                                  |
+|  Size:     [Medium ▾]                                   |
+|  Label:    [Save Changes                           ]    |
+|  Disabled: [ ]                                          |
+|  Loading:  [ ]                                          |
+|                                                          |
+|  Preview:                                                |
+|  +----------------+                                     |
+|  | Save Changes   |                                     |
+|  +----------------+                                     |
+|                                                          |
+|  [Copy JSX]  [Open in CodeSandbox]                      |
+|                                                          |
++----------------------------------------------------------+
 ```
 
 **Implementation:**
@@ -404,23 +404,23 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **Search UI:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  🔍 Search design system...                     ⌘K      │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  🔍 Search design system...                     ⌘K      |
++----------------------------------------------------------+
                     ↓ (User types "but")
-┌──────────────────────────────────────────────────────────┐
-│  🔍 but                                         ⌘K      │
-├──────────────────────────────────────────────────────────┤
-│  Components                                              │
-│  → Button (Primary action component)                     │
-│  → Button Group (Multiple related actions)               │
-│                                                          │
-│  Patterns                                                │
-│  → Form Validation (Real-time validation)                │
-│                                                          │
-│  Tokens                                                  │
-│  → Color Tokens (--color-primary)                        │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  🔍 but                                         ⌘K      |
++----------------------------------------------------------+
+|  Components                                              |
+|  → Button (Primary action component)                     |
+|  → Button Group (Multiple related actions)               |
+|                                                          |
+|  Patterns                                                |
+|  → Form Validation (Real-time validation)                |
+|                                                          |
+|  Tokens                                                  |
+|  → Color Tokens (--color-primary)                        |
++----------------------------------------------------------+
 ```
 
 **Implementation:**
@@ -438,19 +438,19 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 - Line numbers (optional)
 
 ```tsx
-┌──────────────────────────────────────────────────────────┐
-│  TypeScript                                    [Copy]   │
-├──────────────────────────────────────────────────────────┤
-│  1  import { Button } from '@fidus/design-system';      │
-│  2                                                       │
-│  3  export function MyComponent() {                     │
-│  4    return (                                          │
-│  5      <Button variant="primary">                      │
-│  6        Click Me                                      │
-│  7      </Button>                                       │
-│  8    );                                                │
-│  9  }                                                   │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  TypeScript                                    [Copy]   |
++----------------------------------------------------------+
+|  1  import { Button } from '@fidus/design-system';      |
+|  2                                                       |
+|  3  export function MyComponent() {                     |
+|  4    return (                                          |
+|  5      <Button variant="primary">                      |
+|  6        Click Me                                      |
+|  7      </Button>                                       |
+|  8    );                                                |
+|  9  }                                                   |
++----------------------------------------------------------+
 ```
 
 ---
@@ -460,19 +460,19 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **Test components at different breakpoints:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Responsive Preview                                      │
-├──────────────────────────────────────────────────────────┤
-│  [📱 Mobile] [📲 Tablet] [💻 Desktop] [🖥️ Large Desktop] │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  Preview at: 375px width                                │
-│  ┌────────────────┐                                     │
-│  │  [Button]      │                                     │
-│  │  Full width    │                                     │
-│  └────────────────┘                                     │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Responsive Preview                                      |
++----------------------------------------------------------+
+|  [📱 Mobile] [📲 Tablet] [💻 Desktop] [🖥️ Large Desktop] |
++----------------------------------------------------------+
+|                                                          |
+|  Preview at: 375px width                                |
+|  +----------------+                                     |
+|  |  [Button]      |                                     |
+|  |  Full width    |                                     |
+|  +----------------+                                     |
+|                                                          |
++----------------------------------------------------------+
 ```
 
 ---
@@ -482,17 +482,17 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **Built-in accessibility validation:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Accessibility Report                                    │
-├──────────────────────────────────────────────────────────┤
-│  ✅ Color Contrast: 7.2:1 (AAA)                         │
-│  ✅ Keyboard Accessible                                 │
-│  ✅ Screen Reader Friendly                              │
-│  ✅ Focus Indicators Present                            │
-│  ⚠️ Missing ARIA Label (recommended)                    │
-│                                                          │
-│  [Run Full A11y Audit]                                  │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Accessibility Report                                    |
++----------------------------------------------------------+
+|  ✅ Color Contrast: 7.2:1 (AAA)                         |
+|  ✅ Keyboard Accessible                                 |
+|  ✅ Screen Reader Friendly                              |
+|  ✅ Focus Indicators Present                            |
+|  ⚠️ Missing ARIA Label (recommended)                    |
+|                                                          |
+|  [Run Full A11y Audit]                                  |
++----------------------------------------------------------+
 ```
 
 **Implementation:**
@@ -506,21 +506,21 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **View and copy design tokens:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Color Tokens                              [Export JSON] │
-├──────────────────────────────────────────────────────────┤
-│  Primary                                                 │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
-│  --color-primary          #2563EB    ████████   [Copy] │
-│  --color-primary-hover    #1E40AF    ████████   [Copy] │
-│  --color-primary-light    #DBEAFE    ████████   [Copy] │
-│                                                          │
-│  Success                                                 │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
-│  --color-success          #10B981    ████████   [Copy] │
-│  --color-success-hover    #059669    ████████   [Copy] │
-│  --color-success-light    #D1FAE5    ████████   [Copy] │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Color Tokens                              [Export JSON] |
++----------------------------------------------------------+
+|  Primary                                                 |
+|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  |
+|  --color-primary          #2563EB    ████████   [Copy] |
+|  --color-primary-hover    #1E40AF    ████████   [Copy] |
+|  --color-primary-light    #DBEAFE    ████████   [Copy] |
+|                                                          |
+|  Success                                                 |
+|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  |
+|  --color-success          #10B981    ████████   [Copy] |
+|  --color-success-hover    #059669    ████████   [Copy] |
+|  --color-success-light    #D1FAE5    ████████   [Copy] |
++----------------------------------------------------------+
 ```
 
 ---
@@ -530,17 +530,17 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **Support multiple versions:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Fidus Design System      [v2.1.0 ▾]          🌓 ☰      │
-├──────────────────────────────────────────────────────────┤
-│  Version Dropdown:                                       │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
-│  v2.1.0 (latest) ✓                                       │
-│  v2.0.0                                                  │
-│  v1.9.0 (deprecated)                                     │
-│                                                          │
-│  [View Changelog] [Migration Guide]                      │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Fidus Design System      [v2.1.0 ▾]          🌓 ☰      |
++----------------------------------------------------------+
+|  Version Dropdown:                                       |
+|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  |
+|  v2.1.0 (latest) ✓                                       |
+|  v2.0.0                                                  |
+|  v1.9.0 (deprecated)                                     |
+|                                                          |
+|  [View Changelog] [Migration Guide]                      |
++----------------------------------------------------------+
 ```
 
 ---
@@ -550,26 +550,26 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **AI Component Recommender:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  🤖 AI Assistant                                   [✕]  │
-├──────────────────────────────────────────────────────────┤
-│  You: "I need to show an urgent notification"           │
-│                                                          │
-│  AI: Based on your need, I recommend:                   │
-│                                                          │
-│  1️⃣ **OpportunityCard** (Primary)                       │
-│     For urgent, actionable items on the dashboard       │
-│     ├─ Props: urgency="urgent", actions=[...]          │
-│     └─ [View Component] [Copy Code]                    │
-│                                                          │
-│  2️⃣ **Toast** (Alternative)                             │
-│     For temporary notifications                         │
-│     └─ [View Component]                                │
-│                                                          │
-│  3️⃣ **Banner** (Alternative)                            │
-│     For persistent page-level alerts                    │
-│     └─ [View Component]                                │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  🤖 AI Assistant                                   [✕]  |
++----------------------------------------------------------+
+|  You: "I need to show an urgent notification"           |
+|                                                          |
+|  AI: Based on your need, I recommend:                   |
+|                                                          |
+|  1️⃣ **OpportunityCard** (Primary)                       |
+|     For urgent, actionable items on the dashboard       |
+|     +- Props: urgency="urgent", actions=[...]          |
+|     +- [View Component] [Copy Code]                    |
+|                                                          |
+|  2️⃣ **Toast** (Alternative)                             |
+|     For temporary notifications                         |
+|     +- [View Component]                                |
+|                                                          |
+|  3️⃣ **Banner** (Alternative)                            |
+|     For persistent page-level alerts                    |
+|     +- [View Component]                                |
++----------------------------------------------------------+
 ```
 
 **Implementation:**
@@ -584,25 +584,25 @@ import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 **Embed Figma Components:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Button Component                                        │
-├──────────────────────────────────────────────────────────┤
-│  [Code] [Design] [Tokens]                               │
-├──────────────────────────────────────────────────────────┤
-│  Design Tab:                                             │
-│                                                          │
-│  ┌────────────────────────────────────────────────────┐ │
-│  │  [Embedded Figma Frame showing Button variants]   │ │
-│  │                                                    │ │
-│  │  [Open in Figma] [Download as PNG]                │ │
-│  └────────────────────────────────────────────────────┘ │
-│                                                          │
-│  Design Specs:                                           │
-│  - Height: 40px (medium)                                 │
-│  - Padding: 12px 24px                                    │
-│  - Border Radius: 8px                                    │
-│  - Font: Inter 14px Medium                               │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|  Button Component                                        |
++----------------------------------------------------------+
+|  [Code] [Design] [Tokens]                               |
++----------------------------------------------------------+
+|  Design Tab:                                             |
+|                                                          |
+|  +----------------------------------------------------+ |
+|  |  [Embedded Figma Frame showing Button variants]   | |
+|  |                                                    | |
+|  |  [Open in Figma] [Download as PNG]                | |
+|  +----------------------------------------------------+ |
+|                                                          |
+|  Design Specs:                                           |
+|  - Height: 40px (medium)                                 |
+|  - Padding: 12px 24px                                    |
+|  - Border Radius: 8px                                    |
+|  - Font: Inter 14px Medium                               |
++----------------------------------------------------------+
 ```
 
 ---
@@ -831,9 +831,9 @@ export function SaveButton() {
 
 ```
 ✅ DO                              ❌ DON'T
-┌──────────────────────┐          ┌──────────────────────┐
-│ [Reschedule Meeting] │          │ [Click Here]         │
-└──────────────────────┘          └──────────────────────┘
++----------------------+          +----------------------+
+| [Reschedule Meeting] |          | [Click Here]         |
++----------------------+          +----------------------+
 ```
 
 **Use screenshots for complex UIs:**

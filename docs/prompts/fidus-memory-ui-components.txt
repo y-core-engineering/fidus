@@ -93,10 +93,10 @@ CORE PRINCIPLES
 
 3. Component Structure
    packages/ui/src/components/component-name/
-   ├── component-name.tsx      # Component logic
-   ├── component-name.css      # Component styles
-   ├── component-name.test.tsx # Component tests
-   └── index.ts                # Public exports
+   +-- component-name.tsx      # Component logic
+   +-- component-name.css      # Component styles
+   +-- component-name.test.tsx # Component tests
+   +-- index.ts                # Public exports
 
 4. Accessibility
    - Use semantic HTML (<button>, <input>, not <div onClick>)
@@ -183,22 +183,22 @@ VISUAL DESIGN
 --------------------------------------------------------------------------------
 
 User Message (Right-aligned):
-                         ┌──────────────────────────┐
-                         │ "I always have          │
-                         │ cappuccino in           │ 👤
-                         │ the morning"            │
-                         │ 2m ago              ────┘
-                         └──────────────────────────┘
+                         +--------------------------+
+                         | "I always have          |
+                         | cappuccino in           | 👤
+                         | the morning"            |
+                         | 2m ago              ----+
+                         +--------------------------+
 
 AI Message (Left-aligned with suggestions):
-┌──────────────────────────────────────┐
-│ 🤖  "Noted! Cappuccino in the       │
-│     morning seems to be             │
-│     important to you."              │
-│     Just now                        │
-│                                     │
-│  [cappuccino (80%)] [✓] [✗]       │
-└──────────────────────────────────────┘
++--------------------------------------+
+| 🤖  "Noted! Cappuccino in the       |
+|     morning seems to be             |
+|     important to you."              |
+|     Just now                        |
+|                                     |
+|  [cappuccino (80%)] [✓] [✗]       |
++--------------------------------------+
 
 --------------------------------------------------------------------------------
 IMPLEMENTATION CHECKLIST
@@ -284,23 +284,23 @@ export function ChatInterface(props: ChatInterfaceProps): JSX.Element;
 VISUAL LAYOUT
 --------------------------------------------------------------------------------
 
-┌────────────────────────────────────────────┐
-│  Message List (Scrollable)                │
-│  ┌──────────────────────────────────────┐ │
-│  │ [MessageBubble: User]                │ │
-│  │ [MessageBubble: AI]                  │ │
-│  │ [MessageBubble: User]                │ │
-│  │ [Loading: "Thinking..."]             │ │
-│  └──────────────────────────────────────┘ │
-├────────────────────────────────────────────┤
-│  Input Area                               │
-│  ┌──────────────────────────────────┐    │
-│  │ [TextArea: "Type a message..."] │    │
-│  │ (Shift+Enter: newline)          │    │
-│  │ (Enter: send)                   │    │
-│  └──────────────────────────────────┘    │
-│  [Send Button]                           │
-└────────────────────────────────────────────┘
++--------------------------------------------+
+|  Message List (Scrollable)                |
+|  +--------------------------------------+ |
+|  | [MessageBubble: User]                | |
+|  | [MessageBubble: AI]                  | |
+|  | [MessageBubble: User]                | |
+|  | [Loading: "Thinking..."]             | |
+|  +--------------------------------------+ |
++--------------------------------------------+
+|  Input Area                               |
+|  +----------------------------------+    |
+|  | [TextArea: "Type a message..."] |    |
+|  | (Shift+Enter: newline)          |    |
+|  | (Enter: send)                   |    |
+|  +----------------------------------+    |
+|  [Send Button]                           |
++--------------------------------------------+
 
 --------------------------------------------------------------------------------
 IMPLEMENTATION CHECKLIST
@@ -389,7 +389,7 @@ Minimal Variant:
 
 Detailed Variant:
 Confidence            [80%]
-[████████████████────────] Very Confident
+[████████████████--------] Very Confident
 
 --------------------------------------------------------------------------------
 CONFIDENCE LEVEL MAPPING
@@ -851,10 +851,10 @@ EXAMPLE COMPONENT STRUCTURE
 
 Reference how existing components are structured:
 packages/ui/src/components/button/
-├── button.tsx       # Component logic + JSDoc
-├── button.css       # Styles with CSS variables
-├── button.test.tsx  # Unit tests
-└── index.ts         # export { Button } from './button';
++-- button.tsx       # Component logic + JSDoc
++-- button.css       # Styles with CSS variables
++-- button.test.tsx  # Unit tests
++-- index.ts         # export { Button } from './button';
 
 ================================================================================
 QUESTIONS TO ANSWER BEFORE STARTING

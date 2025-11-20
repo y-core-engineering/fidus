@@ -480,14 +480,38 @@ sequenceDiagram
 
 ---
 
-## Next Steps
+## Architecture Deep Dives
 
-For detailed information on specific topics:
+For detailed information on specific architectural topics:
 
-1. [Domain Models](../domain-model/README.md) - Complete DDD documentation
-2. [API Documentation](../api/README.md) - REST API reference
-3. [Setup Guide](../guides/setup.md) - Installation instructions
-4. [Contributing](../../CONTRIBUTING.md) - How to contribute
+### Core Architecture
+1. [Core Principles](00-core-principles.md) - Foundational principles and design philosophy
+2. [System Overview](01-overview.md) - High-level architecture and component interaction
+3. [Supervisor Architecture](02-supervisor-architecture.md) - LangGraph-based agent implementation
+4. [Orchestrator Architecture](03-orchestrator-architecture.md) - Intent detection and routing
+
+### Memory & Context
+5. [User Profiling](07-user-profiling.md) - Preference learning and storage
+6. [Situational Context](08-situational-context-architecture.md) - Context-aware personalization
+7. **[Entity-Relationship Model](10-entity-relationship-model.md) - Entities, relationships, and AI-driven context** ⭐ NEW
+
+### Events & Proactivity
+8. [Signals, Events & Proactivity](04-signals-events-proactivity.md) - Event-driven architecture
+9. [Registry System](05-registry-system.md) - Service discovery and registration
+
+### Integration & UI
+10. [MCP Integration](06-mcp-integration.md) - Model Context Protocol integration
+11. [UI Decision Layer](08-ui-decision-layer.md) - User interface architecture
+
+### Security & Compliance
+12. [Security Architecture](09-security-architecture.md) - Authentication, encryption, privacy
+13. [Compliance Architecture](11-compliance-architecture.md) - GDPR, data retention, audit
+
+### Additional Resources
+- [Domain Models](../domain-model/README.md) - Complete DDD documentation
+- [API Documentation](../api/README.md) - REST API reference
+- [Setup Guide](../guides/setup.md) - Installation instructions
+- [Contributing](../../CONTRIBUTING.md) - How to contribute
 
 ---
 
@@ -507,6 +531,10 @@ For detailed information on specific topics:
 
 ---
 
-**Version:** 1.0
-**Last Updated:** 2025-10-27
+**Version:** 1.1
+**Last Updated:** 2025-11-19
 **License:** AGPL-3.0 (See [LICENSE](../../LICENSE))
+
+**Changelog:**
+- 2025-11-19: Added Entity-Relationship Model documentation (10-entity-relationship-model.md)
+- 2025-10-27: Initial version

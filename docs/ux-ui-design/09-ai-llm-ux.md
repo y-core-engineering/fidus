@@ -78,15 +78,15 @@ stateDiagram-v2
 **Simple Thinking (< 2 seconds):**
 
 ```
-┌────────────────────────────────┐
-│ User                           │
-│ What's my schedule today?      │
-└────────────────────────────────┘
++--------------------------------+
+| User                           |
+| What's my schedule today?      |
++--------------------------------+
 
-┌────────────────────────────────┐
-│ Fidus is thinking...           │  ← Animated dots
-│ ● ● ●                          │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus is thinking...           |  ← Animated dots
+| ● ● ●                          |
++--------------------------------+
 ```
 
 **Animation:** Dots pulse (fade in/out)
@@ -96,13 +96,13 @@ stateDiagram-v2
 **Detailed Thinking (> 2 seconds):**
 
 ```
-┌────────────────────────────────┐
-│ Fidus is thinking...           │
-│                                │
-│ ⏳ Analyzing your calendar...  │  ← Specific feedback
-│                                │
-│ Estimated time: 3 seconds      │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus is thinking...           |
+|                                |
+| ⏳ Analyzing your calendar...  |  ← Specific feedback
+|                                |
+| Estimated time: 3 seconds      |
++--------------------------------+
 ```
 
 ---
@@ -110,15 +110,15 @@ stateDiagram-v2
 **Complex Processing (> 5 seconds):**
 
 ```
-┌────────────────────────────────┐
-│ Planning your trip...          │
-│                                │
-│ ✓ Checked calendar (3 conflicts)│  ← Progress steps
-│ ⏳ Finding flights...           │
-│ ○ Searching hotels...          │
-│                                │
-│ [Cancel]                       │  ← Allow cancellation
-└────────────────────────────────┘
++--------------------------------+
+| Planning your trip...          |
+|                                |
+| ✓ Checked calendar (3 conflicts)|  ← Progress steps
+| ⏳ Finding flights...           |
+| ○ Searching hotels...          |
+|                                |
+| [Cancel]                       |  ← Allow cancellation
++--------------------------------+
 ```
 
 ---
@@ -162,15 +162,15 @@ graph LR
 **Definitive statement, no hedging:**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              🔒 Local    │
-│                                │
-│ You have 2 meetings today:     │
-│ • 10:00 AM - Team Standup      │
-│ • 3:00 PM - Client Review      │
-│                                │
-│ Free time: 11 AM - 2 PM        │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              🔒 Local    |
+|                                |
+| You have 2 meetings today:     |
+| • 10:00 AM - Team Standup      |
+| • 3:00 PM - Client Review      |
+|                                |
+| Free time: 11 AM - 2 PM        |
++--------------------------------+
 ```
 
 **No confidence indicator needed (default = confident)**
@@ -182,22 +182,22 @@ graph LR
 **Qualified language, suggestion rather than certainty:**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              🔒 Local    │
-│ Confidence: Medium             │  ← Shown explicitly
-│                                │
-│ Based on your spending pattern,│
-│ you MIGHT exceed your food     │
-│ budget in 2-3 days.            │
-│                                │
-│ Current: 475 EUR / 500 EUR     │
-│ Average daily spend: 15 EUR    │
-│                                │
-│ 💡 Consider adjusting budget   │
-│    or reducing spending.       │
-│                                │
-│ [View Details]                 │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              🔒 Local    |
+| Confidence: Medium             |  ← Shown explicitly
+|                                |
+| Based on your spending pattern,|
+| you MIGHT exceed your food     |
+| budget in 2-3 days.            |
+|                                |
+| Current: 475 EUR / 500 EUR     |
+| Average daily spend: 15 EUR    |
+|                                |
+| 💡 Consider adjusting budget   |
+|    or reducing spending.       |
+|                                |
+| [View Details]                 |
++--------------------------------+
 ```
 
 **Language:** "might", "possibly", "likely", "based on"
@@ -209,23 +209,23 @@ graph LR
 **Multiple options presented, user chooses:**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              🔒 Local    │
-│ Confidence: Low                │
-│                                │
-│ I'm not certain what you meant.│
-│ Did you mean:                  │
-│                                │
-│ 1. Schedule a meeting with     │
-│    John Smith (colleague)?     │
-│                                │
-│ 2. Schedule a meeting with     │
-│    John Doe (client)?          │
-│                                │
-│ 3. Something else?             │
-│                                │
-│ [Option 1] [Option 2] [Other]  │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              🔒 Local    |
+| Confidence: Low                |
+|                                |
+| I'm not certain what you meant.|
+| Did you mean:                  |
+|                                |
+| 1. Schedule a meeting with     |
+|    John Smith (colleague)?     |
+|                                |
+| 2. Schedule a meeting with     |
+|    John Doe (client)?          |
+|                                |
+| 3. Something else?             |
+|                                |
+| [Option 1] [Option 2] [Other]  |
++--------------------------------+
 ```
 
 **Language:** "I'm not certain", "Did you mean", "Which one?"
@@ -237,18 +237,18 @@ graph LR
 **High-confidence opportunities shown proactively:**
 
 ```
-┌──────────────────────────────────────────┐
-│ ⚠️ Meeting Conflict        🔒 Local    ✕ │
-│ Confidence: High (0.95)                  │
-├──────────────────────────────────────────┤
-│ Double booking detected:                 │
-│ • Team Meeting: 2:00 PM - 3:00 PM        │
-│ • Client Call: 2:30 PM - 3:30 PM         │
-│                                          │
-│ 💡 Definite conflict, action needed     │
-├──────────────────────────────────────────┤
-│ [Reschedule One]  View Calendar          │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| ⚠️ Meeting Conflict        🔒 Local    ✕ |
+| Confidence: High (0.95)                  |
++------------------------------------------+
+| Double booking detected:                 |
+| • Team Meeting: 2:00 PM - 3:00 PM        |
+| • Client Call: 2:30 PM - 3:30 PM         |
+|                                          |
+| 💡 Definite conflict, action needed     |
++------------------------------------------+
+| [Reschedule One]  View Calendar          |
++------------------------------------------+
 ```
 
 **Low-confidence suggestions NOT shown proactively** (appear in chat only if user asks)
@@ -268,17 +268,17 @@ graph LR
 **Every proactive card has "Why?" button:**
 
 ```
-┌──────────────────────────────────────────┐
-│ 💰 Budget Alert            🔒 Local    ✕ │
-│ [Why?]                                   │  ← Tap to see reasoning
-├──────────────────────────────────────────┤
-│ Food: 95% spent                          │
-│ 475 EUR / 500 EUR                        │
-│                                          │
-│ 💡 3 days left in month                 │
-├──────────────────────────────────────────┤
-│ [View Details]  [Adjust Budget]          │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| 💰 Budget Alert            🔒 Local    ✕ |
+| [Why?]                                   |  ← Tap to see reasoning
++------------------------------------------+
+| Food: 95% spent                          |
+| 475 EUR / 500 EUR                        |
+|                                          |
+| 💡 3 days left in month                 |
++------------------------------------------+
+| [View Details]  [Adjust Budget]          |
++------------------------------------------+
 ```
 
 ---
@@ -288,38 +288,38 @@ graph LR
 **User taps "Why?" → Modal opens:**
 
 ```
-┌──────────────────────────────────────────┐
-│ Why This Alert?            🔒 Local    ✕ │
-├──────────────────────────────────────────┤
-│ Fidus showed this budget alert because:  │
-│                                          │
-│ Context Factors:                         │
-│ • Budget: 95% spent (475/500 EUR)        │
-│ • Time: 3 days left in month             │
-│ • History: Exceeded budget 2 of 3 months │
-│ • Recent: Transaction 1h ago (groceries) │
-│                                          │
-│ Relevance Calculation:                   │
-│ • Budget threshold: 0.3 (30% weight)     │
-│ • Time remaining: 0.25 (25% weight)      │
-│ • User history: 0.2 (20% weight)         │
-│ • Recent activity: 0.15 (15% weight)     │
-│                                          │
-│ Total Relevance: 0.88 (High)             │
-│                                          │
-│ Decision:                                │
-│ Show proactive card because relevance    │
-│ > 0.75 threshold.                        │
-│                                          │
-│ 💡 This alert helps you avoid exceeding │
-│    your budget again this month.         │
-│                                          │
-│ EU AI Act Transparency:                  │
-│ System decision based on rules and data  │
-│ analysis. No bias or discrimination.     │
-├──────────────────────────────────────────┤
-│                [Got It]                  │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Why This Alert?            🔒 Local    ✕ |
++------------------------------------------+
+| Fidus showed this budget alert because:  |
+|                                          |
+| Context Factors:                         |
+| • Budget: 95% spent (475/500 EUR)        |
+| • Time: 3 days left in month             |
+| • History: Exceeded budget 2 of 3 months |
+| • Recent: Transaction 1h ago (groceries) |
+|                                          |
+| Relevance Calculation:                   |
+| • Budget threshold: 0.3 (30% weight)     |
+| • Time remaining: 0.25 (25% weight)      |
+| • User history: 0.2 (20% weight)         |
+| • Recent activity: 0.15 (15% weight)     |
+|                                          |
+| Total Relevance: 0.88 (High)             |
+|                                          |
+| Decision:                                |
+| Show proactive card because relevance    |
+| > 0.75 threshold.                        |
+|                                          |
+| 💡 This alert helps you avoid exceeding |
+|    your budget again this month.         |
+|                                          |
+| EU AI Act Transparency:                  |
+| System decision based on rules and data  |
+| analysis. No bias or discrimination.     |
++------------------------------------------+
+|                [Got It]                  |
++------------------------------------------+
 ```
 
 **EU AI Act Compliance:** Explain algorithmic decisions
@@ -362,22 +362,22 @@ graph TB
 **When system switches to rule-based routing:**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              ⚠️ Limited  │
-│                                │
-│ LLM temporarily unavailable.   │
-│ Using rule-based mode.         │
-│                                │
-│ Limited features:              │
-│ • Basic calendar queries       │
-│ • Simple budget summaries      │
-│ • No complex planning          │
-│                                │
-│ 💡 Full functionality returns │
-│    when LLM is back online.    │
-│                                │
-│ [Retry LLM]  [Continue Anyway] │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              ⚠️ Limited  |
+|                                |
+| LLM temporarily unavailable.   |
+| Using rule-based mode.         |
+|                                |
+| Limited features:              |
+| • Basic calendar queries       |
+| • Simple budget summaries      |
+| • No complex planning          |
+|                                |
+| 💡 Full functionality returns |
+|    when LLM is back online.    |
+|                                |
+| [Retry LLM]  [Continue Anyway] |
++--------------------------------+
 ```
 
 ---
@@ -392,25 +392,25 @@ graph TB
 **Fallback Mode (Rule-Based):**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              ⚠️ Limited  │
-│                                │
-│ Trip planning requires LLM     │
-│ for best results.              │
-│                                │
-│ In fallback mode, I can:       │
-│ • Check calendar conflicts     │
-│ • Show saved trips             │
-│                                │
-│ But I cannot:                  │
-│ • Suggest optimal dates        │
-│ • Find flights/hotels          │
-│ • Create smart itinerary       │
-│                                │
-│ [Check Calendar]  [Saved Trips]│
-│                                │
-│ Or: [Retry with LLM]           │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              ⚠️ Limited  |
+|                                |
+| Trip planning requires LLM     |
+| for best results.              |
+|                                |
+| In fallback mode, I can:       |
+| • Check calendar conflicts     |
+| • Show saved trips             |
+|                                |
+| But I cannot:                  |
+| • Suggest optimal dates        |
+| • Find flights/hotels          |
+| • Create smart itinerary       |
+|                                |
+| [Check Calendar]  [Saved Trips]|
+|                                |
+| Or: [Retry with LLM]           |
++--------------------------------+
 ```
 
 ---
@@ -428,45 +428,45 @@ graph TB
 **Settings → LLM:**
 
 ```
-┌──────────────────────────────────────────┐
-│ 🤖 LLM Settings            🔒 Local    ✕ │
-├──────────────────────────────────────────┤
-│ Default LLM Model                        │
-│                                          │
-│ ● Local (Ollama)          Recommended    │
-│   Privacy-first, offline capable         │
-│   Model: Llama 3.1 8B                    │
-│   Status: ✅ Running                     │
-│                                          │
-│ ○ Cloud (OpenAI)                         │
-│   Faster, more capable                   │
-│   Model: GPT-4                           │
-│   Status: ⚠️ Requires internet           │
-│   Privacy: PII filtered via Privacy Proxy│
-│                                          │
-│ ○ Cloud (Anthropic Claude)               │
-│   Advanced reasoning                     │
-│   Model: Claude 3.5 Sonnet               │
-│   Status: ⚠️ Requires internet           │
-│                                          │
-├──────────────────────────────────────────┤
-│ Fallback Settings                        │
-│                                          │
-│ If local LLM fails:                      │
-│ [✓] Try cloud LLM (OpenAI)               │
-│ [ ] Use rule-based mode only             │
-│                                          │
-│ 💡 Cloud fallback uses Privacy Proxy    │
-│    to filter personally identifiable info│
-├──────────────────────────────────────────┤
-│ Advanced                                 │
-│                                          │
-│ [Configure Ollama]                       │
-│ [Test LLM Performance]                   │
-│ [View Model Info]                        │
-│                                          │
-│              [Save Changes]              │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| 🤖 LLM Settings            🔒 Local    ✕ |
++------------------------------------------+
+| Default LLM Model                        |
+|                                          |
+| ● Local (Ollama)          Recommended    |
+|   Privacy-first, offline capable         |
+|   Model: Llama 3.1 8B                    |
+|   Status: ✅ Running                     |
+|                                          |
+| ○ Cloud (OpenAI)                         |
+|   Faster, more capable                   |
+|   Model: GPT-4                           |
+|   Status: ⚠️ Requires internet           |
+|   Privacy: PII filtered via Privacy Proxy|
+|                                          |
+| ○ Cloud (Anthropic Claude)               |
+|   Advanced reasoning                     |
+|   Model: Claude 3.5 Sonnet               |
+|   Status: ⚠️ Requires internet           |
+|                                          |
++------------------------------------------+
+| Fallback Settings                        |
+|                                          |
+| If local LLM fails:                      |
+| [✓] Try cloud LLM (OpenAI)               |
+| [ ] Use rule-based mode only             |
+|                                          |
+| 💡 Cloud fallback uses Privacy Proxy    |
+|    to filter personally identifiable info|
++------------------------------------------+
+| Advanced                                 |
+|                                          |
+| [Configure Ollama]                       |
+| [Test LLM Performance]                   |
+| [View Model Info]                        |
+|                                          |
+|              [Save Changes]              |
++------------------------------------------+
 ```
 
 ---
@@ -476,32 +476,32 @@ graph TB
 **User taps "Test LLM Performance":**
 
 ```
-┌──────────────────────────────────────────┐
-│ LLM Performance Test       🔒 Local    ✕ │
-├──────────────────────────────────────────┤
-│ Testing query: "Summarize my budget      │
-│                 status for this month"   │
-│                                          │
-│ Local (Ollama - Llama 3.1 8B):           │
-│ • Response time: 1.2 seconds             │
-│ • Accuracy: High                         │
-│ • Privacy: ✅ 100% local                 │
-│ • Cost: Free                             │
-│                                          │
-│ Cloud (OpenAI GPT-4):                    │
-│ • Response time: 0.8 seconds             │
-│ • Accuracy: Very High                    │
-│ • Privacy: ⚠️ Query sent to cloud        │
-│ • Cost: $0.03 per request (approx)       │
-│                                          │
-│ Recommendation:                          │
-│ Use Local (Ollama) for privacy.          │
-│ Use Cloud (OpenAI) for complex reasoning.│
-│                                          │
-│ 💡 Most queries work well with local LLM│
-├──────────────────────────────────────────┤
-│               [Close]                    │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| LLM Performance Test       🔒 Local    ✕ |
++------------------------------------------+
+| Testing query: "Summarize my budget      |
+|                 status for this month"   |
+|                                          |
+| Local (Ollama - Llama 3.1 8B):           |
+| • Response time: 1.2 seconds             |
+| • Accuracy: High                         |
+| • Privacy: ✅ 100% local                 |
+| • Cost: Free                             |
+|                                          |
+| Cloud (OpenAI GPT-4):                    |
+| • Response time: 0.8 seconds             |
+| • Accuracy: Very High                    |
+| • Privacy: ⚠️ Query sent to cloud        |
+| • Cost: $0.03 per request (approx)       |
+|                                          |
+| Recommendation:                          |
+| Use Local (Ollama) for privacy.          |
+| Use Cloud (OpenAI) for complex reasoning.|
+|                                          |
+| 💡 Most queries work well with local LLM|
++------------------------------------------+
+|               [Close]                    |
++------------------------------------------+
 ```
 
 ---
@@ -519,16 +519,16 @@ graph TB
 **LLM-Driven:**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              🔒 Local    │
-│ (AI-Driven Decision)           │  ← LLM decided
-│                                │
-│ Based on your spending pattern,│
-│ you might exceed your food     │
-│ budget in 2-3 days.            │
-│                                │
-│ [Why?] ← Tap to see LLM reasoning│
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              🔒 Local    |
+| (AI-Driven Decision)           |  ← LLM decided
+|                                |
+| Based on your spending pattern,|
+| you might exceed your food     |
+| budget in 2-3 days.            |
+|                                |
+| [Why?] ← Tap to see LLM reasoning|
++--------------------------------+
 ```
 
 ---
@@ -536,16 +536,16 @@ graph TB
 **Rule-Based:**
 
 ```
-┌────────────────────────────────┐
-│ Fidus              🔒 Local    │
-│ (Rule-Based)                   │  ← Hardcoded rule
-│                                │
-│ Budget exceeded: Food          │
-│ 550 EUR / 500 EUR (110%)       │
-│                                │
-│ This is a simple threshold     │
-│ check (spent > limit).         │
-└────────────────────────────────┘
++--------------------------------+
+| Fidus              🔒 Local    |
+| (Rule-Based)                   |  ← Hardcoded rule
+|                                |
+| Budget exceeded: Food          |
+| 550 EUR / 500 EUR (110%)       |
+|                                |
+| This is a simple threshold     |
+| check (spent > limit).         |
++--------------------------------+
 ```
 
 ---
@@ -557,40 +557,40 @@ graph TB
 **Settings → Advanced → LLM Prompts:**
 
 ```
-┌──────────────────────────────────────────┐
-│ 🔍 LLM Prompt Transparency  🔒 Local  ✕  │
-├──────────────────────────────────────────┤
-│ ⚠️ Advanced Feature                      │
-│                                          │
-│ See the actual prompts sent to LLM.      │
-│                                          │
-│ [✓] Show prompts in audit log            │
-│ [ ] Show prompts in UI (debug mode)      │
-│                                          │
-│ Example Prompt (last query):             │
-│                                          │
-│ ┌────────────────────────────────────┐   │
-│ │ System: You are Fidus, a privacy- │   │
-│ │ first AI assistant. Analyze user  │   │
-│ │ calendar and detect conflicts.    │   │
-│ │                                   │   │
-│ │ User Query: "Do I have meetings   │   │
-│ │ tomorrow?"                        │   │
-│ │                                   │   │
-│ │ Context:                          │   │
-│ │ - Tomorrow: Oct 29, 2024          │   │
-│ │ - Events: 2 found                 │   │
-│ │ - Event 1: 10 AM - Team Standup  │   │
-│ │ - Event 2: 3 PM - Client Review   │   │
-│ │                                   │   │
-│ │ Task: Provide concise summary.    │   │
-│ └────────────────────────────────────┘   │
-│                                          │
-│ 💡 This helps you understand how Fidus │
-│    generates responses.                  │
-├──────────────────────────────────────────┤
-│              [Close]                     │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| 🔍 LLM Prompt Transparency  🔒 Local  ✕  |
++------------------------------------------+
+| ⚠️ Advanced Feature                      |
+|                                          |
+| See the actual prompts sent to LLM.      |
+|                                          |
+| [✓] Show prompts in audit log            |
+| [ ] Show prompts in UI (debug mode)      |
+|                                          |
+| Example Prompt (last query):             |
+|                                          |
+| +------------------------------------+   |
+| | System: You are Fidus, a privacy- |   |
+| | first AI assistant. Analyze user  |   |
+| | calendar and detect conflicts.    |   |
+| |                                   |   |
+| | User Query: "Do I have meetings   |   |
+| | tomorrow?"                        |   |
+| |                                   |   |
+| | Context:                          |   |
+| | - Tomorrow: Oct 29, 2024          |   |
+| | - Events: 2 found                 |   |
+| | - Event 1: 10 AM - Team Standup  |   |
+| | - Event 2: 3 PM - Client Review   |   |
+| |                                   |   |
+| | Task: Provide concise summary.    |   |
+| +------------------------------------+   |
+|                                          |
+| 💡 This helps you understand how Fidus |
+|    generates responses.                  |
++------------------------------------------+
+|              [Close]                     |
++------------------------------------------+
 ```
 
 ---
@@ -631,31 +631,31 @@ graph TB
 **Subtle, non-intrusive:**
 
 ```
-┌────────────────────────────────┐
-│ [User just completed form]     │
-└────────────────────────────────┘
++--------------------------------+
+| [User just completed form]     |
++--------------------------------+
 
-┌────────────────────────────────┐
-│ ✓ Event created                │
-│                                │
-│ Was this form helpful?         │
-│ [👍 Yes]  [👎 No]              │  ← Quick feedback
-└────────────────────────────────┘
++--------------------------------+
+| ✓ Event created                |
+|                                |
+| Was this form helpful?         |
+| [👍 Yes]  [👎 No]              |  ← Quick feedback
++--------------------------------+
 ```
 
 **User taps 👎:**
 
 ```
-┌────────────────────────────────┐
-│ Thanks for the feedback!       │
-│                                │
-│ What would you prefer?         │
-│ [ ] Conversational wizard      │
-│ [ ] Chat-based instead         │
-│ [ ] Other (tell us)            │
-│                                │
-│ [Submit]  [Skip]               │
-└────────────────────────────────┘
++--------------------------------+
+| Thanks for the feedback!       |
+|                                |
+| What would you prefer?         |
+| [ ] Conversational wizard      |
+| [ ] Chat-based instead         |
+| [ ] Other (tell us)            |
+|                                |
+| [Submit]  [Skip]               |
++--------------------------------+
 ```
 
 ---

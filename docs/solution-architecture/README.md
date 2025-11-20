@@ -1,10 +1,12 @@
 # Fidus Solution Architecture
 
-**Version:** 1.0
-**Date:** 2025-10-27
+**Version:** 1.1
+**Date:** 2025-11-20
 **Status:** Draft (Awaiting Human Review)
 **Part of:** Fidus Solution Architecture
 **Author:** AI-Generated
+**Supersedes:** v1.0 (2025-10-27) - Profile Agent with basic preferences
+**Migration:** Added Memory Context Agent v3.0 with full entity/relationship management and Qdrant-first architecture
 
 ---
 
@@ -51,10 +53,11 @@ The solution architecture serves multiple audiences:
    - Trade-offs and justifications
    - **Critical for understanding all other decisions!**
 
-3. **[03-component-architecture.md](03-component-architecture.md)**
+3. **[03-component-architecture.md](03-component-architecture.md)** - **Updated v1.1**
    - Detailed breakdown of ALL 14 Bounded Contexts
    - For EACH context: Purpose, Interfaces, Dependencies, Technology
    - Supervisor implementation (LangGraph + MCP)
+   - **Memory Context Agent (v3.0)** - Entity & relationship management ⭐ NEW
    - Database schemas (conceptual level)
    - **The heart of the solution!**
 
@@ -67,9 +70,10 @@ The solution architecture serves multiple audiences:
    - External Systems integration (Google Calendar, Stripe, etc.)
    - API Gateway & Authentication flows
 
-5. **[05-data-flows.md](05-data-flows.md)**
+5. **[05-data-flows.md](05-data-flows.md)** - **Updated v1.1**
    - User Request Flow (synchronous) - Mermaid
    - Event-Driven Flow (asynchronous) - Mermaid
+   - **Memory & Entity Management Flows (v3.0)** - 6 new flows ⭐ NEW
    - Proactivity Detection Flow - Mermaid
    - Cross-Domain Scenarios with concrete examples
    - **Visual guide to system behavior!**
@@ -129,6 +133,25 @@ The solution architecture serves multiple audiences:
     - Security & Compliance complete? ✓
     - Deployment scenarios documented? ✓
     - Technology decisions justified? ✓
+
+### Memory & Context (v3.0) ⭐ NEW
+
+13. **[14-situational-context.md](14-situational-context.md)** ⭐ **NEW v2.0**
+    - Situational Context as Relationship Qualifier (ADR-0001)
+    - Qdrant-First Pattern (PRIMARY context storage)
+    - Neo4j relationship properties (SECONDARY reference)
+    - Flexible, AI-discovered context factors
+    - Embedding-based context similarity
+    - **Critical for understanding v3.0 architecture!**
+
+14. **[15-entity-management.md](15-entity-management.md)** ⭐ **NEW v3.0**
+    - Complete implementation guide for 8 entity types
+    - Implementation guide for 9 relationship types
+    - Entity extraction from conversation (LLM-driven)
+    - Entity deduplication strategy
+    - API design for entity/relationship management
+    - Testing strategy & GDPR compliance
+    - **Complete v3.0 implementation guide!**
 
 ---
 
@@ -290,12 +313,12 @@ This solution architecture is based on:
 
 | Document | Status | Reviewer | Date |
 |----------|--------|----------|------|
-| README.md | ✅ Draft | Pending | 2025-10-27 |
+| README.md | ✅ Updated v1.1 | Pending | 2025-11-20 |
 | 01-executive-summary.md | ⏳ In Progress | - | - |
 | 02-architecture-principles.md | ⏳ Pending | - | - |
-| 03-component-architecture.md | ⏳ Pending | - | - |
+| 03-component-architecture.md | ✅ Updated v1.1 | Pending | 2025-11-20 |
 | 04-integration-architecture.md | ⏳ Pending | - | - |
-| 05-data-flows.md | ⏳ Pending | - | - |
+| 05-data-flows.md | ✅ Updated v1.1 | Pending | 2025-11-20 |
 | 06-technology-decisions.md | ⏳ Pending | - | - |
 | 07-security-compliance.md | ⏳ Pending | - | - |
 | 08-quality-attributes.md | ⏳ Pending | - | - |
@@ -303,10 +326,22 @@ This solution architecture is based on:
 | 10-evolution-strategy.md | ⏳ Pending | - | - |
 | 11-open-questions.md | ⏳ Pending | - | - |
 | 12-review-checklist.md | ⏳ Pending | - | - |
+| **14-situational-context.md** | ✅ **NEW v2.0** | Pending | 2025-11-20 |
+| **15-entity-management.md** | ✅ **NEW v3.0** | Pending | 2025-11-20 |
 
 ---
 
 ## Version History
+
+- **v1.1 (2025-11-20):** Memory Context Agent v3.0 - BREAKING CHANGES
+  - **NEW:** [14-situational-context.md](14-situational-context.md) - v2.0 with Qdrant-first pattern
+  - **NEW:** [15-entity-management.md](15-entity-management.md) - Complete entity/relationship implementation guide
+  - **UPDATED:** [03-component-architecture.md](03-component-architecture.md) - Memory Context Agent (formerly Profile Agent)
+  - **UPDATED:** [05-data-flows.md](05-data-flows.md) - Added 6 new Memory & Entity Management flows
+  - **UPDATED:** README.md - Added v3.0 documentation references
+  - **Migration:** Profile Agent → Memory Context Agent with 8 entities + 9 relationships
+  - **Architecture:** Qdrant-first pattern (PRIMARY) + Neo4j references (SECONDARY)
+  - **Based on:** ADR-0001 - Situational Context as Relationship Qualifier
 
 - **v1.0 (2025-10-27):** Initial draft
   - Created document structure
@@ -325,8 +360,8 @@ For questions about this solution architecture:
 ---
 
 **Maintained by:** Core Team
-**Last Updated:** 2025-10-27
-**Next Review:** After human architect review
+**Last Updated:** 2025-11-20
+**Next Review:** After v3.0 implementation & testing
 
 ---
 

@@ -133,41 +133,41 @@ Empty states occur when there's no data to display. They should be **helpful**, 
 
 **Anti-Pattern:**
 ```
-┌─────────────────────────────────────────┐
-│  Dashboard                              │
-├─────────────────────────────────────────┤
-│                                          │
-│                                          │
-│         No opportunities                │
-│                                          │
-│                                          │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|  Dashboard                              |
++-----------------------------------------+
+|                                          |
+|                                          |
+|         No opportunities                |
+|                                          |
+|                                          |
++-----------------------------------------+
 ```
 
 **Fidus Pattern:**
 ```
-┌─────────────────────────────────────────────────────┐
-│  Dashboard                                          │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│              ┌──────────┐                           │
-│              │ ✨ All   │                           │
-│              │  Clear!  │                           │
-│              └──────────┘                           │
-│                                                      │
-│     You're all caught up — no urgent items!        │
-│                                                      │
-│  🎯 What you can do:                                │
-│  • Ask me about your calendar                       │
-│  • Check your budget status                         │
-│  • Add a new appointment                            │
-│                                                      │
-│  💡 Tip: Fidus will show opportunities here when    │
-│     it detects something that needs your attention. │
-│                                                      │
-│  [Chat with Fidus]                                  │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  Dashboard                                          |
++-----------------------------------------------------+
+|                                                      |
+|              +----------+                           |
+|              | ✨ All   |                           |
+|              |  Clear!  |                           |
+|              +----------+                           |
+|                                                      |
+|     You're all caught up — no urgent items!        |
+|                                                      |
+|  🎯 What you can do:                                |
+|  • Ask me about your calendar                       |
+|  • Check your budget status                         |
+|  • Add a new appointment                            |
+|                                                      |
+|  💡 Tip: Fidus will show opportunities here when    |
+|     it detects something that needs your attention. |
+|                                                      |
+|  [Chat with Fidus]                                  |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Pattern: Domain with No Data
@@ -175,25 +175,25 @@ Empty states occur when there's no data to display. They should be **helpful**, 
 **Example: Calendar Domain (No Events)**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Calendar                                           │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│              ┌──────────┐                           │
-│              │ 📅 Empty │                           │
-│              │ Calendar │                           │
-│              └──────────┘                           │
-│                                                      │
-│        No appointments scheduled yet                │
-│                                                      │
-│  Get started:                                        │
-│  • "Schedule a meeting with John tomorrow at 2pm"   │
-│  • "Add dentist appointment Friday at 5pm"          │
-│  • "Show me free time this week"                    │
-│                                                      │
-│  [Add First Appointment]                            │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  Calendar                                           |
++-----------------------------------------------------+
+|                                                      |
+|              +----------+                           |
+|              | 📅 Empty |                           |
+|              | Calendar |                           |
+|              +----------+                           |
+|                                                      |
+|        No appointments scheduled yet                |
+|                                                      |
+|  Get started:                                        |
+|  • "Schedule a meeting with John tomorrow at 2pm"   |
+|  • "Add dentist appointment Friday at 5pm"          |
+|  • "Show me free time this week"                    |
+|                                                      |
+|  [Add First Appointment]                            |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Empty State Guidelines
@@ -220,18 +220,18 @@ Loading states keep users informed while content loads.
 ### Pattern: Initial Load
 
 ```
-┌─────────────────────────────────────────┐
-│  Dashboard                              │
-├─────────────────────────────────────────┤
-│                                          │
-│        ┌────────────────┐               │
-│        │  Loading...    │               │
-│        │  [████░░░░░]  │               │
-│        └────────────────┘               │
-│                                          │
-│  Analyzing your calendar and budgets... │
-│                                          │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|  Dashboard                              |
++-----------------------------------------+
+|                                          |
+|        +----------------+               |
+|        |  Loading...    |               |
+|        |  [████░░░░░]  |               |
+|        +----------------+               |
+|                                          |
+|  Analyzing your calendar and budgets... |
+|                                          |
++-----------------------------------------+
 ```
 
 ### Pattern: Inline Loading (Chat Response)
@@ -254,17 +254,17 @@ sequenceDiagram
 
 **Chat Loading Indicator:**
 ```
-┌─────────────────────────────────────────┐
-│  Chat                                    │
-├─────────────────────────────────────────┤
-│                                          │
-│  You: What's on my calendar today?      │
-│                                          │
-│  Fidus:                                 │
-│  ● ● ●                                  │
-│  Checking your calendar...              │
-│                                          │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|  Chat                                    |
++-----------------------------------------+
+|                                          |
+|  You: What's on my calendar today?      |
+|                                          |
+|  Fidus:                                 |
+|  ● ● ●                                  |
+|  Checking your calendar...              |
+|                                          |
++-----------------------------------------+
 ```
 
 ### Pattern: Skeleton Screens
@@ -272,25 +272,25 @@ sequenceDiagram
 For dashboard cards, use **skeleton screens** instead of spinners:
 
 ```
-┌─────────────────────────────────────────┐
-│  Dashboard                              │
-├─────────────────────────────────────────┤
-│                                          │
-│  ┌──────────────────────────────────┐   │
-│  │ ████████░░░░░░░░░░░░░░░░░░░░░░░ │   │
-│  │ ████░░░░░░░░░░░░░░░░░░░░░░░░░░░ │   │
-│  │                                  │   │
-│  │ [██████] [██████]                │   │
-│  └──────────────────────────────────┘   │
-│                                          │
-│  ┌──────────────────────────────────┐   │
-│  │ ████████████░░░░░░░░░░░░░░░░░░░ │   │
-│  │ ████░░░░░░░░░░░░░░░░░░░░░░░░░░░ │   │
-│  │                                  │   │
-│  │ [██████] [██████]                │   │
-│  └──────────────────────────────────┘   │
-│                                          │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|  Dashboard                              |
++-----------------------------------------+
+|                                          |
+|  +----------------------------------+   |
+|  | ████████░░░░░░░░░░░░░░░░░░░░░░░ |   |
+|  | ████░░░░░░░░░░░░░░░░░░░░░░░░░░░ |   |
+|  |                                  |   |
+|  | [██████] [██████]                |   |
+|  +----------------------------------+   |
+|                                          |
+|  +----------------------------------+   |
+|  | ████████████░░░░░░░░░░░░░░░░░░░ |   |
+|  | ████░░░░░░░░░░░░░░░░░░░░░░░░░░░ |   |
+|  |                                  |   |
+|  | [██████] [██████]                |   |
+|  +----------------------------------+   |
+|                                          |
++-----------------------------------------+
 ```
 
 ### Loading State Guidelines
@@ -320,21 +320,21 @@ For dashboard cards, use **skeleton screens** instead of spinners:
 **Example: Invalid Date Input**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Schedule Appointment                                │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  Title:       [Team Meeting              ]          │
-│                                                      │
-│  Start Time:  [2025-02-30 10:00 AM       ]          │
-│               ⚠️ February only has 28 days in 2025  │
-│               Try: 2025-02-28 or 2025-03-01         │
-│                                                      │
-│  Duration:    [1 hour                    ▼]         │
-│                                                      │
-│  [Cancel]                     [Schedule]             │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  Schedule Appointment                                |
++-----------------------------------------------------+
+|                                                      |
+|  Title:       [Team Meeting              ]          |
+|                                                      |
+|  Start Time:  [2025-02-30 10:00 AM       ]          |
+|               ⚠️ February only has 28 days in 2025  |
+|               Try: 2025-02-28 or 2025-03-01         |
+|                                                      |
+|  Duration:    [1 hour                    ▼]         |
+|                                                      |
+|  [Cancel]                     [Schedule]             |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 **Chat Version:**
@@ -359,26 +359,26 @@ Which date works for you?
 **Example: Calendar Service Down**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ❌ Calendar Unavailable                            │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  The calendar service isn't responding right now.   │
-│  Your calendar data is safe, but I can't check it.  │
-│                                                      │
-│  What you can do:                                    │
-│  • Try again in a few minutes                       │
-│  • Check your Finance or Travel domains instead     │
-│  • View cached calendar data (may be outdated)      │
-│                                                      │
-│  Technical details (for support):                   │
-│  Error: CALENDAR_SERVICE_TIMEOUT                    │
-│  Code: CAL-503                                       │
-│  Time: 2025-10-28 14:32:15 UTC                      │
-│                                                      │
-│  [Try Again]  [View Cached Data]  [Report Issue]    │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ❌ Calendar Unavailable                            |
++-----------------------------------------------------+
+|                                                      |
+|  The calendar service isn't responding right now.   |
+|  Your calendar data is safe, but I can't check it.  |
+|                                                      |
+|  What you can do:                                    |
+|  • Try again in a few minutes                       |
+|  • Check your Finance or Travel domains instead     |
+|  • View cached calendar data (may be outdated)      |
+|                                                      |
+|  Technical details (for support):                   |
+|  Error: CALENDAR_SERVICE_TIMEOUT                    |
+|  Code: CAL-503                                       |
+|  Time: 2025-10-28 14:32:15 UTC                      |
+|                                                      |
+|  [Try Again]  [View Cached Data]  [Report Issue]    |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Error State Guidelines
@@ -404,28 +404,28 @@ Which date works for you?
 ### Pattern: Offline Mode
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  📵 Offline Mode                                    │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  You're offline, but Fidus still works!             │
-│                                                      │
-│  ✅ You can:                                        │
-│  • View cached calendar and budgets                 │
-│  • Add appointments (synced when back online)       │
-│  • Use Local AI (if configured)                     │
-│                                                      │
-│  ❌ You can't:                                      │
-│  • Use Cloud AI                                     │
-│  • Sync with external calendars                     │
-│  • Get real-time updates                            │
-│                                                      │
-│  💡 Changes will sync automatically when you're     │
-│     back online.                                     │
-│                                                      │
-│  [Dismiss]                                          │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  📵 Offline Mode                                    |
++-----------------------------------------------------+
+|                                                      |
+|  You're offline, but Fidus still works!             |
+|                                                      |
+|  ✅ You can:                                        |
+|  • View cached calendar and budgets                 |
+|  • Add appointments (synced when back online)       |
+|  • Use Local AI (if configured)                     |
+|                                                      |
+|  ❌ You can't:                                      |
+|  • Use Cloud AI                                     |
+|  • Sync with external calendars                     |
+|  • Get real-time updates                            |
+|                                                      |
+|  💡 Changes will sync automatically when you're     |
+|     back online.                                     |
+|                                                      |
+|  [Dismiss]                                          |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Pattern: Connection Lost During Action
@@ -456,22 +456,22 @@ sequenceDiagram
 **UI During Connection Loss:**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ⚠️ Connection Lost                                 │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  I couldn't reach the server to schedule your       │
-│  meeting, but don't worry — your request is saved.  │
-│                                                      │
-│  I'll try again automatically when you're back      │
-│  online, or you can retry now.                      │
-│                                                      │
-│  Your request:                                       │
-│  "Schedule meeting tomorrow at 2pm"                 │
-│                                                      │
-│  [Retry Now]  [Cancel]  [Save to Draft]             │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ⚠️ Connection Lost                                 |
++-----------------------------------------------------+
+|                                                      |
+|  I couldn't reach the server to schedule your       |
+|  meeting, but don't worry — your request is saved.  |
+|                                                      |
+|  I'll try again automatically when you're back      |
+|  online, or you can retry now.                      |
+|                                                      |
+|  Your request:                                       |
+|  "Schedule meeting tomorrow at 2pm"                 |
+|                                                      |
+|  [Retry Now]  [Cancel]  [Save to Draft]             |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Network Error Guidelines
@@ -497,24 +497,24 @@ sequenceDiagram
 **Example: Calendar Permission Denied**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  📅 Calendar Permission Needed                      │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  I can't check your calendar because you haven't    │
-│  granted permission yet.                            │
-│                                                      │
-│  Why I need this:                                    │
-│  • Detect double-bookings                           │
-│  • Suggest optimal meeting times                    │
-│  • Remind you of appointments                       │
-│                                                      │
-│  🔒 Privacy: Your calendar data stays on your       │
-│     device. I only read it when you ask.            │
-│                                                      │
-│  [Grant Permission]  [Not Now]  [Learn More]        │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  📅 Calendar Permission Needed                      |
++-----------------------------------------------------+
+|                                                      |
+|  I can't check your calendar because you haven't    |
+|  granted permission yet.                            |
+|                                                      |
+|  Why I need this:                                    |
+|  • Detect double-bookings                           |
+|  • Suggest optimal meeting times                    |
+|  • Remind you of appointments                       |
+|                                                      |
+|  🔒 Privacy: Your calendar data stays on your       |
+|     device. I only read it when you ask.            |
+|                                                      |
+|  [Grant Permission]  [Not Now]  [Learn More]        |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Pattern: Permission Revoked
@@ -522,24 +522,24 @@ sequenceDiagram
 **Example: User Revoked Calendar Permission**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ⚠️ Calendar Access Revoked                         │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  You revoked calendar access in your device         │
-│  settings. I can no longer:                         │
-│  • Check for conflicts                              │
-│  • Suggest meeting times                            │
-│  • Show upcoming appointments                       │
-│                                                      │
-│  Would you like to:                                  │
-│  • Re-enable calendar access                        │
-│  • Disable the Calendar domain                      │
-│  • Continue without calendar features               │
-│                                                      │
-│  [Re-enable Access]  [Disable Domain]  [Continue]   │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ⚠️ Calendar Access Revoked                         |
++-----------------------------------------------------+
+|                                                      |
+|  You revoked calendar access in your device         |
+|  settings. I can no longer:                         |
+|  • Check for conflicts                              |
+|  • Suggest meeting times                            |
+|  • Show upcoming appointments                       |
+|                                                      |
+|  Would you like to:                                  |
+|  • Re-enable calendar access                        |
+|  • Disable the Calendar domain                      |
+|  • Continue without calendar features               |
+|                                                      |
+|  [Re-enable Access]  [Disable Domain]  [Continue]   |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Permission Error Guidelines
@@ -585,27 +585,27 @@ sequenceDiagram
 **UI for Conflict:**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ⚠️ Scheduling Conflict                             │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  You already have a meeting at that time:           │
-│                                                      │
-│  📅 Tomorrow, 2:00 PM - 3:00 PM                     │
-│  "Client Call with Sarah"                           │
-│                                                      │
-│  Would you like to:                                  │
-│                                                      │
-│  🔄 Reschedule to a free slot:                      │
-│  • Tomorrow, 3:30 PM - 4:30 PM  ← Recommended       │
-│  • Tomorrow, 11:00 AM - 12:00 PM                    │
-│  • Friday, 2:00 PM - 3:00 PM                        │
-│                                                      │
-│  ⚠️ Or schedule anyway (double-booking)             │
-│                                                      │
-│  [Select Time]  [Find More Times]  [Cancel]         │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ⚠️ Scheduling Conflict                             |
++-----------------------------------------------------+
+|                                                      |
+|  You already have a meeting at that time:           |
+|                                                      |
+|  📅 Tomorrow, 2:00 PM - 3:00 PM                     |
+|  "Client Call with Sarah"                           |
+|                                                      |
+|  Would you like to:                                  |
+|                                                      |
+|  🔄 Reschedule to a free slot:                      |
+|  • Tomorrow, 3:30 PM - 4:30 PM  ← Recommended       |
+|  • Tomorrow, 11:00 AM - 12:00 PM                    |
+|  • Friday, 2:00 PM - 3:00 PM                        |
+|                                                      |
+|  ⚠️ Or schedule anyway (double-booking)             |
+|                                                      |
+|  [Select Time]  [Find More Times]  [Cancel]         |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Pattern: Budget Conflict
@@ -613,30 +613,30 @@ sequenceDiagram
 **Example: Budget Would Be Exceeded**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ⚠️ Budget Limit Would Be Exceeded                  │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  Adding this expense would exceed your Food budget: │
-│                                                      │
-│  Current:   €950 / €1,000                           │
-│  Expense:   +€120 (Grocery shopping)                │
-│  New Total: €1,070 / €1,000  ❌ Over by €70         │
-│                                                      │
-│  Options:                                            │
-│                                                      │
-│  1️⃣ Increase budget to €1,100                      │
-│     (Adjusts limit for this month)                  │
-│                                                      │
-│  2️⃣ Add expense anyway                             │
-│     (Budget will show as exceeded)                  │
-│                                                      │
-│  3️⃣ Reduce expense to €50                          │
-│     (Stays within budget)                           │
-│                                                      │
-│  [Option 1]  [Option 2]  [Option 3]  [Cancel]       │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ⚠️ Budget Limit Would Be Exceeded                  |
++-----------------------------------------------------+
+|                                                      |
+|  Adding this expense would exceed your Food budget: |
+|                                                      |
+|  Current:   €950 / €1,000                           |
+|  Expense:   +€120 (Grocery shopping)                |
+|  New Total: €1,070 / €1,000  ❌ Over by €70         |
+|                                                      |
+|  Options:                                            |
+|                                                      |
+|  1️⃣ Increase budget to €1,100                      |
+|     (Adjusts limit for this month)                  |
+|                                                      |
+|  2️⃣ Add expense anyway                             |
+|     (Budget will show as exceeded)                  |
+|                                                      |
+|  3️⃣ Reduce expense to €50                          |
+|     (Stays within budget)                           |
+|                                                      |
+|  [Option 1]  [Option 2]  [Option 3]  [Cancel]       |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Data Conflict Guidelines
@@ -664,29 +664,29 @@ sequenceDiagram
 **Example: Cloud AI Unavailable**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ☁️ Cloud AI Unavailable                            │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  The Cloud AI service isn't responding. This might  │
-│  be a temporary issue with the provider (OpenAI).   │
-│                                                      │
-│  What you can do:                                    │
-│                                                      │
-│  1️⃣ Try again in a few minutes                     │
-│     The service might be back soon.                 │
-│                                                      │
-│  2️⃣ Switch to Local AI (if available)              │
-│     Process requests on your device instead.        │
-│                                                      │
-│  3️⃣ Check status: status.openai.com                │
-│     See if there's a known outage.                  │
-│                                                      │
-│  Your data is safe — nothing was lost.             │
-│                                                      │
-│  [Try Again]  [Switch to Local AI]  [Check Status]  │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ☁️ Cloud AI Unavailable                            |
++-----------------------------------------------------+
+|                                                      |
+|  The Cloud AI service isn't responding. This might  |
+|  be a temporary issue with the provider (OpenAI).   |
+|                                                      |
+|  What you can do:                                    |
+|                                                      |
+|  1️⃣ Try again in a few minutes                     |
+|     The service might be back soon.                 |
+|                                                      |
+|  2️⃣ Switch to Local AI (if available)              |
+|     Process requests on your device instead.        |
+|                                                      |
+|  3️⃣ Check status: status.openai.com                |
+|     See if there's a known outage.                  |
+|                                                      |
+|  Your data is safe — nothing was lost.             |
+|                                                      |
+|  [Try Again]  [Switch to Local AI]  [Check Status]  |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Pattern: Domain Supervisor Failure
@@ -694,31 +694,31 @@ sequenceDiagram
 **Example: Calendar Supervisor Crashed**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  🔴 Calendar Service Error                          │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  Something went wrong with the Calendar service.    │
-│  I've automatically reported this error.            │
-│                                                      │
-│  What you can try:                                   │
-│  • Restart Fidus                                    │
-│  • Check other domains (Finance, Travel)            │
-│  • Contact support if this keeps happening          │
-│                                                      │
-│  Your calendar data is safe and hasn't been         │
-│  affected. This is just a temporary issue.          │
-│                                                      │
-│  Technical details (for support):                   │
-│  ▼ Error: SUPERVISOR_CRASH                         │
-│    Domain: Calendar                                 │
-│    Code: CAL-FATAL-001                              │
-│    Time: 2025-10-28 14:45:32 UTC                    │
-│    Stack trace: [View Full Log]                     │
-│                                                      │
-│  [Restart Fidus]  [Report Issue]  [Contact Support] │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  🔴 Calendar Service Error                          |
++-----------------------------------------------------+
+|                                                      |
+|  Something went wrong with the Calendar service.    |
+|  I've automatically reported this error.            |
+|                                                      |
+|  What you can try:                                   |
+|  • Restart Fidus                                    |
+|  • Check other domains (Finance, Travel)            |
+|  • Contact support if this keeps happening          |
+|                                                      |
+|  Your calendar data is safe and hasn't been         |
+|  affected. This is just a temporary issue.          |
+|                                                      |
+|  Technical details (for support):                   |
+|  ▼ Error: SUPERVISOR_CRASH                         |
+|    Domain: Calendar                                 |
+|    Code: CAL-FATAL-001                              |
+|    Time: 2025-10-28 14:45:32 UTC                    |
+|    Stack trace: [View Full Log]                     |
+|                                                      |
+|  [Restart Fidus]  [Report Issue]  [Contact Support] |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 ### Service Failure Guidelines
@@ -840,16 +840,16 @@ graph TB
 **Example: Delete Appointment with Undo**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ✅ Appointment Deleted                             │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  "Team Meeting" on 2025-10-29 at 10:00 AM          │
-│  has been deleted.                                  │
-│                                                      │
-│  [Undo]  (available for 30 seconds)                 │
-│                                                      │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  ✅ Appointment Deleted                             |
++-----------------------------------------------------+
+|                                                      |
+|  "Team Meeting" on 2025-10-29 at 10:00 AM          |
+|  has been deleted.                                  |
+|                                                      |
+|  [Undo]  (available for 30 seconds)                 |
+|                                                      |
++-----------------------------------------------------+
 ```
 
 **Undo Guidelines:**

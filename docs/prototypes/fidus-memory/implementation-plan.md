@@ -2922,67 +2922,67 @@ echo "🧠 Neo4j Browser: http://localhost:7474"
 
 ```
 fidus/
-├── packages/
-│   ├── api/                                    # Python Backend
-│   │   ├── fidus/
-│   │   │   ├── main.py                        # FastAPI app
-│   │   │   ├── config.py
-│   │   │   ├── memory/                        # Fidus Memory module
-│   │   │   │   ├── simple_agent.py           # Phase 1: In-memory
-│   │   │   │   ├── persistent_agent.py       # Phase 2: Neo4j
-│   │   │   │   ├── context_aware_agent.py    # Phase 3: Qdrant
-│   │   │   │   ├── preference_extractor.py
-│   │   │   │   ├── implicit_learning.py
-│   │   │   │   ├── situational_context.py
-│   │   │   │   └── mcp_server.py             # Phase 4: MCP
-│   │   │   ├── infrastructure/
-│   │   │   │   ├── neo4j_client.py
-│   │   │   │   ├── qdrant_client.py
-│   │   │   │   ├── postgres_client.py
-│   │   │   │   ├── redis_client.py
-│   │   │   │   └── litellm_client.py
-│   │   │   └── api/
-│   │   │       ├── routes/
-│   │   │       │   └── memory.py
-│   │   │       └── middleware/
-│   │   │           └── auth.py
-│   │   ├── tests/
-│   │   ├── docker-compose.yml
-│   │   ├── litellm_config.yaml
-│   │   └── pyproject.toml
-│   │
-│   ├── web/                                    # Next.js Frontend
-│   │   ├── app/
-│   │   │   └── fidus-memory/
-│   │   │       ├── page.tsx
-│   │   │       └── components/
-│   │   │           └── preference-viewer.tsx
-│   │   └── hooks/
-│   │       └── use-chat-agent.ts
-│   │
-│   └── ui/                                     # @fidus/ui (Design System)
-│       └── src/
-│           └── components/
-│               ├── chat-interface/            # ✅ ALREADY AVAILABLE
-│               ├── message-bubble/            # ✅ ALREADY AVAILABLE
-│               ├── confidence-indicator/      # ✅ ALREADY AVAILABLE
-│               ├── button/                    # ✅ ALREADY AVAILABLE
-│               ├── card/                      # ✅ ALREADY AVAILABLE
-│               ├── stack/                     # ✅ ALREADY AVAILABLE
-│               ├── heading/                   # ✅ ALREADY AVAILABLE
-│               ├── text/                      # ✅ ALREADY AVAILABLE
-│               ├── divider/                   # ✅ ALREADY AVAILABLE
-│               └── empty-state/               # ✅ ALREADY AVAILABLE
-│
-├── docs/
-│   ├── fidus-memory-implementation-plan-v2.md # This document
-│   └── fidus-memory-ui-components.md
-│
-└── scripts/
-    ├── setup-fidus-memory.sh
-    ├── init_neo4j.py
-    ├── init_qdrant.py
-    └── init_postgres.py
++-- packages/
+|   +-- api/                                    # Python Backend
+|   |   +-- fidus/
+|   |   |   +-- main.py                        # FastAPI app
+|   |   |   +-- config.py
+|   |   |   +-- memory/                        # Fidus Memory module
+|   |   |   |   +-- simple_agent.py           # Phase 1: In-memory
+|   |   |   |   +-- persistent_agent.py       # Phase 2: Neo4j
+|   |   |   |   +-- context_aware_agent.py    # Phase 3: Qdrant
+|   |   |   |   +-- preference_extractor.py
+|   |   |   |   +-- implicit_learning.py
+|   |   |   |   +-- situational_context.py
+|   |   |   |   +-- mcp_server.py             # Phase 4: MCP
+|   |   |   +-- infrastructure/
+|   |   |   |   +-- neo4j_client.py
+|   |   |   |   +-- qdrant_client.py
+|   |   |   |   +-- postgres_client.py
+|   |   |   |   +-- redis_client.py
+|   |   |   |   +-- litellm_client.py
+|   |   |   +-- api/
+|   |   |       +-- routes/
+|   |   |       |   +-- memory.py
+|   |   |       +-- middleware/
+|   |   |           +-- auth.py
+|   |   +-- tests/
+|   |   +-- docker-compose.yml
+|   |   +-- litellm_config.yaml
+|   |   +-- pyproject.toml
+|   |
+|   +-- web/                                    # Next.js Frontend
+|   |   +-- app/
+|   |   |   +-- fidus-memory/
+|   |   |       +-- page.tsx
+|   |   |       +-- components/
+|   |   |           +-- preference-viewer.tsx
+|   |   +-- hooks/
+|   |       +-- use-chat-agent.ts
+|   |
+|   +-- ui/                                     # @fidus/ui (Design System)
+|       +-- src/
+|           +-- components/
+|               +-- chat-interface/            # ✅ ALREADY AVAILABLE
+|               +-- message-bubble/            # ✅ ALREADY AVAILABLE
+|               +-- confidence-indicator/      # ✅ ALREADY AVAILABLE
+|               +-- button/                    # ✅ ALREADY AVAILABLE
+|               +-- card/                      # ✅ ALREADY AVAILABLE
+|               +-- stack/                     # ✅ ALREADY AVAILABLE
+|               +-- heading/                   # ✅ ALREADY AVAILABLE
+|               +-- text/                      # ✅ ALREADY AVAILABLE
+|               +-- divider/                   # ✅ ALREADY AVAILABLE
+|               +-- empty-state/               # ✅ ALREADY AVAILABLE
+|
++-- docs/
+|   +-- fidus-memory-implementation-plan-v2.md # This document
+|   +-- fidus-memory-ui-components.md
+|
++-- scripts/
+    +-- setup-fidus-memory.sh
+    +-- init_neo4j.py
+    +-- init_qdrant.py
+    +-- init_postgres.py
 ```
 
 ---

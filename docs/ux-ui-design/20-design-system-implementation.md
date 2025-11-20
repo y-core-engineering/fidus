@@ -50,18 +50,18 @@ Build the **Fidus Design System website** as a **standalone Next.js application*
 **Original Plan (from 18-design-system-website.md):**
 ```
 Nextra (Next.js + MDX)
-  ├─ Documentation pages (MDX)
-  ├─ Component playground
-  └─ Interactive examples
+  +- Documentation pages (MDX)
+  +- Component playground
+  +- Interactive examples
 ```
 
 **Better Plan (this document):**
 ```
 Custom Next.js App
-  ├─ Documentation pages (RSC + MDX)
-  ├─ Real Fidus components (from @fidus/ui)
-  ├─ Interactive playground (same as production)
-  └─ UIDecisionLayer demo (AI-driven UI showcase)
+  +- Documentation pages (RSC + MDX)
+  +- Real Fidus components (from @fidus/ui)
+  +- Interactive playground (same as production)
+  +- UIDecisionLayer demo (AI-driven UI showcase)
 ```
 
 ### Why Custom > Nextra?
@@ -136,105 +136,105 @@ Custom Next.js App
 
 ```
 packages/
-├── design-system/          # ⭐ NEW: Design System Website
-│   ├── app/                # Next.js App Router
-│   ├── components/         # Documentation-specific components
-│   ├── content/            # MDX documentation files
-│   ├── public/             # Static assets
-│   ├── styles/             # Global styles
-│   └── package.json
-│
-├── ui/                     # ⭐ NEW: Shared UI Components
-│   ├── src/
-│   │   ├── components/     # Production-ready components
-│   │   │   ├── button/
-│   │   │   │   ├── button.tsx
-│   │   │   │   ├── button.stories.tsx
-│   │   │   │   ├── button.test.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── opportunity-card/
-│   │   │   └── ...
-│   │   ├── registry/       # Component Registry
-│   │   │   └── component-map.tsx
-│   │   ├── hooks/          # Shared hooks
-│   │   ├── utils/          # Shared utilities
-│   │   └── index.ts        # Public API
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── web/                    # (Future) Main Fidus App
-├── api/                    # (Existing) Backend
-├── cli/                    # (Existing) CLI
-└── shared/                 # (Existing) Shared types
++-- design-system/          # ⭐ NEW: Design System Website
+|   +-- app/                # Next.js App Router
+|   +-- components/         # Documentation-specific components
+|   +-- content/            # MDX documentation files
+|   +-- public/             # Static assets
+|   +-- styles/             # Global styles
+|   +-- package.json
+|
++-- ui/                     # ⭐ NEW: Shared UI Components
+|   +-- src/
+|   |   +-- components/     # Production-ready components
+|   |   |   +-- button/
+|   |   |   |   +-- button.tsx
+|   |   |   |   +-- button.stories.tsx
+|   |   |   |   +-- button.test.tsx
+|   |   |   |   +-- index.ts
+|   |   |   +-- opportunity-card/
+|   |   |   +-- ...
+|   |   +-- registry/       # Component Registry
+|   |   |   +-- component-map.tsx
+|   |   +-- hooks/          # Shared hooks
+|   |   +-- utils/          # Shared utilities
+|   |   +-- index.ts        # Public API
+|   +-- package.json
+|   +-- tsconfig.json
+|
++-- web/                    # (Future) Main Fidus App
++-- api/                    # (Existing) Backend
++-- cli/                    # (Existing) CLI
++-- shared/                 # (Existing) Shared types
 ```
 
 ### Design System Website Structure
 
 ```
 packages/design-system/
-├── app/
-│   ├── layout.tsx                    # Root layout
-│   ├── page.tsx                      # Homepage
-│   ├── getting-started/
-│   │   ├── page.tsx
-│   │   └── layout.tsx
-│   ├── foundations/
-│   │   ├── ai-driven-ui/page.mdx
-│   │   ├── privacy-ux/page.mdx
-│   │   ├── colors/page.tsx           # Interactive color palette
-│   │   ├── typography/page.tsx       # Font showcase
-│   │   └── spacing/page.tsx          # Spacing scale
-│   ├── components/
-│   │   ├── [component]/              # Dynamic route
-│   │   │   └── page.tsx              # Component detail page
-│   │   └── page.tsx                  # Components overview
-│   ├── patterns/
-│   │   ├── onboarding/page.mdx
-│   │   ├── search/page.mdx
-│   │   └── ...
-│   ├── architecture/
-│   │   ├── ui-decision-layer/
-│   │   │   └── page.tsx              # Interactive demo
-│   │   └── component-registry/page.mdx
-│   └── playground/
-│       └── page.tsx                   # Live component playground
-│
-├── components/
-│   ├── component-preview.tsx          # Component showcase
-│   ├── code-block.tsx                 # Syntax highlighted code
-│   ├── props-table.tsx                # Auto-generated props docs
-│   ├── color-palette.tsx              # Color showcase
-│   ├── playground.tsx                 # Interactive playground
-│   └── navigation/
-│       ├── sidebar.tsx
-│       ├── header.tsx
-│       └── search.tsx
-│
-├── content/
-│   ├── components/                    # Component MDX files
-│   │   ├── button.mdx
-│   │   ├── opportunity-card.mdx
-│   │   └── ...
-│   └── patterns/                      # Pattern MDX files
-│
-├── lib/
-│   ├── mdx.ts                         # MDX utilities
-│   ├── metadata.ts                    # Component metadata
-│   └── search.ts                      # Search index
-│
-├── styles/
-│   ├── globals.css                    # Global styles + tokens
-│   └── tailwind.css                   # Tailwind imports
-│
-├── public/
-│   ├── fonts/
-│   ├── images/
-│   └── icons/
-│
-├── next.config.mjs
-├── tailwind.config.ts
-├── tsconfig.json
-└── package.json
++-- app/
+|   +-- layout.tsx                    # Root layout
+|   +-- page.tsx                      # Homepage
+|   +-- getting-started/
+|   |   +-- page.tsx
+|   |   +-- layout.tsx
+|   +-- foundations/
+|   |   +-- ai-driven-ui/page.mdx
+|   |   +-- privacy-ux/page.mdx
+|   |   +-- colors/page.tsx           # Interactive color palette
+|   |   +-- typography/page.tsx       # Font showcase
+|   |   +-- spacing/page.tsx          # Spacing scale
+|   +-- components/
+|   |   +-- [component]/              # Dynamic route
+|   |   |   +-- page.tsx              # Component detail page
+|   |   +-- page.tsx                  # Components overview
+|   +-- patterns/
+|   |   +-- onboarding/page.mdx
+|   |   +-- search/page.mdx
+|   |   +-- ...
+|   +-- architecture/
+|   |   +-- ui-decision-layer/
+|   |   |   +-- page.tsx              # Interactive demo
+|   |   +-- component-registry/page.mdx
+|   +-- playground/
+|       +-- page.tsx                   # Live component playground
+|
++-- components/
+|   +-- component-preview.tsx          # Component showcase
+|   +-- code-block.tsx                 # Syntax highlighted code
+|   +-- props-table.tsx                # Auto-generated props docs
+|   +-- color-palette.tsx              # Color showcase
+|   +-- playground.tsx                 # Interactive playground
+|   +-- navigation/
+|       +-- sidebar.tsx
+|       +-- header.tsx
+|       +-- search.tsx
+|
++-- content/
+|   +-- components/                    # Component MDX files
+|   |   +-- button.mdx
+|   |   +-- opportunity-card.mdx
+|   |   +-- ...
+|   +-- patterns/                      # Pattern MDX files
+|
++-- lib/
+|   +-- mdx.ts                         # MDX utilities
+|   +-- metadata.ts                    # Component metadata
+|   +-- search.ts                      # Search index
+|
++-- styles/
+|   +-- globals.css                    # Global styles + tokens
+|   +-- tailwind.css                   # Tailwind imports
+|
++-- public/
+|   +-- fonts/
+|   +-- images/
+|   +-- icons/
+|
++-- next.config.mjs
++-- tailwind.config.ts
++-- tsconfig.json
++-- package.json
 ```
 
 ---
@@ -652,10 +652,10 @@ Each slice delivers a **complete, usable feature** from infrastructure to UI:
 **Deployment Architecture:**
 ```
 fidus.world (Domain)
-├── design.fidus.world   → Design System Website (Vercel)   [THIS SLICE]
-├── app.fidus.world      → Main Fidus App (Future)
-├── api.fidus.world      → Backend API (Future)
-└── www.fidus.world      → Marketing Site (Future)
++-- design.fidus.world   → Design System Website (Vercel)   [THIS SLICE]
++-- app.fidus.world      → Main Fidus App (Future)
++-- api.fidus.world      → Backend API (Future)
++-- www.fidus.world      → Marketing Site (Future)
 ```
 
 **Deliverable:**
@@ -703,10 +703,10 @@ fidus.world (Domain)
 **npm Registry:**
 ```
 @fidus/ui
-├── Version: 0.1.0+
-├── Exports: ESM + CJS
-├── Types: TypeScript declarations
-└── Provenance: GitHub Actions
++-- Version: 0.1.0+
++-- Exports: ESM + CJS
++-- Types: TypeScript declarations
++-- Provenance: GitHub Actions
 ```
 
 **Publishing Process:**
@@ -1546,7 +1546,7 @@ export function ComponentPreview({
    **DNS Records (at your domain registrar for fidus.world):**
    ```
    Type    Name     Value                   TTL
-   ──────────────────────────────────────────────
+   ----------------------------------------------
    CNAME   design   cname.vercel-dns.com    Auto
    ```
 
@@ -1748,10 +1748,10 @@ export function ComponentPreview({
 
 ```
 fidus.world
-├── design.fidus.world  → Design System (Vercel)     [SLICE 10]
-├── app.fidus.world     → Main Fidus App (Vercel)    [FUTURE]
-├── api.fidus.world     → Backend API (Cloud Run)    [FUTURE]
-└── www.fidus.world     → Marketing Site (Vercel)    [FUTURE]
++-- design.fidus.world  → Design System (Vercel)     [SLICE 10]
++-- app.fidus.world     → Main Fidus App (Vercel)    [FUTURE]
++-- api.fidus.world     → Backend API (Cloud Run)    [FUTURE]
++-- www.fidus.world     → Marketing Site (Vercel)    [FUTURE]
 ```
 
 **Benefits of Subdomain Structure:**
@@ -1764,7 +1764,7 @@ fidus.world
 **DNS Configuration Example:**
 ```
 Type    Name     Value                      TTL    Notes
-────────────────────────────────────────────────────────────────
+----------------------------------------------------------------
 A       @        <marketing-ip>            Auto   www.fidus.world
 CNAME   design   cname.vercel-dns.com      Auto   Design System
 CNAME   app      cname.vercel-dns.com      Auto   Main App (Future)
@@ -1849,25 +1849,25 @@ jobs:
 **The @fidus/ui package is the source of truth:**
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  @fidus/ui (Component Library)                          │
-│  ────────────────────────────────────────               │
-│  Production-ready components                             │
-│  - Button, Card, Input, etc.                            │
-│  - Zod schemas for validation                           │
-│  - TypeScript types                                     │
-│  - Unit tests                                           │
-└───────────────┬──────────────────────────┬───────────────┘
-                │                          │
++----------------------------------------------------------+
+|  @fidus/ui (Component Library)                          |
+|  ----------------------------------------               |
+|  Production-ready components                             |
+|  - Button, Card, Input, etc.                            |
+|  - Zod schemas for validation                           |
+|  - TypeScript types                                     |
+|  - Unit tests                                           |
++---------------+--------------------------+---------------+
+                |                          |
                 ▼                          ▼
-    ┌─────────────────────┐    ┌──────────────────────┐
-    │ @fidus/design-system│    │ @fidus/web (Future)  │
-    │ (Documentation)     │    │ (Main Fidus App)     │
-    │                     │    │                      │
-    │ Imports and         │    │ Imports and          │
-    │ documents           │    │ uses components      │
-    │ components          │    │ in production        │
-    └─────────────────────┘    └──────────────────────┘
+    +---------------------+    +----------------------+
+    | @fidus/design-system|    | @fidus/web (Future)  |
+    | (Documentation)     |    | (Main Fidus App)     |
+    |                     |    |                      |
+    | Imports and         |    | Imports and          |
+    | documents           |    | uses components      |
+    | components          |    | in production        |
+    +---------------------+    +----------------------+
 ```
 
 **Benefits:**
