@@ -5,6 +5,7 @@ similarity-based matching of situations in the vector database.
 """
 
 import logging
+import os
 from typing import Optional
 
 from litellm import embedding
@@ -97,11 +98,27 @@ class EmbeddingService:
             return [0.0] * self.expected_dimension
 
         try:
+            # Build kwargs for embedding
+            embedding_kwargs = {
+                "model": self.model,
+                "input": [text],  # LiteLLM expects a list of texts
+            }
+
+            # Add api_base for models using custom endpoints (LiteLLM/OpenAI-compatible)
+            # Ollama models use OLLAMA_API_BASE, non-ollama models use OPENAI_API_BASE
+            if self.model.startswith("ollama/"):
+                ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
+                embedding_kwargs["api_base"] = ollama_base
+                logger.info(f"Using Ollama API base: {ollama_base}")
+            else:
+                # For non-ollama models, use OPENAI_API_BASE if set
+                openai_base = os.getenv("OPENAI_API_BASE")
+                if openai_base:
+                    embedding_kwargs["api_base"] = openai_base
+                    logger.info(f"Using OpenAI API base: {openai_base}")
+
             # Generate embedding using LiteLLM
-            response = embedding(
-                model=self.model,
-                input=[text],  # LiteLLM expects a list of texts
-            )
+            response = embedding(**embedding_kwargs)
 
             # Extract embedding vector
             embedding_vector = response.data[0]["embedding"]

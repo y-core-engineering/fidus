@@ -1,6 +1,8 @@
 import json
 import os
 import logging
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import Dict, List, Any, AsyncGenerator
 from litellm import acompletion
 
@@ -56,11 +58,17 @@ class InMemoryAgent:
             ]
         }
 
-        # Add api_base for Ollama models
+        # Add api_base for models using custom endpoints
         if self.llm_model.startswith("ollama/"):
             ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
             completion_kwargs["api_base"] = ollama_base
             logger.info(f"Using Ollama API base: {ollama_base}")
+        else:
+            # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
+            openai_base = os.getenv("OPENAI_API_BASE")
+            if openai_base:
+                completion_kwargs["api_base"] = openai_base
+                logger.info(f"Using OpenAI API base: {openai_base}")
 
         response = await acompletion(**completion_kwargs)
 
@@ -161,11 +169,17 @@ class InMemoryAgent:
             "stream": True
         }
 
-        # Add api_base for Ollama models
+        # Add api_base for models using custom endpoints
         if self.llm_model.startswith("ollama/"):
             ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
             completion_kwargs["api_base"] = ollama_base
             logger.info(f"Using Ollama API base: {ollama_base}")
+        else:
+            # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
+            openai_base = os.getenv("OPENAI_API_BASE")
+            if openai_base:
+                completion_kwargs["api_base"] = openai_base
+                logger.info(f"Using OpenAI API base: {openai_base}")
 
         response = await acompletion(**completion_kwargs)
 
@@ -540,9 +554,23 @@ Response:"""
         and compactly included in the system prompt, while conversation
         history uses a sliding window.
         """
-        base = """You are Fidus Memory, a friendly conversational AI that learns about the user's preferences.
+        # Get current datetime in Europe/Berlin timezone
+        timezone = os.getenv("TZ", "Europe/Berlin")
+        try:
+            tz = ZoneInfo(timezone)
+            current_datetime = datetime.now(tz).strftime("%A, %Y-%m-%d %H:%M:%S %Z")
+        except Exception:
+            # Fallback to UTC if timezone not found
+            current_datetime = datetime.now().strftime("%A, %Y-%m-%d %H:%M:%S UTC")
 
-IMPORTANT: Respond naturally in conversation. Do NOT output system information, internal state, or debugging info to the user.
+        base = f"""You are Fidus Memory, a friendly conversational AI that learns about the user's preferences.
+
+Current Date and Time: {current_datetime}
+
+IMPORTANT:
+- Respond naturally in conversation. Do NOT output system information, internal state, or debugging info to the user.
+- When the user asks about the current time or date, use the information provided above to answer accurately.
+- ALWAYS respond in the SAME LANGUAGE as the user's message. If the user writes in German, respond in German. If in English, respond in English.
 
 """
 

@@ -7,7 +7,10 @@ using a predefined schema.
 
 import json
 import logging
+import os
+from datetime import datetime
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from litellm import completion
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -66,10 +69,13 @@ If no clear context is found, return empty context_factors with low confidence.
 
     USER_PROMPT_TEMPLATE = """Analyze this user message and extract relevant context factors:
 
+Current Date and Time: {current_datetime}
 Message: "{message}"
 
-Extract context factors that help understand the situation.
-Return JSON with context_factors, confidence, and explanation."""
+Extract context factors that help understand the situation. Use the current date and time to infer temporal context like time_of_day, day_of_week, season, etc.
+
+IMPORTANT: You MUST respond with ONLY valid JSON in exactly this format (no other text, no markdown, no code blocks):
+{{"context_factors": {{}}, "confidence": 0.0, "explanation": "your explanation"}}"""
 
     def __init__(
         self,
@@ -126,31 +132,80 @@ Return JSON with context_factors, confidence, and explanation."""
         )
 
         try:
+            # Get current datetime for temporal context in Europe/Berlin timezone
+            timezone = os.getenv("TZ", "Europe/Berlin")
+            try:
+                tz = ZoneInfo(timezone)
+                current_datetime = datetime.now(tz).strftime("%A, %Y-%m-%d %H:%M:%S %Z")
+            except Exception:
+                # Fallback to UTC if timezone not found
+                current_datetime = datetime.now().strftime("%A, %Y-%m-%d %H:%M:%S UTC")
+
             # Call LLM for context extraction
+            # Using streaming to work around Ollama/LiteLLM non-streaming empty response bug
             response = completion(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": self.SYSTEM_PROMPT},
                     {
                         "role": "user",
-                        "content": self.USER_PROMPT_TEMPLATE.format(message=message),
+                        "content": self.USER_PROMPT_TEMPLATE.format(
+                            current_datetime=current_datetime,
+                            message=message
+                        ),
                     },
                 ],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                response_format={"type": "json_object"},
+                stream=True,
+                # response_format removed for Ollama compatibility via LiteLLM
             )
 
-            # Extract response content
-            content = response.choices[0].message.content
-            logger.debug(f"LLM response: {content}")
+            # Collect streaming response
+            content = ""
+            chunk_count = 0
+            for chunk in response:
+                chunk_count += 1
+                if chunk.choices and len(chunk.choices) > 0:
+                    delta = chunk.choices[0].delta
+                    # qwen3 uses 'reasoning_content' for all output, other models use 'content'
+                    delta_content = getattr(delta, 'content', None) or getattr(delta, 'reasoning_content', None)
+                    if delta_content is not None:
+                        content += str(delta_content)
+            logger.info(f"Total chunks received: {chunk_count}, final content length: {len(content)}")
+
+            # Clean up response - remove markdown code blocks if present
+            content = content.strip()
+            if content.startswith("```json"):
+                content = content[7:]  # Remove ```json
+            elif content.startswith("```"):
+                content = content[3:]  # Remove ```
+            if content.endswith("```"):
+                content = content[:-3]  # Remove trailing ```
+            content = content.strip()
+
+            # qwen3 may include reasoning before JSON - extract JSON object
+            # Look for the first occurrence of {"context_factors"
+            json_start = content.find('{"context_factors"')
+            if json_start > 0:
+                logger.debug(f"Found JSON at position {json_start}, removing {json_start} characters of reasoning")
+                content = content[json_start:]
+                content = content.strip()
+            elif json_start == -1:
+                # Try finding any JSON object
+                json_start = content.find('{')
+                if json_start > 0:
+                    logger.debug(f"Found JSON object at position {json_start}")
+                    content = content[json_start:]
+                    content = content.strip()
 
             # Parse JSON response
             try:
                 parsed = json.loads(content)
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse LLM response as JSON: {e}")
-                raise ValueError(f"Invalid JSON response from LLM: {content}")
+                logger.error(f"Raw content (first 500 chars): {content[:500]}")
+                raise ValueError(f"Invalid JSON response from LLM")
 
             # Extract context factors
             context_factors = parsed.get("context_factors", {})
@@ -218,31 +273,80 @@ Return JSON with context_factors, confidence, and explanation."""
         )
 
         try:
+            # Get current datetime for temporal context in Europe/Berlin timezone
+            timezone = os.getenv("TZ", "Europe/Berlin")
+            try:
+                tz = ZoneInfo(timezone)
+                current_datetime = datetime.now(tz).strftime("%A, %Y-%m-%d %H:%M:%S %Z")
+            except Exception:
+                # Fallback to UTC if timezone not found
+                current_datetime = datetime.now().strftime("%A, %Y-%m-%d %H:%M:%S UTC")
+
             # Call LLM for context extraction
+            # Using streaming to work around Ollama/LiteLLM non-streaming empty response bug
             response = completion(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": self.SYSTEM_PROMPT},
                     {
                         "role": "user",
-                        "content": self.USER_PROMPT_TEMPLATE.format(message=message),
+                        "content": self.USER_PROMPT_TEMPLATE.format(
+                            current_datetime=current_datetime,
+                            message=message
+                        ),
                     },
                 ],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                response_format={"type": "json_object"},
+                stream=True,
+                # response_format removed for Ollama compatibility via LiteLLM
             )
 
-            # Extract response content
-            content = response.choices[0].message.content
-            logger.debug(f"LLM response: {content}")
+            # Collect streaming response
+            content = ""
+            chunk_count = 0
+            for chunk in response:
+                chunk_count += 1
+                if chunk.choices and len(chunk.choices) > 0:
+                    delta = chunk.choices[0].delta
+                    # qwen3 uses 'reasoning_content' for all output, other models use 'content'
+                    delta_content = getattr(delta, 'content', None) or getattr(delta, 'reasoning_content', None)
+                    if delta_content is not None:
+                        content += str(delta_content)
+            logger.info(f"Total chunks received: {chunk_count}, final content length: {len(content)}")
+
+            # Clean up response - remove markdown code blocks if present
+            content = content.strip()
+            if content.startswith("```json"):
+                content = content[7:]  # Remove ```json
+            elif content.startswith("```"):
+                content = content[3:]  # Remove ```
+            if content.endswith("```"):
+                content = content[:-3]  # Remove trailing ```
+            content = content.strip()
+
+            # qwen3 may include reasoning before JSON - extract JSON object
+            # Look for the first occurrence of {"context_factors"
+            json_start = content.find('{"context_factors"')
+            if json_start > 0:
+                logger.debug(f"Found JSON at position {json_start}, removing {json_start} characters of reasoning")
+                content = content[json_start:]
+                content = content.strip()
+            elif json_start == -1:
+                # Try finding any JSON object
+                json_start = content.find('{')
+                if json_start > 0:
+                    logger.debug(f"Found JSON object at position {json_start}")
+                    content = content[json_start:]
+                    content = content.strip()
 
             # Parse JSON response
             try:
                 parsed = json.loads(content)
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse LLM response as JSON: {e}")
-                raise ValueError(f"Invalid JSON response from LLM: {content}")
+                logger.error(f"Raw content (first 500 chars): {content[:500]}")
+                raise ValueError(f"Invalid JSON response from LLM")
 
             # Extract context factors
             context_factors = parsed.get("context_factors", {})

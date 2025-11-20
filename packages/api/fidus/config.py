@@ -51,6 +51,9 @@ class PrototypeConfig:
         # Mapping of embedding models to their vector dimensions
         self.embedding_dimensions: dict[str, int] = {
             "ollama/nomic-embed-text": 768,
+            "ollama/bge-m3": 1024,
+            "bge-m3": 1024,
+            "openai/bge-m3": 1024,
             "openai/text-embedding-3-small": 1536,
             "openai/text-embedding-3-large": 3072,
             "openai/text-embedding-ada-002": 1536,
