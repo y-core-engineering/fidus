@@ -1,5 +1,86 @@
 model_list:
-  - model_name: llama3.1
+  # Qwen3 30B Chat Models
+  - model_name: qwen3-30b-chat
     litellm_params:
-      model: ollama/llama3.1:8b
-      api_base: http://ollama:11434
+      model: ollama/qwen3:30b-ctx131k
+      api_base: http://192.168.10.45:11434
+      stream: true
+      timeout: 240
+      # max_tokens: 8192  # Optional: Limit output length (default ist unbegrenzt)
+
+  - model_name: qwen3-30b
+    litellm_params:
+      model: ollama/qwen3:30b
+      api_base: http://192.168.10.45:11434
+      stream: true
+      timeout: 180
+
+  # Qwen3 Coder Models
+  - model_name: qwen3-coder-30b
+    litellm_params:
+      model: ollama/qwen3-coder-30b-local:latest
+      api_base: http://192.168.10.45:11434
+      stream: true
+      timeout: 240
+
+  - model_name: qwen3-coder
+    litellm_params:
+      model: ollama/qwen3-coder:latest
+      api_base: http://192.168.10.45:11434
+      stream: true
+      timeout: 120
+
+  - model_name: qwen3-coder-30b-base
+    litellm_params:
+      model: ollama/qwen3-coder:30b
+      api_base: http://192.168.10.45:11434
+      stream: true
+      timeout: 180
+
+  - model_name: qwen2.5-coder-14b
+    litellm_params:
+      model: ollama/qwen2.5-coder:14b
+      api_base: http://192.168.10.45:11434
+      stream: true
+      timeout: 120
+
+  # Embedding Models
+  - model_name: bge-m3
+    litellm_params:
+      model: ollama/bge-m3:latest
+      api_base: http://192.168.10.45:11434
+      timeout: 60
+
+  - model_name: nomic-embed-text
+    litellm_params:
+      model: ollama/nomic-embed-text:latest
+      api_base: http://192.168.10.45:11434
+      timeout: 60
+
+# Global LiteLLM Settings - OPTIMIERT FÜR M4 PRO
+litellm_settings:
+  # Performance optimizations
+  drop_params: true
+  set_verbose: false
+  num_retries: 3
+  request_timeout: 240
+
+  # Parallel request handling (wichtig für M4 Pro!)
+  max_parallel_requests: 16  # M4 Pro kann locker 16 parallel
+
+  # Caching für bessere Performance
+  cache: true
+  cache_params:
+    type: redis
+    host: localhost
+    port: 6379
+    ttl: 3600  # 1 Stunde Cache
+
+  # Fallback bei Errors (Liste von fallback-Modellen pro Modell)
+  fallbacks:
+    - qwen3-30b-chat: [qwen3-30b, qwen3-coder-30b]
+    - qwen3-coder-30b: [qwen3-30b-chat]
+
+# Server settings
+host: 0.0.0.0
+port: 4000
