@@ -111,6 +111,9 @@ temp/
 docs/_build/
 site/
 
-# Local prompts (but allow docs/prompts/ssr/ for milestone implementation prompts)
+# Prompts (not tracked in git)
+docs/prompts/
+
+# Local files
 .env.memory
 CLAUDE_template.md
