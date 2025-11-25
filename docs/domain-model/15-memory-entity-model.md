@@ -16,15 +16,16 @@
 | **2.0** | 2025-11-03 | Added Situational Context (Situation as entity) |
 | **3.0** | 2025-11-19 | **Major refactoring:** Situational Context as Relationship Qualifier (ADR-0001), added Person, Organization, Goal, Habit, Event, Object, Location entities |
 
-**Migration from v2.0 to v3.0:** See [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)
+**Migration from v2.0 to v3.0:** See [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md) and [ADR-0002: Property Placement Strategy](../adr/ADR-0002-property-placement-and-geospatial-exception.md)
 
 **Critical Changes in v3.0:**
 - ❌ **Removed:** `Situation` entity (was Neo4j node in v2.0)
 - ✅ **Added:** `Situation` as Value Object (Qdrant payload only)
 - ✅ **Added:** 7 new entity types (Person, Organization, Goal, Habit, Event, Object, Location)
 - ✅ **Changed:** Relationships now have `situation_id` reference instead of `IN_SITUATION` relationship
-- ✅ **Changed:** Role is now relationship property, NOT entity
-- ✅ **Changed:** Emotion is now situational context, NOT entity
+- ✅ **Changed (ADR-0002):** Role, status, type moved from Neo4j to Qdrant context
+- ✅ **Changed (ADR-0002):** Neo4j stores ONLY structural + temporal boundaries
+- ✅ **Changed (ADR-0002):** Qdrant stores ALL descriptive/contextual properties
 
 ---
 
@@ -488,7 +489,7 @@ CREATE (p:Preference {
 
 ## 2. Relationships (Neo4j Relationships)
 
-**Design Principle:** Relationships have **stable properties** (not situational) + `situation_id` reference to Qdrant
+**Design Principle (ADR-0002):** Neo4j stores ONLY structural + temporal properties. ALL context in Qdrant.
 
 ### Standard Relationship Properties (All Relationships)
 
@@ -499,113 +500,204 @@ CREATE (p:Preference {
   observed_at: datetime,           // When was this relationship observed
   confidence: float,               // AI confidence (0.0-1.0)
   source: string                   // "explicit" | "implicit"
+
+  // Optional temporal boundaries (for efficient date queries):
+  // started_at, ended_at, joined_at, left_at, attended_at, target_date
 }]
 ```
 
+**Temporal Boundaries (ADR-0002):**
+- **WORKS_AT:** `started_at`, `ended_at`
+- **MEMBER_OF:** `joined_at`, `left_at`
+- **PURSUES:** `started_at`, `target_date`, `ended_at`
+- **HAS_HABIT:** `started_at`, `ended_at`
+- **ATTENDS:** `attended_at`
+- **KNOWS, OWNS, FREQUENTS, HAS_PREFERENCE:** No temporal boundaries
+
 ---
 
-### 2.1 KNOWS (User → Person)
+### 2.1 KNOWS (User → Person) - ADR-0002 Compliant
 
 **Connects:** User to Person
 
-**Stable Properties (Neo4j):**
-- `role: string` - User's role in this relationship (e.g., "colleague", "friend", "family", "mentor")
-- `relationship_type: string` - Nature of relationship (e.g., "professional", "personal", "family")
-- `communication_frequency: string` - How often they interact (AI-learned, e.g., "daily", "weekly")
-- `topics: string[]` - Common discussion topics (AI-learned, e.g., ["work", "tech", "hiking"])
+**Neo4j Properties (STRUCTURAL ONLY - no temporal boundaries):**
+- `relationship_instance_id`: UUID
+- `situation_id`: UUID (Qdrant reference)
+- `observed_at`: datetime
+- `confidence`: float
+- `source`: string
 
-**Situational Context (Qdrant - NICHT in Neo4j!):**
-- `emotion: string` - e.g., "friendly", "tense", "respectful"
-- `mood: string` - Current mood during interaction
-- `activity: string` - What they're doing (e.g., "project_discussion", "lunch")
-- `location: string` - Where interaction happens (e.g., "office", "cafe")
-- `time_of_day: string` - When interaction happens
-- ... (AI can add any context factors!)
+**Qdrant Context (ALL DESCRIPTIVE + SITUATIONAL):**
+- `role`: "colleague", "friend", "family", "mentor" (now in Qdrant!)
+- `relationship_type`: "professional", "personal", "family" (now in Qdrant!)
+- `communication_frequency`: "daily", "weekly" (AI-learned, now in Qdrant!)
+- `topics`: ["work", "tech", "hiking"] (AI-learned, now in Qdrant!)
+- `emotion`: "friendly", "tense", "respectful" (situational)
+- `mood`: "collaborative", "distant" (situational)
+- `activity`: "project_discussion", "lunch" (situational)
+- `location`: "office", "cafe" (situational)
+- `time_of_day`: "morning", "evening" (situational)
 
-**Cypher Example:**
+**Cypher Example (v3.0 - ADR-0002):**
 ```cypher
+// Neo4j: STRUCTURAL ONLY
 MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
 MATCH (p:Person {id: $person_id, tenant_id: $tenant_id})
 CREATE (u)-[r:KNOWS {
   relationship_instance_id: randomUUID(),
-  situation_id: $situation_id,  // Reference to Qdrant
-  role: "colleague",            // STABLE property
-  relationship_type: "professional",  // STABLE property
-  communication_frequency: "daily",   // STABLE (AI-learned pattern)
-  topics: ["work", "tech"],          // STABLE (AI-learned pattern)
+  situation_id: $situation_id,       // Reference to Qdrant
   observed_at: datetime(),
   confidence: 0.9,
   source: "explicit"
 }]->(p)
 ```
 
+```python
+# Qdrant: ALL CONTEXT
+{
+  "id": $situation_id,
+  "payload": {
+    "relationship_instance_id": "rel-uuid",
+    "context": {
+      "role": "colleague",                    # Now in Qdrant!
+      "relationship_type": "professional",     # Now in Qdrant!
+      "communication_frequency": "daily",      # Now in Qdrant!
+      "topics": ["work", "tech"],             # Now in Qdrant!
+      "emotion": "friendly",                   # Situational
+      "mood": "collaborative"                  # Situational
+    }
+  }
+}
+```
+
+**BREAKING CHANGE (v3.0):** `role`, `relationship_type`, etc. moved from Neo4j to Qdrant per ADR-0002!
+
 **Invariants:**
-1. `role` must be non-empty
-2. `confidence` must be 0.0-1.0
-3. Both User and Person must exist in same tenant
+1. `confidence` must be 0.0-1.0
+2. Both User and Person must exist in same tenant
+3. Role must be in Qdrant context, NOT Neo4j!
 
 ---
 
-### 2.2 WORKS_AT (User → Organization)
+### 2.2 WORKS_AT (User → Organization) - ADR-0002 Compliant
 
 **Connects:** User to Organization
 
-**Stable Properties (Neo4j):**
-- `role: string` - Job title (e.g., "Senior Engineer", "Manager")
-- `department: string` - Organizational unit (e.g., "Product Development")
-- `employment_type: string` - e.g., "full_time", "part_time", "contractor"
-- `started_at: date` - When employment started
-- `satisfaction_level: string` - Overall job satisfaction (AI-learned, e.g., "high", "medium", "low")
+**Neo4j Properties (STRUCTURAL + TEMPORAL):**
+- `relationship_instance_id`: UUID
+- `situation_id`: UUID
+- `started_at`: date (✅ Temporal boundary)
+- `ended_at`: date | null (✅ Temporal boundary)
+- `observed_at`: datetime
+- `confidence`: float
+- `source`: string
 
-**Situational Context (Qdrant):**
-- `mood: string` - Current mood at work
-- `stress_level: string` - Current stress
-- `activity: string` - What user is working on
-- `deadline_pressure: string` - Current pressure level
-- ... (AI-generated)
+**Qdrant Context (ALL DESCRIPTIVE + SITUATIONAL):**
+- `role`: "Senior Engineer", "Manager" (now in Qdrant!)
+- `department`: "Product Development" (now in Qdrant!)
+- `employment_type`: "full_time", "part_time" (now in Qdrant!)
+- `satisfaction_level`: "high", "medium", "low" (now in Qdrant!)
+- `started_at`: "2023-01-15" (copied for completeness)
+- `ended_at`: null (copied for completeness)
+- `mood`: "productive", "frustrated" (situational)
+- `stress_level`: "high", "low" (situational)
+- `activity`: "coding", "meetings" (situational)
+- `deadline_pressure`: "high", "normal" (situational)
 
-**Cypher Example:**
+**Cypher Example (v3.0 - ADR-0002):**
 ```cypher
+// Neo4j: STRUCTURAL + TEMPORAL ONLY
 MATCH (u:User {id: $user_id})
 MATCH (o:Organization {id: $org_id})
 CREATE (u)-[r:WORKS_AT {
   relationship_instance_id: randomUUID(),
   situation_id: $situation_id,
-  role: "Senior Engineer",      // STABLE
-  department: "Product Development",  // STABLE
-  employment_type: "full_time",  // STABLE
-  started_at: date("2023-01-15"),  // STABLE
-  satisfaction_level: "high",    // STABLE (overall, not situational)
+  started_at: date("2023-01-15"),    // ✅ Temporal boundary
+  ended_at: null,                     // ✅ Still active
   observed_at: datetime(),
   confidence: 1.0,
   source: "explicit"
 }]->(o)
 ```
 
+```python
+# Qdrant: ALL CONTEXT
+{
+  "id": $situation_id,
+  "payload": {
+    "relationship_instance_id": "rel-uuid",
+    "context": {
+      "role": "Senior Engineer",             # Now in Qdrant!
+      "department": "Product Development",    # Now in Qdrant!
+      "employment_type": "full_time",         # Now in Qdrant!
+      "satisfaction_level": "high",           # Now in Qdrant!
+      "started_at": "2023-01-15",            # Copied
+      "ended_at": null,                       # Copied
+      "mood": "productive",                   # Situational
+      "stress_level": "medium"                # Situational
+    }
+  }
+}
+```
+
+**Temporal Query Example:**
+```cypher
+// Find who worked at ACME during 2023 (efficient!)
+MATCH (u:User)-[r:WORKS_AT]->(o:Organization {name: "ACME Corp"})
+WHERE r.started_at <= date("2023-12-31")
+  AND (r.ended_at IS NULL OR r.ended_at >= date("2023-01-01"))
+RETURN u.name
+```
+
 ---
 
-### 2.3 MEMBER_OF (User → Organization)
+### 2.3 MEMBER_OF (User → Organization) - ADR-0002 Compliant
 
 **Connects:** User to Organization (non-employment membership)
 
 **Examples:** Gym membership, club membership, community membership
 
-**Stable Properties (Neo4j):**
-- `membership_type: string` - e.g., "gym", "club", "community"
-- `joined_at: date` - When membership started
-- `active: boolean` - Currently active or lapsed
+**Neo4j Properties (STRUCTURAL + TEMPORAL):**
+- `relationship_instance_id`: UUID
+- `situation_id`: UUID
+- `joined_at`: date (✅ Temporal boundary)
+- `left_at`: date | null (✅ Temporal boundary)
+- `observed_at`: datetime
+- `confidence`: float
+- `source`: string
 
-**Cypher Example:**
+**Qdrant Context (ALL DESCRIPTIVE + SITUATIONAL):**
+- `membership_type`: "gym", "club", "community" (now in Qdrant!)
+- `status`: "active", "lapsed" (now in Qdrant!)
+- `role`: "member", "organizer" (now in Qdrant!)
+- `joined_at`: "2024-01-01" (copied)
+- `left_at`: null (copied)
+- `engagement_level`: "high", "low" (situational)
+
+**Cypher Example (v3.0 - ADR-0002):**
 ```cypher
 CREATE (u)-[r:MEMBER_OF {
   relationship_instance_id: randomUUID(),
   situation_id: $situation_id,
-  membership_type: "gym",
-  joined_at: date("2024-01-01"),
-  active: true,
+  joined_at: date("2024-01-01"),     // ✅ Temporal boundary
+  left_at: null,                      // ✅ Still active
   observed_at: datetime(),
-  confidence: 1.0
+  confidence: 1.0,
+  source: "explicit"
 }]->(o)
+```
+
+```python
+# Qdrant: ALL CONTEXT
+{
+  "context": {
+    "membership_type": "gym",          # Now in Qdrant!
+    "status": "active",                # Now in Qdrant!
+    "role": "member",                  # Now in Qdrant!
+    "joined_at": "2024-01-01",        # Copied
+    "engagement_level": "high"         # Situational
+  }
+}
 ```
 
 ---
@@ -1265,6 +1357,7 @@ persons = await neo4j.run("""
 
 ## 9. Related Documents
 
+- **[ADR-0002: Property Placement Strategy and Geospatial Exception](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** Neo4j vs Qdrant property placement
 - **[ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)** - Technical decision
 - **[Entity-Relationship Model Architecture](../architecture/10-entity-relationship-model.md)** - Architecture overview
 - **[Situational Context Architecture](../architecture/08-situational-context-architecture.md)** - Context principles

@@ -14,6 +14,7 @@
 This document describes the technical implementation of **Situational Context** in the Fidus system, enabling context-aware preference learning and retrieval.
 
 **References:**
+- **[ADR-0002: Property Placement Strategy and Geospatial Exception](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** What goes in Neo4j vs Qdrant
 - [Architecture: Situational Context](../architecture/08-situational-context-architecture.md)
 - [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)
 - [Entity-Relationship Model](../architecture/10-entity-relationship-model.md)
@@ -217,57 +218,86 @@ graph TB
 
 ---
 
-## Design Guidelines: What Goes Where? (v2.0)
+## Design Guidelines: What Goes Where? (v2.0 + ADR-0002)
 
-**CRITICAL:** Understanding the difference between **stable properties** (Neo4j) and **situational context** (Qdrant)
+**CRITICAL:** Understanding the difference between **structural/temporal properties** (Neo4j) and **all context** (Qdrant)
 
-### Stable Properties (Neo4j Relationship)
+**Per ADR-0002:**
+- **Neo4j:** ONLY structural + temporal boundary properties
+- **Qdrant:** ALL descriptive/contextual properties (including role, status, etc.)
 
-Properties that describe the **permanent nature of the relationship**, NOT the current situation:
+### Neo4j Relationship Properties (STRUCTURAL + TEMPORAL)
 
 ✅ **Store in Neo4j:**
-- `role`: "colleague", "friend", "father" (doesn't change with mood/time/location)
-- `relationship_type`: "professional", "personal", "family"
-- `communication_frequency`: "daily", "weekly" (AI-learned stable pattern)
-- `employment_type`: "full_time", "part_time" (for WORKS_AT relationships)
+- `relationship_instance_id`: UUID (Primary key)
+- `situation_id`: UUID (Qdrant reference)
+- **Temporal boundaries** (for efficient date queries):
+  - `started_at`, `ended_at` (WORKS_AT, PURSUES, HAS_HABIT)
+  - `joined_at`, `left_at` (MEMBER_OF)
+  - `attended_at` (ATTENDS)
+  - `target_date` (PURSUES)
+- `observed_at`: DateTime (when relationship observed)
+- `confidence`: Float (0.0-1.0)
+- `source`: String ("explicit"|"inferred"|"llm")
 
-### Situational Context (Qdrant)
-
-Properties that describe **temporary situational conditions**, highly variable:
+### Qdrant Context (ALL DESCRIPTIVE/CONTEXTUAL)
 
 ✅ **Store in Qdrant `context`:**
-- `emotion`: "stressed", "relaxed", "excited" (changes constantly!)
-- `mood`: "energetic", "tired", "focused"
-- `time_of_day`: "morning", "afternoon", "evening"
-- `activity`: "working", "relaxing", "exercising"
-- `location`: "office", "home", "cafe" (can be situational OR stable, depending on use case)
-- `deadline_pressure`: "high", "low" (situational stress)
-- `energy_level`: "high", "low" (current state)
+- **ALL descriptive properties** (now in Qdrant per ADR-0002!):
+  - `role`: "colleague", "friend", "father"
+  - `relationship_type`: "professional", "personal", "family"
+  - `status`: "active", "paused", "completed"
+  - `priority`: "high", "medium", "low"
+  - `department`, `employment_type`, etc.
+- **Situational properties:**
+  - `emotion`: "stressed", "relaxed", "excited"
+  - `mood`: "energetic", "tired", "focused"
+  - `time_of_day`: "morning", "afternoon", "evening"
+  - `activity`: "working", "relaxing", "exercising"
+  - `location`: "office", "home", "cafe"
+  - `deadline_pressure`: "high", "low"
+  - `energy_level`: "high", "low"
 
-### Anti-Pattern Examples
+### Anti-Pattern Examples (ADR-0002)
 
-❌ **WRONG: Emotion as Relationship Property**
+❌ **WRONG v2.0: Descriptive Properties in Neo4j**
 ```cypher
-# NEVER do this!
-[:KNOWS {role: "colleague", emotion: "friendly"}]  # Emotion is situational!
+# NEVER do this (pre-ADR-0002 pattern)!
+[:KNOWS {
+  role: "colleague",              # ❌ Should be in Qdrant!
+  relationship_type: "professional",  # ❌ Should be in Qdrant!
+  emotion: "friendly"             # ❌ Should be in Qdrant!
+}]
 ```
 
-✅ **CORRECT: Emotion in Qdrant Context**
+✅ **CORRECT v3.0 (ADR-0002): Structural/Temporal in Neo4j, ALL Context in Qdrant**
 ```cypher
-# Neo4j: Stable properties only
-[:KNOWS {role: "colleague", situation_id: "sit-123"}]
+# Neo4j: ONLY structural + temporal
+[:KNOWS {
+  relationship_instance_id: "rel-123",
+  situation_id: "sit-123",
+  observed_at: datetime(),
+  confidence: 0.9,
+  source: "explicit"
+}]
 
-# Qdrant: Situational context
+# Qdrant: ALL context (including role!)
 {
   "id": "sit-123",
   "payload": {
+    "relationship_instance_id": "rel-123",
     "context": {
-      "emotion": "friendly",      # Situational!
-      "mood": "collaborative"     # Situational!
+      "role": "colleague",                    # Now in Qdrant!
+      "relationship_type": "professional",     # Now in Qdrant!
+      "communication_frequency": "daily",      # Now in Qdrant!
+      "emotion": "friendly",                   # Situational
+      "mood": "collaborative"                  # Situational
     }
   }
 }
 ```
+
+**BREAKING CHANGE (v3.0 + ADR-0002):** Properties like `role`, `relationship_type` moved from Neo4j to Qdrant!
 
 ---
 
@@ -1302,6 +1332,7 @@ print(job.get_status())  # queued, started, finished, failed
 
 ## Related Documents
 
+- **[ADR-0002: Property Placement Strategy](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL** guidance on Neo4j vs Qdrant
 - [Architecture: Situational Context](../architecture/08-situational-context-architecture.md) - Conceptual architecture
 - [User Profile Service](03-component-architecture.md#user-profile-service) - Where context is used
 - [Technology Decisions: Vector Databases](06-technology-decisions.md#qdrant) - Why Qdrant
