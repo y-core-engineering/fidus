@@ -6,6 +6,7 @@
 **Part of:** Fidus Solution Architecture
 
 **References:**
+- **[ADR-0002: Property Placement Strategy and Geospatial Exception](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** What goes in Neo4j vs Qdrant
 - [Entity-Relationship Model Architecture](../architecture/10-entity-relationship-model.md)
 - [Memory Domain Model](../domain-model/15-memory-entity-model.md)
 - [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)
@@ -393,7 +394,7 @@ PATCH  /api/memory/entities/goal/{goal_id}/progress  # Update progress
 
 ## Relationship Types Implementation
 
-### Standard Relationship Properties
+### Standard Relationship Properties (ADR-0002)
 
 **ALL relationships have these properties:**
 
@@ -404,44 +405,52 @@ PATCH  /api/memory/entities/goal/{goal_id}/progress  # Update progress
   observed_at: datetime,           # When was this relationship observed
   confidence: float,               # AI confidence (0.0-1.0)
   source: string                   # "explicit" | "implicit"
+
+  # Optional temporal boundaries (for efficient date queries):
+  # started_at, ended_at, joined_at, left_at, attended_at, target_date
 }]
 ```
 
+**Per ADR-0002:**
+- Neo4j: ONLY structural + temporal properties
+- Qdrant: ALL context (including role, status, type, etc.)
+
 ---
 
-### 1. KNOWS (User → Person)
+### 1. KNOWS (User → Person) - ADR-0002 Compliant
 
-**Stable Properties (Neo4j):**
+**Neo4j (STRUCTURAL ONLY - no temporal boundaries for KNOWS):**
 ```cypher
 [:KNOWS {
   relationship_instance_id: uuid,
   situation_id: uuid,
-
-  # Stable properties (NOT situational!)
-  role: string,                    # "colleague", "friend", "family", "mentor"
-  relationship_type: string,       # "professional", "personal", "family"
-  communication_frequency: string, # "daily", "weekly" (AI-learned pattern)
-  topics: string[],                # Shared interests (AI-learned)
-
   observed_at: datetime,
   confidence: float,
   source: string
 }]
 ```
 
-**Situational Context (Qdrant):**
+**Qdrant (ALL CONTEXT):**
 ```python
 {
   "context": {
-    "emotion": "friendly" | "tense" | "respectful",  # Situational!
-    "mood": "collaborative" | "distant",
-    "activity": "project_discussion" | "lunch",
-    "location": "office" | "cafe",
-    "time_of_day": "morning" | "evening",
-    # ... AI-discovered situational factors
+    # Descriptive properties (now in Qdrant per ADR-0002!)
+    "role": "colleague",                     # Now in Qdrant!
+    "relationship_type": "professional",      # Now in Qdrant!
+    "communication_frequency": "daily",       # Now in Qdrant!
+    "topics": ["work", "tech", "hiking"],    # Now in Qdrant!
+
+    # Situational properties
+    "emotion": "friendly",
+    "mood": "collaborative",
+    "activity": "project_discussion",
+    "location": "office",
+    "time_of_day": "morning"
   }
 }
 ```
+
+**BREAKING CHANGE:** Properties like `role`, `relationship_type` moved from Neo4j to Qdrant per ADR-0002!
 
 **API Endpoint:**
 ```
@@ -580,52 +589,77 @@ class KnowsRelationshipService:
 
 ---
 
-### 2. WORKS_AT (User → Organization)
+### 2. WORKS_AT (User → Organization) - ADR-0002 Compliant
 
-**Stable Properties:**
+**Neo4j (STRUCTURAL + TEMPORAL):**
 ```cypher
 [:WORKS_AT {
   relationship_instance_id: uuid,
   situation_id: uuid,
-
-  role: string,                    # Job title (e.g., "Senior Engineer")
-  department: string,
-  employment_type: string,         # "full_time", "part_time", "contractor"
-  started_at: date,
-  satisfaction_level: string,      # Overall (AI-learned, e.g., "high", "medium", "low")
-
+  started_at: date("2023-01-15"),    # ✅ Temporal boundary
+  ended_at: null,                     # ✅ Still active
   observed_at: datetime,
   confidence: float,
   source: string
 }]
 ```
 
-**Situational Context (Qdrant):**
+**Qdrant (ALL CONTEXT):**
 ```python
 {
   "context": {
-    "mood": "productive" | "frustrated",  # Situational!
-    "stress_level": "high" | "low",
-    "activity": "coding" | "meetings",
-    "deadline_pressure": "high" | "normal",
-    # ... AI-discovered
+    # Descriptive properties (now in Qdrant!)
+    "role": "Senior Engineer",             # Now in Qdrant!
+    "department": "Product Development",    # Now in Qdrant!
+    "employment_type": "full_time",         # Now in Qdrant!
+    "satisfaction_level": "high",           # Now in Qdrant!
+
+    # Temporal boundaries (copied for completeness)
+    "started_at": "2023-01-15",
+    "ended_at": null,
+
+    # Situational properties
+    "mood": "productive",
+    "stress_level": "medium",
+    "activity": "coding",
+    "deadline_pressure": "high"
   }
 }
 ```
 
+**Temporal Query Example:**
+```cypher
+// Find who worked at ACME during 2023 (efficient!)
+MATCH (u:User)-[r:WORKS_AT]->(o:Organization {name: "ACME Corp"})
+WHERE r.started_at <= date("2023-12-31")
+  AND (r.ended_at IS NULL OR r.ended_at >= date("2023-01-01"))
+RETURN u.name
+```
+
 ---
 
-### 3-9. Other Relationships
+### 3-9. Other Relationships (ADR-0002 Compliant)
 
 **MEMBER_OF, PURSUES, HAS_HABIT, ATTENDS, OWNS, FREQUENTS, HAS_PREFERENCE**
 
-Follow the same pattern:
-- Standard properties (relationship_instance_id, situation_id, confidence, etc.)
-- Type-specific stable properties (in Neo4j)
-- Situational context (in Qdrant)
-- Qdrant-first storage pattern
+Follow the ADR-0002 pattern:
+- **Neo4j:** ONLY structural + temporal boundary properties
+  - `relationship_instance_id`, `situation_id`, `observed_at`, `confidence`, `source`
+  - Temporal boundaries where applicable: `started_at`, `ended_at`, `joined_at`, `left_at`, `attended_at`, `target_date`
+- **Qdrant:** ALL descriptive + contextual properties
+  - Role, status, type, priority, department, etc.
+  - Situational properties: emotion, mood, activity, etc.
+- Qdrant-first storage pattern with rollback
 
 **See:** [Memory Domain Model](../domain-model/15-memory-entity-model.md) for complete relationship specifications
+
+**Key Temporal Boundaries by Relationship:**
+- `WORKS_AT`: `started_at`, `ended_at`
+- `MEMBER_OF`: `joined_at`, `left_at`
+- `PURSUES`: `started_at`, `target_date`, `ended_at`
+- `HAS_HABIT`: `started_at`, `ended_at`
+- `ATTENDS`: `attended_at`
+- `KNOWS`, `OWNS`, `FREQUENTS`, `HAS_PREFERENCE`: No temporal boundaries
 
 ---
 
@@ -1008,6 +1042,7 @@ async def delete_user(user_id: str, tenant_id: str):
 
 ## Related Documents
 
+- **[ADR-0002: Property Placement Strategy](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** Neo4j vs Qdrant guidance
 - **[Memory Domain Model](../domain-model/15-memory-entity-model.md)** - DDD specification
 - **[Entity-Relationship Model Architecture](../architecture/10-entity-relationship-model.md)** - Architecture overview
 - **[Situational Context - Solution Architecture](14-situational-context.md)** - Context storage

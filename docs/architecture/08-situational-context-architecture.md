@@ -502,6 +502,7 @@ Different domains care about different context factors:
 
 ## Related Documents
 
+- **[ADR-0002: Property Placement Strategy and Geospatial Exception](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **NEW:** Critical guidance on what goes in Neo4j vs Qdrant
 - **[Entity-Relationship Model](10-entity-relationship-model.md) - Complete entity model with AI-driven context** ⭐ NEW
 - [User Profiling Architecture](07-user-profiling.md) - How preferences are stored
 - [Proactivity Architecture](04-signals-events-proactivity.md) - How context triggers proactive actions
