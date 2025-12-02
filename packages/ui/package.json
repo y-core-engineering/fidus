@@ -42,6 +42,11 @@
       "import": "./dist/alert/index.mjs",
       "require": "./dist/alert/index.js"
     },
+    "./autocomplete": {
+      "types": "./dist/autocomplete/index.d.ts",
+      "import": "./dist/autocomplete/index.mjs",
+      "require": "./dist/autocomplete/index.js"
+    },
     "./avatar": {
       "types": "./dist/avatar/index.d.ts",
       "import": "./dist/avatar/index.mjs",
