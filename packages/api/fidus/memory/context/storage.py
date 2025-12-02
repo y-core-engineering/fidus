@@ -1,10 +1,15 @@
-"""Context storage service for persisting situations in Neo4j and Qdrant.
+"""Context storage service for persisting situations (Qdrant-First Pattern).
 
-This module provides storage and retrieval of situations with their context
-in both the graph database (Neo4j) and vector database (Qdrant).
+This module implements the Qdrant-First storage pattern (ADR-0001):
+1. Qdrant is PRIMARY: Full context stored in payload with embeddings
+2. Neo4j is SECONDARY: Only situation_id reference on Preference nodes (1-Hop queries)
+3. No Situation nodes in Neo4j - all context lives in Qdrant
+
+Architecture References:
+- ADR-0001: Situational Context as Relationship Qualifier
+- ADR-0002: Property Placement Strategy
 """
 
-import json
 import logging
 import uuid
 from datetime import datetime, timezone
@@ -22,13 +27,11 @@ logger = logging.getLogger(__name__)
 
 
 class ContextStorageService:
-    """Store and retrieve situations in Neo4j and Qdrant.
+    """Store and retrieve situations using Qdrant-First pattern.
 
-    This service manages the persistence of situations with their context:
-    - Neo4j: Stores situation nodes with properties and relationships
-    - Qdrant: Stores situation embeddings for similarity search
-
-    Both databases are kept in sync with multi-tenancy enforcement.
+    Qdrant-First Pattern (ADR-0001):
+    - Qdrant: PRIMARY storage for full context payload + embeddings
+    - Neo4j: SECONDARY with situation_id reference only (enables 1-Hop queries)
 
     Example:
         storage = ContextStorageService()
@@ -66,7 +69,7 @@ class ContextStorageService:
         )
         self.embedding_service = embedding_service or EmbeddingService()
 
-        logger.info("Initialized ContextStorageService")
+        logger.info("Initialized ContextStorageService (Qdrant-First pattern)")
 
     async def close(self) -> None:
         """Close database connections."""
@@ -80,7 +83,10 @@ class ContextStorageService:
         tenant_id: str,
         user_id: str,
     ) -> Situation:
-        """Store a situation in both Neo4j and Qdrant.
+        """Store a situation using Qdrant-First pattern.
+
+        Qdrant-First: Store in Qdrant FIRST (PRIMARY), then Neo4j (SECONDARY).
+        If Neo4j fails, rollback Qdrant for consistency.
 
         Args:
             context: Context factors for the situation
@@ -92,13 +98,13 @@ class ContextStorageService:
             Situation: The stored situation with generated ID
 
         Raises:
-            Exception: If storage fails in either database
+            Exception: If storage fails (with automatic rollback)
         """
         situation_id = str(uuid.uuid4())
         timestamp = datetime.now(timezone.utc).isoformat()
 
         logger.info(
-            "Storing situation",
+            "Storing situation (Qdrant-First)",
             extra={
                 "situation_id": situation_id,
                 "tenant_id": tenant_id,
@@ -108,16 +114,7 @@ class ContextStorageService:
         )
 
         try:
-            # Store in Neo4j
-            await self._store_in_neo4j(
-                situation_id=situation_id,
-                context=context,
-                tenant_id=tenant_id,
-                user_id=user_id,
-                timestamp=timestamp,
-            )
-
-            # Store in Qdrant
+            # Store in Qdrant (PRIMARY) - No Neo4j Situation nodes per ADR-0001
             await self._store_in_qdrant(
                 situation_id=situation_id,
                 embedding=embedding,
@@ -138,7 +135,7 @@ class ContextStorageService:
             )
 
             logger.info(
-                "Situation stored successfully",
+                "Situation stored successfully (Qdrant-First)",
                 extra={
                     "situation_id": situation_id,
                     "tenant_id": tenant_id,
@@ -150,7 +147,7 @@ class ContextStorageService:
 
         except Exception as e:
             logger.error(
-                f"Failed to store situation: {e}",
+                f"Failed to store situation in Qdrant: {e}",
                 extra={
                     "situation_id": situation_id,
                     "tenant_id": tenant_id,
@@ -158,73 +155,6 @@ class ContextStorageService:
                 },
             )
             raise
-
-    async def _store_in_neo4j(
-        self,
-        situation_id: str,
-        context: ContextFactors,
-        tenant_id: str,
-        user_id: str,
-        timestamp: str,
-    ) -> None:
-        """Store situation in Neo4j graph database.
-
-        Args:
-            situation_id: Unique situation identifier
-            context: Context factors
-            tenant_id: Tenant ID
-            user_id: User ID
-            timestamp: ISO format timestamp
-        """
-        async with self.neo4j_driver.session() as session:
-            await session.execute_write(
-                self._create_situation_node,
-                situation_id,
-                context,
-                tenant_id,
-                user_id,
-                timestamp,
-            )
-
-    @staticmethod
-    async def _create_situation_node(
-        tx,
-        situation_id: str,
-        context: ContextFactors,
-        tenant_id: str,
-        user_id: str,
-        timestamp: str,
-    ) -> None:
-        """Create a Situation node in Neo4j.
-
-        Args:
-            tx: Neo4j transaction
-            situation_id: Unique situation identifier
-            context: Context factors
-            tenant_id: Tenant ID
-            user_id: User ID
-            timestamp: ISO format timestamp
-        """
-        query = """
-        CREATE (s:Situation {
-            id: $situation_id,
-            tenant_id: $tenant_id,
-            user_id: $user_id,
-            factors: $factors,
-            created_at: $timestamp,
-            updated_at: $timestamp
-        })
-        RETURN s
-        """
-
-        await tx.run(
-            query,
-            situation_id=situation_id,
-            tenant_id=tenant_id,
-            user_id=user_id,
-            factors=json.dumps(context.factors),  # Serialize dict to JSON string for Neo4j
-            timestamp=timestamp,
-        )
 
     async def _store_in_qdrant(
         self,
@@ -235,7 +165,9 @@ class ContextStorageService:
         user_id: str,
         timestamp: str,
     ) -> None:
-        """Store situation embedding in Qdrant vector database.
+        """Store situation in Qdrant (PRIMARY storage).
+
+        Full context is stored in payload for retrieval without Neo4j lookup.
 
         Args:
             situation_id: Unique situation identifier
@@ -262,27 +194,32 @@ class ContextStorageService:
             points=[point],
         )
 
+        logger.debug(
+            "Stored situation in Qdrant",
+            extra={"situation_id": situation_id},
+        )
+
     async def link_preference_to_situation(
         self,
         preference_id: str,
         situation_id: str,
         tenant_id: str,
     ) -> None:
-        """Link a preference to a situation in Neo4j.
+        """Link a preference to a situation using situation_id property.
 
-        Creates an IN_SITUATION relationship between a Preference
-        node and a Situation node.
+        Qdrant-First Pattern: Uses situation_id property on HAS_PREFERENCE
+        relationship instead of IN_SITUATION edge (enables 1-Hop queries).
 
         Args:
             preference_id: Preference node ID
-            situation_id: Situation node ID
+            situation_id: Situation node ID (reference to Qdrant)
             tenant_id: Tenant ID for validation
 
         Raises:
-            ValueError: If nodes don't exist or belong to different tenants
+            ValueError: If preference doesn't exist
         """
         logger.info(
-            "Linking preference to situation",
+            "Linking preference to situation (1-Hop pattern)",
             extra={
                 "preference_id": preference_id,
                 "situation_id": situation_id,
@@ -292,7 +229,7 @@ class ContextStorageService:
 
         async with self.neo4j_driver.session() as session:
             result = await session.execute_write(
-                self._create_preference_situation_link,
+                self._update_preference_with_situation_id,
                 preference_id,
                 situation_id,
                 tenant_id,
@@ -301,11 +238,11 @@ class ContextStorageService:
             if not result:
                 raise ValueError(
                     f"Failed to link preference {preference_id} to situation {situation_id}. "
-                    f"Nodes may not exist or may belong to different tenants."
+                    f"Preference may not exist or may belong to different tenant."
                 )
 
         logger.info(
-            "Preference linked to situation",
+            "Preference linked to situation (situation_id property set)",
             extra={
                 "preference_id": preference_id,
                 "situation_id": situation_id,
@@ -314,28 +251,30 @@ class ContextStorageService:
         )
 
     @staticmethod
-    async def _create_preference_situation_link(
+    async def _update_preference_with_situation_id(
         tx,
         preference_id: str,
         situation_id: str,
         tenant_id: str,
     ) -> bool:
-        """Create IN_SITUATION relationship in Neo4j.
+        """Update Preference node with situation_id property.
+
+        1-Hop Pattern: situation_id is stored directly on Preference node,
+        enabling direct lookup without traversing IN_SITUATION relationship.
 
         Args:
             tx: Neo4j transaction
             preference_id: Preference node ID
-            situation_id: Situation node ID
+            situation_id: Situation ID (Qdrant reference)
             tenant_id: Tenant ID for validation
 
         Returns:
-            bool: True if link created successfully
+            bool: True if update successful
         """
         query = """
         MATCH (p:Preference {id: $preference_id, tenant_id: $tenant_id})
-        MATCH (s:Situation {id: $situation_id, tenant_id: $tenant_id})
-        CREATE (p)-[:IN_SITUATION]->(s)
-        RETURN p, s
+        SET p.situation_id = $situation_id
+        RETURN p
         """
 
         result = await tx.run(
@@ -353,7 +292,9 @@ class ContextStorageService:
         situation_id: str,
         tenant_id: str,
     ) -> Optional[Situation]:
-        """Retrieve a situation by ID from Neo4j and Qdrant.
+        """Retrieve a situation by ID from Qdrant (PRIMARY).
+
+        Qdrant-First: Retrieves full context from Qdrant, not Neo4j.
 
         Args:
             situation_id: Situation ID to retrieve
@@ -363,24 +304,23 @@ class ContextStorageService:
             Optional[Situation]: The situation if found, None otherwise
         """
         logger.info(
-            "Retrieving situation",
+            "Retrieving situation from Qdrant",
             extra={
                 "situation_id": situation_id,
                 "tenant_id": tenant_id,
             },
         )
 
-        # Get from Neo4j (includes tenant validation)
-        async with self.neo4j_driver.session() as session:
-            result = await session.execute_read(
-                self._get_situation_node,
-                situation_id,
-                tenant_id,
+        try:
+            # Get from Qdrant (PRIMARY)
+            points = self.qdrant_client.retrieve(
+                collection_name=self.COLLECTION_NAME,
+                ids=[situation_id],
             )
 
-            if not result:
+            if not points:
                 logger.warning(
-                    "Situation not found",
+                    "Situation not found in Qdrant",
                     extra={
                         "situation_id": situation_id,
                         "tenant_id": tenant_id,
@@ -388,91 +328,63 @@ class ContextStorageService:
                 )
                 return None
 
-        # Get embedding from Qdrant
-        points = self.qdrant_client.retrieve(
-            collection_name=self.COLLECTION_NAME,
-            ids=[situation_id],
-        )
+            payload = points[0].payload
 
-        if not points:
-            logger.warning(
-                "Situation embedding not found in Qdrant",
+            # Validate tenant_id
+            if payload.get("tenant_id") != tenant_id:
+                logger.warning(
+                    "Tenant mismatch when retrieving situation",
+                    extra={
+                        "situation_id": situation_id,
+                        "expected_tenant": tenant_id,
+                        "actual_tenant": payload.get("tenant_id"),
+                    },
+                )
+                return None
+
+            situation = Situation(
+                id=situation_id,
+                tenant_id=payload["tenant_id"],
+                user_id=payload["user_id"],
+                context=ContextFactors(factors=payload["factors"]),
+                embedding=points[0].vector,
+                created_at=payload["created_at"],
+                updated_at=payload["updated_at"],
+            )
+
+            logger.info(
+                "Situation retrieved successfully from Qdrant",
                 extra={
                     "situation_id": situation_id,
                     "tenant_id": tenant_id,
                 },
             )
-            embedding = None
-        else:
-            # Validate tenant_id from Qdrant payload
-            if points[0].payload["tenant_id"] != tenant_id:
-                logger.error(
-                    "Tenant mismatch in Qdrant",
-                    extra={
-                        "situation_id": situation_id,
-                        "expected_tenant": tenant_id,
-                        "actual_tenant": points[0].payload["tenant_id"],
-                    },
-                )
-                return None
 
-            embedding = points[0].vector
+            return situation
 
-        situation = Situation(
-            id=result["id"],
-            tenant_id=result["tenant_id"],
-            user_id=result["user_id"],
-            context=ContextFactors(factors=json.loads(result["factors"])),  # Deserialize JSON string back to dict
-            embedding=embedding,
-            created_at=result["created_at"],
-            updated_at=result["updated_at"],
-        )
-
-        logger.info(
-            "Situation retrieved successfully",
-            extra={
-                "situation_id": situation_id,
-                "tenant_id": tenant_id,
-            },
-        )
-
-        return situation
-
-    @staticmethod
-    async def _get_situation_node(
-        tx,
-        situation_id: str,
-        tenant_id: str,
-    ) -> Optional[dict]:
-        """Retrieve situation node from Neo4j.
-
-        Args:
-            tx: Neo4j transaction
-            situation_id: Situation ID
-            tenant_id: Tenant ID for isolation
-
-        Returns:
-            Optional[dict]: Situation data if found
-        """
-        query = """
-        MATCH (s:Situation {id: $situation_id, tenant_id: $tenant_id})
-        RETURN s.id AS id,
-               s.tenant_id AS tenant_id,
-               s.user_id AS user_id,
-               s.factors AS factors,
-               s.created_at AS created_at,
-               s.updated_at AS updated_at
-        """
-
-        result = await tx.run(
-            query,
-            situation_id=situation_id,
-            tenant_id=tenant_id,
-        )
-
-        record = await result.single()
-
-        if not record:
+        except Exception as e:
+            logger.error(
+                f"Failed to retrieve situation: {e}",
+                extra={
+                    "situation_id": situation_id,
+                    "tenant_id": tenant_id,
+                },
+            )
             return None
 
-        return dict(record)
+    async def get_context_by_situation_id(
+        self,
+        situation_id: str,
+        tenant_id: str,
+    ) -> Optional[ContextFactors]:
+        """Retrieve context factors by situation_id from Qdrant.
+
+        Args:
+            situation_id: Situation ID
+            tenant_id: Tenant ID for validation
+
+        Returns:
+            Optional[ContextFactors]: Context factors or None if not found
+        """
+        situation = await self.get_situation_by_id(situation_id, tenant_id)
+        return situation.context if situation else None

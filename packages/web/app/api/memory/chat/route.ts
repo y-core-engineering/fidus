@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
 
+// Increase timeout for LLM streaming responses
+export const maxDuration = 120; // 2 minutes
+
 interface ChatRequest {
   user_id: string;
   message: string;
@@ -35,11 +38,18 @@ export async function POST(request: NextRequest) {
       headers['X-User-ID'] = userIdHeader;
     }
 
+    // Use AbortController with longer timeout for LLM streaming (2 minutes)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
+
     const response = await fetch(`${backendUrl}/memory/chat`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ user_id, message }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -53,29 +63,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Stream the response back to the client
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader();
-        if (!reader) {
-          controller.close();
-          return;
-        }
+    // Stream the response back to the client using TransformStream for better handling
+    const reader = response.body?.getReader();
+    if (!reader) {
+      return new Response(
+        JSON.stringify({ error: 'No response body from backend' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
+    const stream = new ReadableStream({
+      async pull(controller) {
         try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-              controller.close();
-              break;
-            }
-            controller.enqueue(value);
+          const { done, value } = await reader.read();
+          if (done) {
+            controller.close();
+            return;
           }
+          controller.enqueue(value);
         } catch (error) {
-          console.error('Stream error:', error);
+          console.error('Stream pull error:', error);
           controller.error(error);
         }
+      },
+      cancel() {
+        reader.cancel();
       },
     });
 

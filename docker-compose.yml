@@ -42,25 +42,6 @@ services:
       retries: 5
 
   # =============================================================================
-  # LLM Service (Ollama for local testing)
-  # =============================================================================
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: fidus-memory-ollama
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 0"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-  # =============================================================================
   # Qdrant Vector Database
   # =============================================================================
 
@@ -121,8 +102,9 @@ services:
       - .env.memory
     environment:
       # LLM Configuration (loaded from .env.memory via env_file)
-      # Defaults provided here only as fallback
-      OLLAMA_API_BASE: http://ollama:11434
+      # OPENAI_API_BASE and FIDUS_LLM_MODEL are set in .env.memory
+      # Fallback to Ollama if not using external LLM
+      OLLAMA_API_BASE: ${OLLAMA_API_BASE:-http://ollama:11434}
 
       # Application
       ENVIRONMENT: ${ENVIRONMENT:-production}
@@ -144,16 +126,19 @@ services:
       QDRANT_PORT: 6333
       QDRANT_GRPC_PORT: 6334
 
+      # v3.0 Feature Flags (ADR-0001: Qdrant-First Pattern)
+      USE_QDRANT_FIRST: ${USE_QDRANT_FIRST:-true}
+
       # CORS
       CORS_ORIGINS: http://localhost:3001,http://memory-web:3000
     ports:
       - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       memory-postgres:
         condition: service_healthy
       memory-redis:
-        condition: service_healthy
-      ollama:
         condition: service_healthy
       qdrant:
         condition: service_healthy
@@ -178,8 +163,8 @@ services:
     env_file:
       - .env.memory
     environment:
-      # LLM Configuration
-      OLLAMA_API_BASE: http://ollama:11434
+      # LLM Configuration (loaded from .env.memory)
+      OLLAMA_API_BASE: ${OLLAMA_API_BASE:-http://ollama:11434}
 
       # Application
       ENVIRONMENT: ${ENVIRONMENT:-production}
@@ -200,14 +185,17 @@ services:
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
       QDRANT_GRPC_PORT: 6334
+
+      # v3.0 Feature Flags (ADR-0001: Qdrant-First Pattern)
+      USE_QDRANT_FIRST: ${USE_QDRANT_FIRST:-true}
     ports:
       - "8001:8001"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       memory-postgres:
         condition: service_healthy
       memory-redis:
-        condition: service_healthy
-      ollama:
         condition: service_healthy
       qdrant:
         condition: service_healthy
@@ -256,8 +244,6 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
-    driver: local
-  ollama_data:
     driver: local
   qdrant_data:
     driver: local

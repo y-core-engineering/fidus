@@ -408,20 +408,41 @@ class PersistentAgent(InMemoryAgent):
                 # Phase 3: Record situational context
                 if self.enable_context_awareness and self.context_agent:
                     try:
-                        # Get the original message that triggered this preference
-                        original_message = pref_data.get("original_message", "")
-
-                        if original_message:
-                            situation = await self.context_agent.record_preference_with_context(
-                                message=original_message,
-                                preference_id=created_pref["id"],
+                        # Use cached context and embedding if available (avoids duplicate LLM calls)
+                        if hasattr(self, '_cached_context') and self._cached_context is not None:
+                            # Store situation using cached data
+                            situation = await self.context_agent.storage.store_situation(
+                                context=self._cached_context,
+                                embedding=self._cached_embedding,
                                 tenant_id=self.tenant_id,
                                 user_id=pref_data.get("user_id", "unknown"),
                             )
-                            logger.info(
-                                f"Recorded context for preference {key}: "
-                                f"{len(situation.context.factors)} factors, situation_id={situation.id}"
+
+                            # Link preference to situation
+                            await self.context_agent.storage.link_preference_to_situation(
+                                preference_id=created_pref["id"],
+                                situation_id=situation.id,
+                                tenant_id=self.tenant_id,
                             )
+
+                            logger.info(
+                                f"Recorded context for preference {key} (using cached context): "
+                                f"{len(self._cached_context.factors)} factors, situation_id={situation.id}"
+                            )
+                        else:
+                            # Fallback: Extract context fresh (only if not cached)
+                            original_message = pref_data.get("original_message", "")
+                            if original_message:
+                                situation = await self.context_agent.record_preference_with_context(
+                                    message=original_message,
+                                    preference_id=created_pref["id"],
+                                    tenant_id=self.tenant_id,
+                                    user_id=pref_data.get("user_id", "unknown"),
+                                )
+                                logger.info(
+                                    f"Recorded context for preference {key}: "
+                                    f"{len(situation.context.factors)} factors, situation_id={situation.id}"
+                                )
                     except Exception as e:
                         # Don't fail preference creation if context recording fails
                         logger.warning(f"Failed to record context for preference {key}: {e}")
@@ -495,15 +516,50 @@ class PersistentAgent(InMemoryAgent):
         self._last_user_message = user_message
         self._current_user_id = user_id
 
+        # Phase 3: Cache context extraction to avoid duplicate LLM calls
+        # This is reused later in _persist_pending_saves() for record_preference_with_context()
+        self._cached_context = None
+        self._cached_embedding = None
+
         # Phase 3: Get context-relevant preferences before generating response
         if self.enable_context_awareness and self.context_agent:
             original_prefs = self.preferences.copy()
             try:
-                # Temporarily set preferences to context-relevant ones
-                self.preferences = await self._get_context_relevant_preferences(
+                # Extract context once and cache it for later use
+                self._cached_context = await self.context_agent.extract_and_merge_context(
                     message=user_message,
+                    tenant_id=self.tenant_id,
                     user_id=user_id,
                 )
+
+                # Generate embedding once and cache it
+                self._cached_embedding = await self.context_agent.embedding_service.generate_embedding(
+                    context=self._cached_context,
+                    tenant_id=self.tenant_id,
+                    user_id=user_id,
+                )
+
+                # Find similar situations using cached embedding
+                similar_situations = self.context_agent.retrieval.find_similar_situations(
+                    query_embedding=self._cached_embedding,
+                    user_id=user_id,
+                    tenant_id=self.tenant_id,
+                    top_k=10,
+                    min_score=0.6,
+                )
+
+                if similar_situations:
+                    # Extract preference IDs from situations
+                    relevant_prefs = {}
+                    for situation in similar_situations:
+                        for key, pref in self.preferences.items():
+                            if pref.get("id"):
+                                relevant_prefs[key] = pref
+                    self.preferences = relevant_prefs if relevant_prefs else self.preferences
+                    logger.info(
+                        f"Context-aware retrieval: {len(similar_situations)} situations → "
+                        f"{len(self.preferences)} relevant preferences"
+                    )
             except Exception as e:
                 logger.warning(f"Context-aware filtering failed, using all preferences: {e}")
                 # Keep original preferences on error
@@ -540,3 +596,7 @@ class PersistentAgent(InMemoryAgent):
 
                 # Restore original preferences (now including new ones)
                 self.preferences = original_prefs
+
+            # Clear cached context and embedding to free memory
+            self._cached_context = None
+            self._cached_embedding = None

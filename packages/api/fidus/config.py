@@ -63,6 +63,9 @@ class PrototypeConfig:
         self.environment: str = os.getenv("ENVIRONMENT", "development")
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
 
+        # Feature Flags
+        self.use_user_entity: bool = os.getenv("USE_USER_ENTITY", "true").lower() == "true"
+
     @property
     def is_production(self) -> bool:
         """Check if running in production environment."""

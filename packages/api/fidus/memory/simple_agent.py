@@ -70,6 +70,11 @@ class InMemoryAgent:
                 completion_kwargs["api_base"] = openai_base
                 logger.info(f"Using OpenAI API base: {openai_base}")
 
+        # Disable thinking mode for Qwen3 models (returns empty content otherwise)
+        if "qwen3" in self.llm_model.lower():
+            completion_kwargs["extra_body"] = {"enable_thinking": False}
+            logger.info("Disabled thinking mode for Qwen3 model")
+
         response = await acompletion(**completion_kwargs)
 
         bot_response = response.choices[0].message.content
@@ -79,10 +84,14 @@ class InMemoryAgent:
     async def chat_stream(self, user_message: str, user_id: str = "unknown") -> AsyncGenerator[str, None]:
         """Process user message and stream response token by token.
 
+        Uses parallel LLM calls to maximize throughput when multiple LiteLLM workers are available.
+
         Args:
             user_message: The user's message
             user_id: User identifier for context tracking (Phase 4)
         """
+        import asyncio
+
         logger.info(f"Chat stream called with message: {user_message[:50]}... (user: {user_id})")
         logger.info(f"Using model: {self.llm_model}")
 
@@ -92,72 +101,20 @@ class InMemoryAgent:
         # 2. Yield acknowledgment event
         yield json.dumps({"type": "acknowledged"}) + "\n"
 
-        # 3. Extract preferences from message (in background, don't block streaming)
-        extracted = await self._extract_preferences(user_message)
-        conflicts = self._update_preferences(extracted)
-
-        # Yield preferences update event immediately after extraction
-        extracted_count = len(extracted) if extracted else 0
-        if extracted_count > 0:
-            yield json.dumps({
-                "type": "preferences_updated",
-                "count": extracted_count
-            }) + "\n"
-
-        # Check for semantic inconsistencies in newly added preferences
-        semantic_conflicts = await self._find_semantic_inconsistencies()
-
-        # Combine direct conflicts with semantic conflicts
-        all_conflicts = conflicts + semantic_conflicts
-
-        # Yield conflict event if there are sentiment conflicts
-        if all_conflicts:
-            # For each conflict, find semantically related preferences
-            enriched_conflicts = []
-            for conflict in all_conflicts:
-                # Find related preferences that might also be inconsistent
-                related_keys = await self._find_related_preferences(
-                    conflict["key"],
-                    conflict["new_sentiment"]
-                )
-
-                # Check which related preferences have opposite sentiment
-                affected_prefs = []
-                for related_key in related_keys:
-                    # Skip if this is the same key as the conflict itself (direct conflict, not semantic)
-                    if related_key == conflict["key"]:
-                        continue
-
-                    if related_key in self.preferences:
-                        related_pref = self.preferences[related_key]
-                        # Only include if sentiment is opposite to new preference
-                        if ((conflict["new_sentiment"] == "negative" and related_pref["sentiment"] == "positive") or
-                            (conflict["new_sentiment"] == "positive" and related_pref["sentiment"] == "negative")):
-                            affected_prefs.append({
-                                "key": related_key,
-                                "value": related_pref["value"],
-                                "sentiment": related_pref["sentiment"],
-                                "confidence": related_pref["confidence"]
-                            })
-
-                # Add related preferences to conflict
-                enriched_conflict = {**conflict, "related_preferences": affected_prefs}
-                enriched_conflicts.append(enriched_conflict)
-
-            yield json.dumps({
-                "type": "preference_conflict",
-                "conflicts": enriched_conflicts
-            }) + "\n"
-
-        # 4. Build system prompt with learned preferences
+        # 3. Build system prompt with CURRENT preferences (before extraction)
+        # This allows chat to start immediately while preference extraction runs in parallel
         system_prompt = self._build_prompt()
 
-        # 5. Apply sliding window to conversation history
+        # 4. Start preference extraction AND chat response in PARALLEL
+        # This leverages multiple LiteLLM workers for faster response
+        preference_task = asyncio.create_task(self._extract_preferences(user_message))
+
+        # 5. Start streaming chat response immediately (don't wait for preference extraction)
+        logger.info(f"Calling LiteLLM with streaming model: {self.llm_model}")
+
+        # Apply sliding window to conversation history
         recent_history = self._get_recent_history()
         logger.info(f"Using {len(recent_history)} messages from history (window size: {self.max_history_messages})")
-
-        # 6. Generate streaming response
-        logger.info(f"Calling LiteLLM with streaming model: {self.llm_model}")
 
         # Build kwargs for acompletion with streaming
         completion_kwargs = {
@@ -181,6 +138,11 @@ class InMemoryAgent:
                 completion_kwargs["api_base"] = openai_base
                 logger.info(f"Using OpenAI API base: {openai_base}")
 
+        # Disable thinking mode for Qwen3 models (returns empty content otherwise)
+        if "qwen3" in self.llm_model.lower():
+            completion_kwargs["extra_body"] = {"enable_thinking": False}
+            logger.info("Disabled thinking mode for Qwen3 model")
+
         response = await acompletion(**completion_kwargs)
 
         # Stream tokens and build full response
@@ -196,10 +158,61 @@ class InMemoryAgent:
                         "content": token
                     }) + "\n"
 
-        # 7. Add to conversation history
+        # 6. Add to conversation history
         self.conversation_history.append({"role": "assistant", "content": full_response})
 
-        # 8. Yield completion event
+        # 7. Now await preference extraction result (should be done or nearly done)
+        extracted = await preference_task
+        conflicts = self._update_preferences(extracted)
+
+        # Yield preferences update event
+        extracted_count = len(extracted) if extracted else 0
+        if extracted_count > 0:
+            yield json.dumps({
+                "type": "preferences_updated",
+                "count": extracted_count
+            }) + "\n"
+
+        # 8. Only check for semantic inconsistencies if there are direct conflicts
+        # This saves LLM calls when there are no conflicts to analyze
+        if conflicts:
+            # For direct conflicts, find related preferences to enrich the conflict info
+            async def enrich_conflict(conflict):
+                related_keys = await self._find_related_preferences(
+                    conflict["key"],
+                    conflict["new_sentiment"]
+                )
+
+                affected_prefs = []
+                for related_key in related_keys:
+                    if related_key == conflict["key"]:
+                        continue
+                    if related_key in self.preferences:
+                        related_pref = self.preferences[related_key]
+                        if ((conflict["new_sentiment"] == "negative" and related_pref["sentiment"] == "positive") or
+                            (conflict["new_sentiment"] == "positive" and related_pref["sentiment"] == "negative")):
+                            affected_prefs.append({
+                                "key": related_key,
+                                "value": related_pref["value"],
+                                "sentiment": related_pref["sentiment"],
+                                "confidence": related_pref["confidence"]
+                            })
+
+                return {**conflict, "related_preferences": affected_prefs}
+
+            # Run all conflict enrichments in parallel
+            enriched_conflicts = await asyncio.gather(*[enrich_conflict(c) for c in conflicts])
+
+            yield json.dumps({
+                "type": "preference_conflict",
+                "conflicts": list(enriched_conflicts)
+            }) + "\n"
+
+        # NOTE: _find_semantic_inconsistencies() is disabled for performance
+        # It was making O(n²) LLM calls for n preferences
+        # TODO: Re-enable with embedding-based similarity instead of LLM calls
+
+        # 9. Yield completion event
         yield json.dumps({"type": "done"}) + "\n"
 
     async def _extract_preferences(self, text: str) -> List[Dict[str, Any]]:
@@ -276,6 +289,15 @@ class InMemoryAgent:
         if self.llm_model.startswith("ollama/"):
             ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
             completion_kwargs["api_base"] = ollama_base
+        else:
+            # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
+            openai_base = os.getenv("OPENAI_API_BASE")
+            if openai_base:
+                completion_kwargs["api_base"] = openai_base
+
+        # Disable thinking mode for Qwen3 models (returns empty content otherwise)
+        if "qwen3" in self.llm_model.lower():
+            completion_kwargs["extra_body"] = {"enable_thinking": False}
 
         response = await acompletion(**completion_kwargs)
 
@@ -379,6 +401,15 @@ Response:"""
             if self.llm_model.startswith("ollama/"):
                 ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
                 completion_kwargs["api_base"] = ollama_base
+            else:
+                # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
+                openai_base = os.getenv("OPENAI_API_BASE")
+                if openai_base:
+                    completion_kwargs["api_base"] = openai_base
+
+            # Disable thinking mode for Qwen3 models (returns empty content otherwise)
+            if "qwen3" in self.llm_model.lower():
+                completion_kwargs["extra_body"] = {"enable_thinking": False}
 
             response = await acompletion(**completion_kwargs)
             result = json.loads(response.choices[0].message.content)

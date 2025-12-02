@@ -3,6 +3,7 @@
 import { ChatInterface, Alert, Stack, Container, OpportunityCard, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui';
 import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceViewer';
 import { SituationsViewer, SituationsViewerRef } from './components/SituationsViewer';
+import { MigrationStatus } from './components/MigrationStatus';
 import { useState, useEffect, useRef } from 'react';
 import { getUserId, setUserId } from '../lib/userSession';
 
@@ -45,7 +46,7 @@ export default function FidusMemoryPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [conflicts, setConflicts] = useState<PreferenceConflict[]>([]);
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<'preferences' | 'situations'>('preferences');
+  const [sidebarTab, setSidebarTab] = useState<'preferences' | 'situations' | 'admin'>('preferences');
   const preferenceViewerRef = useRef<PreferenceViewerRef>(null);
   const situationsViewerRef = useRef<SituationsViewerRef>(null);
 
@@ -517,6 +518,16 @@ export default function FidusMemoryPage() {
                 >
                   🎯 Situations
                 </button>
+                <button
+                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
+                    sidebarTab === 'admin'
+                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSidebarTab('admin')}
+                >
+                  ⚙️ Admin
+                </button>
               </div>
 
               {/* Tab Content */}
@@ -526,6 +537,9 @@ export default function FidusMemoryPage() {
                 )}
                 {sidebarTab === 'situations' && (
                   <SituationsViewer ref={situationsViewerRef} className="p-4" />
+                )}
+                {sidebarTab === 'admin' && (
+                  <MigrationStatus className="p-4" />
                 )}
               </div>
             </div>
