@@ -2,6 +2,9 @@
  * Memory API client for user management.
  *
  * Provides typed functions for interacting with the User API endpoints.
+ *
+ * NOTE (ADR-0003): Skills are stored as role-scoped attributes on relationship
+ * contexts in Qdrant, not on the User entity.
  */
 
 export interface User {
@@ -11,7 +14,6 @@ export interface User {
   name: string;
   preferred_language: string;
   timezone: string;
-  skills: string[];
   ai_properties: Record<string, unknown>;
   created_at: string;
   updated_at: string;
@@ -23,7 +25,6 @@ export interface UserCreate {
   name: string;
   preferred_language?: string;
   timezone?: string;
-  skills?: string[];
   ai_properties?: Record<string, unknown>;
 }
 
@@ -31,7 +32,6 @@ export interface UserUpdate {
   name?: string;
   preferred_language?: string;
   timezone?: string;
-  skills?: string[];
   ai_properties?: Record<string, unknown>;
 }
 

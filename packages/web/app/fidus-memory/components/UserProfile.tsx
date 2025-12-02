@@ -15,14 +15,16 @@ import {
   ModalFooter,
   Skeleton,
 } from '@fidus/ui';
-import { SkillsEditor } from './SkillsEditor';
+// NOTE (ADR-0003): Skills are now managed per relationship context, not on User
 import {
   type User,
-  type UserUpdate,
   getUser,
+  getUserByEmail,
+  createUser,
   updateUser,
   deleteUser,
 } from '@/lib/api/memory';
+import { setUserId } from '@/app/lib/userSession';
 
 interface UserProfileProps {
   userId: string;
@@ -61,9 +63,14 @@ export function UserProfile({ userId, tenantId }: UserProfileProps) {
   const [name, setName] = useState('');
   const [preferredLanguage, setPreferredLanguage] = useState('en');
   const [timezone, setTimezone] = useState('UTC');
-  const [skills, setSkills] = useState<string[]>([]);
 
   const fetchUser = useCallback(async () => {
+    if (!userId) {
+      setError('No user ID available. Please send a message first to create your profile.');
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
@@ -72,10 +79,43 @@ export function UserProfile({ userId, tenantId }: UserProfileProps) {
       setName(userData.name);
       setPreferredLanguage(userData.preferred_language);
       setTimezone(userData.timezone);
-      setSkills(userData.skills || []);
     } catch (err) {
-      setError('Failed to load user profile');
-      console.error(err);
+      // If user not found by ID (404), try to find by email or create
+      if (err instanceof Error && err.message === 'User not found') {
+        const email = `${userId}@example.com`;
+        try {
+          // First, try to find by email (user may exist with different ID)
+          const existingUser = await getUserByEmail(email, tenantId);
+          // Found! Update localStorage with the correct ID
+          setUserId(existingUser.id);
+          setUser(existingUser);
+          setName(existingUser.name);
+          setPreferredLanguage(existingUser.preferred_language);
+          setTimezone(existingUser.timezone);
+        } catch {
+          // Not found by email either, create new user
+          try {
+            const newUser = await createUser({
+              tenant_id: tenantId,
+              email,
+              name: 'New User',
+            });
+            // Update localStorage with the new user's ID
+            setUserId(newUser.id);
+            setUser(newUser);
+            setName(newUser.name);
+            setPreferredLanguage(newUser.preferred_language);
+            setTimezone(newUser.timezone);
+            setIsEditing(true); // Start in edit mode for new users
+          } catch (createErr) {
+            setError('Failed to create user profile');
+            console.error(createErr);
+          }
+        }
+      } else {
+        setError('Failed to load user profile');
+        console.error(err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -86,14 +126,15 @@ export function UserProfile({ userId, tenantId }: UserProfileProps) {
   }, [fetchUser]);
 
   const handleSave = async () => {
+    if (!user) return;
     setIsSaving(true);
     setError(null);
     try {
-      const updatedUser = await updateUser(userId, tenantId, {
+      // Use user.id (actual DB ID) instead of userId prop (may be stale)
+      const updatedUser = await updateUser(user.id, tenantId, {
         name,
         preferred_language: preferredLanguage,
         timezone,
-        skills,
       });
       setUser(updatedUser);
       setIsEditing(false);
@@ -106,9 +147,11 @@ export function UserProfile({ userId, tenantId }: UserProfileProps) {
   };
 
   const handleDelete = async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
-      await deleteUser(userId, tenantId);
+      // Use user.id (actual DB ID) instead of userId prop
+      await deleteUser(user.id, tenantId);
       router.push('/');
     } catch (err) {
       setError('Failed to delete account');
@@ -122,7 +165,6 @@ export function UserProfile({ userId, tenantId }: UserProfileProps) {
       setName(user.name);
       setPreferredLanguage(user.preferred_language);
       setTimezone(user.timezone);
-      setSkills(user.skills || []);
     }
     setIsEditing(false);
   };
@@ -209,16 +251,6 @@ export function UserProfile({ userId, tenantId }: UserProfileProps) {
               onChange={setTimezone}
               disabled={!isEditing}
               options={TIMEZONES}
-            />
-          </div>
-
-          {/* Skills */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
-            <SkillsEditor
-              skills={skills}
-              onChange={setSkills}
-              disabled={!isEditing}
             />
           </div>
 

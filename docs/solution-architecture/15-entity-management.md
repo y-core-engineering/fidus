@@ -7,6 +7,7 @@
 
 **References:**
 - **[ADR-0002: Property Placement Strategy and Geospatial Exception](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** What goes in Neo4j vs Qdrant
+- **[ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md)** - **CRITICAL:** Skills, Goals, Preferences on relationships (not User)
 - [Entity-Relationship Model Architecture](../architecture/10-entity-relationship-model.md)
 - [Memory Domain Model](../domain-model/15-memory-entity-model.md)
 - [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)
@@ -55,7 +56,10 @@ This document describes the technical implementation of **Entity Management** in
   name: string,
   preferred_language: string,     # e.g., "de", "en"
   timezone: string,               # e.g., "Europe/Berlin"
-  skills: string[],               # List of skills (Priority 🟢 Low)
+
+  # NOTE (ADR-0003): skills REMOVED from User
+  # Skills are now role-scoped on relationships (Qdrant)
+  # See: docs/adr/ADR-0003-role-scoped-attributes.md
 
   # AI-discovered properties (examples)
   notification_preferences: json,
@@ -90,7 +94,7 @@ class User(BaseModel):
     name: Optional[str] = None
     preferred_language: Optional[str] = "en"
     timezone: Optional[str] = "UTC"
-    skills: List[str] = []
+    # NOTE (ADR-0003): skills REMOVED - now role-scoped on relationships
 
     # AI-discovered properties
     ai_properties: Dict[str, Any] = {}  # Flexible storage for AI-discovered attributes
@@ -100,6 +104,7 @@ class UserRepository:
 
     async def create(self, user: User) -> User:
         """Create user in Neo4j."""
+        # NOTE (ADR-0003): skills REMOVED - now role-scoped on relationships
         query = """
         CREATE (u:User {
             id: $id,
@@ -108,7 +113,6 @@ class UserRepository:
             name: $name,
             preferred_language: $preferred_language,
             timezone: $timezone,
-            skills: $skills,
             created_at: datetime(),
             updated_at: datetime()
         })

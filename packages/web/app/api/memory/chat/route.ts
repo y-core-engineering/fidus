@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Stream the response back to the client using TransformStream for better handling
+    // Stream the response back to the client
+    // Using push-based pattern for better cross-browser compatibility (Firefox)
     const reader = response.body?.getReader();
     if (!reader) {
       return new Response(
@@ -72,30 +73,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let isClosed = false;
     const stream = new ReadableStream({
-      async pull(controller) {
+      async start(controller) {
         try {
-          const { done, value } = await reader.read();
-          if (done) {
-            controller.close();
-            return;
+          while (!isClosed) {
+            const { done, value } = await reader.read();
+            if (done || isClosed) {
+              if (!isClosed) {
+                isClosed = true;
+                controller.close();
+              }
+              break;
+            }
+            controller.enqueue(value);
           }
-          controller.enqueue(value);
         } catch (error) {
-          console.error('Stream pull error:', error);
-          controller.error(error);
+          // Only log non-abort errors
+          if (!isClosed && (error as Error).name !== 'AbortError') {
+            console.error('Stream error:', error);
+            controller.error(error);
+          }
         }
       },
       cancel() {
+        isClosed = true;
         reader.cancel();
       },
     });
 
     // Extract X-User-ID from backend response and forward to client
+    // Note: Headers optimized for cross-browser SSE compatibility (Firefox requires specific headers)
     const responseHeaders: Record<string, string> = {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no', // Disable nginx buffering
     };
 
     const backendUserId = response.headers.get('X-User-ID');
@@ -104,6 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     return new Response(stream, {
+      status: 200,
       headers: responseHeaders,
     });
   } catch (error) {

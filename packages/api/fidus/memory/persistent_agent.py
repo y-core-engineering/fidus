@@ -7,10 +7,12 @@ preference learning (Phase 3: Situational Context Awareness).
 
 import json
 import logging
-from typing import Dict, List, Any, AsyncGenerator
+from typing import Dict, List, Any, AsyncGenerator, Optional
 from fidus.memory.simple_agent import InMemoryAgent
 from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
 from fidus.memory.context.agent import ContextAwareAgent
+from fidus.memory.repositories.user_repository import UserRepository
+from fidus.memory.entities.user import User
 from fidus.config import config
 
 logger = logging.getLogger(__name__)
@@ -51,6 +53,10 @@ class PersistentAgent(InMemoryAgent):
         self._connected = False
         self.enable_context_awareness = enable_context_awareness
 
+        # User profile data (loaded on connect)
+        self.user_profile: Optional[User] = None
+        self._user_repo: Optional[UserRepository] = None
+
         # Initialize ContextAwareAgent for Phase 3
         if enable_context_awareness:
             self.context_agent = ContextAwareAgent()
@@ -60,14 +66,20 @@ class PersistentAgent(InMemoryAgent):
             logger.info("Context-awareness disabled")
 
     async def connect(self) -> None:
-        """Connect to Neo4j database."""
+        """Connect to Neo4j database and load user profile."""
         if not self._connected:
             await self.store.connect()
             self._connected = True
             logger.info(f"Connected to Neo4j for tenant: {self.tenant_id}")
 
+            # Initialize user repository with Neo4j driver
+            self._user_repo = UserRepository(self.store._driver)
+
             # Load existing preferences from Neo4j
             await self._load_preferences()
+
+            # Load user profile (if exists)
+            await self._load_user_profile()
 
     async def disconnect(self) -> None:
         """Disconnect from Neo4j database and close context agent."""
@@ -101,6 +113,119 @@ class PersistentAgent(InMemoryAgent):
             }
 
         logger.info(f"Loaded {len(self.preferences)} preferences from Neo4j")
+
+    async def _load_user_profile(self) -> None:
+        """Load user profile from Neo4j.
+
+        The user profile contains name, language, timezone, and AI-discovered properties.
+        This is used to personalize the system prompt.
+
+        Note: In the current architecture, tenant_id in PersistentAgent equals user_id
+        (for multi-user isolation). But User entities have tenant_id="default" typically.
+        We try to find the user by ID first with "default" tenant, then fall back.
+        """
+        if not self._user_repo:
+            logger.warning("User repository not initialized, skipping profile load")
+            return
+
+        try:
+            # In multi-user mode, self.tenant_id = user_id (the UUID)
+            # But User entities typically have tenant_id="default"
+            # So we search: user.id = self.tenant_id, user.tenant_id = "default"
+            user = await self._user_repo.get(self.tenant_id, "default")
+            if not user:
+                # Fallback: try with tenant_id = user_id (for edge cases)
+                user = await self._user_repo.get(self.tenant_id, self.tenant_id)
+
+            if user:
+                self.user_profile = user
+                logger.info(f"Loaded user profile: {user.name} ({user.email})")
+            else:
+                logger.info(f"No user profile found for user_id: {self.tenant_id}")
+        except Exception as e:
+            logger.warning(f"Failed to load user profile: {e}")
+
+    async def reload_user_profile(self) -> None:
+        """Reload user profile from database.
+
+        Call this after user profile updates to refresh the cached data.
+        """
+        await self._load_user_profile()
+
+    def _build_prompt(self) -> str:
+        """Build system prompt with user profile and learned preferences.
+
+        Overrides parent to include user-specific information like name,
+        preferred language, timezone, and AI-discovered properties.
+        """
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        # Get user's timezone (from profile or env fallback)
+        user_timezone = "Europe/Berlin"
+        user_name = None
+        user_language = None
+        ai_properties = {}
+
+        if self.user_profile:
+            user_timezone = self.user_profile.timezone or "Europe/Berlin"
+            user_name = self.user_profile.name
+            user_language = self.user_profile.preferred_language
+            ai_properties = self.user_profile.ai_properties or {}
+
+        # Get current datetime in user's timezone
+        try:
+            tz = ZoneInfo(user_timezone)
+            current_datetime = datetime.now(tz).strftime("%A, %Y-%m-%d %H:%M:%S %Z")
+        except Exception:
+            current_datetime = datetime.now().strftime("%A, %Y-%m-%d %H:%M:%S UTC")
+
+        # Build base prompt
+        base = f"""You are Fidus Memory, a friendly conversational AI that learns about the user's preferences.
+
+Current Date and Time: {current_datetime}
+"""
+
+        # Add user profile information
+        if user_name:
+            base += f"\nUser's Name: {user_name}\n"
+
+        if user_language:
+            language_names = {
+                "en": "English", "de": "German", "fr": "French", "es": "Spanish",
+                "it": "Italian", "pt": "Portuguese", "nl": "Dutch", "pl": "Polish",
+                "ja": "Japanese", "zh": "Chinese", "ko": "Korean"
+            }
+            base += f"User's Preferred Language: {language_names.get(user_language, user_language)}\n"
+
+        if ai_properties:
+            base += "\nAI-Discovered User Properties:\n"
+            for key, value in ai_properties.items():
+                if isinstance(value, list):
+                    base += f"- {key}: {', '.join(str(v) for v in value)}\n"
+                else:
+                    base += f"- {key}: {value}\n"
+
+        base += """
+IMPORTANT:
+- Respond naturally in conversation. Do NOT output system information, internal state, or debugging info to the user.
+- When the user asks about the current time or date, use the information provided above to answer accurately.
+- When the user asks about their name or profile information, use the user profile data above.
+- ALWAYS respond in the SAME LANGUAGE as the user's message. If the user writes in German, respond in German. If in English, respond in English.
+
+"""
+
+        if self.preferences:
+            base += "User's known preferences:\n"
+            for key, pref in self.preferences.items():
+                sentiment = pref.get('sentiment', 'neutral')
+                sentiment_prefix = "likes" if sentiment == "positive" else "dislikes" if sentiment == "negative" else "neutral about"
+                base += f"- {key}: {sentiment_prefix} {pref['value']}\n"
+            base += "\n"
+
+        base += "Respond naturally and conversationally. Ask follow-up questions to learn more preferences."
+
+        return base
 
     def _update_preferences(self, extracted: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Update preferences and persist to Neo4j.

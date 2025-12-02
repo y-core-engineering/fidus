@@ -91,8 +91,15 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
 
   const handleDeleteAll = async () => {
     try {
-      const response = await fetch('http://localhost:8000/memory/purge-all', {
+      const userId = getUserId();
+      const headers: Record<string, string> = {};
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+
+      const response = await fetch('/api/memory/purge-all', {
         method: 'DELETE',
+        headers,
       });
 
       if (!response.ok) {
@@ -119,7 +126,7 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
       if (userId) {
         headers['X-User-ID'] = userId;
       }
-      const response = await fetch('http://localhost:8000/memory/preferences/accept', {
+      const response = await fetch('/api/memory/preferences/accept', {
         method: 'POST',
         headers,
         body: JSON.stringify({ preference_id: preferenceId }),
@@ -145,7 +152,7 @@ export const PreferenceViewer = forwardRef<PreferenceViewerRef, PreferenceViewer
       if (userId) {
         headers['X-User-ID'] = userId;
       }
-      const response = await fetch('http://localhost:8000/memory/preferences/reject', {
+      const response = await fetch('/api/memory/preferences/reject', {
         method: 'POST',
         headers,
         body: JSON.stringify({ preference_id: preferenceId }),

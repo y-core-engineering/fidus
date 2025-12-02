@@ -1,4 +1,8 @@
-"""Unit tests for UserRepository."""
+"""Unit tests for UserRepository.
+
+NOTE (ADR-0003): Skills are stored as role-scoped attributes on relationship
+contexts in Qdrant, not on the User entity.
+"""
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -44,7 +48,6 @@ class TestUserRepositoryCreate:
             tenant_id="tenant-1",
             email="test@example.com",
             name="Test User",
-            skills=["Python", "TypeScript"],
         )
 
         # Mock Neo4j response
@@ -61,7 +64,6 @@ class TestUserRepositoryCreate:
                 "name": "Test User",
                 "preferred_language": "en",
                 "timezone": "UTC",
-                "skills": ["Python", "TypeScript"],
                 "ai_properties": "{}",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
@@ -75,7 +77,6 @@ class TestUserRepositoryCreate:
 
         assert user.id == "user-123"
         assert user.email == "test@example.com"
-        assert user.skills == ["Python", "TypeScript"]
         mock_session.run.assert_called_once()
 
     @pytest.mark.asyncio
@@ -123,7 +124,6 @@ class TestUserRepositoryGet:
                 "name": "Test User",
                 "preferred_language": "en",
                 "timezone": "UTC",
-                "skills": [],
                 "ai_properties": "{}",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
@@ -174,7 +174,6 @@ class TestUserRepositoryUpdate:
                 "name": "Updated Name",
                 "preferred_language": "en",
                 "timezone": "UTC",
-                "skills": [],
                 "ai_properties": "{}",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
@@ -263,7 +262,6 @@ class TestUserRepositoryListByTenant:
                     "name": f"User {idx}",
                     "preferred_language": "en",
                     "timezone": "UTC",
-                    "skills": [],
                     "ai_properties": "{}",
                     "created_at": datetime.utcnow(),
                     "updated_at": datetime.utcnow(),

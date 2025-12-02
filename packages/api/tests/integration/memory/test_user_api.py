@@ -2,6 +2,9 @@
 
 These tests require a running Neo4j instance (typically via Docker).
 Run with: NEO4J_URI=bolt://localhost:7687 NEO4J_PASSWORD=your_password pytest tests/integration/memory/test_user_api.py -v
+
+NOTE (ADR-0003): Skills are stored as role-scoped attributes on relationship
+contexts in Qdrant, not on the User entity.
 """
 
 import os
@@ -33,7 +36,6 @@ def user_data(tenant_id: str) -> dict:
         "name": "Test User",
         "preferred_language": "en",
         "timezone": "UTC",
-        "skills": ["Python", "TypeScript"],
         "ai_properties": {"interests": ["AI", "Music"]},
     }
 
@@ -126,7 +128,7 @@ class TestUserAPIIntegration:
         # Update user
         update_data = {
             "name": "Updated Name",
-            "skills": ["Python", "TypeScript", "Go"],
+            "timezone": "Europe/Berlin",
         }
         update_response = await client.put(
             f"/api/memory/user/{user['id']}",
@@ -137,7 +139,7 @@ class TestUserAPIIntegration:
         assert update_response.status_code == 200
         data = update_response.json()
         assert data["name"] == "Updated Name"
-        assert "Go" in data["skills"]
+        assert data["timezone"] == "Europe/Berlin"
 
         # Cleanup
         await client.delete(

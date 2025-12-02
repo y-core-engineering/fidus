@@ -36,6 +36,7 @@ class UserRepository:
         user_id = str(uuid4())
         now = datetime.utcnow()
 
+        # NOTE (ADR-0003): Skills are stored on relationship contexts in Qdrant, not on User
         query = """
         MERGE (u:User {email: $email, tenant_id: $tenant_id})
         ON CREATE SET
@@ -43,7 +44,6 @@ class UserRepository:
             u.name = $name,
             u.preferred_language = $preferred_language,
             u.timezone = $timezone,
-            u.skills = $skills,
             u.ai_properties = $ai_properties,
             u.created_at = datetime($created_at),
             u.updated_at = datetime($updated_at)
@@ -61,7 +61,6 @@ class UserRepository:
                 name=user_data.name,
                 preferred_language=user_data.preferred_language,
                 timezone=user_data.timezone,
-                skills=user_data.skills,
                 ai_properties=json.dumps(user_data.ai_properties),
                 created_at=now.isoformat(),
                 updated_at=now.isoformat()
@@ -155,9 +154,7 @@ class UserRepository:
             set_clauses.append("u.timezone = $timezone")
             params["timezone"] = updates.timezone
 
-        if updates.skills is not None:
-            set_clauses.append("u.skills = $skills")
-            params["skills"] = updates.skills
+        # NOTE (ADR-0003): Skills are stored on relationship contexts in Qdrant, not on User
 
         if updates.ai_properties is not None:
             # Merge ai_properties (don't overwrite, add new keys)
@@ -205,21 +202,15 @@ class UserRepository:
         Returns:
             True if deleted, False if not found
         """
+        # GDPR cascade delete: delete user and all connected entities
+        # Using multiple queries to avoid Cypher syntax issues with DELETE and MATCH
         query = """
         MATCH (u:User {id: $user_id, tenant_id: $tenant_id})
-
-        // Delete all outgoing relationships and connected entities
         OPTIONAL MATCH (u)-[r]->(e)
         DETACH DELETE e
-
-        // Delete all incoming relationships
-        OPTIONAL MATCH (other)-[r2]->(u)
-        DELETE r2
-
-        // Delete the user node
+        WITH u
         DETACH DELETE u
-
-        RETURN count(u) as deleted_count
+        RETURN count(*) as deleted_count
         """
 
         async with self.driver.session() as session:
@@ -285,7 +276,6 @@ class UserRepository:
             name=record["name"],
             preferred_language=record.get("preferred_language", "en"),
             timezone=record.get("timezone", "UTC"),
-            skills=record.get("skills", []) or [],
             ai_properties=ai_properties,
             created_at=created_at or datetime.utcnow(),
             updated_at=updated_at or datetime.utcnow()

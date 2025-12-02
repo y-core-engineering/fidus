@@ -3924,7 +3924,8 @@ class User(BaseModel):
     name: str                         # User's full name
     preferred_language: str = "en"    # ISO 639-1 language code
     timezone: str = "UTC"             # IANA timezone
-    skills: List[str] = []            # User skills/expertise
+    # NOTE (ADR-0003): skills REMOVED - now role-scoped on relationships
+    # See: docs/adr/ADR-0003-role-scoped-attributes.md
     ai_properties: Dict[str, Any] = {} # AI-discovered properties
     created_at: datetime
     updated_at: datetime
