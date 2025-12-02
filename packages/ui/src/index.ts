@@ -31,6 +31,7 @@ export * from './components/toggle-switch';
 
 // Form Components (Advanced)
 export * from './components/select';
+export * from './components/autocomplete';
 export * from './components/date-picker';
 export * from './components/time-picker';
 export * from './components/file-upload';
