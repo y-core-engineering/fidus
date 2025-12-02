@@ -64,6 +64,7 @@ const searchData: SearchResult[] = [
   { id: 'radio-button', title: 'Radio Button', description: 'Radio button for single selection from multiple options', href: '/components/radio-button', category: 'Component' },
   { id: 'toggle-switch', title: 'Toggle Switch', description: 'Toggle switch for on/off states', href: '/components/toggle-switch', category: 'Component' },
   { id: 'select', title: 'Select', description: 'Select dropdown for choosing from a list of options', href: '/components/select', category: 'Component' },
+  { id: 'autocomplete', title: 'Autocomplete', description: 'Text input with type-ahead suggestions and keyboard navigation', href: '/components/autocomplete', category: 'Component' },
   { id: 'date-picker', title: 'Date Picker', description: 'Date picker for selecting dates', href: '/components/date-picker', category: 'Component' },
   { id: 'time-picker', title: 'Time Picker', description: 'Time picker for selecting time', href: '/components/time-picker', category: 'Component' },
   { id: 'file-upload', title: 'File Upload', description: 'File upload component for uploading files', href: '/components/file-upload', category: 'Component' },

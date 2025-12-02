@@ -73,7 +73,7 @@ import * as FidusUI from '@fidus/ui';
 
 ### Available Components by Category
 
-**Forms**: Button, TextInput, TextArea, Checkbox, RadioButton, ToggleSwitch, Select, DatePicker, TimePicker, FileUpload
+**Forms**: Button, TextInput, TextArea, Checkbox, RadioButton, ToggleSwitch, Select, Autocomplete, DatePicker, TimePicker, FileUpload
 **Layout**: Container, Grid, Stack, Divider
 **Display**: Table, List, Badge, Chip, Avatar, OpportunityCard, DetailCard, EmptyCard
 **Feedback**: Toast, Modal, Alert, Banner, ProgressBar, Spinner, Skeleton
@@ -293,7 +293,7 @@ import { Button, Stack, Alert, TextInput } from '@fidus/ui';
 
 ### All Available Subpaths
 
-All 45+ components support subpath imports. Common ones include:
+All 46+ components support subpath imports. Common ones include:
 
 ```typescript
 // Forms
@@ -302,6 +302,7 @@ import { TextArea } from '@fidus/ui/text-area';
 import { Checkbox } from '@fidus/ui/checkbox';
 import { RadioButton } from '@fidus/ui/radio-button';
 import { Select } from '@fidus/ui/select';
+import { Autocomplete } from '@fidus/ui/autocomplete';
 import { DatePicker } from '@fidus/ui/date-picker';
 
 // Layout
@@ -421,7 +422,7 @@ All form components support `forwardRef` and work with React Hook Form:
 
 - TextInput, TextArea, FileUpload, TimePicker
 - Checkbox, RadioButton, ToggleSwitch
-- Select, DatePicker, Dropdown
+- Select, Autocomplete, DatePicker, Dropdown
 
 ## Usage
 
@@ -492,6 +493,7 @@ function App() {
 | Component | Description |
 |-----------|-------------|
 | **Select** | Dropdown select with search and multi-select |
+| **Autocomplete** | Text input with type-ahead suggestions and keyboard navigation |
 | **DatePicker** | Date selection with calendar interface |
 | **TimePicker** | Time selection with 12/24 hour format |
 | **FileUpload** | File upload with drag-and-drop support |
