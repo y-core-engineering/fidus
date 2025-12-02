@@ -21,11 +21,100 @@ export default function ReleasesPage() {
 
         <Divider />
 
-        {/* Version 1.7.2 */}
+        {/* Version 1.8.0 */}
         <Stack direction="vertical" spacing="lg" className="border-2 border-primary rounded-lg p-lg bg-gradient-to-br from-primary/5 to-transparent">
           <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
-            <h2 className="text-3xl font-bold text-foreground">v1.7.2</h2>
+            <h2 className="text-3xl font-bold text-foreground">v1.8.0</h2>
             <Badge variant="success">Latest</Badge>
+            <Badge variant="info">
+              <Sparkles className="w-3 h-3 mr-1" />
+              New Component
+            </Badge>
+          </Stack>
+
+          <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Calendar className="w-4 h-4" />
+              <span>December 2, 2025</span>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <GitBranch className="w-4 h-4" />
+              <Link
+                href="https://github.com/y-core-engineering/fidus/pull/79"
+                target="_blank"
+              >
+                PR #79
+              </Link>
+            </Stack>
+            <Stack direction="horizontal" spacing="xs" align="center">
+              <Package className="w-4 h-4" />
+              <Link
+                href="https://www.npmjs.com/package/@fidus/ui"
+                target="_blank"
+              >
+                NPM Package
+              </Link>
+            </Stack>
+          </Stack>
+
+          <Divider />
+
+          {/* New Components */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              New Components
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7">
+              <Stack direction="vertical" spacing="xs">
+                <Link href="/components/autocomplete" className="font-medium">
+                  Autocomplete
+                </Link>
+                <p className="text-sm text-muted-foreground">
+                  Text input with type-ahead suggestions, keyboard navigation (Arrow keys, Enter, Escape),
+                  clearable input, custom value support, and full accessibility with ARIA combobox pattern.
+                </p>
+              </Stack>
+            </Stack>
+          </Stack>
+
+          {/* Features */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Component Features
+            </h3>
+
+            <Stack direction="vertical" spacing="sm" className="ml-7 text-sm text-muted-foreground">
+              <p>✅ Full keyboard navigation (↑↓ arrows, Enter to select, Escape to close)</p>
+              <p>✅ Controlled and uncontrolled modes with <code className="bg-muted px-1 py-0.5 rounded text-xs">value</code> and <code className="bg-muted px-1 py-0.5 rounded text-xs">onChange</code></p>
+              <p>✅ Clearable input with X button</p>
+              <p>✅ Custom value support with <code className="bg-muted px-1 py-0.5 rounded text-xs">allowCustomValue</code> prop</p>
+              <p>✅ Suggestion filtering and limiting with <code className="bg-muted px-1 py-0.5 rounded text-xs">maxSuggestions</code></p>
+              <p>✅ Error and helper text states for form validation</p>
+              <p>✅ ARIA combobox/listbox pattern for screen readers</p>
+              <p>✅ Zod schema for runtime prop validation</p>
+            </Stack>
+          </Stack>
+
+          {/* Migration */}
+          <Stack direction="vertical" spacing="md">
+            <h3 className="text-xl font-semibold text-foreground">Migration</h3>
+            <div className="ml-7 p-4 bg-success/10 border border-success/20 rounded-lg">
+              <p className="text-sm font-medium text-success-foreground">✅ Zero breaking changes</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                This is a minor release that adds the new Autocomplete component. No changes required for existing code.
+                Import with <code className="bg-muted px-1 py-0.5 rounded text-xs">import {'{ Autocomplete }'} from &apos;@fidus/ui/autocomplete&apos;</code>
+              </p>
+            </div>
+          </Stack>
+        </Stack>
+
+        {/* Version 1.7.2 */}
+        <Stack direction="vertical" spacing="lg" className="border border-border rounded-lg p-lg bg-card">
+          <Stack direction="horizontal" spacing="md" align="center" className="flex-wrap">
+            <h2 className="text-3xl font-bold text-foreground">v1.7.2</h2>
           </Stack>
 
           <Stack direction="horizontal" spacing="md" align="center" className="text-sm text-muted-foreground flex-wrap">
