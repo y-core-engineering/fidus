@@ -585,6 +585,7 @@ async def get_situations(request: Request):
     """Get all situations with their context factors (Phase 3).
 
     Phase 4: Returns only the authenticated user's situations.
+    ADR-0001: Situations are stored in Qdrant (PRIMARY), not Neo4j.
     """
     if not USE_NEO4J:
         raise HTTPException(status_code=501, detail="Situational context requires Neo4j")
@@ -599,36 +600,39 @@ async def get_situations(request: Request):
         raise HTTPException(status_code=501, detail="Context-awareness is disabled")
 
     try:
-        # Query Neo4j for all situations
+        # Query Qdrant for all situations (ADR-0001: Qdrant-First Pattern)
         from fidus.memory.context.storage import ContextStorageService
         storage = ContextStorageService()
 
-        # Get all situations from Neo4j for this user (using tenant_id = user_id)
+        # Get all situations from Qdrant for this user (using tenant_id = user_id)
+        qdrant_situations = await storage.get_situations_for_user(tenant_id=user_id)
+
+        # Get preference_ids linked to each situation from Neo4j
+        # (Preferences have situation_id property per ADR-0001)
         async with storage.neo4j_driver.session() as session:
             result = await session.run("""
-                MATCH (s:Situation {tenant_id: $tenant_id})
-                OPTIONAL MATCH (s)<-[:IN_SITUATION]-(p:Preference)
-                RETURN s, collect(p.id) as preference_ids
-                ORDER BY s.created_at DESC
-                LIMIT 100
+                MATCH (p:Preference {tenant_id: $tenant_id})
+                WHERE p.situation_id IS NOT NULL
+                RETURN p.situation_id AS situation_id, collect(p.id) AS preference_ids
             """, tenant_id=user_id)
 
             records = await result.values()
-            situations = []
+            situation_preferences = {
+                record[0]: record[1] for record in records
+            }
 
-            for record in records:
-                situation_node = record[0]
-                preference_ids = record[1] if len(record) > 1 else []
-
-                situations.append(SituationItem(
-                    id=situation_node["id"],
-                    tenant_id=situation_node["tenant_id"],
-                    user_id=situation_node["user_id"],
-                    factors=json.loads(situation_node["factors"]),
-                    preference_ids=[pid for pid in preference_ids if pid],
-                    created_at=situation_node["created_at"],
-                    updated_at=situation_node["updated_at"]
-                ))
+        situations = []
+        for situation in qdrant_situations:
+            preference_ids = situation_preferences.get(situation.id, [])
+            situations.append(SituationItem(
+                id=situation.id,
+                tenant_id=situation.tenant_id,
+                user_id=situation.user_id,
+                factors=situation.context.factors,
+                preference_ids=[pid for pid in preference_ids if pid],
+                created_at=situation.created_at,
+                updated_at=situation.updated_at
+            ))
 
         return SituationsResponse(situations=situations)
     except Exception as e:
@@ -642,6 +646,7 @@ async def get_preference_context(preference_id: str, request: Request):
     """Get situational context for a specific preference (Phase 3).
 
     Phase 4: Returns only context for the authenticated user's preferences.
+    ADR-0001: Situations are stored in Qdrant, linked via situation_id property on Preference.
     """
     if not USE_NEO4J:
         raise HTTPException(status_code=501, detail="Situational context requires Neo4j")
@@ -659,28 +664,31 @@ async def get_preference_context(preference_id: str, request: Request):
         from fidus.memory.context.storage import ContextStorageService
         storage = ContextStorageService()
 
-        # Query Neo4j for situations linked to this preference (for this user)
+        # Query Neo4j for situation_id linked to this preference (ADR-0001: 1-Hop pattern)
         async with storage.neo4j_driver.session() as session:
             result = await session.run("""
-                MATCH (p:Preference {id: $preference_id, tenant_id: $tenant_id})-[:IN_SITUATION]->(s:Situation)
-                RETURN s
-                ORDER BY s.created_at DESC
+                MATCH (p:Preference {id: $preference_id, tenant_id: $tenant_id})
+                WHERE p.situation_id IS NOT NULL
+                RETURN p.situation_id AS situation_id
             """, preference_id=preference_id, tenant_id=user_id)
 
             records = await result.values()
             situations = []
 
             for record in records:
-                situation_node = record[0]
-                situations.append(SituationItem(
-                    id=situation_node["id"],
-                    tenant_id=situation_node["tenant_id"],
-                    user_id=situation_node["user_id"],
-                    factors=json.loads(situation_node["factors"]),
-                    preference_ids=[preference_id],
-                    created_at=situation_node["created_at"],
-                    updated_at=situation_node["updated_at"]
-                ))
+                situation_id = record[0]
+                # Fetch full situation from Qdrant (PRIMARY)
+                situation = await storage.get_situation_by_id(situation_id, user_id)
+                if situation:
+                    situations.append(SituationItem(
+                        id=situation.id,
+                        tenant_id=situation.tenant_id,
+                        user_id=situation.user_id,
+                        factors=situation.context.factors,
+                        preference_ids=[preference_id],
+                        created_at=situation.created_at,
+                        updated_at=situation.updated_at
+                    ))
 
         return {"preference_id": preference_id, "situations": situations}
     except Exception as e:

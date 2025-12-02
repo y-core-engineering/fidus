@@ -388,3 +388,80 @@ class ContextStorageService:
         """
         situation = await self.get_situation_by_id(situation_id, tenant_id)
         return situation.context if situation else None
+
+    async def get_situations_for_user(
+        self,
+        tenant_id: str,
+        limit: int = 100,
+    ) -> list[Situation]:
+        """Retrieve all situations for a user from Qdrant (PRIMARY).
+
+        Qdrant-First: Retrieves full context from Qdrant, not Neo4j.
+
+        Args:
+            tenant_id: Tenant ID for isolation (= user_id in single-tenant mode)
+            limit: Maximum number of situations to return
+
+        Returns:
+            list[Situation]: List of situations for the user
+        """
+        from qdrant_client.models import Filter, FieldCondition, MatchValue
+
+        logger.info(
+            "Retrieving situations from Qdrant",
+            extra={
+                "tenant_id": tenant_id,
+                "limit": limit,
+            },
+        )
+
+        try:
+            # Scroll through Qdrant with tenant filter
+            points, _ = self.qdrant_client.scroll(
+                collection_name=self.COLLECTION_NAME,
+                scroll_filter=Filter(
+                    must=[
+                        FieldCondition(
+                            key="tenant_id",
+                            match=MatchValue(value=tenant_id),
+                        )
+                    ]
+                ),
+                limit=limit,
+                with_payload=True,
+                with_vectors=False,  # Don't need embeddings for listing
+            )
+
+            situations = []
+            for point in points:
+                payload = point.payload
+                situations.append(
+                    Situation(
+                        id=str(point.id),
+                        tenant_id=payload["tenant_id"],
+                        user_id=payload["user_id"],
+                        context=ContextFactors(factors=payload["factors"]),
+                        embedding=[],  # Not loaded for performance
+                        created_at=payload["created_at"],
+                        updated_at=payload["updated_at"],
+                    )
+                )
+
+            logger.info(
+                f"Retrieved {len(situations)} situations from Qdrant",
+                extra={
+                    "tenant_id": tenant_id,
+                    "count": len(situations),
+                },
+            )
+
+            return situations
+
+        except Exception as e:
+            logger.error(
+                f"Failed to retrieve situations: {e}",
+                extra={
+                    "tenant_id": tenant_id,
+                },
+            )
+            return []

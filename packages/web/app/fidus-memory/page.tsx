@@ -87,10 +87,10 @@ export default function FidusMemoryPage() {
     setIsLoading(true);
 
     try {
-      // Get user_id from LocalStorage
-      const userId = getUserId() || 'user-1'; // Fallback to 'user-1' if not set
+      // Get user_id from LocalStorage (will be set by first backend response)
+      const userId = getUserId();
 
-      // Prepare headers with X-User-ID
+      // Prepare headers with X-User-ID (if available)
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
@@ -99,10 +99,11 @@ export default function FidusMemoryPage() {
       }
 
       // Call backend with SSE streaming
+      // Note: user_id in body is for backwards compatibility, actual user is from X-User-ID header
       const response = await fetch('/api/memory/chat', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ user_id: userId, message: content }),
+        body: JSON.stringify({ user_id: userId || 'anonymous', message: content }),
       });
 
       if (!response.ok) {
