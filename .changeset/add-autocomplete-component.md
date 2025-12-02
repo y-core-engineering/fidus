@@ -1,6 +1,5 @@
 ---
 "@fidus/ui": minor
-"@fidus/design-system": patch
 ---
 
 feat(ui): add Autocomplete component with keyboard navigation
