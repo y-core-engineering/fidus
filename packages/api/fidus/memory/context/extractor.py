@@ -94,6 +94,36 @@ IMPORTANT: You MUST respond with ONLY valid JSON in exactly this format (no othe
         self.temperature = temperature
         self.max_tokens = max_tokens
 
+    def _build_completion_kwargs(self, messages: list[dict]) -> dict:
+        """Build completion kwargs with proper configuration for the model.
+
+        Args:
+            messages: List of message dicts for the LLM
+
+        Returns:
+            Dict of kwargs for litellm.completion()
+        """
+        completion_kwargs = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+            "stream": True,
+        }
+
+        # Add api_base for non-ollama models using LiteLLM proxy
+        if not self.model.startswith("ollama/"):
+            openai_base = os.getenv("OPENAI_API_BASE")
+            if openai_base:
+                completion_kwargs["api_base"] = openai_base
+
+        # Disable thinking mode for Qwen3 models (returns empty content otherwise)
+        if "qwen3" in self.model.lower():
+            completion_kwargs["extra_body"] = {"enable_thinking": False}
+            logger.debug("Disabled thinking mode for Qwen3 model")
+
+        return completion_kwargs
+
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=10),
@@ -143,23 +173,18 @@ IMPORTANT: You MUST respond with ONLY valid JSON in exactly this format (no othe
 
             # Call LLM for context extraction
             # Using streaming to work around Ollama/LiteLLM non-streaming empty response bug
-            response = completion(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {
-                        "role": "user",
-                        "content": self.USER_PROMPT_TEMPLATE.format(
-                            current_datetime=current_datetime,
-                            message=message
-                        ),
-                    },
-                ],
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                stream=True,
-                # response_format removed for Ollama compatibility via LiteLLM
-            )
+            messages = [
+                {"role": "system", "content": self.SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": self.USER_PROMPT_TEMPLATE.format(
+                        current_datetime=current_datetime,
+                        message=message
+                    ),
+                },
+            ]
+            completion_kwargs = self._build_completion_kwargs(messages)
+            response = completion(**completion_kwargs)
 
             # Collect streaming response
             content = ""
@@ -284,23 +309,18 @@ IMPORTANT: You MUST respond with ONLY valid JSON in exactly this format (no othe
 
             # Call LLM for context extraction
             # Using streaming to work around Ollama/LiteLLM non-streaming empty response bug
-            response = completion(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {
-                        "role": "user",
-                        "content": self.USER_PROMPT_TEMPLATE.format(
-                            current_datetime=current_datetime,
-                            message=message
-                        ),
-                    },
-                ],
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                stream=True,
-                # response_format removed for Ollama compatibility via LiteLLM
-            )
+            messages = [
+                {"role": "system", "content": self.SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": self.USER_PROMPT_TEMPLATE.format(
+                        current_datetime=current_datetime,
+                        message=message
+                    ),
+                },
+            ]
+            completion_kwargs = self._build_completion_kwargs(messages)
+            response = completion(**completion_kwargs)
 
             # Collect streaming response
             content = ""

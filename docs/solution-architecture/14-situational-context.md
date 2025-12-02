@@ -1,11 +1,11 @@
 # Situational Context - Solution Architecture
 
-**Version:** 2.0 (BREAKING CHANGES)
-**Date:** 2025-11-20
+**Version:** 3.0 (v3.0 Qdrant-First Implementation)
+**Date:** 2025-11-25
 **Status:** Active
 **Part of:** Fidus Solution Architecture
-**Supersedes:** v1.0 (2025-11-03) - Situation as Neo4j Node (deprecated)
-**Migration:** See [ADR-0001](../adr/ADR-0001-situational-context-as-relationship-qualifier.md) - No production data, clean slate implementation
+**Supersedes:** v2.0 (2025-11-20) - Architectural pattern, v1.0 (2025-11-03) - Situation as Neo4j Node (deprecated)
+**Architecture Decision:** See [ADR-0001](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)
 
 ---
 
@@ -20,15 +20,15 @@ This document describes the technical implementation of **Situational Context** 
 - [Entity-Relationship Model](../architecture/10-entity-relationship-model.md)
 - [Memory Domain Model](../domain-model/15-memory-entity-model.md)
 
-**⚠️ IMPORTANT NOTE (v2.0):**
+**✅ v3.0 Implementation Complete:**
+The v3.0 Qdrant-First pattern is now fully implemented (default, no feature flag):
+1. **Backend:** `packages/api/fidus/memory/context/storage.py` - ContextStorageService class
+2. **Models:** `packages/api/fidus/memory/context/models.py` - SituationalContextV3, TemporalBoundaries
+3. **Admin API:** `packages/api/fidus/api/routes/admin.py` - Status endpoints
+4. **Frontend:** `packages/web/app/fidus-memory/components/MigrationStatus.tsx`
+
+**⚠️ LEGACY NOTE:**
 Some code examples in sections 5-7 below still show the **old v1.0 pattern** (Situation as Neo4j node, IN_SITUATION relationship). These are **DEPRECATED** and provided for reference only.
-
-**✅ For correct v2.0 implementation:**
-1. Use the **Data Model** section above (Neo4j + Qdrant schemas)
-2. Use the **Design Guidelines** section (What Goes Where)
-3. Follow the **Qdrant-first pattern** described in ADR-0001
-
-The code examples will be fully updated to v2.0 in the next revision.
 
 ---
 
@@ -68,8 +68,7 @@ graph TB
 
     subgraph "Layer 3: Context Storage (Qdrant-First!)"
         H --> J[(Qdrant PRIMARY<br/>Full Context + Embeddings)]
-        J -->|situation_id| I[(Neo4j SECONDARY<br/>situation_id reference only)]
-        J -.rollback on failure.-> I
+        J -->|situation_id| I[(Neo4j SECONDARY<br/>situation_id on Preference only)]
     end
 
     subgraph "Context Retrieval (Similarity-Based)"
@@ -87,11 +86,11 @@ graph TB
     style I fill:#cccccc
 ```
 
-**Key Changes (v2.0):**
+**Key Changes (v3.0):**
 1. ✅ **Qdrant is PRIMARY** storage for context (not Neo4j!)
-2. ✅ **Neo4j stores only `situation_id` reference** (no context details)
-3. ✅ **Qdrant-first pattern**: Insert Qdrant → Insert Neo4j → Rollback Qdrant on failure
-4. ✅ **1-Hop Query**: Direct property access `WHERE r.situation_id IN [...]` (no IN_SITUATION relationship)
+2. ✅ **Neo4j stores only `situation_id` on Preference node** (no Situation nodes, no context details)
+3. ✅ **Qdrant-only write**: Context stored only in Qdrant, Neo4j updated via `link_preference_to_situation`
+4. ✅ **1-Hop Query**: Direct property access `WHERE p.situation_id = $sid` (no IN_SITUATION relationship)
 
 ---
 
@@ -301,7 +300,92 @@ graph TB
 
 ---
 
-## Implementation Components
+## v3.0 Implementation (Current)
+
+### Core Storage Service
+
+**Component:** `ContextStorageService` (`packages/api/fidus/memory/context/storage.py`)
+
+**Responsibility:** Qdrant-First storage (PRIMARY), Neo4j reference only (SECONDARY)
+
+```python
+from fidus.memory.context.storage import ContextStorageService
+
+# Initialize
+storage = ContextStorageService(qdrant=qdrant_client, neo4j=neo4j_driver)
+
+# Store with rollback support
+situation_id, rel_id = await storage.store_with_rollback(
+    tenant_id="tenant-1",
+    user_id="user-123",
+    context={
+        "time_of_day": "morning",
+        "location": "office",
+        "mood": "focused",
+        "activity": "working"
+    },
+    relationship_type="HAS_PREFERENCE",
+    entity_id="pref-456",
+    entity_label="Preference",
+    properties={"confidence": 0.9, "source": "explicit"},
+    temporal_boundaries={"started_at": "2025-01-15"}
+)
+
+# Retrieve context
+context = await storage.get_context_by_situation_id(situation_id)
+```
+
+**Key Features:**
+1. ✅ Qdrant-First: Primary storage in Qdrant only (no Neo4j Situation nodes per ADR-0001)
+2. ✅ situation_id Reference: Preference nodes get `situation_id` property pointing to Qdrant
+3. ✅ Tenant Isolation: All queries filter by tenant_id
+4. ✅ Payload Indexes: Qdrant indexes on `tenant_id`, `user_id`, `relationship_type`, `entity_id`
+
+### Data Models
+
+**Component:** `models.py` (`packages/api/fidus/memory/context/models.py`)
+
+```python
+from fidus.memory.context.models import (
+    SituationalContextV3,
+    TemporalBoundaries,
+    RelationshipContext
+)
+
+# v3.0 Context (stored in Qdrant)
+context = SituationalContextV3(
+    tenant_id="tenant-1",
+    user_id="user-123",
+    relationship_type="KNOWS",
+    entity_id="person-456",
+    context={
+        "role": "colleague",          # Now in Qdrant!
+        "emotion": "friendly",
+        "communication_frequency": "daily"
+    }
+)
+
+# Temporal Boundaries (stored in Neo4j per ADR-0002)
+temporal = TemporalBoundaries(
+    started_at="2025-01-15",
+    ended_at=None
+)
+```
+
+### Admin API
+
+**Endpoints:** (`packages/api/fidus/api/routes/admin.py`)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/memory/admin/system-status` | GET | Get system status (Neo4j, Qdrant connections) |
+| `/memory/admin/storage-stats` | GET | Get storage statistics (counts, patterns) |
+
+**Note:** v3.0 is now the default implementation. No feature flag required.
+
+---
+
+## Implementation Components (Legacy Reference)
 
 ### 1. Dynamic Context Extraction
 
@@ -1341,8 +1425,8 @@ print(job.get_status())  # queued, started, finished, failed
 ---
 
 **Maintained by:** Solution Architecture Team
-**Last Updated:** 2025-11-03
-**Next Review:** After Fidus Memory Phase 3 completion
+**Last Updated:** 2025-11-25
+**Next Review:** After v3.0 production deployment
 
 ---
 

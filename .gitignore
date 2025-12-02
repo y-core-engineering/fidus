@@ -117,3 +117,4 @@ docs/prompts/
 # Local files
 .env.memory
 CLAUDE_template.md
+CLAUDE.md

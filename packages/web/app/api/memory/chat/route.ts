@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
 
+// Increase timeout for LLM streaming responses
+export const maxDuration = 120; // 2 minutes
+
 interface ChatRequest {
   user_id: string;
   message: string;
@@ -35,11 +38,18 @@ export async function POST(request: NextRequest) {
       headers['X-User-ID'] = userIdHeader;
     }
 
+    // Use AbortController with longer timeout for LLM streaming (2 minutes)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
+
     const response = await fetch(`${backendUrl}/memory/chat`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ user_id, message }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -54,36 +64,51 @@ export async function POST(request: NextRequest) {
     }
 
     // Stream the response back to the client
-    const encoder = new TextEncoder();
+    // Using push-based pattern for better cross-browser compatibility (Firefox)
+    const reader = response.body?.getReader();
+    if (!reader) {
+      return new Response(
+        JSON.stringify({ error: 'No response body from backend' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    let isClosed = false;
     const stream = new ReadableStream({
       async start(controller) {
-        const reader = response.body?.getReader();
-        if (!reader) {
-          controller.close();
-          return;
-        }
-
         try {
-          while (true) {
+          while (!isClosed) {
             const { done, value } = await reader.read();
-            if (done) {
-              controller.close();
+            if (done || isClosed) {
+              if (!isClosed) {
+                isClosed = true;
+                controller.close();
+              }
               break;
             }
             controller.enqueue(value);
           }
         } catch (error) {
-          console.error('Stream error:', error);
-          controller.error(error);
+          // Only log non-abort errors
+          if (!isClosed && (error as Error).name !== 'AbortError') {
+            console.error('Stream error:', error);
+            controller.error(error);
+          }
         }
+      },
+      cancel() {
+        isClosed = true;
+        reader.cancel();
       },
     });
 
     // Extract X-User-ID from backend response and forward to client
+    // Note: Headers optimized for cross-browser SSE compatibility (Firefox requires specific headers)
     const responseHeaders: Record<string, string> = {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no', // Disable nginx buffering
     };
 
     const backendUserId = response.headers.get('X-User-ID');
@@ -92,6 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     return new Response(stream, {
+      status: 200,
       headers: responseHeaders,
     });
   } catch (error) {

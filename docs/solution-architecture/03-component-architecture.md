@@ -3910,6 +3910,80 @@ sequenceDiagram
 - **Context Architecture:** [14-situational-context.md](14-situational-context.md)
 - **Domain Model:** [15-memory-entity-model.md](../../docs/domain-model/15-memory-entity-model.md)
 
+**User Entity API (Package 1.2):**
+
+The User entity serves as the **aggregate root** for all memory domain entities. Every entity in the memory system belongs to a specific user.
+
+**User Entity Model:**
+
+```python
+class User(BaseModel):
+    id: str                           # Unique user identifier (UUID)
+    tenant_id: str                    # Tenant identifier for multi-tenancy
+    email: EmailStr                   # User email address (unique per tenant)
+    name: str                         # User's full name
+    preferred_language: str = "en"    # ISO 639-1 language code
+    timezone: str = "UTC"             # IANA timezone
+    # NOTE (ADR-0003): skills REMOVED - now role-scoped on relationships
+    # See: docs/adr/ADR-0003-role-scoped-attributes.md
+    ai_properties: Dict[str, Any] = {} # AI-discovered properties
+    created_at: datetime
+    updated_at: datetime
+```
+
+**REST API Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/memory/user/` | POST | Create new user |
+| `/api/memory/user/{user_id}` | GET | Get user by ID |
+| `/api/memory/user/by-email/{email}` | GET | Get user by email |
+| `/api/memory/user/{user_id}` | PUT | Update user properties |
+| `/api/memory/user/{user_id}` | DELETE | Delete user (GDPR cascade) |
+| `/api/memory/user/` | GET | List users for tenant |
+| `/api/memory/user/ensure-constraints` | POST | Create Neo4j constraints |
+
+**Dependency Injection Pattern:**
+
+```python
+# fidus/dependencies/repositories.py
+async def get_user_repository(
+    driver: AsyncDriver = Depends(get_neo4j_driver),
+) -> AsyncGenerator[UserRepository, None]:
+    yield UserRepository(driver)
+
+# Usage in routes
+@router.get("/{user_id}")
+async def get_user(
+    user_id: str,
+    tenant_id: str,
+    repo: UserRepository = Depends(get_user_repository),
+) -> UserResponse:
+    user = await repo.get(user_id, tenant_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponse(**user.model_dump())
+```
+
+**Frontend API Client:**
+
+```typescript
+// lib/api/memory.ts
+export async function getUser(userId: string, tenantId: string): Promise<User>;
+export async function getUserByEmail(email: string, tenantId: string): Promise<User>;
+export async function createUser(userData: UserCreate): Promise<User>;
+export async function updateUser(userId: string, tenantId: string, updates: UserUpdate): Promise<User>;
+export async function deleteUser(userId: string, tenantId: string): Promise<void>;
+export async function listUsers(tenantId: string, limit?: number): Promise<User[]>;
+```
+
+**Testing:**
+
+- **Unit Tests:** `packages/api/tests/memory/entities/test_user.py`
+- **Repository Tests:** `packages/api/tests/memory/repositories/test_user_repository.py`
+- **Integration Tests:** `packages/api/tests/integration/memory/test_user_api.py`
+- **E2E Tests:** `packages/web/tests/e2e/memory/user-profile.spec.ts`
+
 ---
 
 ### Plugin Agent

@@ -679,8 +679,9 @@ score = confidence × context_similarity × factor_relevance
   preferred_language: "de",
   timezone: "Europe/Berlin",
 
-  // Skills (vorerst als Liste, Priority 🟢 Low)
-  skills: ["python", "typescript", "spanish_a2"],
+  // NOTE (ADR-0003): skills REMOVED from User
+  // Skills are now role-scoped on relationships (Qdrant)
+  // See: docs/adr/ADR-0003-role-scoped-attributes.md
 
   // Preferences (system-level, nicht domänenspezifisch)
   notification_preferences: {
@@ -691,32 +692,189 @@ score = confidence × context_similarity × factor_relevance
 })
 ```
 
-### 4.2 Skills: Attribute vs. Entity
+### 4.2 Skills, Goals, Preferences: Role-Scoped Attributes (ADR-0003)
 
-**Current Decision (Priority 🟢 Low):** Store as **User attribute** (simple list)
+**UPDATED (ADR-0003):** Skills, Goals, and Preferences are now **role-scoped attributes on relationships**, NOT User-level properties.
 
-```cypher
-(:User {skills: ["python", "typescript", "spanish_a2"]})
+**Rationale:** Skills like "Python" or "Event Planning" only make sense in context:
+- "Python" at work (WORKS_AT → Organization) ≠ "Python" for hobby project
+- "Team Lead" goal at Company A ≠ "Board Member" goal at Club B
+- "Remote work" preference only applies in work context
+
+**Implementation (Qdrant context payload on relationships):**
+
+```python
+# Qdrant: Role-scoped attributes on WORKS_AT relationship
+{
+  "id": "sit-uuid",
+  "payload": {
+    "relationship_instance_id": "rel-uuid",
+    "relationship_type": "WORKS_AT",
+    "role": "Software Engineer",
+
+    # Role-Scoped Attributes (ADR-0003)
+    "skills": [
+      {"name": "Python", "proficiency": "expert", "years_experience": 5},
+      {"name": "TypeScript", "proficiency": "advanced"}
+    ],
+    "goals": [
+      {"description": "Become Tech Lead", "priority": "high", "target_date": "2026-01"},
+      {"description": "Learn Rust", "priority": "medium"}
+    ],
+    "preferences": [
+      {"type": "work_style", "value": "remote", "strength": 0.9},
+      {"type": "meeting_time", "value": "mornings", "strength": 0.7}
+    ],
+
+    # Situational context
+    "mood": "productive",
+    "stress_level": "medium"
+  }
+}
 ```
 
-**Future Option (if tracking needed):** Upgrade to **Skill entity**
+**Query Examples:**
 
-```cypher
-(User)-[:HAS_SKILL {
-  proficiency: "advanced",
-  acquired_at: "2020-01",
-  situation_id: "sit-skill-py"
-}]->(Skill {
-  name: "Python",
-  category: "programming",
-  subcategory: "backend"
-})
+```python
+# "What skills do I use at ACME?"
+results = qdrant.search(
+    collection_name="situations",
+    query_filter={
+        "must": [
+            {"key": "user_id", "match": {"value": "user-123"}},
+            {"key": "relationship_type", "match": {"value": "WORKS_AT"}},
+            {"key": "entity_id", "match": {"value": "org-acme"}}
+        ]
+    }
+)
+# Returns: skills from WORKS_AT → ACME context
+
+# "All my skills across all contexts" (aggregated)
+GET /api/memory/role-scoped/skills/aggregated
+# Returns: deduplicated list with context info
 ```
 
-**Trigger for upgrade:** If skills need:
-- Progress tracking (beginner → advanced)
-- Situational context ("I use Python at work, TypeScript for hobbies")
-- Certifications, courses, practice logs
+**See:** [ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md) | [Package 3.6](../prompts/fidus-memory/migration/epic-3/package-3.6-role-scoped-attributes-ui.md)
+
+~~**Previous Decision (deprecated):** Store as User attribute~~
+
+```cypher
+// DEPRECATED - Do NOT use
+(:User {skills: ["python", "typescript"]})
+```
+
+### 4.3 Vollständiges Attribute-Modell: Role-Scoped vs. General
+
+**WICHTIG:** Es gibt **zwei verschiedene Arten** von Attributen für Skills, Goals und Preferences:
+
+| Attribut-Art | Speicherort | Beispiel | Wann verwenden? |
+|--------------|-------------|----------|-----------------|
+| **Role-Scoped (ADR-0003)** | Qdrant Context auf Relationship | "Remote Work" auf WORKS_AT → ACME | Kontext-spezifische Präferenzen/Skills/Goals |
+| **General (Entity)** | HAS_PREFERENCE → Preference Entity | "Ich mag Sushi" | Allgemeine Präferenzen ohne spezifischen Kontext |
+
+**Vollständiges Diagramm:**
+
+```
+User (Agent Owner)
+│
+├── [ROLE-SCOPED ATTRIBUTES - ADR-0003]
+│   │  Gespeichert: Qdrant Context auf Relationships
+│   │  Für: Kontext-spezifische Skills, Goals, Preferences
+│   │
+│   ├── WORKS_AT → Organization: "ACME Corp"
+│   │   └── Qdrant Context: {
+│   │         role: "Software Engineer",
+│   │         skills: ["Python", "TypeScript"],      ← Role-scoped
+│   │         goals: ["Tech Lead promotion"],        ← Role-scoped
+│   │         preferences: ["Remote Work", "Mornings"] ← Role-scoped
+│   │       }
+│   │
+│   ├── MEMBER_OF → Organization: "Sports Club"
+│   │   └── Qdrant Context: {
+│   │         role: "Board Member",
+│   │         skills: ["Event Planning"],            ← Role-scoped
+│   │         goals: ["Increase membership"]         ← Role-scoped
+│   │       }
+│   │
+│   └── KNOWS → Person: "Anna"
+│       └── Qdrant Context: {
+│             role: "Friend",
+│             preferences: ["Joint hiking trips"]    ← Role-scoped
+│           }
+│
+├── [GENERAL PREFERENCES - HAS_PREFERENCE Entity]
+│   │  Gespeichert: Neo4j HAS_PREFERENCE → Preference Node
+│   │  Für: Allgemeine Präferenzen OHNE spezifischen Kontext
+│   │
+│   ├── HAS_PREFERENCE → Preference: "Sushi"
+│   │   └── {category: "food", sentiment: "positive", strength: 0.9}
+│   │
+│   ├── HAS_PREFERENCE → Preference: "Jazz"
+│   │   └── {category: "music", sentiment: "positive"}
+│   │
+│   └── HAS_PREFERENCE → Preference: "Kaffee morgens"
+│       └── {category: "food", time_context: "morning", strength: 0.95}
+│
+└── [USER PROPERTIES - Neo4j User Node]
+    │  Gespeichert: Direkt am User Node
+    │  Für: System-Level Attribute
+    │
+    └── {
+          preferred_language: "de",
+          timezone: "Europe/Berlin",
+          notification_preferences: {...}
+        }
+```
+
+**Entscheidungsbaum: Wo speichere ich was?**
+
+```
+"Ich mag Sushi essen"
+   │
+   ├── Ist es kontext-spezifisch?
+   │   │
+   │   ├── JA: "Ich mag Sushi beim Geschäftsessen"
+   │   │   └── → Role-Scoped Preference auf WORKS_AT (ADR-0003)
+   │   │
+   │   └── NEIN: "Ich mag generell Sushi"
+   │       └── → HAS_PREFERENCE → Preference Entity
+   │
+   └── → Preference Entity: {value: "Sushi", category: "food", sentiment: "positive"}
+
+"Ich bin gut in Python"
+   │
+   ├── Ist es kontext-spezifisch?
+   │   │
+   │   ├── JA: "Ich nutze Python bei der Arbeit"
+   │   │   └── → Role-Scoped Skill auf WORKS_AT (ADR-0003)
+   │   │
+   │   └── NEIN: "Ich kann Python" (allgemein)
+   │       └── → ai_properties am User (legacy) ODER
+   │           → Aggregation über alle role-scoped contexts
+```
+
+**Query-Unterschiede:**
+
+```python
+# General Preference: "Mag Sushi?"
+results = neo4j.query("""
+    MATCH (u:User {id: $user_id})-[:HAS_PREFERENCE]->(p:Preference)
+    WHERE p.value CONTAINS 'Sushi' OR p.category = 'food'
+    RETURN p
+""")
+
+# Role-Scoped Preference: "Was bevorzuge ich bei der Arbeit?"
+results = qdrant.search(
+    collection_name="situations",
+    query_filter={
+        "must": [
+            {"key": "user_id", "match": {"value": "user-123"}},
+            {"key": "relationship_type", "match": {"value": "WORKS_AT"}}
+        ]
+    }
+)
+# Returns: preferences: ["Remote Work", "Mornings"]
+```
 
 ---
 
@@ -725,7 +883,7 @@ score = confidence × context_similarity × factor_relevance
 ```mermaid
 graph TB
     subgraph Neo4j["Neo4j (Entity Graph)"]
-        User["User Node<br/>{id, tenant_id, skills}"]
+        User["User Node<br/>{id, tenant_id}<br/>(skills: see ADR-0003)"]
 
         Person["Person<br/>{name, profession, ...}"]
         Org["Organization<br/>{name, industry, ...}"]
@@ -779,7 +937,8 @@ graph TB
 | **Entities** | Neo4j Nodes | Minimal core schema + AI-discovered properties | `Person {name, profession: AI-added}` |
 | **Relationships** | Neo4j Relationships | Fixed type + minimal stable properties | `KNOWS {role: "colleague"}` |
 | **Situational Context** | Qdrant Payload | **NO SCHEMA** - fully AI-driven | `{emotion: "stressed", coffee_count_today: 3}` |
-| **User Attributes** | User Node Properties | Minimal (only non-relational data) | `skills: ["python"]` |
+| **User Attributes** | User Node Properties | Minimal (only non-relational data) | `preferred_language: "de"` |
+| **Role-Scoped Attributes** | Qdrant (on relationships) | Skills, Goals, Preferences per context | `skills: [{name: "Python", proficiency: "expert"}]` (ADR-0003) |
 
 ### 6.2 Key Decision Rules
 
@@ -803,9 +962,15 @@ graph TB
 
 **Is it a User Attribute?**
 - ✅ Direct property of the user (not a relationship)
-- ✅ Doesn't fit entity model (e.g., skills list)
-- ✅ System-level data (auth, preferences)
+- ✅ System-level data (auth, language, timezone)
+- ❌ NOT skills, goals, preferences (these are role-scoped per ADR-0003)
 - → Store as **User Node property**
+
+**Is it a Role-Scoped Attribute? (ADR-0003)**
+- ✅ Skills, Goals, or Preferences
+- ✅ Only makes sense in a relationship context
+- ✅ "Skills at work" ≠ "Skills in hobby club"
+- → Store in **Qdrant context on relationship** (see Package 3.6)
 
 ### 6.3 Anti-Patterns to Avoid
 
@@ -825,6 +990,21 @@ graph TB
 
 // CORRECT (in Qdrant)
 {context: {emotion: "stressed"}}
+```
+
+❌ **Skills as User Attribute (ADR-0003)**
+```cypher
+// WRONG - Skills without context
+(:User {skills: ["python", "typescript"]})
+
+// CORRECT - Role-scoped skills on relationship (Qdrant)
+// In WORKS_AT → Organization context:
+{
+  "skills": [
+    {"name": "Python", "proficiency": "expert"},
+    {"name": "TypeScript", "proficiency": "advanced"}
+  ]
+}
 ```
 
 ❌ **Context Properties in Neo4j**

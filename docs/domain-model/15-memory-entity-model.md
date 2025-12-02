@@ -15,8 +15,11 @@
 | **1.0** | 2024-XX-XX | Initial profile domain with preferences |
 | **2.0** | 2025-11-03 | Added Situational Context (Situation as entity) |
 | **3.0** | 2025-11-19 | **Major refactoring:** Situational Context as Relationship Qualifier (ADR-0001), added Person, Organization, Goal, Habit, Event, Object, Location entities |
+| **3.1** | 2025-12-02 | **ADR-0003:** Skills, Goals, Preferences moved to role-scoped attributes on relationships |
 
 **Migration from v2.0 to v3.0:** See [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md) and [ADR-0002: Property Placement Strategy](../adr/ADR-0002-property-placement-and-geospatial-exception.md)
+
+**Migration v3.1 (ADR-0003):** See [ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md) - Skills, Goals, Preferences are now stored on relationship contexts in Qdrant, NOT on User entity.
 
 **Critical Changes in v3.0:**
 - ❌ **Removed:** `Situation` entity (was Neo4j node in v2.0)
@@ -89,12 +92,16 @@ Layer 3: Situational Context (Qdrant)
 - `name: string` - Display name
 - `preferred_language: string` - e.g., "de", "en"
 - `timezone: string` - e.g., "Europe/Berlin"
-- `skills: string[]` - List of skills (Priority 🟢 Low, may be upgraded to entity later)
+- ~~`skills: string[]`~~ **REMOVED (ADR-0003)** - Skills are now role-scoped on relationships
 
 **AI-Discovered Properties (Examples, not exhaustive):**
-- `notification_preferences: object` - Learned preferences
+- `notification_preferences: object` - System-level preferences
 - `active_hours: string[]` - When user is typically active
 - Any other properties the AI discovers from conversation
+
+> **NOTE (ADR-0003):** Skills, Goals, and context-specific Preferences are **NOT** stored on User.
+> They are role-scoped and stored on relationship contexts in Qdrant.
+> See [ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md)
 
 **Cypher Example:**
 ```cypher
@@ -105,7 +112,7 @@ CREATE (u:User {
   name: "Max Mustermann",
   preferred_language: "de",
   timezone: "Europe/Berlin",
-  skills: ["python", "typescript"],
+  // NOTE: skills REMOVED per ADR-0003 - now role-scoped on relationships
   created_at: datetime(),
   updated_at: datetime()
 })
@@ -114,7 +121,6 @@ CREATE (u:User {
 **Invariants:**
 1. User must have valid `email`
 2. User must belong to exactly one tenant
-3. `skills` array must contain lowercase strings
 
 ---
 
@@ -513,6 +519,43 @@ CREATE (p:Preference {
 - **HAS_HABIT:** `started_at`, `ended_at`
 - **ATTENDS:** `attended_at`
 - **KNOWS, OWNS, FREQUENTS, HAS_PREFERENCE:** No temporal boundaries
+
+### Role-Scoped Attributes (ADR-0003)
+
+**WICHTIG:** Skills, Goals, und kontext-spezifische Preferences werden als **Role-Scoped Attributes** auf Relationship-Kontexten in Qdrant gespeichert.
+
+**Qdrant Context Payload (auf WORKS_AT, MEMBER_OF, KNOWS, etc.):**
+```python
+{
+  "id": "sit-uuid",
+  "payload": {
+    "relationship_instance_id": "rel-uuid",
+    "relationship_type": "WORKS_AT",
+    "role": "Software Engineer",
+
+    # Role-Scoped Attributes (ADR-0003)
+    "skills": [
+      {"name": "Python", "proficiency": "expert"},
+      {"name": "TypeScript", "proficiency": "advanced"}
+    ],
+    "goals": [
+      {"description": "Tech Lead promotion", "priority": "high"}
+    ],
+    "preferences": [
+      {"type": "work_style", "value": "remote", "strength": 0.9}
+    ]
+  }
+}
+```
+
+**Unterscheidung: Role-Scoped vs. General Preferences:**
+
+| Typ | Speicherort | Beispiel |
+|-----|-------------|----------|
+| **Role-Scoped** | Qdrant Context auf Relationship | "Remote Work" bei WORKS_AT |
+| **General** | `HAS_PREFERENCE → Preference` Entity | "Ich mag Sushi" |
+
+**Siehe:** [ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md) | [Entity-Relationship Model: Abschnitt 4.3](../architecture/10-entity-relationship-model.md#43-vollständiges-attribute-modell-role-scoped-vs-general)
 
 ---
 
