@@ -131,6 +131,9 @@ services:
       # v3.0 Feature Flags (ADR-0001: Qdrant-First Pattern)
       USE_QDRANT_FIRST: ${USE_QDRANT_FIRST:-true}
 
+      # v3.0 Person Entity Feature Flag
+      ENABLE_PERSON_ENTITY: ${ENABLE_PERSON_ENTITY:-true}
+
       # CORS
       CORS_ORIGINS: http://localhost:3001,http://memory-web:3000
     ports:

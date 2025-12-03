@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -14,7 +15,6 @@ import {
 } from '@fidus/ui';
 import { type Person, type PersonCreate, createPerson } from '@/lib/api/memory';
 
-// Common property suggestions matching Package 2.1 spec
 const PROPERTY_SUGGESTIONS = [
   'Profession',
   'Company',
@@ -26,9 +26,13 @@ const PROPERTY_SUGGESTIONS = [
 ];
 
 interface PropertyPair {
-  id: string;
   key: string;
   value: string;
+}
+
+interface FormData {
+  name: string;
+  properties: PropertyPair[];
 }
 
 interface PersonFormProps {
@@ -38,91 +42,73 @@ interface PersonFormProps {
 }
 
 export function PersonForm({ open, onOpenChange, onCreated }: PersonFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  // Form state
-  const [name, setName] = useState('');
-  const [properties, setProperties] = useState<PropertyPair[]>([]);
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      properties: [],
+    },
+  });
 
-  const resetForm = () => {
-    setName('');
-    setProperties([]);
-    setError(null);
-  };
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'properties',
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: PersonCreate) => createPerson(data),
+    onSuccess: (created) => {
+      queryClient.invalidateQueries({ queryKey: ['persons'] });
+      onCreated?.(created);
+      handleClose();
+    },
+  });
 
   const handleClose = () => {
-    resetForm();
+    reset();
     onOpenChange(false);
   };
 
+  const onSubmit = (formData: FormData) => {
+    const ai_properties: Record<string, unknown> = {};
+
+    for (const prop of formData.properties) {
+      const key = prop.key.trim();
+      const value = prop.value.trim();
+      if (key && value) {
+        const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
+        ai_properties[normalizedKey] = value;
+      }
+    }
+
+    const personData: PersonCreate = {
+      name: formData.name.trim(),
+      source: 'explicit',
+      confidence: 1.0,
+    };
+
+    if (Object.keys(ai_properties).length > 0) {
+      personData.ai_properties = ai_properties;
+    }
+
+    createMutation.mutate(personData);
+  };
+
   const addProperty = () => {
-    setProperties([
-      ...properties,
-      { id: crypto.randomUUID(), key: '', value: '' },
-    ]);
-  };
-
-  const removeProperty = (id: string) => {
-    setProperties(properties.filter((p) => p.id !== id));
-  };
-
-  const updateProperty = (id: string, field: 'key' | 'value', value: string) => {
-    setProperties(
-      properties.map((p) => (p.id === id ? { ...p, [field]: value } : p))
-    );
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!name.trim()) {
-      setError('Name is required');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      // Build ai_properties from dynamic properties
-      const ai_properties: Record<string, unknown> = {};
-
-      // Add all custom properties
-      for (const prop of properties) {
-        const key = prop.key.trim();
-        const value = prop.value.trim();
-        if (key && value) {
-          // Convert key to snake_case for consistency
-          const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
-          ai_properties[normalizedKey] = value;
-        }
-      }
-
-      const personData: PersonCreate = {
-        name: name.trim(),
-        source: 'explicit',
-        confidence: 1.0,
-      };
-
-      if (Object.keys(ai_properties).length > 0) {
-        personData.ai_properties = ai_properties;
-      }
-
-      const created = await createPerson(personData);
-      onCreated?.(created);
-      handleClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create person');
-    } finally {
-      setIsSubmitting(false);
-    }
+    append({ key: '', value: '' });
   };
 
   return (
     <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader>
             <ModalTitle>Add Person</ModalTitle>
             <ModalDescription>
@@ -132,17 +118,24 @@ export function PersonForm({ open, onOpenChange, onCreated }: PersonFormProps) {
           </ModalHeader>
 
           <div className="p-4 space-y-4">
-            {error && <Alert variant="error">{error}</Alert>}
+            {createMutation.error && (
+              <Alert variant="error">
+                {createMutation.error instanceof Error
+                  ? createMutation.error.message
+                  : 'Failed to create person'}
+              </Alert>
+            )}
 
             {/* Name - required */}
             <TextInput
               label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register('name', { required: 'Name is required' })}
               placeholder="Person's name"
-              required
-              disabled={isSubmitting}
+              disabled={createMutation.isPending}
             />
+            {errors.name && (
+              <p className="text-sm text-red-600">{errors.name.message}</p>
+            )}
 
             {/* Dynamic Properties */}
             <div className="space-y-2">
@@ -153,28 +146,27 @@ export function PersonForm({ open, onOpenChange, onCreated }: PersonFormProps) {
                 <button
                   type="button"
                   onClick={addProperty}
-                  disabled={isSubmitting}
+                  disabled={createMutation.isPending}
                   className="text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400"
                 >
                   + Add
                 </button>
               </div>
 
-              {properties.length === 0 && (
+              {fields.length === 0 && (
                 <p className="text-sm text-gray-500 italic">
                   Suggestions: {PROPERTY_SUGGESTIONS.slice(0, 4).join(', ')}...
                 </p>
               )}
 
-              {properties.map((prop) => (
-                <div key={prop.id} className="flex gap-2 items-start">
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-start">
                   <div className="flex-1">
                     <input
                       type="text"
-                      value={prop.key}
-                      onChange={(e) => updateProperty(prop.id, 'key', e.target.value)}
+                      {...register(`properties.${index}.key`)}
                       placeholder="Property"
-                      disabled={isSubmitting}
+                      disabled={createMutation.isPending}
                       list="property-suggestions"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 text-sm"
                     />
@@ -182,17 +174,16 @@ export function PersonForm({ open, onOpenChange, onCreated }: PersonFormProps) {
                   <div className="flex-1">
                     <input
                       type="text"
-                      value={prop.value}
-                      onChange={(e) => updateProperty(prop.id, 'value', e.target.value)}
+                      {...register(`properties.${index}.value`)}
                       placeholder="Value"
-                      disabled={isSubmitting}
+                      disabled={createMutation.isPending}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 text-sm"
                     />
                   </div>
                   <button
                     type="button"
-                    onClick={() => removeProperty(prop.id)}
-                    disabled={isSubmitting}
+                    onClick={() => remove(index)}
+                    disabled={createMutation.isPending}
                     className="p-2 text-gray-400 hover:text-red-600 disabled:cursor-not-allowed"
                     title="Remove"
                   >
@@ -215,12 +206,12 @@ export function PersonForm({ open, onOpenChange, onCreated }: PersonFormProps) {
               type="button"
               variant="secondary"
               onClick={handleClose}
-              disabled={isSubmitting}
+              disabled={createMutation.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Add'}
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending ? 'Creating...' : 'Add'}
             </Button>
           </ModalFooter>
         </form>

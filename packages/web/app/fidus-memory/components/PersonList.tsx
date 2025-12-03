@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
-  Button,
   TextInput,
   Skeleton,
-  Badge,
+  Chip,
 } from '@fidus/ui';
 import {
   type Person,
@@ -14,6 +14,7 @@ import {
   getPersonFeatureStatus,
 } from '@/lib/api/memory';
 import { getUserId } from '@/app/lib/userSession';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 
 export interface PersonListRef {
   refresh: () => void;
@@ -26,62 +27,40 @@ interface PersonListProps {
 
 export const PersonList = forwardRef<PersonListRef, PersonListProps>(
   ({ onSelectPerson, className = '' }, ref) => {
-    const [persons, setPersons] = useState<Person[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [featureEnabled, setFeatureEnabled] = useState<boolean | null>(null);
+    const queryClient = useQueryClient();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const debouncedSearch = useDebounce(searchQuery, 300);
+    const userId = getUserId();
 
-    const fetchPersons = useCallback(async () => {
-      const userId = getUserId();
-      if (!userId) {
-        setError('Please send a message first to create your profile.');
-        setIsLoading(false);
-        return;
-      }
+    // Feature status query
+    const {
+      data: featureStatus,
+      isLoading: isFeatureLoading,
+    } = useQuery({
+      queryKey: ['personFeatureStatus'],
+      queryFn: getPersonFeatureStatus,
+      staleTime: 60 * 1000, // Cache for 1 minute
+      retry: false,
+    });
 
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const data = await listPersons(userId, searchQuery || undefined);
-        setPersons(data);
-      } catch (err) {
-        if (err instanceof Error && err.message === 'Person feature is disabled') {
-          setFeatureEnabled(false);
-        } else {
-          setError(err instanceof Error ? err.message : 'Failed to load persons');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }, [searchQuery]);
-
-    const checkFeatureStatus = useCallback(async () => {
-      try {
-        const status = await getPersonFeatureStatus();
-        setFeatureEnabled(status.enabled);
-        return status.enabled;
-      } catch {
-        setFeatureEnabled(false);
-        return false;
-      }
-    }, []);
-
-    useEffect(() => {
-      checkFeatureStatus().then((enabled) => {
-        if (enabled) {
-          fetchPersons();
-        } else {
-          setIsLoading(false);
-        }
-      });
-    }, [checkFeatureStatus, fetchPersons]);
+    // Persons list query
+    const {
+      data: persons = [],
+      isLoading: isPersonsLoading,
+      error,
+    } = useQuery({
+      queryKey: ['persons', userId, debouncedSearch],
+      queryFn: () => listPersons(userId!, debouncedSearch || undefined),
+      enabled: !!userId && featureStatus?.enabled === true,
+      staleTime: 30 * 1000, // 30 seconds
+    });
 
     // Expose refresh method to parent
     useImperativeHandle(ref, () => ({
-      refresh: fetchPersons,
+      refresh: () => {
+        queryClient.invalidateQueries({ queryKey: ['persons'] });
+      },
     }));
 
     const handleSelectPerson = (person: Person) => {
@@ -89,12 +68,19 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
       onSelectPerson?.(person);
     };
 
-    const handleSearch = () => {
-      fetchPersons();
-    };
+    // No user ID
+    if (!userId) {
+      return (
+        <div className={`p-4 ${className}`}>
+          <Alert variant="info">
+            Please send a message first to create your profile.
+          </Alert>
+        </div>
+      );
+    }
 
     // Feature disabled state
-    if (featureEnabled === false) {
+    if (featureStatus?.enabled === false) {
       return (
         <div className={`p-4 ${className}`}>
           <Alert variant="info">
@@ -108,6 +94,7 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
     }
 
     // Loading state
+    const isLoading = isFeatureLoading || isPersonsLoading;
     if (isLoading && persons.length === 0) {
       return (
         <div className={`p-4 space-y-4 ${className}`}>
@@ -123,7 +110,9 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
     if (error) {
       return (
         <div className={`p-4 ${className}`}>
-          <Alert variant="error">{error}</Alert>
+          <Alert variant="error">
+            {error instanceof Error ? error.message : 'Failed to load persons'}
+          </Alert>
         </div>
       );
     }
@@ -132,19 +121,13 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
       <div className={`flex flex-col h-full ${className}`}>
         {/* Search bar */}
         <div className="p-4 border-b border-gray-200">
-          <div className="flex gap-2">
-            <TextInput
-              label=""
-              placeholder="Search persons..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1"
-            />
-            <Button onClick={handleSearch} size="sm">
-              Search
-            </Button>
-          </div>
+          <TextInput
+            label=""
+            placeholder="Search persons..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
         </div>
 
         {/* Person list */}
@@ -179,25 +162,31 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
                       {person.topics && person.topics.length > 0 && (
                         <div className="flex gap-1 mt-1 flex-wrap">
                           {person.topics.slice(0, 3).map((topic, idx) => (
-                            <Badge key={idx} variant="info" size="sm">
+                            <Chip key={idx} size="sm">
                               {topic}
-                            </Badge>
+                            </Chip>
                           ))}
                           {person.topics.length > 3 && (
-                            <Badge variant="info" size="sm">
+                            <Chip size="sm" variant="outlined">
                               +{person.topics.length - 3}
-                            </Badge>
+                            </Chip>
                           )}
                         </div>
                       )}
                     </div>
-                    <div className="ml-2 text-right">
-                      <Badge
-                        variant={person.confidence >= 0.9 ? 'success' : 'normal'}
+                    <div className="ml-2 flex flex-col items-end gap-1">
+                      <Chip
                         size="sm"
+                        variant={person.source === 'explicit' ? 'filled' : 'outlined'}
+                      >
+                        {person.source}
+                      </Chip>
+                      <Chip
+                        size="sm"
+                        variant={person.confidence >= 0.9 ? 'filled' : 'outlined'}
                       >
                         {Math.round(person.confidence * 100)}%
-                      </Badge>
+                      </Chip>
                     </div>
                   </div>
                 </li>
