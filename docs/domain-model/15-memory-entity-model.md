@@ -16,10 +16,13 @@
 | **2.0** | 2025-11-03 | Added Situational Context (Situation as entity) |
 | **3.0** | 2025-11-19 | **Major refactoring:** Situational Context as Relationship Qualifier (ADR-0001), added Person, Organization, Goal, Habit, Event, Object, Location entities |
 | **3.1** | 2025-12-02 | **ADR-0003:** Skills, Goals, Preferences moved to role-scoped attributes on relationships |
+| **3.2** | 2025-12-03 | **ADR-0004:** Memory Traces & Structured Goals for AI artifacts and numeric constraints |
 
 **Migration from v2.0 to v3.0:** See [ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md) and [ADR-0002: Property Placement Strategy](../adr/ADR-0002-property-placement-and-geospatial-exception.md)
 
 **Migration v3.1 (ADR-0003):** See [ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md) - Skills, Goals, Preferences are now stored on relationship contexts in Qdrant, NOT on User entity.
+
+**v3.2 (ADR-0004):** See [ADR-0004: Memory Traces and Structured Goals](../adr/ADR-0004-memory-traces-and-structured-goals.md) - Memory Traces for AI-generated artifacts, Structured Goals with numeric constraints.
 
 **Critical Changes in v3.0:**
 - ❌ **Removed:** `Situation` entity (was Neo4j node in v2.0)
@@ -1398,9 +1401,161 @@ persons = await neo4j.run("""
 
 ---
 
-## 9. Related Documents
+## 9. Memory Traces & Structured Goals (ADR-0004)
 
+**Version:** 3.2 (Epic 6)
+**Date:** 2025-12-03
+**Status:** Proposed
+
+### Problem Statement
+
+The current system loses critical information:
+1. **Goals with constraints**: "max 2000 kcal/Tag" → stored as `caloric_intake: "follows diet"` (numeric value lost!)
+2. **AI artifacts**: Generated recipe → stored as `recipe: "likes it"` (entire content lost!)
+
+### 9.1 Structured Goals with Parameters
+
+**Extended Goal Model:**
+
+The Goal entity (Section 1.4) is extended with structured parameters stored in Qdrant:
+
+```python
+class GoalParameter(BaseModel):
+    """Structured parameter for measurable goals."""
+    name: str                    # e.g., "daily_budget"
+    value: float | int | str     # e.g., 2000
+    unit: str | None             # e.g., "kcal", "g", "km"
+    constraint_type: Literal["min", "max", "equals", "between"] | None
+
+# Qdrant Payload (extends existing Goal context)
+{
+  "entity_id": "goal-uuid",
+  "entity_type": "goal",
+  "context": {
+    "motivation": "health",
+    "priority": "high"
+  },
+  "parameters": [
+    {"name": "daily_budget", "value": 2000, "unit": "kcal", "constraint_type": "max"},
+    {"name": "protein_min", "value": 100, "unit": "g", "constraint_type": "min"}
+  ]
+}
+```
+
+### 9.2 Memory Trace (Value Object in Qdrant)
+
+**Type:** Value Object (NOT a Neo4j entity!)
+
+**Purpose:** Store AI-generated or user-provided artifacts with structured content
+
+**Key Design:**
+- **AI discovers `trace_type` organically** (NOT a fixed enum!)
+- **Flexible JSON `content` structure** (schema determined by trace_type)
+- **Vector embedding for similarity search**
+- **Links to Goals for constraint satisfaction**
+
+**Qdrant Collection: `memory_traces`**
+
+```python
+{
+  "id": "trace-uuid",
+  "vector": [0.1, 0.2, ...],  # 768-dim embedding
+  "payload": {
+    # Fixed metadata
+    "tenant_id": "tenant-1",
+    "user_id": "user-123",
+    "trace_type": "recipe",           # AI-discovered type
+    "source": "ai_generated",          # "ai_generated" | "user_provided" | "imported"
+    "created_at": "2025-12-03T10:00:00Z",
+
+    # Flexible content (structure depends on trace_type!)
+    "content": {
+      "title": "Hähnchen-Gemüse-Wok",
+      "portions": 2,
+      "calories_per_portion": 450,
+      "ingredients": [...],
+      "instructions": [...],
+      "nutrition": {"protein": 45, "carbs": 20, "fat": 15}
+    },
+
+    # Constraint satisfaction
+    "satisfies_goals": [
+      {
+        "goal_id": "goal-uuid",
+        "constraint": "calories <= 500",
+        "actual_value": 450,
+        "satisfied": true
+      }
+    ],
+
+    # User feedback
+    "feedback": "positive",  # null | "positive" | "negative"
+    "feedback_count": 3
+  }
+}
+```
+
+### 9.3 TraceRef (Neo4j Reference Node)
+
+**Purpose:** Minimal reference for graph queries (full content in Qdrant)
+
+```cypher
+(:TraceRef {
+  id: "trace-uuid",        # Same as Qdrant ID
+  tenant_id: uuid,
+  user_id: uuid,
+  trace_type: "recipe",    # For graph filtering
+  created_at: datetime
+})
+```
+
+**Relationships:**
+
+```cypher
+// User created trace
+(User)-[:CREATED_TRACE {
+  created_at: datetime,
+  feedback: "positive"
+}]->(TraceRef)
+
+// Trace satisfies goal constraints
+(TraceRef)-[:SATISFIES {
+  constraint: "calories <= 500",
+  actual_value: 450,
+  satisfied: true,
+  evaluated_at: datetime
+}]->(Goal)
+```
+
+### 9.4 AI-Driven Type Discovery
+
+**Critical:** `trace_type` is NOT a fixed enum!
+
+AI discovers types organically from conversation:
+- `"recipe"` - Recipes and meal plans
+- `"workout_plan"` - Exercise routines
+- `"travel_itinerary"` - Trip plans
+- `"meeting_notes"` - Meeting summaries
+- `"recommendation"` - Product/service recommendations
+- ... any other type the AI discovers!
+
+**New types emerge without schema changes.**
+
+### 9.5 Invariants
+
+1. **MemoryTrace must have non-empty `content`**
+2. **`trace_type` must be snake_case**
+3. **TraceRef `id` must match Qdrant `id`**
+4. **Constraint satisfaction requires valid Goal reference**
+5. **Feedback must be null, "positive", or "negative"**
+
+---
+
+## 10. Related Documents
+
+- **[ADR-0004: Memory Traces and Structured Goals](../adr/ADR-0004-memory-traces-and-structured-goals.md)** - **NEW:** AI artifacts and numeric constraints
 - **[ADR-0002: Property Placement Strategy and Geospatial Exception](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** Neo4j vs Qdrant property placement
+- **[ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md)** - Skills, Goals on relationships
 - **[ADR-0001: Situational Context as Relationship Qualifier](../adr/ADR-0001-situational-context-as-relationship-qualifier.md)** - Technical decision
 - **[Entity-Relationship Model Architecture](../architecture/10-entity-relationship-model.md)** - Architecture overview
 - **[Situational Context Architecture](../architecture/08-situational-context-architecture.md)** - Context principles
@@ -1409,8 +1564,8 @@ persons = await neo4j.run("""
 ---
 
 **Maintained by:** Memory Team
-**Last Updated:** 2025-11-19
-**Next Review:** After implementing Person, Organization, Goal entities
+**Last Updated:** 2025-12-03
+**Next Review:** After implementing Memory Traces (Epic 6)
 
 ---
 

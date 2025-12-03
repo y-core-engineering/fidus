@@ -16,11 +16,13 @@
 
 ## Overview
 
-This document describes the technical implementation of **Entity Management** in the Fidus Memory system, covering 8 entity types and 9 relationship types.
+This document describes the technical implementation of **Entity Management** in the Fidus Memory system, covering 8 entity types, 9 relationship types, and the new Memory Traces architecture (ADR-0004).
 
 **Entities:** User, Person, Organization, Goal, Habit, Event, Object, Location, Preference
 
 **Relationships:** KNOWS, WORKS_AT, MEMBER_OF, PURSUES, HAS_HABIT, ATTENDS, OWNS, FREQUENTS, HAS_PREFERENCE
+
+**v3.2 (ADR-0004):** Memory Traces & Structured Goals for capturing AI-generated artifacts and numeric constraints
 
 **Core Principle:** **Minimal fixed schema + AI-discovered properties**
 
@@ -1044,9 +1046,238 @@ async def delete_user(user_id: str, tenant_id: str):
 
 ---
 
+## Memory Traces & Structured Goals (ADR-0004)
+
+**Version:** 3.2 (Epic 6)
+**Date:** 2025-12-03
+**Status:** Proposed (Implementation pending)
+
+### Problem Statement
+
+The current system loses critical information when:
+1. **Structured Goals**: User says "max 2000 kcal pro Tag" → stored as `caloric_intake: "follows strict diet"` (loses numeric value!)
+2. **AI Artifacts**: AI generates a recipe → stored as `recipe: "likes it"` (loses the entire recipe content!)
+
+### Solution: Memory Traces
+
+**Memory Traces** are AI-generated or user-provided artifacts with structured content, stored in Qdrant for similarity search.
+
+**Key Design Principles:**
+- **NOT static entities per domain** (no `Recipe`, `MealPlan` entities)
+- **AI discovers `trace_type` organically** from conversation
+- **Flexible JSON content structure** (no fixed schema)
+- **Vector embeddings for similarity search**
+- **Links to Goals for constraint satisfaction**
+
+### Structured Goals with Parameters
+
+**Extended Goal Entity (Neo4j + Qdrant):**
+
+```cypher
+// Neo4j: Structural + Temporal ONLY
+(:Goal {
+  id: uuid,
+  tenant_id: uuid,
+  description: string,
+  type: string,
+  created_at: datetime,
+  updated_at: datetime
+})
+```
+
+```python
+# Qdrant: Parameters + Context
+{
+  "id": "goal-uuid",
+  "vector": [...],  # embedding
+  "payload": {
+    "tenant_id": "tenant-1",
+    "user_id": "user-123",
+    "entity_type": "goal",
+    "entity_id": "goal-uuid",
+
+    # Structured Parameters (NEW - ADR-0004!)
+    "parameters": [
+      {
+        "name": "daily_budget",
+        "value": 2000,
+        "unit": "kcal",
+        "constraint_type": "max"
+      },
+      {
+        "name": "protein_min",
+        "value": 100,
+        "unit": "g",
+        "constraint_type": "min"
+      }
+    ],
+
+    # Situational context
+    "context": {
+      "motivation": "health",
+      "commitment_level": "high"
+    }
+  }
+}
+```
+
+### Memory Trace Model (Qdrant)
+
+**Memory Traces are stored ONLY in Qdrant** (not Neo4j entities):
+
+```python
+# Collection: memory_traces
+{
+  "id": "trace-uuid",
+  "vector": [...],  # embedding of content
+  "payload": {
+    "tenant_id": "tenant-1",
+    "user_id": "user-123",
+    "trace_type": "recipe",          # AI-discovered type
+    "source": "ai_generated",         # or "user_provided", "imported"
+    "created_at": "2025-12-03T10:00:00Z",
+
+    # Flexible JSON content (structure depends on trace_type)
+    "content": {
+      "title": "Hähnchen-Gemüse-Wok",
+      "portions": 2,
+      "calories_per_portion": 450,
+      "ingredients": [
+        {"name": "Hähnchenbrust", "amount": 400, "unit": "g"},
+        {"name": "Brokkoli", "amount": 200, "unit": "g"}
+      ],
+      "instructions": ["Hähnchen schneiden...", "Gemüse anbraten..."],
+      "nutrition": {
+        "protein": 45,
+        "carbs": 20,
+        "fat": 15
+      }
+    },
+
+    # Links to Goals (constraint satisfaction)
+    "satisfies_goals": [
+      {
+        "goal_id": "goal-calorie-budget",
+        "constraint": "calories <= 500",
+        "actual_value": 450,
+        "satisfied": true
+      }
+    ],
+
+    # User feedback
+    "feedback": "positive",  # null | "positive" | "negative"
+    "feedback_count": 3,
+    "last_feedback_at": "2025-12-03T11:00:00Z"
+  }
+}
+```
+
+### Neo4j Reference Pattern
+
+**Memory Traces are referenced via TraceRef nodes:**
+
+```cypher
+// Minimal reference node (NOT the full trace!)
+(:TraceRef {
+  id: "trace-uuid",       # Same as Qdrant ID
+  tenant_id: uuid,
+  user_id: uuid,
+  trace_type: "recipe",   # For graph queries
+  created_at: datetime
+})
+
+// Link trace to goal it satisfies
+(TraceRef)-[:SATISFIES {
+  constraint: "calories <= 500",
+  actual_value: 450,
+  satisfied: true,
+  evaluated_at: datetime
+}]->(Goal)
+
+// Link trace to user
+(User)-[:CREATED_TRACE {
+  created_at: datetime,
+  feedback: "positive"
+}]->(TraceRef)
+```
+
+### API Endpoints
+
+```
+# Traces
+POST   /api/memory/traces              # Create trace (AI or manual)
+GET    /api/memory/traces/{id}         # Get trace by ID
+GET    /api/memory/traces/similar      # Find similar traces (vector search)
+PUT    /api/memory/traces/{id}/feedback  # Update feedback
+
+# Goals with parameters
+POST   /api/memory/goals               # Create goal with parameters
+GET    /api/memory/goals/{id}/constraints  # Get constraint status
+POST   /api/memory/goals/{id}/check    # Check if value satisfies constraints
+```
+
+### Implementation Components
+
+**New Components (Epic 6):**
+
+| Component | Package | Description |
+|-----------|---------|-------------|
+| `MemoryTrace` | `fidus.memory.entities.trace` | Trace model with flexible content |
+| `GoalParameter` | `fidus.memory.entities.goal` | Structured goal parameters |
+| `TraceExtractor` | `fidus.memory.services.trace_extractor` | AI service to extract traces from conversation |
+| `ConstraintChecker` | `fidus.memory.services.constraint_checker` | Validates traces against goal constraints |
+| `TraceSimilarity` | `fidus.memory.services.trace_similarity` | Vector search for similar traces |
+
+### Example Flow: Recipe Generation
+
+```python
+# 1. User expresses goal with constraint
+# "Ich möchte maximal 2000 kcal pro Tag essen"
+
+goal = await goal_service.create_with_parameters(
+    description="Kalorienbudget einhalten",
+    type="health",
+    parameters=[
+        GoalParameter(
+            name="daily_budget",
+            value=2000,
+            unit="kcal",
+            constraint_type="max"
+        )
+    ]
+)
+
+# 2. User asks for recipe
+# "Kannst du mir ein Rezept für heute Abend vorschlagen?"
+
+recipe_trace = await trace_extractor.extract_and_store(
+    conversation=conversation,
+    trace_type="recipe",
+    content=generated_recipe_json,
+    check_constraints=[goal.id]
+)
+
+# 3. System validates constraints
+constraint_result = await constraint_checker.check(
+    trace=recipe_trace,
+    goal=goal
+)
+# Result: {satisfied: true, actual: 450, constraint: "max 2000 kcal"}
+
+# 4. User provides feedback
+await trace_service.update_feedback(
+    trace_id=recipe_trace.id,
+    feedback="positive"
+)
+```
+
+---
+
 ## Related Documents
 
+- **[ADR-0004: Memory Traces and Structured Goals](../adr/ADR-0004-memory-traces-and-structured-goals.md)** - **NEW:** Traces for AI artifacts
 - **[ADR-0002: Property Placement Strategy](../adr/ADR-0002-property-placement-and-geospatial-exception.md)** - **CRITICAL:** Neo4j vs Qdrant guidance
+- **[ADR-0003: Role-Scoped Attributes](../adr/ADR-0003-role-scoped-attributes.md)** - Skills, Goals on relationships
 - **[Memory Domain Model](../domain-model/15-memory-entity-model.md)** - DDD specification
 - **[Entity-Relationship Model Architecture](../architecture/10-entity-relationship-model.md)** - Architecture overview
 - **[Situational Context - Solution Architecture](14-situational-context.md)** - Context storage
@@ -1055,8 +1286,8 @@ async def delete_user(user_id: str, tenant_id: str):
 ---
 
 **Maintained by:** Memory Team
-**Last Updated:** 2025-11-20
-**Next Review:** After implementing Person, Organization, Goal entities
+**Last Updated:** 2025-12-03
+**Next Review:** After implementing Memory Traces (Epic 6)
 
 ---
 

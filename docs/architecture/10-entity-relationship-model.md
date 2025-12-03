@@ -1224,7 +1224,112 @@ persons = await neo4j.run("""
 
 ---
 
-## 10. Open Questions
+## 10. Memory Traces & Structured Goals (ADR-0004)
+
+**Version 3.2 Addition:** The system now supports two additional concepts for complete information capture:
+
+### 10.1 Structured Goals
+
+Goals can now have **structured parameters with constraints**, not just descriptive text.
+
+**Problem Solved:**
+- User says: "My daily calorie budget is 2000 kcal"
+- Old: `Goal { description: "follows strict diet" }` ← Value lost!
+- New: `Goal { parameters: [{ name: "daily_budget", value: 2000, unit: "kcal", constraint_type: "max" }] }`
+
+**Extended Goal Model:**
+```cypher
+// Neo4j: Goal Node (unchanged)
+(:Goal {
+  id: "goal-uuid",
+  name: "calorie_management",
+  goal_type: "constraint",
+  status: "active"
+})
+
+// Qdrant: Goal Parameters (NEW)
+{
+  "id": "sit-goal-uuid",
+  "payload": {
+    "goal_id": "goal-uuid",
+    "parameters": [
+      { "name": "daily_budget", "value": 2000, "unit": "kcal", "constraint_type": "max" },
+      { "name": "lunch_ratio", "value": 0.25, "unit": "percentage" }
+    ],
+    "derived_constraints": [
+      { "name": "lunch_budget", "expression": "daily_budget * 0.25", "computed_value": 500, "unit": "kcal" }
+    ]
+  }
+}
+```
+
+### 10.2 Memory Traces
+
+**Definition:** A Memory Trace is a record of AI-generated or user-provided content with structured, queryable content.
+
+**Problem Solved:**
+- AI generates a recipe, user likes it
+- Old: `Preference { value: "likes it" }` ← Content lost!
+- New: `MemoryTrace { trace_type: "recipe", content: { name: "...", calories: 450, ingredients: [...] } }`
+
+**Trace Model (Qdrant Collection: `memory_traces`):**
+```python
+{
+  "id": "trace-uuid",
+  "vector": [...],  # Embedding for similarity search
+  "payload": {
+    "tenant_id": "tenant-1",
+    "user_id": "user-123",
+
+    "trace_type": "recipe",  # AI-discovered! Not fixed schema
+
+    "content": {  # Flexible JSON structure
+      "name": "Hähnchen-Gemüse-Wok",
+      "nutrition": { "calories": 450, "protein": "45g" },
+      "ingredients": [
+        { "item": "Hähnchenbrustfilet", "amount": 300, "unit": "g" }
+      ],
+      "steps": ["Hähnchen schneiden...", "..."]
+    },
+
+    "source": "ai_generated",
+    "conversation_id": "conv-uuid",
+
+    "feedback": "positive",  # User feedback
+    "feedback_at": "2025-12-03T12:30:00Z",
+
+    "created_at": "2025-12-03T12:25:00Z",
+    "accessed_at": "2025-12-03T12:30:00Z",
+    "access_count": 1
+  }
+}
+```
+
+**Key Characteristics:**
+- **AI-Driven Type Discovery:** `trace_type` is not a fixed enum - AI discovers new types organically
+- **Flexible Content:** JSON structure varies by type (recipe ≠ workout_plan ≠ packing_list)
+- **Vector Search:** Embeddings enable "find similar recipes" queries
+- **Feedback Loop:** User feedback improves future recommendations
+- **Constraint Satisfaction:** Traces can be linked to Goals they satisfy
+
+**Neo4j Relationships (optional):**
+```cypher
+// Link trace to satisfied goal
+(TraceRef {id: "trace-uuid"})-[:SATISFIES {
+  constraint: "calories <= 500",
+  actual_value: 450,
+  satisfied: true
+}]->(Goal {name: "calorie_budget"})
+
+// Link trace to aligned preference
+(TraceRef)-[:ALIGNS_WITH]->(Preference {key: "food.asian_cuisine"})
+```
+
+**See:** [ADR-0004: Memory Traces and Structured Goals](../adr/ADR-0004-memory-traces-and-structured-goals.md)
+
+---
+
+## 11. Open Questions
 
 1. **Entity Deduplication:** How to merge "Anna" and "Anna Schmidt" if AI discovers they're the same?
    - Fuzzy matching on name + context
@@ -1242,6 +1347,11 @@ persons = await neo4j.run("""
 4. **Cross-Tenant Entity Sharing:** Can "ACME Corp" be shared across tenants?
    - No (privacy) - each tenant has own entity graph
    - Future: Public entity registry for well-known entities (companies, places)
+
+5. **Trace Type Discovery:** How to handle new trace types?
+   - AI discovers `trace_type` from content structure
+   - No enum required - fully organic type emergence
+   - Background process can consolidate similar types
 
 ---
 
