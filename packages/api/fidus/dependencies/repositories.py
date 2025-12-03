@@ -11,6 +11,7 @@ from fastapi import Depends
 
 from fidus.dependencies.database import get_neo4j_driver
 from fidus.memory.repositories.user_repository import UserRepository
+from fidus.memory.repositories.person_repository import PersonRepository
 
 
 async def get_user_repository(
@@ -34,3 +35,26 @@ async def get_user_repository(
             return await repo.get(user_id, tenant_id)
     """
     yield UserRepository(driver)
+
+
+async def get_person_repository(
+    driver: AsyncDriver = Depends(get_neo4j_driver),
+) -> AsyncGenerator[PersonRepository, None]:
+    """
+    Get PersonRepository as FastAPI dependency.
+
+    Args:
+        driver: Neo4j driver (injected)
+
+    Yields:
+        PersonRepository: Repository instance
+
+    Usage:
+        @router.get("/person/{person_id}")
+        async def get_person(
+            person_id: str,
+            repo: PersonRepository = Depends(get_person_repository)
+        ):
+            return await repo.get(tenant_id, person_id)
+    """
+    yield PersonRepository(driver)

@@ -5,6 +5,10 @@ import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceVi
 import { SituationsViewer, SituationsViewerRef } from './components/SituationsViewer';
 import { MigrationStatus } from './components/MigrationStatus';
 import { UserProfile } from './components/UserProfile';
+import { PersonList, PersonListRef } from './components/PersonList';
+import { PersonDetail } from './components/PersonDetail';
+import { PersonForm } from './components/PersonForm';
+import { type Person } from '@/lib/api/memory';
 import { useState, useEffect, useRef } from 'react';
 import { getUserId, setUserId } from '../lib/userSession';
 
@@ -47,9 +51,12 @@ export default function FidusMemoryPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [conflicts, setConflicts] = useState<PreferenceConflict[]>([]);
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<'preferences' | 'situations' | 'profile' | 'admin'>('preferences');
+  const [sidebarTab, setSidebarTab] = useState<'preferences' | 'situations' | 'people' | 'profile' | 'admin'>('preferences');
   const preferenceViewerRef = useRef<PreferenceViewerRef>(null);
   const situationsViewerRef = useRef<SituationsViewerRef>(null);
+  const personListRef = useRef<PersonListRef>(null);
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [showPersonForm, setShowPersonForm] = useState(false);
 
   const fetchAIConfig = async () => {
     try {
@@ -522,6 +529,16 @@ export default function FidusMemoryPage() {
                 </button>
                 <button
                   className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
+                    sidebarTab === 'people'
+                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSidebarTab('people')}
+                >
+                  👥 People
+                </button>
+                <button
+                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
                     sidebarTab === 'profile'
                       ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -550,6 +567,50 @@ export default function FidusMemoryPage() {
                 {sidebarTab === 'situations' && (
                   <SituationsViewer ref={situationsViewerRef} className="p-4" />
                 )}
+                {sidebarTab === 'people' && (
+                  <div className="flex flex-col h-full">
+                    {selectedPerson ? (
+                      <PersonDetail
+                        person={selectedPerson}
+                        onUpdate={(updated) => {
+                          setSelectedPerson(updated);
+                          personListRef.current?.refresh();
+                        }}
+                        onDelete={() => {
+                          setSelectedPerson(null);
+                          personListRef.current?.refresh();
+                        }}
+                        className="flex-1"
+                      />
+                    ) : (
+                      <>
+                        <div className="p-2 border-b border-gray-200">
+                          <button
+                            onClick={() => setShowPersonForm(true)}
+                            className="w-full px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                          >
+                            + Add Person
+                          </button>
+                        </div>
+                        <PersonList
+                          ref={personListRef}
+                          onSelectPerson={setSelectedPerson}
+                          className="flex-1"
+                        />
+                      </>
+                    )}
+                    {selectedPerson && (
+                      <div className="p-2 border-t border-gray-200">
+                        <button
+                          onClick={() => setSelectedPerson(null)}
+                          className="w-full px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
+                        >
+                          ← Back to List
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {sidebarTab === 'profile' && (
                   <UserProfile userId={getUserId() || ''} tenantId="default" />
                 )}
@@ -572,6 +633,17 @@ export default function FidusMemoryPage() {
           </div>
         </Stack>
       </Container>
+
+      {/* Person Form Modal */}
+      <PersonForm
+        open={showPersonForm}
+        onOpenChange={setShowPersonForm}
+        onCreated={(person) => {
+          personListRef.current?.refresh();
+          setSelectedPerson(person);
+          setSidebarTab('people');
+        }}
+      />
     </div>
   );
 }
