@@ -134,6 +134,9 @@ services:
       # v3.0 Person Entity Feature Flag
       ENABLE_PERSON_ENTITY: ${ENABLE_PERSON_ENTITY:-true}
 
+      # v3.0 Organization Entity Feature Flag
+      ENABLE_ORGANIZATION_ENTITY: ${ENABLE_ORGANIZATION_ENTITY:-true}
+
       # CORS
       CORS_ORIGINS: http://localhost:3001,http://memory-web:3000
     ports:

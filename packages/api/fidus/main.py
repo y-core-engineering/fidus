@@ -6,7 +6,7 @@ load_dotenv()
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fidus.api.routes import memory, mcp, health, admin, user, person
+from fidus.api.routes import memory, mcp, health, admin, user, person, organization
 from fidus.api.middleware.auth import SimpleAuthMiddleware
 from fidus.memory.mcp_server import PreferenceMCPServer
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -44,6 +44,7 @@ app.include_router(mcp.router)     # MCP endpoints (auth required)
 app.include_router(admin.router)   # Admin endpoints (auth required)
 app.include_router(user.router)    # User profile endpoints (auth required)
 app.include_router(person.router)  # Person entity endpoints (feature flag protected)
+app.include_router(organization.router)  # Organization entity endpoints (feature flag protected)
 
 
 @app.on_event("startup")
