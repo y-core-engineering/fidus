@@ -3,7 +3,7 @@ import os
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from typing import Dict, List, Any, AsyncGenerator
+from typing import Dict, List, Any, AsyncGenerator, Optional
 from litellm import acompletion
 
 logger = logging.getLogger(__name__)

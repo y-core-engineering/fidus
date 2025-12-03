@@ -5,6 +5,7 @@ confidence scoring, accept/reject functionality, and context-aware
 preference learning (Phase 3: Situational Context Awareness).
 """
 
+import asyncio
 import json
 import logging
 from typing import Dict, List, Any, AsyncGenerator, Optional
@@ -12,7 +13,11 @@ from fidus.memory.simple_agent import InMemoryAgent
 from fidus.infrastructure.neo4j_client import Neo4jPreferenceStore
 from fidus.memory.context.agent import ContextAwareAgent
 from fidus.memory.repositories.user_repository import UserRepository
+from fidus.memory.repositories.person_repository import PersonRepository
 from fidus.memory.entities.user import User
+from fidus.memory.entities.person import Person
+from fidus.memory.services.person_extractor import PersonEntityExtractor
+from fidus.feature_flags import is_person_entity_enabled
 from fidus.config import config
 
 logger = logging.getLogger(__name__)
@@ -57,6 +62,14 @@ class PersistentAgent(InMemoryAgent):
         self.user_profile: Optional[User] = None
         self._user_repo: Optional[UserRepository] = None
 
+        # v3.0: Person entity extraction (when enabled via feature flag)
+        self._person_repo: Optional[PersonRepository] = None
+        self._person_extractor: Optional[PersonEntityExtractor] = None
+        self._enable_person_extraction = is_person_entity_enabled()
+        if self._enable_person_extraction:
+            self._person_extractor = PersonEntityExtractor()
+            logger.info("Person entity extraction enabled (v3.0)")
+
         # Initialize ContextAwareAgent for Phase 3
         if enable_context_awareness:
             self.context_agent = ContextAwareAgent()
@@ -74,6 +87,11 @@ class PersistentAgent(InMemoryAgent):
 
             # Initialize user repository with Neo4j driver
             self._user_repo = UserRepository(self.store._driver)
+
+            # v3.0: Initialize person repository (when enabled)
+            if self._enable_person_extraction:
+                self._person_repo = PersonRepository(self.store._driver)
+                logger.info("Person repository initialized")
 
             # Load existing preferences from Neo4j
             await self._load_preferences()
@@ -635,7 +653,7 @@ IMPORTANT:
             user_id: User identifier for context tracking (Phase 3)
 
         Yields:
-            str: SSE events (tokens, preferences_updated, conflicts, done)
+            str: SSE events (tokens, preferences_updated, conflicts, persons_extracted, done)
         """
         # Phase 3: Store message and user_id for context recording
         self._last_user_message = user_message
@@ -645,6 +663,13 @@ IMPORTANT:
         # This is reused later in _persist_pending_saves() for record_preference_with_context()
         self._cached_context = None
         self._cached_embedding = None
+
+        # v3.0: Start person extraction in parallel (if enabled)
+        person_task = None
+        if self._enable_person_extraction:
+            person_task = asyncio.create_task(
+                self._extract_and_save_persons(user_message, user_id)
+            )
 
         # Phase 3: Get context-relevant preferences before generating response
         if self.enable_context_awareness and self.context_agent:
@@ -703,7 +728,29 @@ IMPORTANT:
                         yield event
                         continue
                     elif event_type == "done":
-                        # Just yield done - persistence already happened at preferences_updated
+                        # v3.0: Await person extraction and emit event before done
+                        if person_task:
+                            try:
+                                saved_persons = await person_task
+                                if saved_persons:
+                                    # Emit persons_extracted event for frontend
+                                    yield json.dumps({
+                                        "type": "persons_extracted",
+                                        "count": len(saved_persons),
+                                        "persons": [
+                                            {
+                                                "id": p.id,
+                                                "name": p.name,
+                                                "profession": p.profession,
+                                            }
+                                            for p in saved_persons
+                                        ],
+                                    }) + "\n"
+                            except Exception as e:
+                                logger.warning(f"Person extraction task failed: {e}")
+                            person_task = None  # Clear task reference
+
+                        # Now yield done - persistence already happened at preferences_updated
                         yield event
                         continue
                 except json.JSONDecodeError:
@@ -712,6 +759,14 @@ IMPORTANT:
                 # Yield all other events (tokens, acknowledged, etc.)
                 yield event
         finally:
+            # v3.0: Cancel person task if still running (e.g., on error)
+            if person_task and not person_task.done():
+                person_task.cancel()
+                try:
+                    await person_task
+                except asyncio.CancelledError:
+                    pass
+
             # Phase 3: Restore original preferences after stream
             if self.enable_context_awareness and self.context_agent:
                 # Merge any NEW preferences learned during chat back into original
@@ -725,3 +780,81 @@ IMPORTANT:
             # Clear cached context and embedding to free memory
             self._cached_context = None
             self._cached_embedding = None
+
+    async def _extract_and_save_persons(
+        self,
+        message: str,
+        user_id: str,
+    ) -> List[Person]:
+        """Extract person entities from message and save to Neo4j.
+
+        v3.0: Person entity extraction runs in parallel with chat response.
+        Deduplicates by name (case-insensitive) and merges AI properties.
+
+        Args:
+            message: User message to extract persons from
+            user_id: User ID for ownership
+
+        Returns:
+            List of saved/updated Person entities
+        """
+        if not self._enable_person_extraction or not self._person_extractor:
+            return []
+
+        if not self._person_repo:
+            logger.warning("Person repository not initialized")
+            return []
+
+        try:
+            # Extract persons using LLM
+            extracted_persons = await self._person_extractor.extract_from_conversation(message)
+
+            if not extracted_persons:
+                return []
+
+            saved_persons = []
+            for person_data in extracted_persons:
+                try:
+                    # Check for existing person with same name (deduplication)
+                    existing = await self._person_repo.find_by_name_exact(
+                        tenant_id=self.tenant_id,
+                        user_id=user_id,
+                        name=person_data.name,
+                    )
+
+                    if existing:
+                        # Merge AI properties into existing person
+                        if person_data.ai_properties:
+                            updated = await self._person_repo.update_properties(
+                                tenant_id=self.tenant_id,
+                                person_id=existing.id,
+                                new_properties=person_data.ai_properties,
+                            )
+                            if updated:
+                                saved_persons.append(updated)
+                                logger.info(
+                                    f"Merged properties into existing person: {existing.name}",
+                                    extra={"person_id": existing.id, "user_id": user_id},
+                                )
+                    else:
+                        # Create new person
+                        new_person = await self._person_repo.create(
+                            tenant_id=self.tenant_id,
+                            user_id=user_id,
+                            person_data=person_data,
+                        )
+                        saved_persons.append(new_person)
+                        logger.info(
+                            f"Created new person: {new_person.name}",
+                            extra={"person_id": new_person.id, "user_id": user_id},
+                        )
+
+                except Exception as e:
+                    logger.warning(f"Failed to save person {person_data.name}: {e}")
+                    continue
+
+            return saved_persons
+
+        except Exception as e:
+            logger.error(f"Person extraction failed: {e}", exc_info=True)
+            return []

@@ -5,6 +5,7 @@ Provides feature flag utilities for gradual rollout and fallback capabilities.
 
 Usage:
     from fidus.feature_flags import is_user_entity_enabled, require_user_entity
+    from fidus.feature_flags import is_person_entity_enabled, require_person_entity
 
     if is_user_entity_enabled():
         # Use User entity as aggregate root
@@ -16,6 +17,8 @@ Usage:
 Environment Variables:
     USE_USER_ENTITY: Enable User entity as aggregate root (default: true)
                      Set to 'false' to use legacy tenant_id-based queries
+    ENABLE_PERSON_ENTITY: Enable Person entity CRUD (default: false)
+                          Set to 'true' to enable person management
 """
 
 import logging
@@ -111,6 +114,53 @@ def with_user_entity_fallback(
     return decorator
 
 
+def is_person_entity_enabled() -> bool:
+    """
+    Check if Person entity feature is enabled.
+
+    When enabled:
+    - Person CRUD API is available
+    - LLM extraction of persons is active
+    - Person management UI is accessible
+
+    When disabled:
+    - Person API returns 501 Not Implemented
+    - No persons are extracted from conversations
+
+    Returns:
+        bool: True if Person entity feature is enabled
+    """
+    return config.enable_person_entity
+
+
+def require_person_entity(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Decorator that requires Person entity feature to be enabled.
+
+    If the feature is disabled, returns 501 Not Implemented.
+    Use this for endpoints that only work with Person entity enabled.
+
+    Example:
+        @router.get("/person/{person_id}")
+        @require_person_entity
+        async def get_person(person_id: str, tenant_id: str):
+            ...
+    """
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        if not is_person_entity_enabled():
+            logger.warning(
+                f"Person entity feature disabled, blocking access to {func.__name__}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Person entity feature is currently disabled. "
+                       "Set ENABLE_PERSON_ENTITY=true to enable."
+            )
+        return await func(*args, **kwargs)
+    return wrapper
+
+
 def log_feature_status() -> None:
     """Log current feature flag status. Call on application startup."""
     if is_user_entity_enabled():
@@ -120,3 +170,8 @@ def log_feature_status() -> None:
             "Feature: USE_USER_ENTITY=false - Using legacy tenant_id queries. "
             "This is a fallback mode and should not be used in production."
         )
+
+    if is_person_entity_enabled():
+        logger.info("Feature: ENABLE_PERSON_ENTITY=true - Person entity CRUD is enabled")
+    else:
+        logger.info("Feature: ENABLE_PERSON_ENTITY=false - Person entity CRUD is disabled")

@@ -77,6 +77,7 @@ class PrototypeConfig:
 
         # Feature Flags
         self.use_user_entity: bool = os.getenv("USE_USER_ENTITY", "true").lower() == "true"
+        self.enable_person_entity: bool = os.getenv("ENABLE_PERSON_ENTITY", "false").lower() == "true"
 
     @property
     def is_production(self) -> bool:
