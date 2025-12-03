@@ -65,6 +65,10 @@ class PersistentAgent(InMemoryAgent):
         self.user_profile: Optional[User] = None
         self._user_repo: Optional[UserRepository] = None
 
+        # v3.0: Known persons and organizations (loaded on connect)
+        self.known_persons: List[Person] = []
+        self.known_organizations: List[Organization] = []
+
         # v3.0: Person entity extraction (when enabled via feature flag)
         self._person_repo: Optional[PersonRepository] = None
         self._person_extractor: Optional[PersonEntityExtractor] = None
@@ -114,6 +118,9 @@ class PersistentAgent(InMemoryAgent):
 
             # Load user profile (if exists)
             await self._load_user_profile()
+
+            # v3.0: Load known persons and organizations
+            await self._load_known_entities()
 
     async def disconnect(self) -> None:
         """Disconnect from Neo4j database and close context agent."""
@@ -186,6 +193,48 @@ class PersistentAgent(InMemoryAgent):
         """
         await self._load_user_profile()
 
+    async def _load_known_entities(self) -> None:
+        """Load known persons and organizations from Neo4j.
+
+        These entities are used to enrich the system prompt so the AI
+        can answer questions about people and organizations the user knows.
+        """
+        # Load persons (if feature enabled and repo available)
+        if self._enable_person_extraction and self._person_repo:
+            try:
+                # In multi-user mode, tenant_id = user_id = self.tenant_id (the UUID)
+                # This matches how entities are created in the person routes
+                self.known_persons = await self._person_repo.list_by_user(
+                    tenant_id=self.tenant_id,
+                    user_id=self.tenant_id,
+                    limit=50  # Limit to avoid context overflow
+                )
+                logger.info(f"Loaded {len(self.known_persons)} known persons")
+            except Exception as e:
+                logger.warning(f"Failed to load persons: {e}")
+                self.known_persons = []
+
+        # Load organizations (if feature enabled and repo available)
+        if self._enable_organization_extraction and self._organization_repo:
+            try:
+                # In multi-user mode, tenant_id = user_id = self.tenant_id (the UUID)
+                self.known_organizations = await self._organization_repo.list_by_user(
+                    tenant_id=self.tenant_id,
+                    user_id=self.tenant_id,
+                    limit=50  # Limit to avoid context overflow
+                )
+                logger.info(f"Loaded {len(self.known_organizations)} known organizations")
+            except Exception as e:
+                logger.warning(f"Failed to load organizations: {e}")
+                self.known_organizations = []
+
+    async def reload_known_entities(self) -> None:
+        """Reload known persons and organizations from database.
+
+        Call this after entity updates to refresh the cached data.
+        """
+        await self._load_known_entities()
+
     def _build_prompt(self) -> str:
         """Build system prompt with user profile and learned preferences.
 
@@ -255,6 +304,44 @@ IMPORTANT:
                 sentiment = pref.get('sentiment', 'neutral')
                 sentiment_prefix = "likes" if sentiment == "positive" else "dislikes" if sentiment == "negative" else "neutral about"
                 base += f"- {key}: {sentiment_prefix} {pref['value']}\n"
+            base += "\n"
+
+        # v3.0: Add known persons to the prompt
+        if self.known_persons:
+            base += "People the user knows:\n"
+            for person in self.known_persons:
+                # Build person description with available properties from ai_properties
+                desc_parts = [person.name]
+                props = person.ai_properties or {}
+                if props.get("relationship"):
+                    desc_parts.append(f"({props['relationship']})")
+                if person.profession:  # Uses property helper
+                    desc_parts.append(f"- {person.profession}")
+                if props.get("company"):
+                    desc_parts.append(f"at {props['company']}")
+                if props.get("email"):
+                    desc_parts.append(f"[{props['email']}]")
+                if props.get("notes"):
+                    desc_parts.append(f"({props['notes']})")
+                base += f"- {' '.join(desc_parts)}\n"
+            base += "\n"
+
+        # v3.0: Add known organizations to the prompt
+        if self.known_organizations:
+            base += "Organizations the user knows:\n"
+            for org in self.known_organizations:
+                # Build org description using property helpers (read from ai_properties)
+                desc_parts = [org.name]
+                if org.industry:  # Property helper
+                    desc_parts.append(f"({org.industry})")
+                if org.size:  # Property helper
+                    desc_parts.append(f"- {org.size}")
+                if org.location:  # Property helper
+                    desc_parts.append(f"in {org.location}")
+                props = org.ai_properties or {}
+                if props.get("description"):
+                    desc_parts.append(f"- {props['description']}")
+                base += f"- {' '.join(desc_parts)}\n"
             base += "\n"
 
         base += "Respond naturally and conversationally. Ask follow-up questions to learn more preferences."

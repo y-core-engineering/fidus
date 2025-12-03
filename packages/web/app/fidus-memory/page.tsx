@@ -1,16 +1,9 @@
 'use client';
 
-import { ChatInterface, Alert, Stack, Container, OpportunityCard, TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@fidus/ui';
-import { PreferenceViewer, PreferenceViewerRef } from './components/PreferenceViewer';
-import { SituationsViewer, SituationsViewerRef } from './components/SituationsViewer';
-import { MigrationStatus } from './components/MigrationStatus';
-import { UserProfile } from './components/UserProfile';
-import { PersonList, PersonListRef } from './components/PersonList';
-import { PersonDetail } from './components/PersonDetail';
-import { PersonForm } from './components/PersonForm';
-import { type Person } from '@/lib/api/memory';
-import { useState, useEffect, useRef } from 'react';
+import { ChatInterface, Alert, Stack, Container, OpportunityCard } from '@fidus/ui';
+import { useState, useEffect } from 'react';
 import { getUserId, setUserId } from '../lib/userSession';
+import { useChatPersistence } from '@/lib/hooks/useChatPersistence';
 
 interface Message {
   id: string;
@@ -45,18 +38,13 @@ interface AIConfig {
 }
 
 export default function FidusMemoryPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  // Use persisted chat messages (survives navigation within session)
+  const { messages, setMessages, clearMessages } = useChatPersistence();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [conflicts, setConflicts] = useState<PreferenceConflict[]>([]);
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<'preferences' | 'situations' | 'people' | 'profile' | 'admin'>('preferences');
-  const preferenceViewerRef = useRef<PreferenceViewerRef>(null);
-  const situationsViewerRef = useRef<SituationsViewerRef>(null);
-  const personListRef = useRef<PersonListRef>(null);
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-  const [showPersonForm, setShowPersonForm] = useState(false);
 
   const fetchAIConfig = async () => {
     try {
@@ -172,9 +160,7 @@ export default function FidusMemoryPage() {
                 break;
 
               case 'preferences_updated':
-                // Trigger refresh of PreferenceViewer and SituationsViewer via refs
-                preferenceViewerRef.current?.refresh();
-                situationsViewerRef.current?.refresh();
+                // Preferences updated - viewers on other pages will refresh on navigation
                 break;
 
               case 'preference_conflict':
@@ -335,10 +321,10 @@ export default function FidusMemoryPage() {
             </Alert>
           )}
 
-          {/* Main Content: Chat + Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg" style={{ height: 'calc(100vh - 280px)' }}>
+          {/* Main Content: Chat */}
+          <div style={{ height: 'calc(100vh - 280px)' }}>
             {/* Chat Interface */}
-            <div className="lg:col-span-2 shadow-lg rounded-lg overflow-hidden h-full">
+            <div className="shadow-lg rounded-lg overflow-hidden h-full">
               <ChatInterface
                 messages={messages}
                 onSendMessage={handleSendMessage}
@@ -503,122 +489,6 @@ export default function FidusMemoryPage() {
               </ChatInterface>
             </div>
 
-            {/* Sidebar with Tabs */}
-            <div className="shadow-lg rounded-lg overflow-hidden bg-white h-full" style={{ display: 'flex', flexDirection: 'column' }}>
-              {/* Tab Headers */}
-              <div className="flex border-b border-gray-200">
-                <button
-                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
-                    sidebarTab === 'preferences'
-                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSidebarTab('preferences')}
-                >
-                  📋 Preferences
-                </button>
-                <button
-                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
-                    sidebarTab === 'situations'
-                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSidebarTab('situations')}
-                >
-                  🎯 Situations
-                </button>
-                <button
-                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
-                    sidebarTab === 'people'
-                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSidebarTab('people')}
-                >
-                  👥 People
-                </button>
-                <button
-                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
-                    sidebarTab === 'profile'
-                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSidebarTab('profile')}
-                >
-                  👤 Profile
-                </button>
-                <button
-                  className={`flex-1 px-4 py-3 font-medium text-sm transition-colors ${
-                    sidebarTab === 'admin'
-                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSidebarTab('admin')}
-                >
-                  ⚙️ Admin
-                </button>
-              </div>
-
-              {/* Tab Content */}
-              <div className="flex-1 overflow-y-auto">
-                {sidebarTab === 'preferences' && (
-                  <PreferenceViewer ref={preferenceViewerRef} />
-                )}
-                {sidebarTab === 'situations' && (
-                  <SituationsViewer ref={situationsViewerRef} className="p-4" />
-                )}
-                {sidebarTab === 'people' && (
-                  <div className="flex flex-col h-full">
-                    {selectedPerson ? (
-                      <PersonDetail
-                        person={selectedPerson}
-                        onUpdate={(updated) => {
-                          setSelectedPerson(updated);
-                          personListRef.current?.refresh();
-                        }}
-                        onDelete={() => {
-                          setSelectedPerson(null);
-                          personListRef.current?.refresh();
-                        }}
-                        className="flex-1"
-                      />
-                    ) : (
-                      <>
-                        <div className="p-2 border-b border-gray-200">
-                          <button
-                            onClick={() => setShowPersonForm(true)}
-                            className="w-full px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
-                          >
-                            + Add Person
-                          </button>
-                        </div>
-                        <PersonList
-                          ref={personListRef}
-                          onSelectPerson={setSelectedPerson}
-                          className="flex-1"
-                        />
-                      </>
-                    )}
-                    {selectedPerson && (
-                      <div className="p-2 border-t border-gray-200">
-                        <button
-                          onClick={() => setSelectedPerson(null)}
-                          className="w-full px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
-                        >
-                          ← Back to List
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-                {sidebarTab === 'profile' && (
-                  <UserProfile userId={getUserId() || ''} tenantId="default" />
-                )}
-                {sidebarTab === 'admin' && (
-                  <MigrationStatus className="p-4" />
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Privacy Notice */}
@@ -633,17 +503,6 @@ export default function FidusMemoryPage() {
           </div>
         </Stack>
       </Container>
-
-      {/* Person Form Modal */}
-      <PersonForm
-        open={showPersonForm}
-        onOpenChange={setShowPersonForm}
-        onCreated={(person) => {
-          personListRef.current?.refresh();
-          setSelectedPerson(person);
-          setSidebarTab('people');
-        }}
-      />
     </div>
   );
 }
