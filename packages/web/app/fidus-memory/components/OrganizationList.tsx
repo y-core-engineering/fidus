@@ -7,6 +7,10 @@ import {
   TextInput,
   Skeleton,
   Chip,
+  Card,
+  Stack,
+  Select,
+  type SelectOption,
 } from '@fidus/ui';
 import {
   type Organization,
@@ -16,16 +20,15 @@ import {
 import { getUserId } from '@/app/lib/userSession';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 
-const INDUSTRIES = [
-  'All Industries',
-  'Technology',
-  'AI Safety',
-  'Finance',
-  'Healthcare',
-  'Education',
-  'Manufacturing',
-  'Retail',
-  'Other',
+const INDUSTRY_OPTIONS: SelectOption[] = [
+  { value: 'Technology', label: 'Technology' },
+  { value: 'AI Safety', label: 'AI Safety' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Healthcare', label: 'Healthcare' },
+  { value: 'Education', label: 'Education' },
+  { value: 'Manufacturing', label: 'Manufacturing' },
+  { value: 'Retail', label: 'Retail' },
+  { value: 'Other', label: 'Other' },
 ];
 
 export interface OrganizationListRef {
@@ -41,7 +44,7 @@ export const OrganizationList = forwardRef<OrganizationListRef, OrganizationList
   ({ onSelectOrganization, className = '' }, ref) => {
     const queryClient = useQueryClient();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedIndustry, setSelectedIndustry] = useState('All Industries');
+    const [selectedIndustry, setSelectedIndustry] = useState('');
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const debouncedSearch = useDebounce(searchQuery, 300);
     const userId = getUserId();
@@ -67,7 +70,7 @@ export const OrganizationList = forwardRef<OrganizationListRef, OrganizationList
       queryFn: () => listOrganizations(
         userId!,
         debouncedSearch || undefined,
-        selectedIndustry !== 'All Industries' ? selectedIndustry : undefined
+        selectedIndustry || undefined
       ),
       enabled: !!userId && featureStatus?.enabled === true,
       staleTime: 30 * 1000, // 30 seconds
@@ -116,12 +119,9 @@ export const OrganizationList = forwardRef<OrganizationListRef, OrganizationList
       return (
         <div className={`p-4 space-y-4 ${className}`}>
           <Skeleton className="h-10 w-full" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-          </div>
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
         </div>
       );
     }
@@ -140,7 +140,7 @@ export const OrganizationList = forwardRef<OrganizationListRef, OrganizationList
     return (
       <div className={`flex flex-col h-full ${className}`}>
         {/* Search bar and industry filter */}
-        <div className="p-4 border-b border-gray-200 space-y-3">
+        <div className="p-4 border-b border-border space-y-3">
           <TextInput
             label=""
             placeholder="Search organizations..."
@@ -148,86 +148,80 @@ export const OrganizationList = forwardRef<OrganizationListRef, OrganizationList
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
           />
-          <select
+          <Select
+            label=""
+            placeholder="All Industries"
             value={selectedIndustry}
-            onChange={(e) => setSelectedIndustry(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-          >
-            {INDUSTRIES.map((industry) => (
-              <option key={industry} value={industry}>
-                {industry}
-              </option>
-            ))}
-          </select>
+            options={INDUSTRY_OPTIONS}
+            onChange={(value) => setSelectedIndustry(value)}
+            clearable
+            className="w-full"
+          />
         </div>
 
-        {/* Organization grid */}
+        {/* Organization list */}
         <div className="flex-1 overflow-y-auto p-4">
           {organizations.length === 0 ? (
-            <div className="text-center text-gray-500">
+            <div className="text-center text-muted-foreground">
               <p>No organizations found.</p>
               <p className="text-sm mt-2">
                 Start a conversation to extract organization information automatically.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Stack direction="vertical" spacing="sm">
               {organizations.map((org) => (
-                <div
+                <Card
                   key={org.id}
-                  className={`p-4 cursor-pointer hover:shadow-md transition-shadow bg-white border border-gray-200 rounded-lg ${
-                    selectedId === org.id ? 'ring-2 ring-blue-500' : ''
-                  }`}
+                  interactive
+                  selected={selectedId === org.id}
                   onClick={() => handleSelectOrganization(org)}
+                  padding="md"
                 >
-                  <div className="flex items-start gap-3">
-                    {/* Organization icon/logo placeholder */}
-                    <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-lg font-semibold">
-                      {org.name.charAt(0).toUpperCase()}
-                    </div>
+                  <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate">
+                      <h3 className="font-medium text-foreground truncate">
                         {org.name}
                       </h3>
                       {org.industry && (
-                        <p className="text-sm text-gray-600 truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           {org.industry}
                         </p>
                       )}
                       {org.location && (
-                        <p className="text-xs text-gray-500 truncate">
-                          {org.location}
-                        </p>
+                        <div className="flex gap-1 mt-1 flex-wrap">
+                          <Chip size="sm">{org.location}</Chip>
+                          {org.size && (
+                            <Chip size="sm" variant="outlined">
+                              {org.size}
+                            </Chip>
+                          )}
+                        </div>
                       )}
-                      <div className="flex gap-1 mt-2 flex-wrap">
-                        {org.size && (
-                          <Chip size="sm" variant="outlined">
-                            {org.size}
-                          </Chip>
-                        )}
-                        <Chip
-                          size="sm"
-                          variant={org.source === 'explicit' ? 'filled' : 'outlined'}
-                        >
-                          {org.source}
-                        </Chip>
-                        <Chip
-                          size="sm"
-                          variant={org.confidence >= 0.9 ? 'filled' : 'outlined'}
-                        >
-                          {Math.round(org.confidence * 100)}%
-                        </Chip>
-                      </div>
+                    </div>
+                    <div className="ml-2 flex flex-col items-end gap-1">
+                      <Chip
+                        size="sm"
+                        variant={org.source === 'explicit' ? 'filled' : 'outlined'}
+                      >
+                        {org.source}
+                      </Chip>
+                      <Chip
+                        size="sm"
+                        variant={org.confidence >= 0.9 ? 'filled' : 'outlined'}
+                      >
+                        {Math.round(org.confidence * 100)}%
+                      </Chip>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
-            </div>
+            </Stack>
           )}
         </div>
 
         {/* Footer with count */}
-        <div className="p-2 border-t border-gray-200 text-xs text-gray-500 text-center">
+        <div className="p-2 border-t border-border text-xs text-muted-foreground text-center">
           {organizations.length} organization{organizations.length !== 1 ? 's' : ''}
         </div>
       </div>
