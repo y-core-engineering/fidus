@@ -38,6 +38,7 @@ class EmbeddingService:
             model: Embedding model to use (defaults to config.embedding_model)
         """
         self.model = model or config.embedding_model
+        self._config = config
         self.expected_dimension = config.get_embedding_dimension()
 
         logger.info(
@@ -107,15 +108,14 @@ class EmbeddingService:
             # Add api_base for models using custom endpoints (LiteLLM/OpenAI-compatible)
             # Ollama models use OLLAMA_API_BASE, non-ollama models use OPENAI_API_BASE
             if self.model.startswith("ollama/"):
-                ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
+                ollama_base = self._config.ollama_api_base or "http://localhost:11434"
                 embedding_kwargs["api_base"] = ollama_base
                 logger.info(f"Using Ollama API base: {ollama_base}")
             else:
                 # For non-ollama models, use OPENAI_API_BASE if set
-                openai_base = os.getenv("OPENAI_API_BASE")
-                if openai_base:
-                    embedding_kwargs["api_base"] = openai_base
-                    logger.info(f"Using OpenAI API base: {openai_base}")
+                if self._config.openai_api_base:
+                    embedding_kwargs["api_base"] = self._config.openai_api_base
+                    logger.info(f"Using OpenAI API base: {self._config.openai_api_base}")
 
             # Generate embedding using LiteLLM
             response = embedding(**embedding_kwargs)
@@ -185,11 +185,23 @@ class EmbeddingService:
             return [0.0] * self.expected_dimension
 
         try:
+            # Build kwargs for embedding
+            embedding_kwargs = {
+                "model": self.model,
+                "input": [text],
+            }
+
+            # Add api_base for models using custom endpoints (LiteLLM/OpenAI-compatible)
+            if self.model.startswith("ollama/"):
+                ollama_base = self._config.ollama_api_base or "http://localhost:11434"
+                embedding_kwargs["api_base"] = ollama_base
+            elif self.model.startswith("openai/") or not "/" in self.model:
+                # For openai/ models or models without provider prefix, use OPENAI_API_BASE
+                if self._config.openai_api_base:
+                    embedding_kwargs["api_base"] = self._config.openai_api_base
+
             # Generate embedding using LiteLLM
-            response = embedding(
-                model=self.model,
-                input=[text],
-            )
+            response = embedding(**embedding_kwargs)
 
             # Extract embedding vector
             embedding_vector = response.data[0]["embedding"]

@@ -101,10 +101,12 @@ services:
     env_file:
       - .env.memory
     environment:
-      # LLM Configuration (loaded from .env.memory via env_file)
-      # OPENAI_API_BASE and FIDUS_LLM_MODEL are set in .env.memory
-      # Fallback to Ollama if not using external LLM
-      OLLAMA_API_BASE: ${OLLAMA_API_BASE:-http://ollama:11434}
+      # ==========================================================================
+      # LLM Configuration loaded from .env.memory:
+      # - OPENAI_API_BASE (LiteLLM Proxy URL)
+      # - OLLAMA_API_BASE (Local embeddings)
+      # - FIDUS_LLM_MODEL, FIDUS_CHAT_MODEL, etc.
+      # ==========================================================================
 
       # Application
       ENVIRONMENT: ${ENVIRONMENT:-production}
@@ -163,8 +165,12 @@ services:
     env_file:
       - .env.memory
     environment:
-      # LLM Configuration (loaded from .env.memory)
-      OLLAMA_API_BASE: ${OLLAMA_API_BASE:-http://ollama:11434}
+      # ==========================================================================
+      # LLM Configuration loaded from .env.memory:
+      # - OPENAI_API_BASE (LiteLLM Proxy URL: 192.168.10.32:4000)
+      # - OLLAMA_API_BASE (Local embeddings)
+      # - FIDUS_LLM_MODEL, FIDUS_CHAT_MODEL, etc.
+      # ==========================================================================
 
       # Application
       ENVIRONMENT: ${ENVIRONMENT:-production}
