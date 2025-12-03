@@ -7,6 +7,8 @@ import {
   TextInput,
   Skeleton,
   Chip,
+  Card,
+  Stack,
 } from '@fidus/ui';
 import {
   type Person,
@@ -120,7 +122,7 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
     return (
       <div className={`flex flex-col h-full ${className}`}>
         {/* Search bar */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-border">
           <TextInput
             label=""
             placeholder="Search persons..."
@@ -131,31 +133,31 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
         </div>
 
         {/* Person list */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto p-4">
           {persons.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
+            <div className="text-center text-muted-foreground">
               <p>No persons found.</p>
               <p className="text-sm mt-2">
                 Start a conversation to extract person information automatically.
               </p>
             </div>
           ) : (
-            <ul className="divide-y divide-gray-200">
+            <Stack direction="vertical" spacing="sm">
               {persons.map((person) => (
-                <li
+                <Card
                   key={person.id}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    selectedId === person.id ? 'bg-blue-50' : ''
-                  }`}
+                  interactive
+                  selected={selectedId === person.id}
                   onClick={() => handleSelectPerson(person)}
+                  padding="md"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate">
+                      <h3 className="font-medium text-foreground truncate">
                         {person.name}
                       </h3>
                       {person.profession && (
-                        <p className="text-sm text-gray-600 truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           {person.profession}
                         </p>
                       )}
@@ -189,14 +191,14 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
                       </Chip>
                     </div>
                   </div>
-                </li>
+                </Card>
               ))}
-            </ul>
+            </Stack>
           )}
         </div>
 
         {/* Footer with count */}
-        <div className="p-2 border-t border-gray-200 text-xs text-gray-500 text-center">
+        <div className="p-2 border-t border-border text-xs text-muted-foreground text-center">
           {persons.length} person{persons.length !== 1 ? 's' : ''}
         </div>
       </div>

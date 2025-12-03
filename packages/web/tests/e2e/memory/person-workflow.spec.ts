@@ -23,14 +23,14 @@ const TEST_TENANT_ID = 'test-tenant-e2e';
 
 test.describe('Person Entity Management', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to memory page with test user context
-    await page.goto(`/fidus-memory?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
+    // Navigate to persons page with test user context
+    await page.goto(`/fidus-memory/persons?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
   });
 
   test.describe('Person List', () => {
     test('displays person list with header', async ({ page }) => {
       // Wait for the persons section to load
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Check that Add Person button exists
       await expect(page.getByRole('button', { name: 'Add Person' })).toBeVisible();
@@ -38,22 +38,22 @@ test.describe('Person Entity Management', () => {
 
     test('shows loading state initially', async ({ page }) => {
       // Navigate fresh to catch loading state
-      await page.goto(`/fidus-memory?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
+      await page.goto(`/fidus-memory/persons?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
 
       // Either loading state or content should be visible quickly
-      const heading = page.getByRole('heading', { name: 'People' });
+      const heading = page.getByRole('heading', { name: 'Persons' });
       await expect(heading).toBeVisible({ timeout: 5000 });
     });
 
     test('displays search input', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Check search input exists
       await expect(page.getByPlaceholder('Search people...')).toBeVisible();
     });
 
     test('can search for persons', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Enter search term
       const searchInput = page.getByPlaceholder('Search people...');
@@ -68,9 +68,9 @@ test.describe('Person Entity Management', () => {
 
     test('shows empty state when no persons exist', async ({ page }) => {
       // Use a user ID that has no persons
-      await page.goto(`/fidus-memory?userId=empty-user&tenantId=${TEST_TENANT_ID}`);
+      await page.goto(`/fidus-memory/persons?userId=empty-user&tenantId=${TEST_TENANT_ID}`);
 
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Should show empty state message
       await expect(
@@ -81,7 +81,7 @@ test.describe('Person Entity Management', () => {
 
   test.describe('Create Person', () => {
     test('opens create person modal', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Click Add Person button
       await page.getByRole('button', { name: 'Add Person' }).click();
@@ -92,7 +92,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('can close create modal with Cancel', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Open modal
       await page.getByRole('button', { name: 'Add Person' }).click();
@@ -106,7 +106,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('validates required name field', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Open modal
       await page.getByRole('button', { name: 'Add Person' }).click();
@@ -120,7 +120,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('can add and remove properties', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Open modal
       await page.getByRole('button', { name: 'Add Person' }).click();
@@ -145,7 +145,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('creates a person successfully', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Open modal
       await page.getByRole('button', { name: 'Add Person' }).click();
@@ -173,7 +173,7 @@ test.describe('Person Entity Management', () => {
 
   test.describe('Person Details', () => {
     test('shows person details when selected', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Wait for list to load and click first person
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
@@ -187,7 +187,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('shows metadata in details view', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Click on a person
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
@@ -202,7 +202,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('displays empty state when no person selected', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Should show instruction to select person
       await expect(page.getByText('Select a person to view details')).toBeVisible();
@@ -211,7 +211,7 @@ test.describe('Person Entity Management', () => {
 
   test.describe('Edit Person', () => {
     test('enables edit mode when Edit clicked', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // Select a person
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
@@ -230,7 +230,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('can cancel editing', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
       if (await personItem.isVisible()) {
@@ -250,7 +250,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('saves person updates', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
       if (await personItem.isVisible()) {
@@ -276,7 +276,7 @@ test.describe('Person Entity Management', () => {
 
   test.describe('Delete Person', () => {
     test('shows delete confirmation dialog', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
       if (await personItem.isVisible()) {
@@ -293,7 +293,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('can cancel delete dialog', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       const personItem = page.locator('[role="button"]').filter({ hasText: /.+/ }).first();
       if (await personItem.isVisible()) {
@@ -314,7 +314,7 @@ test.describe('Person Entity Management', () => {
     });
 
     test('deletes person successfully', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       // First create a person to delete
       await page.getByRole('button', { name: 'Add Person' }).click();
@@ -341,7 +341,7 @@ test.describe('Person Entity Management', () => {
 
   test.describe('Full CRUD Workflow', () => {
     test('complete create → view → edit → delete workflow', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'People' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Persons' })).toBeVisible();
 
       const testName = `Workflow Test ${Date.now()}`;
 
