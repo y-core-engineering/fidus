@@ -6,6 +6,7 @@ Provides feature flag utilities for gradual rollout and fallback capabilities.
 Usage:
     from fidus.feature_flags import is_user_entity_enabled, require_user_entity
     from fidus.feature_flags import is_person_entity_enabled, require_person_entity
+    from fidus.feature_flags import is_organization_entity_enabled, require_organization_entity
 
     if is_user_entity_enabled():
         # Use User entity as aggregate root
@@ -19,6 +20,8 @@ Environment Variables:
                      Set to 'false' to use legacy tenant_id-based queries
     ENABLE_PERSON_ENTITY: Enable Person entity CRUD (default: false)
                           Set to 'true' to enable person management
+    ENABLE_ORGANIZATION_ENTITY: Enable Organization entity CRUD (default: false)
+                                Set to 'true' to enable organization management
 """
 
 import logging
@@ -161,6 +164,53 @@ def require_person_entity(func: Callable[P, T]) -> Callable[P, T]:
     return wrapper
 
 
+def is_organization_entity_enabled() -> bool:
+    """
+    Check if Organization entity feature is enabled.
+
+    When enabled:
+    - Organization CRUD API is available
+    - LLM extraction of organizations is active
+    - Organization management UI is accessible
+
+    When disabled:
+    - Organization API returns 501 Not Implemented
+    - No organizations are extracted from conversations
+
+    Returns:
+        bool: True if Organization entity feature is enabled
+    """
+    return config.enable_organization_entity
+
+
+def require_organization_entity(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Decorator that requires Organization entity feature to be enabled.
+
+    If the feature is disabled, returns 501 Not Implemented.
+    Use this for endpoints that only work with Organization entity enabled.
+
+    Example:
+        @router.get("/organization/{org_id}")
+        @require_organization_entity
+        async def get_organization(org_id: str, tenant_id: str):
+            ...
+    """
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        if not is_organization_entity_enabled():
+            logger.warning(
+                f"Organization entity feature disabled, blocking access to {func.__name__}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Organization entity feature is currently disabled. "
+                       "Set ENABLE_ORGANIZATION_ENTITY=true to enable."
+            )
+        return await func(*args, **kwargs)
+    return wrapper
+
+
 def log_feature_status() -> None:
     """Log current feature flag status. Call on application startup."""
     if is_user_entity_enabled():
@@ -175,3 +225,8 @@ def log_feature_status() -> None:
         logger.info("Feature: ENABLE_PERSON_ENTITY=true - Person entity CRUD is enabled")
     else:
         logger.info("Feature: ENABLE_PERSON_ENTITY=false - Person entity CRUD is disabled")
+
+    if is_organization_entity_enabled():
+        logger.info("Feature: ENABLE_ORGANIZATION_ENTITY=true - Organization entity CRUD is enabled")
+    else:
+        logger.info("Feature: ENABLE_ORGANIZATION_ENTITY=false - Organization entity CRUD is disabled")

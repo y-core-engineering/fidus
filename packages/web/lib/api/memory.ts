@@ -371,3 +371,200 @@ export async function listPersons(
   }
   return response.json();
 }
+
+// ==================== Organization Types ====================
+
+export interface Organization {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  name: string;
+  ai_properties: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  confidence: number;
+  source: string;
+  // Convenience properties extracted from ai_properties
+  industry: string | null;
+  size: string | null;
+  location: string | null;
+  culture: string | null;
+  website: string | null;
+  description: string | null;
+}
+
+export interface OrganizationCreate {
+  name: string;
+  ai_properties?: Record<string, unknown>;
+  confidence?: number;
+  source?: string;
+}
+
+export interface OrganizationUpdate {
+  name?: string;
+  ai_properties?: Record<string, unknown>;
+}
+
+export interface OrganizationFeatureStatus {
+  feature: string;
+  enabled: boolean;
+  description: string;
+  hint: string;
+}
+
+// ==================== Organization API Functions ====================
+
+/**
+ * Check if the Organization entity feature is enabled.
+ *
+ * @returns Feature status object
+ * @throws Error if the request fails
+ */
+export async function getOrganizationFeatureStatus(): Promise<OrganizationFeatureStatus> {
+  const response = await fetch('/api/memory/entities/organization/feature-status');
+  if (!response.ok) {
+    throw new Error('Failed to check organization feature status');
+  }
+  return response.json();
+}
+
+/**
+ * Fetch an organization by ID.
+ *
+ * @param orgId - The organization's unique identifier
+ * @returns The organization object
+ * @throws Error if the request fails or feature is disabled
+ */
+export async function getOrganization(orgId: string): Promise<Organization> {
+  const response = await fetch(`/api/memory/entities/organization/${orgId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Organization not found');
+    }
+    if (response.status === 501) {
+      throw new Error('Organization feature is disabled');
+    }
+    throw new Error('Failed to fetch organization');
+  }
+  return response.json();
+}
+
+/**
+ * Create a new organization.
+ *
+ * @param orgData - The organization creation data
+ * @returns The created organization object
+ * @throws Error if the request fails or feature is disabled
+ */
+export async function createOrganization(orgData: OrganizationCreate): Promise<Organization> {
+  const response = await fetch('/api/memory/entities/organization', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(orgData),
+  });
+  if (!response.ok) {
+    if (response.status === 501) {
+      throw new Error('Organization feature is disabled');
+    }
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || 'Failed to create organization');
+  }
+  return response.json();
+}
+
+/**
+ * Update an organization's properties.
+ *
+ * Properties are MERGED, not overwritten:
+ * - New keys are added
+ * - List values are unioned
+ * - Existing scalar values are preserved
+ *
+ * @param orgId - The organization's unique identifier
+ * @param updates - The fields to update
+ * @returns The updated organization object
+ * @throws Error if the request fails or feature is disabled
+ */
+export async function updateOrganization(
+  orgId: string,
+  updates: OrganizationUpdate
+): Promise<Organization> {
+  const response = await fetch(`/api/memory/entities/organization/${orgId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(updates),
+  });
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Organization not found');
+    }
+    if (response.status === 501) {
+      throw new Error('Organization feature is disabled');
+    }
+    throw new Error('Failed to update organization');
+  }
+  return response.json();
+}
+
+/**
+ * Delete an organization.
+ *
+ * @param orgId - The organization's unique identifier
+ * @throws Error if the request fails or feature is disabled
+ */
+export async function deleteOrganization(orgId: string): Promise<void> {
+  const response = await fetch(`/api/memory/entities/organization/${orgId}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Organization not found');
+    }
+    if (response.status === 501) {
+      throw new Error('Organization feature is disabled');
+    }
+    throw new Error('Failed to delete organization');
+  }
+}
+
+/**
+ * List all organizations for the current user.
+ *
+ * @param userId - The user ID to filter by
+ * @param search - Optional search query for name fuzzy matching
+ * @param industry - Optional filter by industry
+ * @param limit - Maximum number of organizations to return (default: 100)
+ * @returns Array of organization objects
+ * @throws Error if the request fails or feature is disabled
+ */
+export async function listOrganizations(
+  userId: string,
+  search?: string,
+  industry?: string,
+  limit: number = 100
+): Promise<Organization[]> {
+  const params = new URLSearchParams({
+    user_id: userId,
+    limit: limit.toString(),
+  });
+  if (search) {
+    params.set('q', search);
+  }
+  if (industry) {
+    params.set('industry', industry);
+  }
+
+  const response = await fetch(`/api/memory/entities/organization?${params}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    if (response.status === 501) {
+      throw new Error('Organization feature is disabled');
+    }
+    throw new Error('Failed to fetch organizations');
+  }
+  return response.json();
+}

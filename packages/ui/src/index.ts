@@ -18,6 +18,7 @@ export * from './components/chip';
 export * from './components/avatar';
 
 // Card Components
+export * from './components/card';
 export * from './components/opportunity-card';
 export * from './components/detail-card';
 export * from './components/empty-card';

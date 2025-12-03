@@ -17,7 +17,10 @@ from fidus.memory.repositories.person_repository import PersonRepository
 from fidus.memory.entities.user import User
 from fidus.memory.entities.person import Person
 from fidus.memory.services.person_extractor import PersonEntityExtractor
-from fidus.feature_flags import is_person_entity_enabled
+from fidus.memory.services.organization_extractor import OrganizationEntityExtractor
+from fidus.memory.repositories.organization_repository import OrganizationRepository
+from fidus.memory.entities.organization import Organization
+from fidus.feature_flags import is_person_entity_enabled, is_organization_entity_enabled
 from fidus.config import config
 
 logger = logging.getLogger(__name__)
@@ -62,6 +65,10 @@ class PersistentAgent(InMemoryAgent):
         self.user_profile: Optional[User] = None
         self._user_repo: Optional[UserRepository] = None
 
+        # v3.0: Known persons and organizations (loaded on connect)
+        self.known_persons: List[Person] = []
+        self.known_organizations: List[Organization] = []
+
         # v3.0: Person entity extraction (when enabled via feature flag)
         self._person_repo: Optional[PersonRepository] = None
         self._person_extractor: Optional[PersonEntityExtractor] = None
@@ -69,6 +76,14 @@ class PersistentAgent(InMemoryAgent):
         if self._enable_person_extraction:
             self._person_extractor = PersonEntityExtractor()
             logger.info("Person entity extraction enabled (v3.0)")
+
+        # v3.0: Organization entity extraction (when enabled via feature flag)
+        self._organization_repo: Optional[OrganizationRepository] = None
+        self._organization_extractor: Optional[OrganizationEntityExtractor] = None
+        self._enable_organization_extraction = is_organization_entity_enabled()
+        if self._enable_organization_extraction:
+            self._organization_extractor = OrganizationEntityExtractor()
+            logger.info("Organization entity extraction enabled (v3.0)")
 
         # Initialize ContextAwareAgent for Phase 3
         if enable_context_awareness:
@@ -93,11 +108,19 @@ class PersistentAgent(InMemoryAgent):
                 self._person_repo = PersonRepository(self.store._driver)
                 logger.info("Person repository initialized")
 
+            # v3.0: Initialize organization repository (when enabled)
+            if self._enable_organization_extraction:
+                self._organization_repo = OrganizationRepository(self.store._driver)
+                logger.info("Organization repository initialized")
+
             # Load existing preferences from Neo4j
             await self._load_preferences()
 
             # Load user profile (if exists)
             await self._load_user_profile()
+
+            # v3.0: Load known persons and organizations
+            await self._load_known_entities()
 
     async def disconnect(self) -> None:
         """Disconnect from Neo4j database and close context agent."""
@@ -170,6 +193,48 @@ class PersistentAgent(InMemoryAgent):
         """
         await self._load_user_profile()
 
+    async def _load_known_entities(self) -> None:
+        """Load known persons and organizations from Neo4j.
+
+        These entities are used to enrich the system prompt so the AI
+        can answer questions about people and organizations the user knows.
+        """
+        # Load persons (if feature enabled and repo available)
+        if self._enable_person_extraction and self._person_repo:
+            try:
+                # In multi-user mode, tenant_id = user_id = self.tenant_id (the UUID)
+                # This matches how entities are created in the person routes
+                self.known_persons = await self._person_repo.list_by_user(
+                    tenant_id=self.tenant_id,
+                    user_id=self.tenant_id,
+                    limit=50  # Limit to avoid context overflow
+                )
+                logger.info(f"Loaded {len(self.known_persons)} known persons")
+            except Exception as e:
+                logger.warning(f"Failed to load persons: {e}")
+                self.known_persons = []
+
+        # Load organizations (if feature enabled and repo available)
+        if self._enable_organization_extraction and self._organization_repo:
+            try:
+                # In multi-user mode, tenant_id = user_id = self.tenant_id (the UUID)
+                self.known_organizations = await self._organization_repo.list_by_user(
+                    tenant_id=self.tenant_id,
+                    user_id=self.tenant_id,
+                    limit=50  # Limit to avoid context overflow
+                )
+                logger.info(f"Loaded {len(self.known_organizations)} known organizations")
+            except Exception as e:
+                logger.warning(f"Failed to load organizations: {e}")
+                self.known_organizations = []
+
+    async def reload_known_entities(self) -> None:
+        """Reload known persons and organizations from database.
+
+        Call this after entity updates to refresh the cached data.
+        """
+        await self._load_known_entities()
+
     def _build_prompt(self) -> str:
         """Build system prompt with user profile and learned preferences.
 
@@ -239,6 +304,44 @@ IMPORTANT:
                 sentiment = pref.get('sentiment', 'neutral')
                 sentiment_prefix = "likes" if sentiment == "positive" else "dislikes" if sentiment == "negative" else "neutral about"
                 base += f"- {key}: {sentiment_prefix} {pref['value']}\n"
+            base += "\n"
+
+        # v3.0: Add known persons to the prompt
+        if self.known_persons:
+            base += "People the user knows:\n"
+            for person in self.known_persons:
+                # Build person description with available properties from ai_properties
+                desc_parts = [person.name]
+                props = person.ai_properties or {}
+                if props.get("relationship"):
+                    desc_parts.append(f"({props['relationship']})")
+                if person.profession:  # Uses property helper
+                    desc_parts.append(f"- {person.profession}")
+                if props.get("company"):
+                    desc_parts.append(f"at {props['company']}")
+                if props.get("email"):
+                    desc_parts.append(f"[{props['email']}]")
+                if props.get("notes"):
+                    desc_parts.append(f"({props['notes']})")
+                base += f"- {' '.join(desc_parts)}\n"
+            base += "\n"
+
+        # v3.0: Add known organizations to the prompt
+        if self.known_organizations:
+            base += "Organizations the user knows:\n"
+            for org in self.known_organizations:
+                # Build org description using property helpers (read from ai_properties)
+                desc_parts = [org.name]
+                if org.industry:  # Property helper
+                    desc_parts.append(f"({org.industry})")
+                if org.size:  # Property helper
+                    desc_parts.append(f"- {org.size}")
+                if org.location:  # Property helper
+                    desc_parts.append(f"in {org.location}")
+                props = org.ai_properties or {}
+                if props.get("description"):
+                    desc_parts.append(f"- {props['description']}")
+                base += f"- {' '.join(desc_parts)}\n"
             base += "\n"
 
         base += "Respond naturally and conversationally. Ask follow-up questions to learn more preferences."
@@ -671,6 +774,13 @@ IMPORTANT:
                 self._extract_and_save_persons(user_message, user_id)
             )
 
+        # v3.0: Start organization extraction in parallel (if enabled)
+        organization_task = None
+        if self._enable_organization_extraction:
+            organization_task = asyncio.create_task(
+                self._extract_and_save_organizations(user_message, user_id)
+            )
+
         # Phase 3: Get context-relevant preferences before generating response
         if self.enable_context_awareness and self.context_agent:
             original_prefs = self.preferences.copy()
@@ -750,6 +860,28 @@ IMPORTANT:
                                 logger.warning(f"Person extraction task failed: {e}")
                             person_task = None  # Clear task reference
 
+                        # v3.0: Await organization extraction and emit event before done
+                        if organization_task:
+                            try:
+                                saved_orgs = await organization_task
+                                if saved_orgs:
+                                    # Emit organizations_extracted event for frontend
+                                    yield json.dumps({
+                                        "type": "organizations_extracted",
+                                        "count": len(saved_orgs),
+                                        "organizations": [
+                                            {
+                                                "id": org.id,
+                                                "name": org.name,
+                                                "industry": org.industry,
+                                            }
+                                            for org in saved_orgs
+                                        ],
+                                    }) + "\n"
+                            except Exception as e:
+                                logger.warning(f"Organization extraction task failed: {e}")
+                            organization_task = None  # Clear task reference
+
                         # Now yield done - persistence already happened at preferences_updated
                         yield event
                         continue
@@ -764,6 +896,14 @@ IMPORTANT:
                 person_task.cancel()
                 try:
                     await person_task
+                except asyncio.CancelledError:
+                    pass
+
+            # v3.0: Cancel organization task if still running (e.g., on error)
+            if organization_task and not organization_task.done():
+                organization_task.cancel()
+                try:
+                    await organization_task
                 except asyncio.CancelledError:
                     pass
 
@@ -857,4 +997,82 @@ IMPORTANT:
 
         except Exception as e:
             logger.error(f"Person extraction failed: {e}", exc_info=True)
+            return []
+
+    async def _extract_and_save_organizations(
+        self,
+        message: str,
+        user_id: str,
+    ) -> List[Organization]:
+        """Extract organization entities from message and save to Neo4j.
+
+        v3.0: Organization entity extraction runs in parallel with chat response.
+        Deduplicates by name (case-insensitive) and merges AI properties.
+
+        Args:
+            message: User message to extract organizations from
+            user_id: User ID for ownership
+
+        Returns:
+            List of saved/updated Organization entities
+        """
+        if not self._enable_organization_extraction or not self._organization_extractor:
+            return []
+
+        if not self._organization_repo:
+            logger.warning("Organization repository not initialized")
+            return []
+
+        try:
+            # Extract organizations using LLM
+            extracted_orgs = await self._organization_extractor.extract_from_conversation(message)
+
+            if not extracted_orgs:
+                return []
+
+            saved_orgs = []
+            for org_data in extracted_orgs:
+                try:
+                    # Check for existing organization with same name (deduplication)
+                    existing = await self._organization_repo.find_by_name_exact(
+                        tenant_id=self.tenant_id,
+                        user_id=user_id,
+                        name=org_data.name,
+                    )
+
+                    if existing:
+                        # Merge AI properties into existing organization
+                        if org_data.ai_properties:
+                            updated = await self._organization_repo.update_properties(
+                                tenant_id=self.tenant_id,
+                                org_id=existing.id,
+                                new_properties=org_data.ai_properties,
+                            )
+                            if updated:
+                                saved_orgs.append(updated)
+                                logger.info(
+                                    f"Merged properties into existing organization: {existing.name}",
+                                    extra={"organization_id": existing.id, "user_id": user_id},
+                                )
+                    else:
+                        # Create new organization
+                        new_org = await self._organization_repo.create(
+                            tenant_id=self.tenant_id,
+                            user_id=user_id,
+                            org_data=org_data,
+                        )
+                        saved_orgs.append(new_org)
+                        logger.info(
+                            f"Created new organization: {new_org.name}",
+                            extra={"organization_id": new_org.id, "user_id": user_id},
+                        )
+
+                except Exception as e:
+                    logger.warning(f"Failed to save organization {org_data.name}: {e}")
+                    continue
+
+            return saved_orgs
+
+        except Exception as e:
+            logger.error(f"Organization extraction failed: {e}", exc_info=True)
             return []

@@ -16,8 +16,8 @@ const TEST_TENANT_ID = 'test-tenant-e2e';
 
 test.describe('User Profile Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to memory page with test user context
-    await page.goto(`/fidus-memory?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
+    // Navigate to profile page with test user context
+    await page.goto(`/fidus-memory/profile?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
   });
 
   test('displays user profile with correct information', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('User Profile Page', () => {
 
   test('shows loading skeleton initially', async ({ page }) => {
     // Check for skeleton loading state (briefly visible)
-    await page.goto(`/fidus-memory?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
+    await page.goto(`/fidus-memory/profile?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
 
     // Either skeleton is visible or profile has loaded
     const skeleton = page.locator('[class*="skeleton"]');
@@ -123,7 +123,7 @@ test.describe('User Profile Page', () => {
 
   test('handles API errors gracefully', async ({ page }) => {
     // Navigate with invalid user ID
-    await page.goto(`/fidus-memory?userId=non-existent&tenantId=${TEST_TENANT_ID}`);
+    await page.goto(`/fidus-memory/profile?userId=non-existent&tenantId=${TEST_TENANT_ID}`);
 
     // Should show error alert
     await expect(page.getByText(/Failed to load user profile/)).toBeVisible({ timeout: 10000 });
@@ -132,7 +132,7 @@ test.describe('User Profile Page', () => {
 
 test.describe('Skills Editor', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`/fidus-memory?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
+    await page.goto(`/fidus-memory/profile?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
     await expect(page.getByRole('heading', { name: 'User Profile' })).toBeVisible();
     await page.getByRole('button', { name: 'Edit Profile' }).click();
   });
@@ -177,7 +177,7 @@ test.describe('Skills Editor', () => {
 
 test.describe('Language and Timezone Selection', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`/fidus-memory?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
+    await page.goto(`/fidus-memory/profile?userId=${TEST_USER_ID}&tenantId=${TEST_TENANT_ID}`);
     await expect(page.getByRole('heading', { name: 'User Profile' })).toBeVisible();
     await page.getByRole('button', { name: 'Edit Profile' }).click();
   });
