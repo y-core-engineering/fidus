@@ -20,6 +20,7 @@
   "dependencies": {
     "@fidus/shared": "workspace:*",
     "@fidus/ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.11",
     "axios": "^1.6.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

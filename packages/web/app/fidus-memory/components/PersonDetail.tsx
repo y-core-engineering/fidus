@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -32,9 +33,8 @@ export function PersonDetail({
   onDelete,
   className = '',
 }: PersonDetailProps) {
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Form state
@@ -44,46 +44,41 @@ export function PersonDetail({
   useEffect(() => {
     setName(person?.name || '');
     setIsEditing(false);
-    setError(null);
   }, [person]);
 
-  const resetForm = () => {
-    setName(person?.name || '');
-    setIsEditing(false);
-    setError(null);
-  };
-
-  const handleSave = async () => {
-    if (!person) return;
-
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      const updated = await updatePerson(person.id, { name });
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: (data: { name: string }) => updatePerson(person!.id, data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['persons'] });
       onUpdate?.(updated);
       setIsEditing(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update person');
-    } finally {
-      setIsSaving(false);
-    }
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: () => deletePerson(person!.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['persons'] });
+      onDelete?.(person!.id);
+      setShowDeleteDialog(false);
+    },
+  });
+
+  const handleSave = () => {
+    if (!person) return;
+    updateMutation.mutate({ name });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!person) return;
-
-    try {
-      await deletePerson(person.id);
-      onDelete?.(person.id);
-      setShowDeleteDialog(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete person');
-    }
+    deleteMutation.mutate();
   };
 
   const handleCancel = () => {
-    resetForm();
+    setName(person?.name || '');
+    setIsEditing(false);
   };
 
   // No person selected
@@ -95,11 +90,15 @@ export function PersonDetail({
     );
   }
 
+  const error = updateMutation.error || deleteMutation.error;
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {error && (
         <div className="p-4">
-          <Alert variant="error">{error}</Alert>
+          <Alert variant="error">
+            {error instanceof Error ? error.message : 'An error occurred'}
+          </Alert>
         </div>
       )}
 
@@ -112,13 +111,17 @@ export function PersonDetail({
           <div className="flex gap-2">
             {isEditing ? (
               <>
-                <Button onClick={handleSave} disabled={isSaving} size="sm">
-                  {isSaving ? 'Saving...' : 'Save'}
+                <Button
+                  onClick={handleSave}
+                  disabled={updateMutation.isPending}
+                  size="sm"
+                >
+                  {updateMutation.isPending ? 'Saving...' : 'Save'}
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={handleCancel}
-                  disabled={isSaving}
+                  disabled={updateMutation.isPending}
                   size="sm"
                 >
                   Cancel
@@ -248,8 +251,12 @@ export function PersonDetail({
             <Button variant="secondary" onClick={() => setShowDeleteDialog(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete Person
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete Person'}
             </Button>
           </ModalFooter>
         </ModalContent>
