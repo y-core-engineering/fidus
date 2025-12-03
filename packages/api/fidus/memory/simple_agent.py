@@ -13,10 +13,13 @@ class InMemoryAgent:
     """Simple chat agent with in-memory preference learning."""
 
     def __init__(self, llm_model: str | None = None, max_history_messages: int = 20):
-        self.llm_model = llm_model or os.getenv("FIDUS_LLM_MODEL", "gpt-4o-mini")
+        from fidus.config import config
+        # Use chat_model from config (optimized for conversations)
+        self.llm_model = llm_model or config.chat_model
+        self._config = config
         logger.info(f"Initializing InMemoryAgent with model: {self.llm_model}")
-        logger.info(f"FIDUS_LLM_MODEL env var: {os.getenv('FIDUS_LLM_MODEL')}")
-        logger.info(f"OLLAMA_API_BASE env var: {os.getenv('OLLAMA_API_BASE')}")
+        logger.info(f"FIDUS_CHAT_MODEL: {config.chat_model}")
+        logger.info(f"OPENAI_API_BASE: {config.openai_api_base}")
         self.preferences: Dict[str, Dict[str, Any]] = {}  # {domain.key: {value, sentiment, confidence, is_exception}}
         self.conversation_history: List[Dict[str, str]] = []
         self.max_history_messages = max_history_messages  # Sliding window size
@@ -65,10 +68,9 @@ class InMemoryAgent:
             logger.info(f"Using Ollama API base: {ollama_base}")
         else:
             # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
-            openai_base = os.getenv("OPENAI_API_BASE")
-            if openai_base:
-                completion_kwargs["api_base"] = openai_base
-                logger.info(f"Using OpenAI API base: {openai_base}")
+            if self._config.openai_api_base:
+                completion_kwargs["api_base"] = self._config.openai_api_base
+                logger.info(f"Using OpenAI API base: {self._config.openai_api_base}")
 
         # Disable thinking mode for Qwen3 models (returns empty content otherwise)
         if "qwen3" in self.llm_model.lower():
@@ -133,10 +135,9 @@ class InMemoryAgent:
             logger.info(f"Using Ollama API base: {ollama_base}")
         else:
             # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
-            openai_base = os.getenv("OPENAI_API_BASE")
-            if openai_base:
-                completion_kwargs["api_base"] = openai_base
-                logger.info(f"Using OpenAI API base: {openai_base}")
+            if self._config.openai_api_base:
+                completion_kwargs["api_base"] = self._config.openai_api_base
+                logger.info(f"Using OpenAI API base: {self._config.openai_api_base}")
 
         # Disable thinking mode for Qwen3 models (returns empty content otherwise)
         if "qwen3" in self.llm_model.lower():
@@ -287,13 +288,12 @@ class InMemoryAgent:
 
         # Add api_base for Ollama models
         if self.llm_model.startswith("ollama/"):
-            ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
+            ollama_base = self._config.ollama_api_base or "http://localhost:11434"
             completion_kwargs["api_base"] = ollama_base
         else:
             # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
-            openai_base = os.getenv("OPENAI_API_BASE")
-            if openai_base:
-                completion_kwargs["api_base"] = openai_base
+            if self._config.openai_api_base:
+                completion_kwargs["api_base"] = self._config.openai_api_base
 
         # Disable thinking mode for Qwen3 models (returns empty content otherwise)
         if "qwen3" in self.llm_model.lower():
@@ -399,13 +399,12 @@ Response:"""
 
             # Add api_base for Ollama models
             if self.llm_model.startswith("ollama/"):
-                ollama_base = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
+                ollama_base = self._config.ollama_api_base or "http://localhost:11434"
                 completion_kwargs["api_base"] = ollama_base
             else:
                 # For non-ollama models, use OPENAI_API_BASE if set (e.g., LiteLLM proxy)
-                openai_base = os.getenv("OPENAI_API_BASE")
-                if openai_base:
-                    completion_kwargs["api_base"] = openai_base
+                if self._config.openai_api_base:
+                    completion_kwargs["api_base"] = self._config.openai_api_base
 
             # Disable thinking mode for Qwen3 models (returns empty content otherwise)
             if "qwen3" in self.llm_model.lower():

@@ -125,26 +125,33 @@ export const SituationsViewer = forwardRef<SituationsViewerRef, SituationsViewer
         .join(' ');
     };
 
-    // Filter situations based on filter criteria
+    // Filter and sort situations based on filter criteria (newest first)
     const filteredSituations = useMemo(() => {
-      if (!filterKey && !filterValue) {
-        return situations;
+      let result = situations;
+
+      if (filterKey || filterValue) {
+        result = situations.filter((situation) => {
+          if (filterKey && filterValue) {
+            // Filter by specific key-value pair
+            return situation.factors[filterKey]?.toLowerCase().includes(filterValue.toLowerCase());
+          } else if (filterKey) {
+            // Filter by key existence
+            return filterKey in situation.factors;
+          } else if (filterValue) {
+            // Filter by value in any factor
+            return Object.values(situation.factors).some((val) =>
+              val.toLowerCase().includes(filterValue.toLowerCase())
+            );
+          }
+          return true;
+        });
       }
 
-      return situations.filter((situation) => {
-        if (filterKey && filterValue) {
-          // Filter by specific key-value pair
-          return situation.factors[filterKey]?.toLowerCase().includes(filterValue.toLowerCase());
-        } else if (filterKey) {
-          // Filter by key existence
-          return filterKey in situation.factors;
-        } else if (filterValue) {
-          // Filter by value in any factor
-          return Object.values(situation.factors).some((val) =>
-            val.toLowerCase().includes(filterValue.toLowerCase())
-          );
-        }
-        return true;
+      // Sort by created_at descending (newest first)
+      return [...result].sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return dateB - dateA;
       });
     }, [situations, filterKey, filterValue]);
 

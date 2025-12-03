@@ -41,13 +41,25 @@ class PrototypeConfig:
         self.qdrant_grpc_port: int = int(os.getenv("QDRANT_GRPC_PORT", "6334"))
 
         # LLM Configuration
-        self.llm_model: str = os.getenv("FIDUS_LLM_MODEL", "ollama/llama3.2:3b")
+        # Default model (fallback for all agents)
+        self.llm_model: str = os.getenv("FIDUS_LLM_MODEL", "gpt-4.1-mini")
         self.ollama_api_base: Optional[str] = os.getenv("OLLAMA_API_BASE")
+        self.openai_api_base: Optional[str] = os.getenv("OPENAI_API_BASE")
         self.openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY")
         self.anthropic_api_key: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
 
+        # Per-Agent LLM Models
+        # Chat Agent: Handles user conversations (fast, good instruction following)
+        self.chat_model: str = os.getenv("FIDUS_CHAT_MODEL", self.llm_model)
+        # Context Extraction: Extracts situational context from messages (structured output)
+        self.context_extraction_model: str = os.getenv("FIDUS_CONTEXT_MODEL", "gpt-4.1-nano")
+        # Preference Learning: Learns and stores user preferences (good understanding)
+        self.preference_model: str = os.getenv("FIDUS_PREFERENCE_MODEL", self.llm_model)
+        # Reasoning: Complex reasoning tasks (math, logic)
+        self.reasoning_model: str = os.getenv("FIDUS_REASONING_MODEL", "o4-mini")
+
         # Embedding Configuration
-        self.embedding_model: str = os.getenv("FIDUS_EMBEDDING_MODEL", "ollama/nomic-embed-text")
+        self.embedding_model: str = os.getenv("FIDUS_EMBEDDING_MODEL", "bge-m3")
         # Mapping of embedding models to their vector dimensions
         self.embedding_dimensions: dict[str, int] = {
             "ollama/nomic-embed-text": 768,

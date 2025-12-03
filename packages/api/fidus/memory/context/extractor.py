@@ -86,13 +86,15 @@ IMPORTANT: You MUST respond with ONLY valid JSON in exactly this format (no othe
         """Initialize the context extractor.
 
         Args:
-            model: LLM model to use (defaults to config.llm_model)
+            model: LLM model to use (defaults to config.context_extraction_model)
             temperature: LLM temperature for response variability
             max_tokens: Maximum tokens in LLM response
         """
-        self.model = model or config.llm_model
+        # Use context_extraction_model optimized for structured output
+        self.model = model or config.context_extraction_model
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self._config = config
 
     def _build_completion_kwargs(self, messages: list[dict]) -> dict:
         """Build completion kwargs with proper configuration for the model.
@@ -113,9 +115,8 @@ IMPORTANT: You MUST respond with ONLY valid JSON in exactly this format (no othe
 
         # Add api_base for non-ollama models using LiteLLM proxy
         if not self.model.startswith("ollama/"):
-            openai_base = os.getenv("OPENAI_API_BASE")
-            if openai_base:
-                completion_kwargs["api_base"] = openai_base
+            if self._config.openai_api_base:
+                completion_kwargs["api_base"] = self._config.openai_api_base
 
         # Disable thinking mode for Qwen3 models (returns empty content otherwise)
         if "qwen3" in self.model.lower():
