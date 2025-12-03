@@ -4,10 +4,9 @@ import { useState, forwardRef, useImperativeHandle } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
-  Button,
   TextInput,
   Skeleton,
-  Badge,
+  Chip,
 } from '@fidus/ui';
 import {
   type Person,
@@ -163,25 +162,31 @@ export const PersonList = forwardRef<PersonListRef, PersonListProps>(
                       {person.topics && person.topics.length > 0 && (
                         <div className="flex gap-1 mt-1 flex-wrap">
                           {person.topics.slice(0, 3).map((topic, idx) => (
-                            <Badge key={idx} variant="info" size="sm">
+                            <Chip key={idx} size="sm">
                               {topic}
-                            </Badge>
+                            </Chip>
                           ))}
                           {person.topics.length > 3 && (
-                            <Badge variant="info" size="sm">
+                            <Chip size="sm" variant="outlined">
                               +{person.topics.length - 3}
-                            </Badge>
+                            </Chip>
                           )}
                         </div>
                       )}
                     </div>
-                    <div className="ml-2 text-right">
-                      <Badge
-                        variant={person.confidence >= 0.9 ? 'success' : 'normal'}
+                    <div className="ml-2 flex flex-col items-end gap-1">
+                      <Chip
                         size="sm"
+                        variant={person.source === 'explicit' ? 'filled' : 'outlined'}
+                      >
+                        {person.source}
+                      </Chip>
+                      <Chip
+                        size="sm"
+                        variant={person.confidence >= 0.9 ? 'filled' : 'outlined'}
                       >
                         {Math.round(person.confidence * 100)}%
-                      </Badge>
+                      </Chip>
                     </div>
                   </div>
                 </li>

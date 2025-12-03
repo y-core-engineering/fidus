@@ -6,7 +6,7 @@ import {
   Alert,
   Button,
   TextInput,
-  Badge,
+  Chip,
   ModalRoot,
   ModalContent,
   ModalHeader,
@@ -182,9 +182,9 @@ export function PersonDetail({
             </label>
             <div className="flex flex-wrap gap-2">
               {person.topics.map((topic, idx) => (
-                <Badge key={idx} variant="info">
+                <Chip key={idx} size="sm">
                   {topic}
-                </Badge>
+                </Chip>
               ))}
             </div>
           </div>
